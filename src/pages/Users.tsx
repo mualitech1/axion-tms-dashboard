@@ -1,7 +1,6 @@
-
 import { useState } from 'react';
 import { 
-  Users, Shield, UserPlus, Search, 
+  Users as UsersIcon, Shield, UserPlus, Search, 
   Filter, MoreHorizontal, LockIcon, UserCog
 } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
@@ -25,7 +24,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import DashboardCard from '@/components/dashboard/DashboardCard';
 
-// Mock data for users
 const userData = [
   {
     id: 1,
@@ -74,7 +72,6 @@ const userData = [
   },
 ];
 
-// Role permissions
 const rolePermissions = {
   'Senior Management': {
     dashboard: true,
@@ -117,7 +114,6 @@ const rolePermissions = {
 export default function Users() {
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Filter users based on search term
   const filteredUsers = userData.filter(
     user => 
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -256,7 +252,7 @@ export default function Users() {
               <div className="space-y-4">
                 <div className="flex items-center">
                   <div className="bg-tms-blue-light p-2 rounded-full mr-3">
-                    <Users className="h-4 w-4 text-tms-blue" />
+                    <UsersIcon className="h-4 w-4 text-tms-blue" />
                   </div>
                   <div>
                     <div className="text-2xl font-semibold text-tms-gray-800">42</div>
