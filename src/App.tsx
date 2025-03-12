@@ -12,6 +12,8 @@ import Carriers from "./pages/Carriers";
 import Users from "./pages/Users";
 import Settings from "./pages/Settings";
 import Analytics from "./pages/Analytics";
+import Finance from "./pages/Finance";
+import Invoices from "./pages/Invoices";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +30,8 @@ const App = () => (
           <Route path="/carriers" element={<Carriers />} />
           <Route path="/users" element={<Users />} />
           <Route path="/analytics" element={<Analytics />} />
+          <Route path="/finance" element={<Finance />} />
+          <Route path="/invoices" element={<Invoices />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
