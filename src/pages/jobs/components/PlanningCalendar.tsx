@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, ArrowUpRight, Truck, MapPin } from "lucide-react";
+import { CalendarIcon, ArrowUpRight, Truck, MapPin, Clock } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
