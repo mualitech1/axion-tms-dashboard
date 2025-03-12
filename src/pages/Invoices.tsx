@@ -5,8 +5,12 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, Eye, Filter, PlusCircle, Search } from "lucide-react";
+import { FileText, Download, Eye, Filter, PlusCircle, Search, Briefcase } from "lucide-react";
 import { InputWithIcon } from "@/components/ui/input-with-icon";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock invoice data
 const invoices = [
@@ -62,11 +66,40 @@ const invoices = [
 
 export default function Invoices() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [createJobOpen, setCreateJobOpen] = useState(false);
+  const [jobTitle, setJobTitle] = useState("");
+  const [jobClient, setJobClient] = useState("");
+  const { toast } = useToast();
   
   const filteredInvoices = invoices.filter(invoice => 
     invoice.customer.toLowerCase().includes(searchQuery.toLowerCase()) || 
     invoice.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleCreateJob = () => {
+    // Simple validation
+    if (!jobTitle.trim() || !jobClient.trim()) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Here we would typically send the data to an API
+    // For demo purposes, we'll just show a success message
+    toast({
+      title: "Job created",
+      description: `Job '${jobTitle}' for ${jobClient} has been created successfully.`,
+      variant: "default"
+    });
+
+    // Reset form and close dialog
+    setJobTitle("");
+    setJobClient("");
+    setCreateJobOpen(false);
+  };
 
   return (
     <MainLayout title="Invoices">
@@ -131,6 +164,14 @@ export default function Invoices() {
               <Button variant="outline" size="icon">
                 <Filter className="h-4 w-4" />
               </Button>
+              <Button 
+                variant="outline"
+                className="gap-1"
+                onClick={() => setCreateJobOpen(true)}
+              >
+                <Briefcase className="h-4 w-4" />
+                Create Job
+              </Button>
               <Button className="gap-1">
                 <PlusCircle className="h-4 w-4" />
                 New Invoice
@@ -184,6 +225,48 @@ export default function Invoices() {
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={createJobOpen} onOpenChange={setCreateJobOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create New Job</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="job-title" className="text-right">
+                Job Title
+              </Label>
+              <Input
+                id="job-title"
+                value={jobTitle}
+                onChange={(e) => setJobTitle(e.target.value)}
+                className="col-span-3"
+                placeholder="Enter job title"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="client" className="text-right">
+                Client
+              </Label>
+              <Input
+                id="client"
+                value={jobClient}
+                onChange={(e) => setJobClient(e.target.value)}
+                className="col-span-3"
+                placeholder="Enter client name"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateJobOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreateJob}>
+              Create Job
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 }
