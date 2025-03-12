@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { 
@@ -144,6 +143,7 @@ export default function Sidebar() {
           </NavSection>
           
           <NavSection title="Management" isCollapsed={isCollapsed}>
+            <NavItem to="/jobs" icon={Truck} label="Jobs" isCollapsed={isCollapsed} />
             <NavItem to="/customers" icon={Users} label="Customers" isCollapsed={isCollapsed} />
             <NavItem to="/carriers" icon={Truck} label="Carriers" isCollapsed={isCollapsed} />
             <NavItem to="/invoices" icon={FileText} label="Invoices" isCollapsed={isCollapsed} />

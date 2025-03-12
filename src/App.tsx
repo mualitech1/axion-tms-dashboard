@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // Pages
 import Index from "./pages/Index";
+import Jobs from "./pages/Jobs";
 import Customers from "./pages/Customers";
 import Carriers from "./pages/Carriers";
 import Users from "./pages/Users";
@@ -26,6 +27,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/jobs" element={<Jobs />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/carriers" element={<Carriers />} />
           <Route path="/users" element={<Users />} />
@@ -33,7 +35,6 @@ const App = () => (
           <Route path="/finance" element={<Finance />} />
           <Route path="/invoices" element={<Invoices />} />
           <Route path="/settings" element={<Settings />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
