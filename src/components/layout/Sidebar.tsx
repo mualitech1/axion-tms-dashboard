@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   Sheet,
@@ -29,8 +30,7 @@ import {
   Database,
   DollarSign,
 } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, useLocation } from "react-router-dom";
 
 interface NavItemProps {
   title: string;
@@ -39,13 +39,13 @@ interface NavItemProps {
 }
 
 const NavItem: React.FC<NavItemProps> = ({ title, href, icon }) => {
-  const pathname = usePathname();
-  const isActive = pathname === href;
+  const location = useLocation();
+  const isActive = location.pathname === href;
 
   return (
     <li>
       <Link
-        href={href}
+        to={href}
         className={`flex items-center gap-3 rounded-md p-2 text-sm font-medium hover:bg-tms-blue-light transition-colors ${
           isActive ? "bg-tms-blue-light text-tms-blue" : "text-tms-gray-700"
         }`}
@@ -103,7 +103,7 @@ const mainNavItems = [
 export default function Sidebar() {
   return (
     <div className="hidden border-r bg-gray-50/50 h-screen w-60 flex-col py-3 md:flex">
-      <Link href="/" className="px-4">
+      <Link to="/" className="px-4">
         <div className="flex items-center gap-2 px-2 py-4">
           <Avatar className="h-8 w-8">
             <AvatarImage src="/images/tms-logo.png" alt="TMS Logo" />
@@ -126,7 +126,7 @@ export default function Sidebar() {
           <ul className="space-y-1">
             <li>
               <Link
-                href="/settings"
+                to="/settings"
                 className="flex items-center gap-3 rounded-md p-2 text-sm font-medium text-tms-gray-700 hover:bg-tms-blue-light transition-colors"
               >
                 <Settings className="h-5 w-5" />
