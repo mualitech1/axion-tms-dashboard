@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { FileText, Download, Eye, Filter, PlusCircle, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { InputWithIcon } from "@/components/ui/input-with-icon";
 
 // Mock invoice data
 const invoices = [
@@ -120,7 +120,7 @@ export default function Invoices() {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Invoice Management</CardTitle>
           <div className="flex flex-col sm:flex-row gap-2">
-            <Input
+            <InputWithIcon
               placeholder="Search invoices..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
