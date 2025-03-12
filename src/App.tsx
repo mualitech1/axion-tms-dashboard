@@ -11,6 +11,7 @@ import Customers from "./pages/Customers";
 import Carriers from "./pages/Carriers";
 import Users from "./pages/Users";
 import Settings from "./pages/Settings";
+import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/customers" element={<Customers />} />
           <Route path="/carriers" element={<Carriers />} />
           <Route path="/users" element={<Users />} />
+          <Route path="/analytics" element={<Analytics />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
