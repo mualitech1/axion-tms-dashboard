@@ -29,7 +29,7 @@ export default function MainLayout({ children, title }: MainLayoutProps) {
         isMobile ? "ml-0" : (isSidebarCollapsed ? "ml-16" : "ml-64")
       )}>
         <Header title={title} />
-        <main className="p-6 md:p-8">
+        <main className="p-4 md:p-6 lg:p-8">
           {children}
         </main>
       </div>
