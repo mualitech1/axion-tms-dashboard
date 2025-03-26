@@ -1,51 +1,27 @@
+export interface Carrier {
+  id: number;
+  name: string;
+  region: string;
+  fleet: string;
+  status: 'Active' | 'Inactive' | 'Issue';
+  favorite: boolean;
+}
 
-import { Carrier } from '../components/CarrierTable';
-
-// Mock data for carriers
+// Update the carrier data to include status and favorite
 export const carrierData: Carrier[] = [
-  {
-    id: 1,
-    name: 'Express Logistics',
-    fleet: 'Mixed Fleet',
-    region: 'National',
-    complianceStatus: 'Compliant',
-    insuranceExpiry: '2023-12-15',
-    licenseExpiry: '2024-02-28',
-  },
-  {
-    id: 2,
-    name: 'Swift Transport',
-    fleet: 'HGV Only',
-    region: 'North & Midlands',
-    complianceStatus: 'Compliant',
-    insuranceExpiry: '2023-09-20',
-    licenseExpiry: '2024-01-15',
-  },
-  {
-    id: 3,
-    name: 'Global Freight Services',
-    fleet: 'Multimodal',
-    region: 'International',
-    complianceStatus: 'Action Required',
-    insuranceExpiry: '2023-07-10',
-    licenseExpiry: '2023-08-05',
-  },
-  {
-    id: 4,
-    name: 'Regional Haulage',
-    fleet: 'Vans & Rigids',
-    region: 'South East',
-    complianceStatus: 'Compliant',
-    insuranceExpiry: '2024-01-30',
-    licenseExpiry: '2024-03-15',
-  },
-  {
-    id: 5,
-    name: 'City Distribution Ltd',
-    fleet: 'LGV Only',
-    region: 'London & Home Counties',
-    complianceStatus: 'Non-Compliant',
-    insuranceExpiry: '2023-06-05',
-    licenseExpiry: '2023-05-31',
-  },
+  { id: 1, name: 'City Distribution Ltd', region: 'London', fleet: 'LGV', status: 'Issue', favorite: true },
+  { id: 2, name: 'Long Haul Transport', region: 'Manchester', fleet: 'HGV', status: 'Active', favorite: false },
+  { id: 3, name: 'Swift Freight Services', region: 'Birmingham', fleet: 'Mixed Fleet', status: 'Active', favorite: true },
+  { id: 4, name: 'Global Logistics Co.', region: 'Glasgow', fleet: 'HGV', status: 'Active', favorite: false },
+  { id: 5, name: 'Regional Express', region: 'Liverpool', fleet: 'LGV', status: 'Active', favorite: false },
+  { id: 6, name: 'Island Carriers', region: 'Belfast', fleet: 'Multimodal', status: 'Issue', favorite: false },
+  { id: 7, name: 'Northern Transport', region: 'Newcastle', fleet: 'HGV', status: 'Inactive', favorite: false },
+  { id: 8, name: 'Southern Freight Ltd', region: 'Southampton', fleet: 'LGV', status: 'Active', favorite: true },
+  { id: 9, name: 'Midland Logistics', region: 'Leeds', fleet: 'Mixed Fleet', status: 'Active', favorite: false },
+  { id: 10, name: 'Eastern Carriers', region: 'Norwich', fleet: 'Multimodal', status: 'Active', favorite: false },
+  { id: 11, name: 'Western Transport', region: 'Bristol', fleet: 'HGV', status: 'Active', favorite: false },
+  { id: 12, name: 'Coastal Shipping', region: 'Cardiff', fleet: 'Multimodal', status: 'Active', favorite: false },
+  { id: 13, name: 'Highland Haulers', region: 'Inverness', fleet: 'Mixed Fleet', status: 'Issue', favorite: false },
+  { id: 14, name: 'Valley Distribution', region: 'Sheffield', fleet: 'LGV', status: 'Active', favorite: false },
+  { id: 15, name: 'Peak Transport', region: 'Derby', fleet: 'HGV', status: 'Active', favorite: true }
 ];

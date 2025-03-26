@@ -1,6 +1,18 @@
 
+import { Routes, Route, Navigate } from 'react-router-dom';
 import CarriersPage from './carriers/CarriersPage';
+import CarrierDetails from './carriers/CarrierDetails';
+import CarrierCompliance from './carriers/CarrierCompliance';
+import CarrierPayments from './carriers/CarrierPayments';
 
 export default function Carriers() {
-  return <CarriersPage />;
+  return (
+    <Routes>
+      <Route path="/" element={<CarriersPage />} />
+      <Route path="/details/:id" element={<CarrierDetails />} />
+      <Route path="/compliance" element={<CarrierCompliance />} />
+      <Route path="/payments" element={<CarrierPayments />} />
+      <Route path="*" element={<Navigate to="/carriers" replace />} />
+    </Routes>
+  );
 }
