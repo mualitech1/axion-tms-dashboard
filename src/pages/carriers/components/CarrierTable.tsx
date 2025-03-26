@@ -17,17 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-// Types
-export interface Carrier {
-  id: number;
-  name: string;
-  fleet: string;
-  region: string;
-  complianceStatus: string;
-  insuranceExpiry: string;
-  licenseExpiry: string;
-}
+import { Carrier } from '../data/carrierData';
 
 interface CarrierTableProps {
   carriers: Carrier[];
