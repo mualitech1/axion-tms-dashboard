@@ -1,5 +1,6 @@
 
-import { Search, Filter, MoreHorizontal } from 'lucide-react';
+import { Search, Filter, MoreHorizontal, FileText, Activity } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { 
   Table, TableBody, TableCell, TableHead, 
   TableHeader, TableRow 
@@ -54,7 +55,7 @@ export default function UserTable({ users, searchTerm, onSearchChange }: UserTab
               <TableHead>Role & Department</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Last Active</TableHead>
-              <TableHead className="w-[70px]"></TableHead>
+              <TableHead className="w-[120px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -101,23 +102,37 @@ export default function UserTable({ users, searchTerm, onSearchChange }: UserTab
                     })}
                   </TableCell>
                   <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Edit User</DropdownMenuItem>
-                        <DropdownMenuItem>View Activity Log</DropdownMenuItem>
-                        <DropdownMenuItem>Reset Password</DropdownMenuItem>
-                        {user.status === 'Active' ? (
-                          <DropdownMenuItem className="text-tms-red">Deactivate User</DropdownMenuItem>
-                        ) : (
-                          <DropdownMenuItem className="text-tms-green">Activate User</DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div className="flex space-x-2">
+                      <Button asChild variant="outline" size="icon" className="h-8 w-8">
+                        <Link to={`/users/details/${user.id}`}>
+                          <FileText className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button asChild variant="outline" size="icon" className="h-8 w-8">
+                        <Link to={`/users/logs/${user.id}`}>
+                          <Activity className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>Edit User</DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link to={`/users/logs/${user.id}`}>View Activity Log</Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>Reset Password</DropdownMenuItem>
+                          {user.status === 'Active' ? (
+                            <DropdownMenuItem className="text-tms-red">Deactivate User</DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem className="text-tms-green">Activate User</DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
