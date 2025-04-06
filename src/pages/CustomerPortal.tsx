@@ -23,7 +23,7 @@ const customerData = {
     { 
       id: "1", 
       name: "Insurance Certificate", 
-      type: "contract", 
+      type: "contract" as const, 
       dateUploaded: "2023-01-15", 
       expiryDate: "2023-12-31",
       filePath: "/documents/insurance.pdf",
@@ -32,7 +32,7 @@ const customerData = {
     { 
       id: "2", 
       name: "VAT Registration", 
-      type: "terms", 
+      type: "terms" as const, 
       dateUploaded: "2023-02-20", 
       expiryDate: "2024-02-20",
       filePath: "/documents/vat.pdf",
@@ -41,7 +41,7 @@ const customerData = {
     { 
       id: "3", 
       name: "Terms Agreement", 
-      type: "terms", 
+      type: "terms" as const, 
       dateUploaded: "2023-03-01", 
       expiryDate: null,
       filePath: "/documents/terms.docx",
