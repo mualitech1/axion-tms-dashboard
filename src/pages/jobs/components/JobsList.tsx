@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
@@ -6,7 +5,8 @@ import { InputWithIcon } from "@/components/ui/input-with-icon";
 import { useState, useMemo } from "react";
 import { JobCard } from "./jobs-list/JobCard";
 import { mockJobs } from "./jobs-list/mockJobData";
-import { AdvancedFilters, FilterOptions } from "./jobs-list/AdvancedFilters";
+import { AdvancedFilters } from "./jobs-list/AdvancedFilters";
+import { FilterOptions } from "./jobs-list/filters/types";
 
 interface JobsListProps {
   openJobCreation: () => void;
