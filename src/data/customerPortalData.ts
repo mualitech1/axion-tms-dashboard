@@ -11,8 +11,10 @@ window.Date = class extends OriginalDate {
   constructor(...args: any[]) {
     if (args.length === 0) {
       super(currentDate);
+    } else if (args.length === 1) {
+      super(args[0]);
     } else {
-      super(...args[0]);
+      super(...args);
     }
   }
 };
