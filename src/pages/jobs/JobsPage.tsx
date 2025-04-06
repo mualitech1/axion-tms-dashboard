@@ -25,12 +25,12 @@ export default function JobsPage() {
   }, []);
   
   return (
-    <MainLayout title="Jobs Management">
+    <MainLayout title="Jobs Dashboard">
       <div className="space-y-6">
         {/* Page Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-tms-gray-800">Jobs Dashboard</h1>
+            <h1 className="text-2xl font-semibold text-tms-gray-800">Dashboard</h1>
             <p className="text-muted-foreground mt-1">Manage and track all transportation jobs</p>
           </div>
           
@@ -55,7 +55,7 @@ export default function JobsPage() {
                   Create Job
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-3xl">
+              <DialogContent className="max-w-4xl">
                 <DialogTitle>Create New Job</DialogTitle>
                 <DialogDescription>Fill in the details to create a new job.</DialogDescription>
                 <JobCreation onComplete={() => setIsCreatingJob(false)} />
