@@ -1,14 +1,13 @@
 
-import { Truck, Calendar, Plus, LayoutDashboard } from "lucide-react";
 import { useState, useEffect } from "react";
-import JobsList from "./components/JobsList";
+import { Calendar, LayoutDashboard, Plus, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import MainLayout from "@/components/layout/MainLayout";
+import JobCreation from "./components/JobCreation";
 import FleetOverview from "./components/FleetOverview";
 import PlanningCalendar from "./components/PlanningCalendar";
-import JobCreation from "./components/JobCreation";
-import MainLayout from "@/components/layout/MainLayout";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
-import DragDropScheduler from "./components/DragDropScheduler";
+import JobsList from "./components/JobsList";
 
 export default function JobsPage() {
   console.log("JobsPage component rendered");
@@ -57,23 +56,26 @@ export default function JobsPage() {
         </Dialog>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-12">
-        <div className="md:col-span-12">
-          <FleetOverview />
+      {/* Fleet Overview Section */}
+      <div className="mb-6">
+        <FleetOverview />
+      </div>
+      
+      {/* Planning Calendar & Jobs List Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          {viewMode === "calendar" ? (
+            <PlanningCalendar />
+          ) : (
+            <div className="bg-white p-6 rounded-lg shadow-sm border">
+              <h3 className="text-lg font-semibold mb-4">Scheduler View</h3>
+              <p className="text-muted-foreground">Select calendar view to see the planning calendar.</p>
+            </div>
+          )}
         </div>
         
-        <div className="grid gap-6 md:grid-cols-12 md:col-span-12">
-          <div className="md:col-span-8">
-            {viewMode === "calendar" ? (
-              <PlanningCalendar />
-            ) : (
-              <DragDropScheduler />
-            )}
-          </div>
-          
-          <div className="md:col-span-4">
-            <JobsList openJobCreation={() => setIsCreatingJob(true)} />
-          </div>
+        <div className="lg:col-span-1">
+          <JobsList openJobCreation={() => setIsCreatingJob(true)} />
         </div>
       </div>
     </MainLayout>

@@ -13,7 +13,7 @@ export function JobCard({ job }: JobCardProps) {
   console.log("Rendering job card for job ID:", job.id);
   return (
     <Link to={`/jobs/${job.id}`}>
-      <Card className="p-4 hover:bg-accent/50 cursor-pointer transition-colors border border-border">
+      <Card className="p-4 hover:bg-accent/50 cursor-pointer transition-colors border">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2">
