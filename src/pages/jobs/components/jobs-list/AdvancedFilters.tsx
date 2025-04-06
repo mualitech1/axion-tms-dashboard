@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Filter, Calendar, CalendarRange, ArrowDown, ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -47,9 +46,16 @@ export function AdvancedFilters({ onFilterChange, activeFiltersCount }: Advanced
   const [isOpen, setIsOpen] = useState(false);
 
   const handleFilterChange = (key: keyof FilterOptions, value: any) => {
-    const updatedFilters = { ...filters, [key]: value };
-    setFilters(updatedFilters);
-    onFilterChange(updatedFilters);
+    if (key === "sortDirection") {
+      const typedValue = value as "asc" | "desc";
+      const updatedFilters = { ...filters, [key]: typedValue };
+      setFilters(updatedFilters);
+      onFilterChange(updatedFilters);
+    } else {
+      const updatedFilters = { ...filters, [key]: value };
+      setFilters(updatedFilters);
+      onFilterChange(updatedFilters);
+    }
   };
 
   const clearFilters = () => {
@@ -59,7 +65,7 @@ export function AdvancedFilters({ onFilterChange, activeFiltersCount }: Advanced
       startDate: null,
       endDate: null,
       sortBy: "date",
-      sortDirection: "desc",
+      sortDirection: "desc" as const,
     };
     setFilters(defaultFilters);
     onFilterChange(defaultFilters);
@@ -100,7 +106,7 @@ export function AdvancedFilters({ onFilterChange, activeFiltersCount }: Advanced
                 <SelectValue placeholder="Any status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Any status</SelectItem>
+                <SelectItem value="all">Any status</SelectItem>
                 <SelectItem value="scheduled">Scheduled</SelectItem>
                 <SelectItem value="in-progress">In Progress</SelectItem>
                 <SelectItem value="completed">Completed</SelectItem>
@@ -119,7 +125,7 @@ export function AdvancedFilters({ onFilterChange, activeFiltersCount }: Advanced
                 <SelectValue placeholder="Any priority" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Any priority</SelectItem>
+                <SelectItem value="all">Any priority</SelectItem>
                 <SelectItem value="low">Low</SelectItem>
                 <SelectItem value="medium">Medium</SelectItem>
                 <SelectItem value="high">High</SelectItem>
