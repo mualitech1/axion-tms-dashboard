@@ -11,11 +11,12 @@ export interface ContactPerson {
 export interface Document {
   id: string;
   name: string;
-  type: 'contract' | 'terms' | 'rate_card' | 'invoice' | 'pod' | 'other';
+  type: 'contract' | 'terms' | 'rate_card' | 'invoice' | 'pod' | 'insurance' | 'license' | 'other';
   dateUploaded: string;
   expiryDate?: string;
   filePath: string;
   fileSize: string;
+  verificationStatus?: 'pending' | 'verified' | 'rejected';
 }
 
 export interface RateCard {
