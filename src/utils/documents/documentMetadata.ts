@@ -5,7 +5,7 @@ import { Document } from '@/types/customer';
  * Check if the document type requires an expiry date
  */
 export const typeRequiresExpiry = (type: Document['type']): boolean => {
-  return ['contract', 'terms'].includes(type);
+  return ['contract', 'terms', 'insurance', 'license'].includes(type);
 };
 
 /**
@@ -18,6 +18,8 @@ export const getDocumentTypeDisplayName = (type: Document['type']): string => {
     'rate_card': 'Rate Card',
     'invoice': 'Invoice',
     'pod': 'Proof of Delivery',
+    'insurance': 'Insurance Policy',
+    'license': 'License',
     'other': 'Other'
   };
   
@@ -33,6 +35,8 @@ export const generateDocumentFilePath = (name: string, type: Document['type']): 
   switch (type) {
     case 'contract':
     case 'terms':
+    case 'insurance':
+    case 'license':
       extension = 'pdf';
       break;
     case 'rate_card':
