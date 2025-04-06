@@ -1,36 +1,22 @@
 
 import { useState } from "react";
-import { Filter, Calendar, ArrowDown, ArrowUp } from "lucide-react";
+import { Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { StatusFilter } from "./filters/StatusFilter";
+import { PriorityFilter } from "./filters/PriorityFilter";
+import { DateRangeFilter } from "./filters/DateRangeFilter";
+import { SortingControls } from "./filters/SortingControls";
+import { FilterOptions } from "./filters/types";
 
 interface AdvancedFiltersProps {
   onFilterChange: (filters: FilterOptions) => void;
   activeFiltersCount: number;
-}
-
-export interface FilterOptions {
-  status: string | null;
-  priority: string | null;
-  startDate: Date | null;
-  endDate: Date | null;
-  sortBy: string;
-  sortDirection: "asc" | "desc";
 }
 
 export function AdvancedFilters({ onFilterChange, activeFiltersCount }: AdvancedFiltersProps) {
@@ -43,7 +29,6 @@ export function AdvancedFilters({ onFilterChange, activeFiltersCount }: Advanced
     sortDirection: "desc",
   });
 
-  const [dateView, setDateView] = useState<"start" | "end">("start");
   const [isOpen, setIsOpen] = useState(false);
 
   const handleFilterChange = (key: keyof FilterOptions, value: any) => {
@@ -99,126 +84,29 @@ export function AdvancedFilters({ onFilterChange, activeFiltersCount }: Advanced
         </div>
         
         <div className="p-4 space-y-4">
-          <div>
-            <label className="text-sm font-medium block mb-2">Status</label>
-            <Select
-              value={filters.status || ""}
-              onValueChange={(value) => handleFilterChange("status", value === "" ? null : value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Any status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Any status</SelectItem>
-                <SelectItem value="scheduled">Scheduled</SelectItem>
-                <SelectItem value="in-progress">In Progress</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <StatusFilter 
+            value={filters.status} 
+            onChange={(value) => handleFilterChange("status", value)} 
+          />
 
-          <div>
-            <label className="text-sm font-medium block mb-2">Priority</label>
-            <Select
-              value={filters.priority || ""}
-              onValueChange={(value) => handleFilterChange("priority", value === "" ? null : value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Any priority" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Any priority</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <PriorityFilter 
+            value={filters.priority} 
+            onChange={(value) => handleFilterChange("priority", value)} 
+          />
 
-          <div>
-            <label className="text-sm font-medium block mb-2">Date Range</label>
-            <div className="flex gap-2 mb-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setDateView("start")}
-                className={cn(
-                  "flex-1",
-                  dateView === "start" ? "border-primary/50 bg-primary/5" : ""
-                )}
-              >
-                Start Date
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setDateView("end")}
-                className={cn(
-                  "flex-1",
-                  dateView === "end" ? "border-primary/50 bg-primary/5" : ""
-                )}
-              >
-                End Date
-              </Button>
-            </div>
-            
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-xs">
-                {filters.startDate ? format(filters.startDate, "MMM dd, yyyy") : "No start date"}
-              </div>
-              <div className="text-xs">
-                {filters.endDate ? format(filters.endDate, "MMM dd, yyyy") : "No end date"}
-              </div>
-            </div>
-
-            <CalendarComponent
-              mode="single"
-              selected={dateView === "start" ? filters.startDate || undefined : filters.endDate || undefined}
-              onSelect={(date) => {
-                if (dateView === "start") {
-                  handleFilterChange("startDate", date);
-                  setDateView("end");
-                } else {
-                  handleFilterChange("endDate", date);
-                }
-              }}
-              className="rounded border p-3"
-              initialFocus
-            />
-          </div>
+          <DateRangeFilter 
+            startDate={filters.startDate}
+            endDate={filters.endDate}
+            onStartDateChange={(date) => handleFilterChange("startDate", date)}
+            onEndDateChange={(date) => handleFilterChange("endDate", date)}
+          />
           
-          <div>
-            <label className="text-sm font-medium block mb-2">Sort</label>
-            <div className="grid grid-cols-2 gap-2">
-              <Select
-                value={filters.sortBy}
-                onValueChange={(value) => handleFilterChange("sortBy", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="date">Date</SelectItem>
-                  <SelectItem value="priority">Priority</SelectItem>
-                  <SelectItem value="client">Client</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => handleFilterChange("sortDirection", filters.sortDirection === "asc" ? "desc" : "asc")}
-                className="bg-gray-50/60"
-              >
-                {filters.sortDirection === "asc" ? (
-                  <ArrowUp className="h-4 w-4" />
-                ) : (
-                  <ArrowDown className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-          </div>
+          <SortingControls 
+            sortBy={filters.sortBy}
+            sortDirection={filters.sortDirection}
+            onSortByChange={(value) => handleFilterChange("sortBy", value)}
+            onSortDirectionChange={(direction) => handleFilterChange("sortDirection", direction)}
+          />
         </div>
         
         <div className="flex justify-between p-4 pt-2 border-t border-border/40 bg-muted/10">
@@ -233,3 +121,5 @@ export function AdvancedFilters({ onFilterChange, activeFiltersCount }: Advanced
     </Popover>
   );
 }
+
+export { type FilterOptions } from "./filters/types";
