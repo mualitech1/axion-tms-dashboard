@@ -2,7 +2,13 @@
 import { useState, useEffect } from "react";
 import { Calendar, LayoutDashboard, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogTitle, 
+  DialogDescription,
+  DialogTrigger 
+} from "@/components/ui/dialog";
 import MainLayout from "@/components/layout/MainLayout";
 import JobCreation from "./components/JobCreation";
 import FleetOverview from "./components/FleetOverview";
