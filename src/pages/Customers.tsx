@@ -7,14 +7,25 @@ import CustomerHeader from '@/components/customers/CustomerHeader';
 import CustomerOverview from '@/components/customers/CustomerOverview';
 import { Customer } from '@/types/customer';
 import { customerData } from '@/data/customerMockData';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Customers() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [customers, setCustomers] = useState(customerData);
+  const { toast } = useToast();
   
   const handleViewDetails = (customer: Customer) => {
     setSelectedCustomer(customer);
     setIsDetailOpen(true);
+  };
+
+  const handleAddCustomer = (newCustomer: Customer) => {
+    setCustomers([...customers, newCustomer]);
+    toast({
+      title: "Customer Added",
+      description: `${newCustomer.name} has been successfully added`,
+    });
   };
 
   return (
@@ -22,7 +33,7 @@ export default function Customers() {
       <div className="animate-fade-in">
         <CustomerHeader />
         <CustomerTable 
-          customers={customerData} 
+          customers={customers} 
           onViewDetails={handleViewDetails} 
         />
         <CustomerOverview />
