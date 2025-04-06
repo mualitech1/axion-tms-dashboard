@@ -29,6 +29,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import ContactDetailsForm from './ContactDetailsForm';
+import { Customer } from '@/types/customer';
 
 const customerSchema = z.object({
   name: z.string().min(2, { message: 'Company name is required' }),
@@ -48,9 +49,10 @@ type CustomerFormValues = z.infer<typeof customerSchema>;
 
 interface AddCustomerFormProps {
   onClose: () => void;
+  onAddCustomer?: (customer: Customer) => void;
 }
 
-const AddCustomerForm = ({ onClose }: AddCustomerFormProps) => {
+const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
   const [activeTab, setActiveTab] = useState('general');
   const [primaryContact, setPrimaryContact] = useState<any>(null);
   const [invoiceContact, setInvoiceContact] = useState<any>(null);
@@ -95,12 +97,21 @@ const AddCustomerForm = ({ onClose }: AddCustomerFormProps) => {
         { ...primaryContact, isPrimary: true, role: 'Primary' },
         ...(invoiceContact ? [{ ...invoiceContact, role: 'Invoice' }] : []),
         ...(operationsContact ? [{ ...operationsContact, role: 'Operations' }] : []),
-      ]
+      ],
+      // Add required properties from Customer type
+      contact: primaryContact ? primaryContact.name : '',
+      email: primaryContact ? primaryContact.email : '',
+      phone: primaryContact ? primaryContact.phone : '',
+      lastOrder: '-'
     };
     
     console.log('New Customer:', newCustomer);
     
-    // Here you would typically save the customer to your database
+    // Now call the onAddCustomer prop if it exists
+    if (onAddCustomer) {
+      onAddCustomer(newCustomer as Customer);
+    }
+    
     toast({
       title: "Customer Added",
       description: `${values.name} has been successfully added`,

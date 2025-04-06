@@ -32,7 +32,7 @@ export default function Customers() {
   return (
     <MainLayout title="Customers">
       <div className="animate-fade-in">
-        <CustomerHeader />
+        <CustomerHeader onAddCustomer={handleAddCustomer} />
         
         {/* Customer Alerts Dashboard */}
         <div className="mb-6">
