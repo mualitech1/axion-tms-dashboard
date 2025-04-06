@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from 'react-router-dom';
-import { BadgeDollarSign, FileText, LayoutDashboard, Mail, User } from 'lucide-react';
+import { BadgeDollarSign, FileText, LayoutDashboard, Mail, User, Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -11,36 +11,43 @@ interface CustomerPortalNavigationProps {
 export default function CustomerPortalNavigation({ hasExpiringDocuments }: CustomerPortalNavigationProps) {
   const location = useLocation();
   
+  // Added hasUpdates property to indicate if there are auto-updates
   const navItems = [
     { 
       name: 'Dashboard', 
       href: '/customer-portal/dashboard', 
       icon: LayoutDashboard,
-      notification: false
+      notification: false,
+      hasUpdates: false
     },
     { 
       name: 'Profile', 
       href: '/customer-portal/profile', 
       icon: User,
-      notification: false
+      notification: false,
+      hasUpdates: false
     },
     { 
       name: 'Documents', 
       href: '/customer-portal/documents', 
       icon: FileText,
-      notification: hasExpiringDocuments
+      notification: hasExpiringDocuments,
+      hasUpdates: hasExpiringDocuments
     },
     { 
       name: 'Communications', 
       href: '/customer-portal/communications', 
       icon: Mail,
-      notification: false
+      notification: false,
+      // Showing that there are auto-updates available
+      hasUpdates: true
     },
     { 
       name: 'Rate Cards', 
       href: '/customer-portal/rates', 
       icon: BadgeDollarSign,
-      notification: false
+      notification: false,
+      hasUpdates: false
     }
   ];
   
@@ -63,6 +70,11 @@ export default function CustomerPortalNavigation({ hasExpiringDocuments }: Custo
               {item.notification && (
                 <Badge variant="destructive" className="ml-auto h-5 min-w-5 px-1">
                   !
+                </Badge>
+              )}
+              {item.hasUpdates && !item.notification && (
+                <Badge variant="outline" className="ml-auto h-5 bg-blue-50 text-blue-600 border-blue-200">
+                  <Bell className="h-3 w-3" />
                 </Badge>
               )}
             </Link>

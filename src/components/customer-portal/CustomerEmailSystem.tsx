@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Mail, Send } from 'lucide-react';
 import { Customer } from '@/types/customer';
 import { toast } from "@/hooks/use-toast";
+import AutomatedStatusUpdates from './AutomatedStatusUpdates';
 
 interface CustomerEmailSystemProps {
   customer: Customer;
@@ -17,6 +19,7 @@ export default function CustomerEmailSystem({ customer }: CustomerEmailSystemPro
   const [message, setMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [emailTemplateType, setEmailTemplateType] = useState<string>("custom");
+  const [activeTab, setActiveTab] = useState<string>("manual");
 
   const emailTemplates = {
     custom: { subject: "", message: "" },
@@ -78,73 +81,86 @@ export default function CustomerEmailSystem({ customer }: CustomerEmailSystemPro
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-start gap-4">
-          <div className="p-2 bg-blue-50 rounded-full">
-            <Mail className="h-6 w-6 text-blue-500" />
-          </div>
-          <div>
-            <CardTitle className="text-xl font-semibold">Email Communication</CardTitle>
-            <CardDescription>Send email communications to {customer.name}</CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-1">
-          <div className="text-sm font-medium">Email Templates</div>
-          <div className="flex gap-2 flex-wrap">
-            {Object.keys(emailTemplates).map((type) => (
-              <Button 
-                key={type} 
-                variant={type === emailTemplateType ? "default" : "outline"} 
-                size="sm" 
-                onClick={() => handleTemplateChange(type)}
-              >
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </Button>
-            ))}
-          </div>
-        </div>
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <TabsList className="grid grid-cols-2 w-full">
+        <TabsTrigger value="manual">Manual Email</TabsTrigger>
+        <TabsTrigger value="automated">Automated Updates</TabsTrigger>
+      </TabsList>
+      
+      <TabsContent value="manual">
+        <Card>
+          <CardHeader>
+            <div className="flex items-start gap-4">
+              <div className="p-2 bg-blue-50 rounded-full">
+                <Mail className="h-6 w-6 text-blue-500" />
+              </div>
+              <div>
+                <CardTitle className="text-xl font-semibold">Email Communication</CardTitle>
+                <CardDescription>Send email communications to {customer.name}</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-1">
+              <div className="text-sm font-medium">Email Templates</div>
+              <div className="flex gap-2 flex-wrap">
+                {Object.keys(emailTemplates).map((type) => (
+                  <Button 
+                    key={type} 
+                    variant={type === emailTemplateType ? "default" : "outline"} 
+                    size="sm" 
+                    onClick={() => handleTemplateChange(type)}
+                  >
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </Button>
+                ))}
+              </div>
+            </div>
 
-        <div className="space-y-2">
-          <label htmlFor="recipient" className="text-sm font-medium">Recipient</label>
-          <Input 
-            id="recipient" 
-            value={customer.email} 
-            readOnly 
-            disabled
-            className="bg-gray-50"
-          />
-        </div>
+            <div className="space-y-2">
+              <label htmlFor="recipient" className="text-sm font-medium">Recipient</label>
+              <Input 
+                id="recipient" 
+                value={customer.email} 
+                readOnly 
+                disabled
+                className="bg-gray-50"
+              />
+            </div>
 
-        <div className="space-y-2">
-          <label htmlFor="subject" className="text-sm font-medium">Subject</label>
-          <Input 
-            id="subject" 
-            value={subject} 
-            onChange={(e) => setSubject(e.target.value)} 
-            placeholder="Enter email subject"
-          />
-        </div>
+            <div className="space-y-2">
+              <label htmlFor="subject" className="text-sm font-medium">Subject</label>
+              <Input 
+                id="subject" 
+                value={subject} 
+                onChange={(e) => setSubject(e.target.value)} 
+                placeholder="Enter email subject"
+              />
+            </div>
 
-        <div className="space-y-2">
-          <label htmlFor="message" className="text-sm font-medium">Message</label>
-          <Textarea 
-            id="message" 
-            value={message} 
-            onChange={(e) => setMessage(e.target.value)} 
-            placeholder="Enter your message"
-            rows={6}
-          />
-        </div>
-      </CardContent>
-      <CardFooter className="justify-end">
-        <Button onClick={handleSendEmail} disabled={isLoading}>
-          {isLoading ? "Sending..." : "Send Email"}
-          <Send className="ml-2 h-4 w-4" />
-        </Button>
-      </CardFooter>
-    </Card>
+            <div className="space-y-2">
+              <label htmlFor="message" className="text-sm font-medium">Message</label>
+              <Textarea 
+                id="message" 
+                value={message} 
+                onChange={(e) => setMessage(e.target.value)} 
+                placeholder="Enter your message"
+                rows={6}
+              />
+            </div>
+          </CardContent>
+          <CardFooter className="justify-end">
+            <Button onClick={handleSendEmail} disabled={isLoading}>
+              {isLoading ? "Sending..." : "Send Email"}
+              <Send className="ml-2 h-4 w-4" />
+            </Button>
+          </CardFooter>
+        </Card>
+      </TabsContent>
+      
+      <TabsContent value="automated">
+        <AutomatedStatusUpdates customer={customer} />
+      </TabsContent>
+    </Tabs>
   );
 }
