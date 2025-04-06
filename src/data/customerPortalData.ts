@@ -4,12 +4,15 @@ import { isDocumentExpiringSoon } from '@/utils/documentUtils';
 
 // Set current date to match document expiry dates for demo purposes
 const currentDate = new Date('2023-12-15');
-global.Date = class extends Date {
+
+// Override Date constructor for demo purposes using window instead of global
+const OriginalDate = Date;
+window.Date = class extends OriginalDate {
   constructor(...args: any[]) {
     if (args.length === 0) {
       super(currentDate);
     } else {
-      super(...args);
+      super(...args[0]);
     }
   }
 };
