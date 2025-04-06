@@ -36,6 +36,8 @@ export default function PlanningCalendar() {
     }
   };
 
+  const today = new Date();
+
   return (
     <Card className="bg-white border border-border/40 shadow-sm overflow-hidden">
       <div className="p-5 border-b border-border/40">
@@ -68,18 +70,34 @@ export default function PlanningCalendar() {
               onSelect={handleDateSelect}
               className="rounded-md border-none"
               components={{
-                Day: ({ date }) => {
+                Day: ({ date: dayDate }) => {
                   const jobEvent = mockJobEvents.find(
                     event => 
-                      event.date.getDate() === date.getDate() && 
-                      event.date.getMonth() === date.getMonth() && 
-                      event.date.getFullYear() === date.getFullYear()
+                      event.date.getDate() === dayDate.getDate() && 
+                      event.date.getMonth() === dayDate.getMonth() && 
+                      event.date.getFullYear() === dayDate.getFullYear()
                   );
                   
-                  return jobEvent ? (
-                    <DayWithJobs date={date} jobCount={jobEvent.count} />
-                  ) : (
-                    <div>{date.getDate()}</div>
+                  const isSelected = date && 
+                    date.getDate() === dayDate.getDate() && 
+                    date.getMonth() === dayDate.getMonth() && 
+                    date.getFullYear() === dayDate.getFullYear();
+                    
+                  const isToday = 
+                    today.getDate() === dayDate.getDate() && 
+                    today.getMonth() === dayDate.getMonth() && 
+                    today.getFullYear() === dayDate.getFullYear();
+                    
+                  const isCurrentMonth = today.getMonth() === dayDate.getMonth();
+                  
+                  return (
+                    <DayWithJobs 
+                      date={dayDate} 
+                      jobCount={jobEvent?.count || 0}
+                      isActive={isSelected}
+                      isToday={isToday}
+                      isOutsideMonth={!isCurrentMonth}
+                    />
                   );
                 }
               }}
