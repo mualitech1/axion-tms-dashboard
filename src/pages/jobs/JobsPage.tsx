@@ -7,7 +7,7 @@ import PlanningCalendar from "./components/PlanningCalendar";
 import JobCreation from "./components/JobCreation";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import DragDropScheduler from "./components/DragDropScheduler";
 
 export default function JobsPage() {
@@ -45,6 +45,8 @@ export default function JobsPage() {
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-3xl">
+            <DialogTitle>Create New Job</DialogTitle>
+            <DialogDescription>Fill in the details to create a new job.</DialogDescription>
             <JobCreation onComplete={() => setIsCreatingJob(false)} />
           </DialogContent>
         </Dialog>
