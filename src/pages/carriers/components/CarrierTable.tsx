@@ -1,131 +1,195 @@
 
-import { Truck, Search, Filter, Download, MoreHorizontal } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { 
+  Star, 
+  AlertCircle, 
+  CheckCircle, 
+  Truck,
+  MoreHorizontal,
+  Thermometer,
+  AlertTriangle,
+  Package,
+  Globe,
+  BoxesStacked
+} from 'lucide-react';
+import { Carrier } from '../data/carrierData';
 import { 
   Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
   TableHeader, 
-  TableRow 
+  TableBody, 
+  TableHead, 
+  TableRow, 
+  TableCell 
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Carrier } from '../data/carrierData';
 
 interface CarrierTableProps {
   carriers: Carrier[];
-  searchTerm: string;
-  onSearchChange: (value: string) => void;
 }
 
-export default function CarrierTable({ carriers, searchTerm, onSearchChange }: CarrierTableProps) {
+// Map capability to icon for display
+const capabilityIcons: Record<string, React.ReactNode> = {
+  'curtain-side': <Truck size={16} />,
+  'temperature-controlled': <Thermometer size={16} />,
+  'adr': <AlertTriangle size={16} />,
+  'container': <Package size={16} />,
+  'traction-only': <Truck size={16} />,
+  'rigid': <BoxesStacked size={16} />,
+  'eu-transport': <Globe size={16} />,
+  'deep-sea': <Globe size={16} />
+};
+
+const capabilityLabels: Record<string, string> = {
+  'curtain-side': 'Curtain-side',
+  'temperature-controlled': 'Temperature Controlled',
+  'adr': 'ADR (Hazardous Goods)',
+  'container': 'Container Transport',
+  'traction-only': 'Traction Only',
+  'rigid': 'Rigid Vehicles',
+  'eu-transport': 'EU Transport',
+  'deep-sea': 'Deep-Sea Capabilities'
+};
+
+export default function CarrierTable({ carriers }: CarrierTableProps) {
+  const [favorites, setFavorites] = useState<number[]>([]);
+  
+  const toggleFavorite = (id: number) => {
+    setFavorites(prev => 
+      prev.includes(id) 
+        ? prev.filter(favId => favId !== id) 
+        : [...prev, id]
+    );
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-card mb-6">
-      <div className="p-4 border-b border-tms-gray-200">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="relative w-full sm:w-96">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-tms-gray-500" />
-            <Input
-              placeholder="Search carriers..."
-              className="pl-10 w-full"
-              value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
-            />
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="h-9">
-              <Filter className="h-4 w-4 mr-2" />
-              Filter
-            </Button>
-            <Button variant="outline" size="sm" className="h-9">
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-          </div>
-        </div>
-      </div>
-      
+    <div className="bg-white rounded-lg border overflow-hidden shadow-sm">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[250px]">Carrier</TableHead>
-              <TableHead>Fleet Type</TableHead>
+              <TableHead className="w-10"></TableHead>
+              <TableHead>Carrier Name</TableHead>
               <TableHead>Region</TableHead>
-              <TableHead>Compliance Status</TableHead>
-              <TableHead>Key Expiry Dates</TableHead>
-              <TableHead className="w-[70px]"></TableHead>
+              <TableHead>Fleet</TableHead>
+              <TableHead>Capabilities</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Compliance</TableHead>
+              <TableHead className="w-10"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {carriers.length > 0 ? (
               carriers.map((carrier) => (
-                <TableRow key={carrier.id} className="hover:bg-tms-gray-100">
+                <TableRow key={carrier.id}>
+                  <TableCell className="w-10">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => toggleFavorite(carrier.id)}
+                    >
+                      <Star className={carrier.favorite ? "fill-yellow-400 text-yellow-400" : "text-gray-300"} size={16} />
+                    </Button>
+                  </TableCell>
                   <TableCell>
-                    <div className="flex items-center">
-                      <div className="bg-tms-blue-light h-9 w-9 rounded-full flex items-center justify-center mr-3">
-                        <Truck className="h-4 w-4 text-tms-blue" />
-                      </div>
-                      <div className="font-medium text-tms-gray-800">{carrier.name}</div>
+                    <Link 
+                      to={`/carriers/details/${carrier.id}`}
+                      className="font-medium text-blue-600 hover:underline"
+                    >
+                      {carrier.name}
+                    </Link>
+                  </TableCell>
+                  <TableCell>{carrier.region}</TableCell>
+                  <TableCell>{carrier.fleet}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-1 flex-wrap">
+                      <TooltipProvider>
+                        {carrier.capabilities.slice(0, 3).map((capability) => (
+                          <Tooltip key={capability}>
+                            <TooltipTrigger asChild>
+                              <div className="inline-flex items-center justify-center w-7 h-7 bg-slate-100 rounded-md">
+                                {capabilityIcons[capability] || <Truck size={16} />}
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{capabilityLabels[capability] || capability}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        ))}
+                        
+                        {carrier.capabilities.length > 3 && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="inline-flex items-center justify-center w-7 h-7 bg-slate-100 rounded-md text-xs font-medium">
+                                +{carrier.capabilities.length - 3}
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <div className="space-y-1">
+                                {carrier.capabilities.slice(3).map((capability) => (
+                                  <p key={capability} className="flex items-center gap-2">
+                                    {capabilityIcons[capability] || <Truck size={16} />}
+                                    {capabilityLabels[capability] || capability}
+                                  </p>
+                                ))}
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </TooltipProvider>
                     </div>
                   </TableCell>
-                  <TableCell>{carrier.fleet}</TableCell>
-                  <TableCell>{carrier.region}</TableCell>
                   <TableCell>
                     <Badge 
-                      className={`${
-                        carrier.complianceStatus === 'Compliant' ? 'bg-tms-green-light text-tms-green' :
-                        carrier.complianceStatus === 'Action Required' ? 'bg-tms-yellow-light text-tms-yellow' :
-                        'bg-tms-red-light text-tms-red'
-                      }`}
+                      variant="outline"
+                      className={`
+                        ${carrier.status === 'Active' ? 'bg-green-50 text-green-600 border-green-200' : 
+                          carrier.status === 'Issue' ? 'bg-red-50 text-red-600 border-red-200' : 
+                          'bg-gray-50 text-gray-600 border-gray-200'}
+                      `}
                     >
-                      {carrier.complianceStatus}
+                      {carrier.status}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <div className="flex flex-col space-y-1">
-                      <div className="flex items-center text-xs">
-                        <span className="w-24 text-tms-gray-500">Insurance:</span>
-                        <span className={`${
-                          new Date(carrier.insuranceExpiry) < new Date() ? 'text-tms-red font-medium' :
-                          new Date(carrier.insuranceExpiry) < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) ? 
-                          'text-tms-yellow font-medium' : 'text-tms-gray-800'
-                        }`}>
-                          {new Date(carrier.insuranceExpiry).toLocaleDateString('en-GB')}
-                        </span>
-                      </div>
-                      <div className="flex items-center text-xs">
-                        <span className="w-24 text-tms-gray-500">License:</span>
-                        <span className={`${
-                          new Date(carrier.licenseExpiry) < new Date() ? 'text-tms-red font-medium' :
-                          new Date(carrier.licenseExpiry) < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) ? 
-                          'text-tms-yellow font-medium' : 'text-tms-gray-800'
-                        }`}>
-                          {new Date(carrier.licenseExpiry).toLocaleDateString('en-GB')}
-                        </span>
-                      </div>
+                    <div className="flex items-center">
+                      {carrier.complianceStatus === 'Compliant' ? (
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-1.5" />
+                      ) : carrier.complianceStatus === 'Action Required' ? (
+                        <AlertCircle className="h-4 w-4 text-amber-500 mr-1.5" />
+                      ) : (
+                        <AlertCircle className="h-4 w-4 text-red-500 mr-1.5" />
+                      )}
+                      <span className="text-sm">{carrier.complianceStatus}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
+                          <MoreHorizontal size={16} />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>View Details</DropdownMenuItem>
-                        <DropdownMenuItem>Update Compliance</DropdownMenuItem>
-                        <DropdownMenuItem>Performance History</DropdownMenuItem>
-                        <DropdownMenuItem className="text-tms-red">Deactivate</DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to={`/carriers/details/${carrier.id}`}>View Details</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>Edit Carrier</DropdownMenuItem>
+                        <DropdownMenuItem>Check Compliance</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-red-600">
+                          Disable Carrier
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -133,8 +197,12 @@ export default function CarrierTable({ carriers, searchTerm, onSearchChange }: C
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-6 text-tms-gray-500">
-                  No carriers found matching your search criteria.
+                <TableCell colSpan={8} className="text-center py-8">
+                  <div className="flex flex-col items-center justify-center text-gray-500">
+                    <Truck size={36} className="mb-2 opacity-30" />
+                    <h3 className="font-medium">No carriers found</h3>
+                    <p className="text-sm">Try adjusting your filters</p>
+                  </div>
                 </TableCell>
               </TableRow>
             )}

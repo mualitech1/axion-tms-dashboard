@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { PlusCircle, FileCheck, CreditCard } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
@@ -10,17 +10,74 @@ import CarrierOverview from './components/CarrierOverview';
 import FleetDistribution from './components/FleetDistribution';
 import UpcomingExpirations from './components/UpcomingExpirations';
 import { carrierData } from './data/carrierData';
+import { CarrierFilters, CarrierFilterOptions } from './components/filters/CarrierFilters';
+import { CarrierCapability } from './components/filters/CapabilityFilter';
 
 export default function CarriersPage() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterOptions, setFilterOptions] = useState<CarrierFilterOptions>({
+    status: null,
+    region: null,
+    fleetType: null,
+    complianceStatus: null,
+    favorites: false,
+    capabilities: []
+  });
   
-  // Filter carriers based on search term
-  const filteredCarriers = carrierData.filter(
-    carrier => 
-      carrier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      carrier.region.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      carrier.fleet.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Calculate active filters count
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (filterOptions.status) count++;
+    if (filterOptions.region) count++;
+    if (filterOptions.fleetType) count++;
+    if (filterOptions.complianceStatus) count++;
+    if (filterOptions.favorites) count++;
+    if (filterOptions.capabilities.length > 0) count++;
+    return count;
+  }, [filterOptions]);
+  
+  // Filter carriers based on search term and filter options
+  const filteredCarriers = useMemo(() => {
+    return carrierData.filter(carrier => {
+      // Apply text search filter
+      const matchesSearch = 
+        carrier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        carrier.region.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        carrier.fleet.toLowerCase().includes(searchTerm.toLowerCase());
+        
+      if (!matchesSearch) return false;
+      
+      // Apply status filter
+      if (filterOptions.status && carrier.status !== filterOptions.status) return false;
+      
+      // Apply region filter
+      if (filterOptions.region && 
+          filterOptions.region !== 'All Regions' && 
+          carrier.region !== filterOptions.region) return false;
+      
+      // Apply fleet type filter
+      if (filterOptions.fleetType && 
+          filterOptions.fleetType !== 'All Types' && 
+          carrier.fleet !== filterOptions.fleetType) return false;
+      
+      // Apply compliance status filter
+      if (filterOptions.complianceStatus && 
+          carrier.complianceStatus !== filterOptions.complianceStatus) return false;
+      
+      // Apply favorites filter
+      if (filterOptions.favorites && !carrier.favorite) return false;
+      
+      // Apply capabilities filter
+      if (filterOptions.capabilities.length > 0) {
+        const hasCapability = filterOptions.capabilities.some(capability => 
+          carrier.capabilities.includes(capability as string)
+        );
+        if (!hasCapability) return false;
+      }
+      
+      return true;
+    });
+  }, [searchTerm, filterOptions]);
   
   return (
     <MainLayout title="Carriers">
@@ -53,42 +110,36 @@ export default function CarriersPage() {
           </div>
         </div>
         
-        <Tabs defaultValue="all" className="mb-6">
-          <TabsList>
-            <TabsTrigger value="all">All Carriers</TabsTrigger>
-            <TabsTrigger value="active">Active</TabsTrigger>
-            <TabsTrigger value="issues">Compliance Issues</TabsTrigger>
-            <TabsTrigger value="favorite">Favorites</TabsTrigger>
-          </TabsList>
-          <TabsContent value="all" className="mt-2">
-            <CarrierTable 
-              carriers={filteredCarriers} 
-              searchTerm={searchTerm} 
-              onSearchChange={setSearchTerm}
-            />
-          </TabsContent>
-          <TabsContent value="active" className="mt-2">
-            <CarrierTable 
-              carriers={filteredCarriers.filter(c => c.status === 'Active')} 
-              searchTerm={searchTerm} 
-              onSearchChange={setSearchTerm}
-            />
-          </TabsContent>
-          <TabsContent value="issues" className="mt-2">
-            <CarrierTable 
-              carriers={filteredCarriers.filter(c => c.status === 'Issue')} 
-              searchTerm={searchTerm} 
-              onSearchChange={setSearchTerm}
-            />
-          </TabsContent>
-          <TabsContent value="favorite" className="mt-2">
-            <CarrierTable 
-              carriers={filteredCarriers.filter(c => c.favorite)} 
-              searchTerm={searchTerm} 
-              onSearchChange={setSearchTerm}
-            />
-          </TabsContent>
-        </Tabs>
+        <div className="mb-6">
+          <CarrierFilters
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            activeFiltersCount={activeFiltersCount}
+            onFilterChange={setFilterOptions}
+            className="mb-4"
+          />
+          
+          <Tabs defaultValue="all">
+            <TabsList>
+              <TabsTrigger value="all">All Carriers</TabsTrigger>
+              <TabsTrigger value="active">Active</TabsTrigger>
+              <TabsTrigger value="issues">Compliance Issues</TabsTrigger>
+              <TabsTrigger value="favorite">Favorites</TabsTrigger>
+            </TabsList>
+            <TabsContent value="all" className="mt-2">
+              <CarrierTable carriers={filteredCarriers} />
+            </TabsContent>
+            <TabsContent value="active" className="mt-2">
+              <CarrierTable carriers={filteredCarriers.filter(c => c.status === 'Active')} />
+            </TabsContent>
+            <TabsContent value="issues" className="mt-2">
+              <CarrierTable carriers={filteredCarriers.filter(c => c.status === 'Issue')} />
+            </TabsContent>
+            <TabsContent value="favorite" className="mt-2">
+              <CarrierTable carriers={filteredCarriers.filter(c => c.favorite)} />
+            </TabsContent>
+          </Tabs>
+        </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <CarrierOverview />

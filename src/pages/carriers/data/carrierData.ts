@@ -1,4 +1,3 @@
-
 export interface Carrier {
   id: number;
   name: string;
@@ -9,9 +8,9 @@ export interface Carrier {
   complianceStatus: string;
   insuranceExpiry: string;
   licenseExpiry: string;
+  capabilities: string[];
 }
 
-// Update the carrier data to include all required properties
 export const carrierData: Carrier[] = [
   { 
     id: 1, 
@@ -22,7 +21,8 @@ export const carrierData: Carrier[] = [
     favorite: true,
     complianceStatus: 'Action Required',
     insuranceExpiry: '2024-06-15',
-    licenseExpiry: '2024-08-22'
+    licenseExpiry: '2024-08-22',
+    capabilities: ['curtain-side', 'traction-only']
   },
   { 
     id: 2, 
@@ -33,7 +33,8 @@ export const carrierData: Carrier[] = [
     favorite: false,
     complianceStatus: 'Compliant',
     insuranceExpiry: '2024-09-10',
-    licenseExpiry: '2025-02-15'
+    licenseExpiry: '2025-02-15',
+    capabilities: ['temperature-controlled', 'adr', 'eu-transport']
   },
   { 
     id: 3, 
@@ -44,7 +45,8 @@ export const carrierData: Carrier[] = [
     favorite: true,
     complianceStatus: 'Compliant',
     insuranceExpiry: '2024-11-05',
-    licenseExpiry: '2024-12-30'
+    licenseExpiry: '2024-12-30',
+    capabilities: ['container', 'deep-sea']
   },
   { 
     id: 4, 
@@ -55,7 +57,8 @@ export const carrierData: Carrier[] = [
     favorite: false,
     complianceStatus: 'Compliant',
     insuranceExpiry: '2025-01-20',
-    licenseExpiry: '2025-03-15'
+    licenseExpiry: '2025-03-15',
+    capabilities: ['adr', 'temperature-controlled', 'eu-transport']
   },
   { 
     id: 5, 
@@ -66,7 +69,8 @@ export const carrierData: Carrier[] = [
     favorite: false,
     complianceStatus: 'Compliant',
     insuranceExpiry: '2024-08-12',
-    licenseExpiry: '2024-10-05'
+    licenseExpiry: '2024-10-05',
+    capabilities: ['curtain-side', 'rigid']
   },
   { 
     id: 6, 
@@ -77,7 +81,8 @@ export const carrierData: Carrier[] = [
     favorite: false,
     complianceStatus: 'Non-Compliant',
     insuranceExpiry: '2024-05-30',
-    licenseExpiry: '2024-07-18'
+    licenseExpiry: '2024-07-18',
+    capabilities: ['container', 'deep-sea']
   },
   { 
     id: 7, 
@@ -88,7 +93,8 @@ export const carrierData: Carrier[] = [
     favorite: false,
     complianceStatus: 'Compliant',
     insuranceExpiry: '2024-10-15',
-    licenseExpiry: '2025-01-10'
+    licenseExpiry: '2025-01-10',
+    capabilities: ['temperature-controlled', 'adr', 'eu-transport']
   },
   { 
     id: 8, 
@@ -99,7 +105,8 @@ export const carrierData: Carrier[] = [
     favorite: true,
     complianceStatus: 'Compliant',
     insuranceExpiry: '2024-12-05',
-    licenseExpiry: '2025-02-28'
+    licenseExpiry: '2025-02-28',
+    capabilities: ['curtain-side', 'traction-only']
   },
   { 
     id: 9, 
@@ -110,7 +117,8 @@ export const carrierData: Carrier[] = [
     favorite: false,
     complianceStatus: 'Compliant',
     insuranceExpiry: '2024-09-25',
-    licenseExpiry: '2024-11-20'
+    licenseExpiry: '2024-11-20',
+    capabilities: ['container', 'deep-sea']
   },
   { 
     id: 10, 
@@ -121,7 +129,8 @@ export const carrierData: Carrier[] = [
     favorite: false,
     complianceStatus: 'Compliant',
     insuranceExpiry: '2024-08-08',
-    licenseExpiry: '2024-12-12'
+    licenseExpiry: '2024-12-12',
+    capabilities: ['temperature-controlled', 'adr', 'eu-transport']
   },
   { 
     id: 11, 
@@ -132,7 +141,8 @@ export const carrierData: Carrier[] = [
     favorite: false,
     complianceStatus: 'Compliant',
     insuranceExpiry: '2024-07-30',
-    licenseExpiry: '2024-10-25'
+    licenseExpiry: '2024-10-25',
+    capabilities: ['curtain-side', 'traction-only']
   },
   { 
     id: 12, 
@@ -143,7 +153,8 @@ export const carrierData: Carrier[] = [
     favorite: false,
     complianceStatus: 'Compliant',
     insuranceExpiry: '2025-02-15',
-    licenseExpiry: '2025-04-20'
+    licenseExpiry: '2025-04-20',
+    capabilities: ['container', 'deep-sea']
   },
   { 
     id: 13, 
@@ -154,7 +165,8 @@ export const carrierData: Carrier[] = [
     favorite: false,
     complianceStatus: 'Action Required',
     insuranceExpiry: '2024-06-05',
-    licenseExpiry: '2024-07-25'
+    licenseExpiry: '2024-07-25',
+    capabilities: ['temperature-controlled', 'adr', 'eu-transport']
   },
   { 
     id: 14, 
@@ -165,7 +177,8 @@ export const carrierData: Carrier[] = [
     favorite: false,
     complianceStatus: 'Compliant',
     insuranceExpiry: '2024-10-10',
-    licenseExpiry: '2025-01-15'
+    licenseExpiry: '2025-01-15',
+    capabilities: ['curtain-side', 'rigid']
   },
   { 
     id: 15, 
@@ -176,6 +189,7 @@ export const carrierData: Carrier[] = [
     favorite: true,
     complianceStatus: 'Compliant',
     insuranceExpiry: '2024-11-20',
-    licenseExpiry: '2025-03-10'
+    licenseExpiry: '2025-03-10',
+    capabilities: ['temperature-controlled', 'adr', 'eu-transport']
   }
 ];
