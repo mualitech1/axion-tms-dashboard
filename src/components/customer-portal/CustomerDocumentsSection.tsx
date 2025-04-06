@@ -10,11 +10,17 @@ interface CustomerDocumentsSectionProps {
   customer: Customer;
 }
 
+// Define document status type for better type safety
+type DocumentStatus = {
+  label: string;
+  variant: 'destructive' | 'warning' | 'outline';
+};
+
 const CustomerDocumentsSection = ({ customer }: CustomerDocumentsSectionProps) => {
   const [documents, setDocuments] = useState<Document[]>(customer.documents || []);
 
   // Helper function to check if a document is expiring soon (within 30 days)
-  const isExpiringSoon = (expiryDate?: string) => {
+  const isExpiringSoon = (expiryDate: string | null | undefined): boolean => {
     if (!expiryDate) return false;
     const expiry = new Date(expiryDate);
     const today = new Date();
@@ -24,20 +30,20 @@ const CustomerDocumentsSection = ({ customer }: CustomerDocumentsSectionProps) =
   };
 
   // Helper function to check if a document is expired
-  const isExpired = (expiryDate?: string) => {
+  const isExpired = (expiryDate: string | null | undefined): boolean => {
     if (!expiryDate) return false;
     return new Date(expiryDate) < new Date();
   };
 
   // Get document status
-  const getDocumentStatus = (doc: Document) => {
+  const getDocumentStatus = (doc: Document): DocumentStatus => {
     if (isExpired(doc.expiryDate)) {
-      return { label: 'Expired', variant: 'destructive' as const };
+      return { label: 'Expired', variant: 'destructive' };
     }
     if (isExpiringSoon(doc.expiryDate)) {
-      return { label: 'Expiring Soon', variant: 'warning' as const };
+      return { label: 'Expiring Soon', variant: 'warning' };
     }
-    return { label: 'Valid', variant: 'outline' as const };
+    return { label: 'Valid', variant: 'outline' };
   };
 
   return (
