@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Compass } from 'lucide-react';
@@ -6,7 +5,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import CustomerPortalHeader from '@/components/customer-portal/CustomerPortalHeader';
 import CustomerPortalNavigation from '@/components/customer-portal/CustomerPortalNavigation';
 import CustomerPortalDashboard from '@/components/customer-portal/CustomerPortalDashboard';
-import CustomerProfileForm from '@/components/customer-portal/CustomerProfileForm';
+import CustomerProfileForm from '@/components/customer-portal/profile/CustomerProfileForm';
 import CustomerDocumentsSection from '@/components/customer-portal/CustomerDocumentsSection';
 import CustomerEmailSystem from '@/components/customer-portal/CustomerEmailSystem';
 import { Customer, Document } from '@/types/customer';
