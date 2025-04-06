@@ -49,9 +49,9 @@ const customerData = {
     }
   ],
   jobs: [
-    { id: "JOB-1001", reference: "DEL-5678", from: "London", to: "Manchester", value: 1250, date: "2023-03-28" },
-    { id: "JOB-1002", reference: "DEL-5679", from: "Birmingham", to: "Leeds", value: 950, date: "2023-03-15" },
-    { id: "JOB-1003", reference: "DEL-5680", from: "Glasgow", to: "Edinburgh", value: 650, date: "2023-03-10" }
+    { id: "JOB-1001", reference: "DEL-5678", from: "London", to: "Manchester", value: 1250, date: "2023-03-28", status: "Completed" },
+    { id: "JOB-1002", reference: "DEL-5679", from: "Birmingham", to: "Leeds", value: 950, date: "2023-03-15", status: "Completed" },
+    { id: "JOB-1003", reference: "DEL-5680", from: "Glasgow", to: "Edinburgh", value: 650, date: "2023-03-10", status: "Completed" }
   ],
   address: {
     street: "123 Logistics Way",
