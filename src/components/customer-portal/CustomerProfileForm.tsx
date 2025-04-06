@@ -55,10 +55,37 @@ const CustomerProfileForm = ({ customer, onUpdateCustomer }: CustomerProfileForm
   });
 
   const onSubmit = (values: z.infer<typeof profileSchema>) => {
-    const updatedCustomer = {
-      ...customer,
-      ...values,
-    };
+    // Fix: Ensure address object is complete and all fields are properly set
+    let updatedCustomer: Customer;
+    
+    if (values.address) {
+      // If address is provided, ensure all fields are present
+      const completeAddress = {
+        street: values.address.street || '',
+        city: values.address.city || '',
+        postcode: values.address.postcode || '',
+        country: values.address.country || ''
+      };
+      
+      updatedCustomer = {
+        ...customer,
+        name: values.name,
+        contact: values.contact,
+        email: values.email,
+        phone: values.phone,
+        address: completeAddress
+      };
+    } else {
+      // If no address is provided, use the original customer data without an address
+      updatedCustomer = {
+        ...customer,
+        name: values.name,
+        contact: values.contact,
+        email: values.email,
+        phone: values.phone,
+        address: undefined
+      };
+    }
     
     onUpdateCustomer(updatedCustomer);
     
