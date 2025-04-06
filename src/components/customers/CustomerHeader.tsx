@@ -10,8 +10,13 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import AddCustomerForm from './AddCustomerForm';
+import { Customer } from '@/types/customer';
 
-const CustomerHeader = () => {
+interface CustomerHeaderProps {
+  onAddCustomer?: (customer: Customer) => void;
+}
+
+const CustomerHeader = ({ onAddCustomer }: CustomerHeaderProps) => {
   const [isAddCustomerOpen, setIsAddCustomerOpen] = useState(false);
 
   return (
@@ -36,7 +41,7 @@ const CustomerHeader = () => {
             <DialogTitle>Add New Customer</DialogTitle>
           </DialogHeader>
           
-          <AddCustomerForm onClose={() => setIsAddCustomerOpen(false)} />
+          <AddCustomerForm onClose={() => setIsAddCustomerOpen(false)} onAddCustomer={onAddCustomer} />
           
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddCustomerOpen(false)}>

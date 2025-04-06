@@ -5,6 +5,7 @@ import CustomerDetailDialog from '@/components/customers/CustomerDetailDialog';
 import CustomerTable from '@/components/customers/CustomerTable';
 import CustomerHeader from '@/components/customers/CustomerHeader';
 import CustomerOverview from '@/components/customers/CustomerOverview';
+import CustomerAlertsDashboard from '@/components/customers/CustomerAlertsDashboard';
 import { Customer } from '@/types/customer';
 import { customerData } from '@/data/customerMockData';
 import { useToast } from '@/hooks/use-toast';
@@ -32,6 +33,12 @@ export default function Customers() {
     <MainLayout title="Customers">
       <div className="animate-fade-in">
         <CustomerHeader />
+        
+        {/* Customer Alerts Dashboard */}
+        <div className="mb-6">
+          <CustomerAlertsDashboard customers={customers} />
+        </div>
+        
         <CustomerTable 
           customers={customers} 
           onViewDetails={handleViewDetails} 
