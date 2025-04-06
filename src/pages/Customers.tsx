@@ -23,9 +23,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import DashboardCard from '@/components/dashboard/DashboardCard';
+import CustomerDetailDialog from '@/components/customers/CustomerDetailDialog';
+import { Customer } from '@/types/customer';
 
-// Mock data for customers
-const customerData = [
+// Enhanced mock data for customers
+const customerData: Customer[] = [
   {
     id: 1,
     name: 'Acme Corporation',
@@ -35,6 +37,88 @@ const customerData = [
     status: 'Active',
     creditLimit: 25000,
     lastOrder: '2023-06-15',
+    address: {
+      street: '123 Main Street',
+      city: 'London',
+      postcode: 'EC1A 1BB',
+      country: 'United Kingdom'
+    },
+    contacts: [
+      {
+        id: '1-1',
+        name: 'John Smith',
+        role: 'Primary',
+        email: 'john@acmecorp.com',
+        phone: '+44 1234 567890',
+        isPrimary: true
+      },
+      {
+        id: '1-2',
+        name: 'Sarah Johnson',
+        role: 'Invoice',
+        email: 'sarah@acmecorp.com',
+        phone: '+44 1234 567891'
+      },
+      {
+        id: '1-3',
+        name: 'Robert Brown',
+        role: 'Operations',
+        email: 'robert@acmecorp.com',
+        phone: '+44 1234 567892'
+      }
+    ],
+    documents: [
+      {
+        id: '1-1',
+        name: 'Terms and Conditions',
+        type: 'terms',
+        dateUploaded: '2023-01-15',
+        expiryDate: '2024-01-15',
+        filePath: '/documents/acme-terms.pdf',
+        fileSize: '1.2 MB'
+      },
+      {
+        id: '1-2',
+        name: 'Service Contract',
+        type: 'contract',
+        dateUploaded: '2023-01-20',
+        expiryDate: '2024-01-20',
+        filePath: '/documents/acme-contract.pdf',
+        fileSize: '2.5 MB'
+      }
+    ],
+    rateCards: [
+      {
+        id: '1-1',
+        name: 'Standard Rate Card 2023',
+        dateCreated: '2023-01-01',
+        validFrom: '2023-01-01',
+        validTo: '2023-12-31',
+        status: 'active'
+      }
+    ],
+    jobs: [
+      {
+        id: '1-1',
+        reference: 'JOB-2023-001',
+        date: '2023-06-15',
+        from: 'London',
+        to: 'Manchester',
+        status: 'Completed',
+        value: 1250
+      },
+      {
+        id: '1-2',
+        reference: 'JOB-2023-002',
+        date: '2023-05-22',
+        from: 'Birmingham',
+        to: 'London',
+        status: 'Completed',
+        value: 950
+      }
+    ],
+    acceptedTerms: true,
+    notes: 'Key account with regular shipments to Manchester.'
   },
   {
     id: 2,
@@ -45,6 +129,27 @@ const customerData = [
     status: 'Active',
     creditLimit: 15000,
     lastOrder: '2023-06-02',
+    contacts: [
+      {
+        id: '2-1',
+        name: 'Jane Cooper',
+        role: 'Primary',
+        email: 'jane@globex.com',
+        phone: '+44 2345 678901',
+        isPrimary: true
+      }
+    ],
+    jobs: [
+      {
+        id: '2-1',
+        reference: 'JOB-2023-015',
+        date: '2023-06-02',
+        from: 'Liverpool',
+        to: 'Leeds',
+        status: 'Completed',
+        value: 875
+      }
+    ]
   },
   {
     id: 3,
@@ -75,11 +180,14 @@ const customerData = [
     status: 'Inactive',
     creditLimit: 10000,
     lastOrder: '2023-04-15',
+    acceptedTerms: false
   },
 ];
 
 export default function Customers() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   
   // Filter customers based on search term
   const filteredCustomers = customerData.filter(
@@ -89,6 +197,11 @@ export default function Customers() {
       customer.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
+  const handleViewDetails = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setIsDetailOpen(true);
+  };
+
   return (
     <MainLayout title="Customers">
       <div className="animate-fade-in">
@@ -145,7 +258,9 @@ export default function Customers() {
               <TableBody>
                 {filteredCustomers.length > 0 ? (
                   filteredCustomers.map((customer) => (
-                    <TableRow key={customer.id} className="hover:bg-tms-gray-100">
+                    <TableRow key={customer.id} className="hover:bg-tms-gray-100 cursor-pointer"
+                      onClick={() => handleViewDetails(customer)}
+                    >
                       <TableCell>
                         <div className="flex items-center">
                           <div className="bg-tms-blue-light h-9 w-9 rounded-full flex items-center justify-center mr-3">
@@ -184,7 +299,7 @@ export default function Customers() {
                           day: 'numeric',
                         })}
                       </TableCell>
-                      <TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -192,7 +307,7 @@ export default function Customers() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>View Details</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleViewDetails(customer)}>View Details</DropdownMenuItem>
                             <DropdownMenuItem>Edit Customer</DropdownMenuItem>
                             <DropdownMenuItem>View Orders</DropdownMenuItem>
                             <DropdownMenuItem className="text-tms-red">Deactivate</DropdownMenuItem>
@@ -307,6 +422,13 @@ export default function Customers() {
           </DashboardCard>
         </div>
       </div>
+
+      {/* Customer Detail Dialog */}
+      <CustomerDetailDialog 
+        customer={selectedCustomer}
+        open={isDetailOpen}
+        onOpenChange={setIsDetailOpen}
+      />
     </MainLayout>
   );
 }
