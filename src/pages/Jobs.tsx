@@ -6,8 +6,8 @@ import JobDetailPage from './jobs/JobDetailPage';
 export default function Jobs() {
   return (
     <Routes>
-      <Route index element={<JobsPage />} />
-      <Route path=":id" element={<JobDetailPage />} />
+      <Route path="/" element={<JobsPage />} />
+      <Route path="/:id" element={<JobDetailPage />} />
       <Route path="*" element={<Navigate to="/jobs" replace />} />
     </Routes>
   );
