@@ -1,4 +1,3 @@
-
 import { 
   ToggleGroup, 
   ToggleGroupItem 
@@ -9,7 +8,7 @@ import {
   AlertTriangle, 
   Package, 
   Globe, 
-  BoxesStacked
+  Boxes
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -63,7 +62,7 @@ const capabilityOptions: Array<{
   { 
     value: "rigid", 
     label: "Rigid", 
-    icon: <BoxesStacked className="h-4 w-4" /> 
+    icon: <Boxes className="h-4 w-4" /> 
   },
   { 
     value: "eu-transport", 

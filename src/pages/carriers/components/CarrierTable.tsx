@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -11,7 +10,7 @@ import {
   AlertTriangle,
   Package,
   Globe,
-  BoxesStacked
+  Boxes
 } from 'lucide-react';
 import { Carrier } from '../data/carrierData';
 import { 
@@ -44,7 +43,7 @@ const capabilityIcons: Record<string, React.ReactNode> = {
   'adr': <AlertTriangle size={16} />,
   'container': <Package size={16} />,
   'traction-only': <Truck size={16} />,
-  'rigid': <BoxesStacked size={16} />,
+  'rigid': <Boxes size={16} />,
   'eu-transport': <Globe size={16} />,
   'deep-sea': <Globe size={16} />
 };
