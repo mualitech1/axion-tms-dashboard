@@ -11,7 +11,7 @@ interface JobCardProps {
 
 export function JobCard({ job }: JobCardProps) {
   return (
-    <Link to={`/jobs/detail/${job.id}`}>
+    <Link to={`/jobs/${job.id}`}>
       <Card className="p-4 hover:bg-accent/50 cursor-pointer transition-colors border border-border">
         <div className="flex items-start justify-between">
           <div>
