@@ -7,7 +7,7 @@ export default function Jobs() {
   return (
     <Routes>
       <Route index element={<JobsPage />} />
-      <Route path="detail/:id" element={<JobDetailPage />} />
+      <Route path=":id" element={<JobDetailPage />} />
       <Route path="*" element={<Navigate to="/jobs" replace />} />
     </Routes>
   );
