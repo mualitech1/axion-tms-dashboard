@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import CustomerDetailDialog from '@/components/customers/CustomerDetailDialog';
 import CustomerTable from '@/components/customers/CustomerTable';
@@ -9,6 +10,8 @@ import CustomerAlertsDashboard from '@/components/customers/CustomerAlertsDashbo
 import { Customer } from '@/types/customer';
 import { customerData } from '@/data/customerMockData';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { ExternalLink } from 'lucide-react';
 
 export default function Customers() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
@@ -32,7 +35,19 @@ export default function Customers() {
   return (
     <MainLayout title="Customers">
       <div className="animate-fade-in">
-        <CustomerHeader onAddCustomer={handleAddCustomer} />
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <CustomerHeader onAddCustomer={handleAddCustomer} />
+          </div>
+          <div>
+            <Button asChild variant="outline">
+              <Link to="/customer-portal">
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Customer Self-Service Portal
+              </Link>
+            </Button>
+          </div>
+        </div>
         
         {/* Customer Alerts Dashboard */}
         <div className="mb-6">
