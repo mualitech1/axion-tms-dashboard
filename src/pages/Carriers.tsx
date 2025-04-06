@@ -4,6 +4,7 @@ import CarriersPage from './carriers/CarriersPage';
 import CarrierDetails from './carriers/CarrierDetails';
 import CarrierCompliance from './carriers/CarrierCompliance';
 import CarrierPayments from './carriers/CarrierPayments';
+import CarrierRegistration from './carriers/CarrierRegistration';
 
 export default function Carriers() {
   return (
@@ -12,6 +13,7 @@ export default function Carriers() {
       <Route path="/details/:id" element={<CarrierDetails />} />
       <Route path="/compliance" element={<CarrierCompliance />} />
       <Route path="/payments" element={<CarrierPayments />} />
+      <Route path="/register" element={<CarrierRegistration />} />
       <Route path="*" element={<Navigate to="/carriers" replace />} />
     </Routes>
   );

@@ -44,9 +44,11 @@ export default function CarriersPage() {
                 Payments
               </Link>
             </Button>
-            <Button className="bg-tms-blue hover:bg-tms-blue/90">
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Add Carrier
+            <Button asChild className="bg-tms-blue hover:bg-tms-blue/90">
+              <Link to="/carriers/register">
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Add Carrier
+              </Link>
             </Button>
           </div>
         </div>
