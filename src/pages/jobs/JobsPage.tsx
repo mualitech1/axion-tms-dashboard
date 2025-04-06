@@ -1,4 +1,3 @@
-
 import { Truck, Calendar, Plus, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 import JobsList from "./components/JobsList";
@@ -15,7 +14,7 @@ export default function JobsPage() {
   const [viewMode, setViewMode] = useState<"calendar" | "scheduler">("calendar");
   
   return (
-    <MainLayout title="Jobs & Planning">
+    <MainLayout title="Dashboard">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
         <div className="flex flex-wrap items-center gap-2">
           <Button 
@@ -51,13 +50,11 @@ export default function JobsPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-12">
-        {/* Fleet Status Overview */}
         <div className="md:col-span-12">
           <FleetOverview />
         </div>
         
         <div className="grid gap-6 md:grid-cols-12 md:col-span-12">
-          {/* Main Planning Area */}
           <div className="md:col-span-8">
             {viewMode === "calendar" ? (
               <PlanningCalendar />
@@ -66,7 +63,6 @@ export default function JobsPage() {
             )}
           </div>
           
-          {/* Jobs List */}
           <div className="md:col-span-4">
             <JobsList openJobCreation={() => setIsCreatingJob(true)} />
           </div>
