@@ -47,6 +47,7 @@ export default function CustomerHeader({ onAddCustomer }: CustomerHeaderProps) {
                   onAddCustomer(customer);
                   setIsAddCustomerOpen(false);
                 }}
+                onClose={() => setIsAddCustomerOpen(false)}
               />
             </DialogContent>
           </Dialog>

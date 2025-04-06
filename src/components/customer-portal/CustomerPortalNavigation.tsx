@@ -33,7 +33,7 @@ const CustomerPortalNavigation = ({ hasExpiringDocuments = false }: CustomerPort
       path: "/customer-portal/documents", 
       label: "Documents", 
       icon: FileText,
-      badge: hasExpiringDocuments ? { text: "Expiring", variant: "warning" } : undefined
+      badge: hasExpiringDocuments ? { text: "Expiring", variant: "destructive" as const } : undefined
     },
     { 
       path: "/customer-portal/rates", 

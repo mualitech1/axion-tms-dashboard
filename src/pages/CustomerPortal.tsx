@@ -9,9 +9,9 @@ import CustomerPortalDashboard from '@/components/customer-portal/CustomerPortal
 import CustomerProfileForm from '@/components/customer-portal/CustomerProfileForm';
 import CustomerDocumentsSection from '@/components/customer-portal/CustomerDocumentsSection';
 
-// Mock customer data (would typically come from an API)
+// Update the mock customer data to use number id instead of string
 const customerData = {
-  id: "CST-1001",
+  id: 1001,  // Changed from string to number
   name: "Acme Logistics Ltd",
   contact: "Jane Smith",
   email: "jane@acmelogistics.com",
