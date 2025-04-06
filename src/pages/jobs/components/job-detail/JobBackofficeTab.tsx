@@ -227,7 +227,7 @@ export function JobBackofficeTab() {
             <SelectValue placeholder="Select category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All categories</SelectItem>
+            <SelectItem value="all">All categories</SelectItem>
             {categories.map((category) => (
               <SelectItem key={category.id} value={category.id}>
                 <div className="flex items-center">
@@ -488,3 +488,4 @@ export function JobBackofficeTab() {
     </div>
   );
 }
+
