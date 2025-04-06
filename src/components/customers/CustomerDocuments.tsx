@@ -11,6 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { 
   FileText, 
   Download, 
@@ -20,6 +21,14 @@ import {
   AlertTriangle,
   CheckCircle2
 } from 'lucide-react';
+import {
+  isDocumentExpiringSoon,
+  isDocumentExpired,
+  formatFileSize,
+  getDocumentStatus,
+  formatDocumentDate,
+  getFileTypeFromPath
+} from '@/utils/documentUtils';
 
 interface CustomerDocumentsProps {
   customer: Customer;
@@ -33,22 +42,6 @@ const CustomerDocuments = ({ customer }: CustomerDocumentsProps) => {
   const filteredDocuments = documents.filter(
     doc => doc.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const isDocumentExpiring = (doc: any) => {
-    if (!doc.expiryDate) return false;
-    const expiryDate = new Date(doc.expiryDate);
-    const today = new Date();
-    const diffTime = expiryDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays <= 30 && diffDays > 0;
-  };
-
-  const isDocumentExpired = (doc: any) => {
-    if (!doc.expiryDate) return false;
-    const expiryDate = new Date(doc.expiryDate);
-    const today = new Date();
-    return expiryDate < today;
-  };
 
   return (
     <div className="space-y-4">
@@ -78,61 +71,62 @@ const CustomerDocuments = ({ customer }: CustomerDocumentsProps) => {
                 <TableHead>Upload Date</TableHead>
                 <TableHead>Expiry Date</TableHead>
                 <TableHead>Size</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead className="w-[100px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredDocuments.map(doc => (
-                <TableRow key={doc.id}>
-                  <TableCell className="font-medium flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-tms-blue" />
-                    {doc.name}
-                  </TableCell>
-                  <TableCell>
-                    <span className="capitalize">{doc.type.replace('_', ' ')}</span>
-                  </TableCell>
-                  <TableCell>
-                    {new Date(doc.dateUploaded).toLocaleDateString('en-GB', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    })}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      {doc.expiryDate && (
-                        <>
-                          {isDocumentExpired(doc) && (
-                            <AlertTriangle className="h-4 w-4 text-red-500" />
-                          )}
-                          {isDocumentExpiring(doc) && (
-                            <AlertTriangle className="h-4 w-4 text-amber-500" />
-                          )}
-                          {!isDocumentExpired(doc) && !isDocumentExpiring(doc) && (
-                            <CheckCircle2 className="h-4 w-4 text-tms-green" />
-                          )}
-                          {new Date(doc.expiryDate).toLocaleDateString('en-GB', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
-                          })}
-                        </>
-                      )}
-                      {!doc.expiryDate && (
-                        <span className="text-muted-foreground">No expiry</span>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>{doc.fileSize}</TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button variant="outline" size="icon" className="h-8 w-8">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {filteredDocuments.map(doc => {
+                const status = getDocumentStatus(doc);
+                return (
+                  <TableRow key={doc.id}>
+                    <TableCell className="font-medium flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-tms-blue" />
+                      {doc.name}
+                    </TableCell>
+                    <TableCell>
+                      <span className="capitalize">{doc.type.replace('_', ' ')}</span>
+                    </TableCell>
+                    <TableCell>
+                      {formatDocumentDate(doc.dateUploaded)}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        {doc.expiryDate && (
+                          <>
+                            {isDocumentExpired(doc) && (
+                              <AlertTriangle className="h-4 w-4 text-red-500" />
+                            )}
+                            {isDocumentExpiringSoon(doc) && !isDocumentExpired(doc) && (
+                              <AlertTriangle className="h-4 w-4 text-amber-500" />
+                            )}
+                            {!isDocumentExpired(doc) && !isDocumentExpiringSoon(doc) && (
+                              <CheckCircle2 className="h-4 w-4 text-tms-green" />
+                            )}
+                            {formatDocumentDate(doc.expiryDate)}
+                          </>
+                        )}
+                        {!doc.expiryDate && (
+                          <span className="text-muted-foreground">No expiry</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>{formatFileSize(doc.fileSize)}</TableCell>
+                    <TableCell>
+                      <Badge variant={status.variant}>
+                        {status.label}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button variant="outline" size="icon" className="h-8 w-8">
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>

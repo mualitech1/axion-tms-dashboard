@@ -30,7 +30,15 @@ export const isDocumentExpired = (doc: Document): boolean => {
  * Returns a formatted display size for a file
  */
 export const formatFileSize = (size: string | number): string => {
-  if (typeof size === 'string') return size;
+  if (typeof size === 'string') {
+    // Try to parse the string as a number if it looks numeric
+    const parsed = parseFloat(size);
+    if (!isNaN(parsed)) {
+      size = parsed;
+    } else {
+      return size;
+    }
+  }
   
   const bytes = Number(size);
   if (isNaN(bytes)) return '0 Bytes';
@@ -69,4 +77,80 @@ export const getFileTypeFromPath = (path: string): string => {
     default:
       return 'Document';
   }
+};
+
+/**
+ * Get status of a document
+ */
+export const getDocumentStatus = (doc: Document): {
+  label: string;
+  variant: 'destructive' | 'warning' | 'outline' | 'default';
+} => {
+  if (isDocumentExpired(doc)) {
+    return { label: 'Expired', variant: 'destructive' };
+  }
+  if (isDocumentExpiringSoon(doc)) {
+    return { label: 'Expiring Soon', variant: 'warning' };
+  }
+  return { label: 'Valid', variant: 'outline' };
+};
+
+/**
+ * Format date to localized string
+ */
+export const formatDocumentDate = (dateString: string | null | undefined): string => {
+  if (!dateString) return 'No date';
+  
+  return new Date(dateString).toLocaleDateString('en-GB', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
+/**
+ * Get document icon based on file type
+ */
+export const getDocumentIcon = (doc: Document): string => {
+  const extension = doc.filePath.split('.').pop()?.toLowerCase() || '';
+  
+  switch (extension) {
+    case 'pdf':
+      return 'file-text';
+    case 'doc':
+    case 'docx':
+      return 'file-text';
+    case 'xls':
+    case 'xlsx':
+      return 'file-spreadsheet';
+    case 'jpg':
+    case 'jpeg':
+    case 'png':
+      return 'image';
+    default:
+      return 'file';
+  }
+};
+
+/**
+ * Count documents by status
+ */
+export const countDocumentsByStatus = (documents: Document[]): {
+  valid: number;
+  expiringSoon: number;
+  expired: number;
+} => {
+  return documents.reduce(
+    (counts, doc) => {
+      if (isDocumentExpired(doc)) {
+        counts.expired += 1;
+      } else if (isDocumentExpiringSoon(doc)) {
+        counts.expiringSoon += 1;
+      } else {
+        counts.valid += 1;
+      }
+      return counts;
+    },
+    { valid: 0, expiringSoon: 0, expired: 0 }
+  );
 };

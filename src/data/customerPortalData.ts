@@ -1,5 +1,6 @@
 
 import { Customer, Document } from '@/types/customer';
+import { isDocumentExpiringSoon } from '@/utils/documentUtils';
 
 // Mock data for the customer portal
 export const customerPortalData: Customer = {
@@ -53,9 +54,7 @@ export const customerPortalData: Customer = {
   }
 };
 
-// Helper function to check if documents are expiring soon
+// Helper function to check if documents are expiring soon - now using our utility function
 export const hasExpiringDocuments = (customer: Customer): boolean => {
-  return customer.documents?.some(
-    doc => doc.expiryDate && new Date(doc.expiryDate) < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-  ) || false;
+  return customer.documents?.some(doc => isDocumentExpiringSoon(doc)) || false;
 };
