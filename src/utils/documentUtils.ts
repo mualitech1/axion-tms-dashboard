@@ -154,3 +154,84 @@ export const countDocumentsByStatus = (documents: Document[]): {
     { valid: 0, expiringSoon: 0, expired: 0 }
   );
 };
+
+/**
+ * Generate mock document filePath based on name and type
+ */
+export const generateDocumentFilePath = (name: string, type: Document['type']): string => {
+  let extension = 'pdf';
+  
+  switch (type) {
+    case 'contract':
+    case 'terms':
+      extension = 'pdf';
+      break;
+    case 'rate_card':
+      extension = 'xlsx';
+      break;
+    case 'invoice':
+      extension = 'pdf';
+      break;
+    case 'pod':
+      extension = 'jpg';
+      break;
+    default:
+      extension = 'pdf';
+  }
+  
+  return `/documents/${name.toLowerCase().replace(/\s+/g, '-')}.${extension}`;
+};
+
+/**
+ * Get file extension from mime type
+ */
+export const getExtensionFromMimeType = (mimeType: string): string => {
+  switch (mimeType) {
+    case 'application/pdf':
+      return '.pdf';
+    case 'application/msword':
+      return '.doc';
+    case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+      return '.docx';
+    case 'application/vnd.ms-excel':
+      return '.xls';
+    case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+      return '.xlsx';
+    case 'image/jpeg':
+      return '.jpg';
+    case 'image/png':
+      return '.png';
+    default:
+      return '.pdf';
+  }
+};
+
+/**
+ * Check if the document type requires an expiry date
+ */
+export const typeRequiresExpiry = (type: Document['type']): boolean => {
+  return ['contract', 'terms'].includes(type);
+};
+
+/**
+ * Get allowed file types for document upload
+ */
+export const getAllowedFileTypes = (): string => {
+  return '.pdf,.doc,.docx,.jpg,.jpeg,.png,.txt,.xls,.xlsx';
+};
+
+/**
+ * Get display name for document type
+ */
+export const getDocumentTypeDisplayName = (type: Document['type']): string => {
+  const typeMap: Record<Document['type'], string> = {
+    'contract': 'Contract',
+    'terms': 'Terms & Conditions',
+    'rate_card': 'Rate Card',
+    'invoice': 'Invoice',
+    'pod': 'Proof of Delivery',
+    'other': 'Other'
+  };
+  
+  return typeMap[type] || 'Document';
+};

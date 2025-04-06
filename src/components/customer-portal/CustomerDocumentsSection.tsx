@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Customer, Document } from '@/types/customer';
-import { FileText, Download, Calendar, Clock, AlertCircle, Plus, Filter } from 'lucide-react';
+import { FileText, Download, Calendar, Clock, AlertCircle, Plus, Upload, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,12 +13,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   isDocumentExpiringSoon,
   isDocumentExpired,
   formatFileSize,
   getDocumentStatus,
-  formatDocumentDate
+  formatDocumentDate,
+  getFileTypeFromPath
 } from '@/utils/documentUtils';
+import { DocumentUploadModal } from './DocumentUploadModal';
+import { toast } from "@/hooks/use-toast";
 
 interface CustomerDocumentsSectionProps {
   customer: Customer;
@@ -29,6 +43,8 @@ type DocumentFilter = 'all' | 'expiring' | 'expired' | 'valid';
 const CustomerDocumentsSection = ({ customer }: CustomerDocumentsSectionProps) => {
   const [documents, setDocuments] = useState<Document[]>(customer.documents || []);
   const [filter, setFilter] = useState<DocumentFilter>('all');
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<string | null>(null);
 
   const filteredDocuments = documents.filter(doc => {
     switch (filter) {
@@ -47,6 +63,33 @@ const CustomerDocumentsSection = ({ customer }: CustomerDocumentsSectionProps) =
     setFilter(value);
   };
 
+  const handleDocumentUpload = (newDocument: Document) => {
+    setDocuments([...documents, newDocument]);
+  };
+
+  const handleDeleteDocument = (documentId: string) => {
+    setDocumentToDelete(documentId);
+  };
+  
+  const confirmDelete = () => {
+    if (documentToDelete) {
+      setDocuments(documents.filter(doc => doc.id !== documentToDelete));
+      setDocumentToDelete(null);
+      toast({
+        title: "Document deleted",
+        description: "The document has been successfully removed."
+      });
+    }
+  };
+
+  const handleDownload = (doc: Document) => {
+    // In a real application, this would trigger a file download
+    toast({
+      title: "Download started",
+      description: `Downloading ${doc.name}...`
+    });
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -63,7 +106,7 @@ const CustomerDocumentsSection = ({ customer }: CustomerDocumentsSectionProps) =
               <SelectItem value="expired">Expired</SelectItem>
             </SelectContent>
           </Select>
-          <Button size="sm">
+          <Button size="sm" onClick={() => setIsUploadModalOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Upload Document
           </Button>
@@ -95,16 +138,26 @@ const CustomerDocumentsSection = ({ customer }: CustomerDocumentsSectionProps) =
                       <div className="text-sm text-muted-foreground mt-1">
                         {formatFileSize(doc.fileSize)}
                       </div>
+                      <div className="text-sm text-muted-foreground mt-1">
+                        Type: {getFileTypeFromPath(doc.filePath)}
+                      </div>
                     </div>
                   </div>
                   <div className="flex flex-col items-end space-y-2">
                     <Badge variant={status.variant}>
                       {status.label}
                     </Badge>
-                    <Button variant="ghost" size="sm" className="flex items-center">
-                      <Download className="h-4 w-4 mr-1" />
-                      Download
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button variant="ghost" size="sm" className="flex items-center" onClick={() => handleDownload(doc)}>
+                        <Download className="h-4 w-4 mr-1" />
+                        Download
+                      </Button>
+                      <Button variant="ghost" size="sm" className="flex items-center text-red-500 hover:text-red-600 hover:bg-red-50" 
+                        onClick={() => handleDeleteDocument(doc.id)}>
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Delete
+                      </Button>
+                    </div>
                   </div>
                 </div>
               );
@@ -119,13 +172,36 @@ const CustomerDocumentsSection = ({ customer }: CustomerDocumentsSectionProps) =
                 ? `No ${filter === 'expiring' ? 'expiring' : filter === 'expired' ? 'expired' : 'valid'} documents found`
                 : 'You haven\'t uploaded any documents yet'}
             </p>
-            <Button size="sm" className="mt-4">
-              <Plus className="h-4 w-4 mr-1" />
+            <Button size="sm" className="mt-4" onClick={() => setIsUploadModalOpen(true)}>
+              <Upload className="h-4 w-4 mr-1" />
               Upload Document
             </Button>
           </div>
         )}
       </CardContent>
+
+      <DocumentUploadModal 
+        open={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onDocumentUpload={handleDocumentUpload}
+      />
+
+      <AlertDialog open={documentToDelete !== null} onOpenChange={() => setDocumentToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the document.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-500 hover:bg-red-600">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 };

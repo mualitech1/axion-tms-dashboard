@@ -8,14 +8,36 @@ import CustomerPortalNavigation from '@/components/customer-portal/CustomerPorta
 import CustomerPortalDashboard from '@/components/customer-portal/CustomerPortalDashboard';
 import CustomerProfileForm from '@/components/customer-portal/CustomerProfileForm';
 import CustomerDocumentsSection from '@/components/customer-portal/CustomerDocumentsSection';
-import { Customer } from '@/types/customer';
+import { Customer, Document } from '@/types/customer';
 import { customerPortalData, hasExpiringDocuments } from '@/data/customerPortalData';
+import { toast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 export default function CustomerPortal() {
   const location = useLocation();
   const [customer, setCustomer] = useState<Customer>(customerPortalData);
   
   const handleUpdateCustomer = (updatedCustomer: Customer) => {
+    setCustomer(updatedCustomer);
+    toast({
+      title: "Customer updated",
+      description: "Customer information has been successfully updated.",
+    });
+  };
+
+  const handleAddDocument = (newDocument: Document) => {
+    const updatedCustomer = {
+      ...customer,
+      documents: [...(customer.documents || []), newDocument],
+    };
+    setCustomer(updatedCustomer);
+  };
+
+  const handleRemoveDocument = (documentId: string) => {
+    const updatedCustomer = {
+      ...customer,
+      documents: (customer.documents || []).filter(doc => doc.id !== documentId),
+    };
     setCustomer(updatedCustomer);
   };
 
@@ -50,7 +72,11 @@ export default function CustomerPortal() {
               />
               <Route 
                 path="/documents" 
-                element={<CustomerDocumentsSection customer={customer} />} 
+                element={
+                  <CustomerDocumentsSection 
+                    customer={customer}
+                  />
+                } 
               />
               <Route 
                 path="/rates" 
@@ -73,6 +99,7 @@ export default function CustomerPortal() {
           </div>
         </div>
       </div>
+      <Toaster />
     </MainLayout>
   );
 }

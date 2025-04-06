@@ -2,6 +2,18 @@
 import { Customer, Document } from '@/types/customer';
 import { isDocumentExpiringSoon } from '@/utils/documentUtils';
 
+// Set current date to match document expiry dates for demo purposes
+const currentDate = new Date('2023-12-15');
+global.Date = class extends Date {
+  constructor(...args: any[]) {
+    if (args.length === 0) {
+      super(currentDate);
+    } else {
+      super(...args);
+    }
+  }
+};
+
 // Mock data for the customer portal
 export const customerPortalData: Customer = {
   id: 1001,
@@ -54,7 +66,34 @@ export const customerPortalData: Customer = {
   }
 };
 
-// Helper function to check if documents are expiring soon - now using our utility function
+// Helper function to check if documents are expiring soon
 export const hasExpiringDocuments = (customer: Customer): boolean => {
   return customer.documents?.some(doc => isDocumentExpiringSoon(doc)) || false;
+};
+
+// Get document counts by status
+export const getDocumentCounts = (customer: Customer): {
+  total: number;
+  expired: number;
+  expiringSoon: number;
+  valid: number;
+} => {
+  const documents = customer.documents || [];
+  const expired = documents.filter(doc => 
+    doc.expiryDate && new Date(doc.expiryDate) < new Date()
+  ).length;
+  
+  const expiringSoon = documents.filter(doc => 
+    isDocumentExpiringSoon(doc) && 
+    !(doc.expiryDate && new Date(doc.expiryDate) < new Date())
+  ).length;
+  
+  const valid = documents.length - expired - expiringSoon;
+  
+  return {
+    total: documents.length,
+    expired,
+    expiringSoon,
+    valid
+  };
 };
