@@ -1,6 +1,6 @@
 
 import { Truck, Calendar, Plus, LayoutDashboard } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import JobsList from "./components/JobsList";
 import FleetOverview from "./components/FleetOverview";
 import PlanningCalendar from "./components/PlanningCalendar";
@@ -11,8 +11,13 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } 
 import DragDropScheduler from "./components/DragDropScheduler";
 
 export default function JobsPage() {
+  console.log("JobsPage component rendered");
   const [isCreatingJob, setIsCreatingJob] = useState(false);
   const [viewMode, setViewMode] = useState<"calendar" | "scheduler">("calendar");
+  
+  useEffect(() => {
+    console.log("JobsPage mounted");
+  }, []);
   
   return (
     <MainLayout title="Dashboard">

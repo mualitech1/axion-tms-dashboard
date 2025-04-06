@@ -4,6 +4,7 @@ import JobsPage from './jobs/JobsPage';
 import JobDetailPage from './jobs/JobDetailPage';
 
 export default function Jobs() {
+  console.log("Jobs component rendered");
   return (
     <Routes>
       <Route index element={<JobsPage />} />
