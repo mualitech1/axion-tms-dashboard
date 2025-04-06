@@ -5,16 +5,28 @@ import { isDocumentExpiringSoon } from '@/utils/documentUtils';
 // Set current date to match document expiry dates for demo purposes
 const currentDate = new Date('2023-12-15');
 
-// Override Date constructor for demo purposes using window instead of global
+// Store the original Date constructor
 const OriginalDate = Date;
-window.Date = class extends OriginalDate {
+
+// Create a custom date constructor for demo purposes
+// Use proper TypeScript typing to avoid errors
+(window as any).Date = class extends OriginalDate {
   constructor(...args: any[]) {
     if (args.length === 0) {
       super(currentDate);
     } else if (args.length === 1) {
       super(args[0]);
     } else {
-      super(...args);
+      // When multiple arguments are passed, call the constructor correctly
+      super(
+        args[0], 
+        args[1], 
+        args[2] || 1, 
+        args[3] || 0, 
+        args[4] || 0, 
+        args[5] || 0, 
+        args[6] || 0
+      );
     }
   }
 };
