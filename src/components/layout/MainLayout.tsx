@@ -11,7 +11,6 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ children, title }: MainLayoutProps) {
-  console.log("MainLayout rendered with title:", title);
   const isMobile = useIsMobile();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
@@ -22,7 +21,7 @@ export default function MainLayout({ children, title }: MainLayoutProps) {
   }, [isMobile]);
 
   return (
-    <div className="min-h-screen bg-tms-gray-100 flex w-full">
+    <div className="min-h-screen bg-gray-50 flex w-full">
       <Sidebar />
       
       <div className={cn(
