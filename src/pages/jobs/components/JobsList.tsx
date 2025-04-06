@@ -92,8 +92,8 @@ export default function JobsList({ openJobCreation }: JobsListProps) {
   };
   
   const EmptyState = () => (
-    <div className="text-center py-12 text-muted-foreground bg-gray-50/70 rounded-lg">
-      <Search className="h-10 w-10 text-muted-foreground/50 mx-auto mb-3" />
+    <div className="text-center py-8 sm:py-12 text-muted-foreground bg-gray-50/70 rounded-lg">
+      <Search className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground/50 mx-auto mb-3" />
       <p className="font-medium">No jobs found</p>
       <p className="text-sm mt-1 mb-4">Try adjusting your search or filters</p>
       <Button 
@@ -110,17 +110,17 @@ export default function JobsList({ openJobCreation }: JobsListProps) {
 
   return (
     <Card className="bg-white border border-border/40 shadow-sm h-full">
-      <div className="p-5 border-b border-border/40">
-        <div className="flex items-center justify-between mb-4">
+      <div className="p-3 sm:p-5 border-b border-border/40">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
           <h3 className="text-lg font-semibold">Jobs</h3>
-          <Button onClick={openJobCreation} size="sm" className="gap-1">
+          <Button onClick={openJobCreation} size="sm" className="gap-1 w-full sm:w-auto">
             <Plus className="h-4 w-4" />
             New Job
           </Button>
         </div>
         
         <div className="flex flex-col gap-3">
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <InputWithIcon
               icon={Search}
               placeholder="Search jobs..."
@@ -131,6 +131,7 @@ export default function JobsList({ openJobCreation }: JobsListProps) {
             <AdvancedFilters 
               onFilterChange={handleFilterChange}
               activeFiltersCount={activeFiltersCount}
+              className="w-full sm:w-auto"
             />
           </div>
           
@@ -142,7 +143,7 @@ export default function JobsList({ openJobCreation }: JobsListProps) {
         </div>
       </div>
 
-      <div className="p-4">
+      <div className="p-2 sm:p-4">
         <div className="space-y-3 overflow-y-auto max-h-[calc(100vh-400px)] pr-1">
           {filteredJobs.length > 0 ? (
             filteredJobs.map((job) => (

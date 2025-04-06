@@ -14,8 +14,8 @@ export default function FleetOverview() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <Card className="bg-white p-5 border border-border/40 shadow-sm">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <Card className="bg-white p-4 sm:p-5 border border-border/40 shadow-sm">
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-full bg-green-50">
@@ -31,7 +31,7 @@ export default function FleetOverview() {
         <p className="text-xs text-muted-foreground">{fleetStats.available.percentage}% of fleet available for assignments</p>
       </Card>
       
-      <Card className="bg-white p-5 border border-border/40 shadow-sm">
+      <Card className="bg-white p-4 sm:p-5 border border-border/40 shadow-sm">
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-full bg-amber-50">
@@ -47,7 +47,7 @@ export default function FleetOverview() {
         <p className="text-xs text-muted-foreground">{fleetStats.inTransit.percentage}% of fleet currently on the road</p>
       </Card>
       
-      <Card className="bg-white p-5 border border-border/40 shadow-sm">
+      <Card className="bg-white p-4 sm:p-5 border border-border/40 shadow-sm">
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-full bg-red-50">
@@ -63,7 +63,7 @@ export default function FleetOverview() {
         <p className="text-xs text-muted-foreground">{fleetStats.maintenance.percentage}% of fleet under maintenance</p>
       </Card>
       
-      <Card className="bg-white p-5 border border-border/40 shadow-sm">
+      <Card className="bg-white p-4 sm:p-5 border border-border/40 shadow-sm">
         <div>
           <h3 className="font-medium text-sm mb-2">Vehicle Utilization</h3>
           <div className="flex items-center gap-2 mb-1">

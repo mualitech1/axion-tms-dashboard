@@ -15,10 +15,12 @@ import FleetOverview from "./components/FleetOverview";
 import PlanningCalendar from "./components/PlanningCalendar";
 import JobsList from "./components/JobsList";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function JobsPage() {
   const [isCreatingJob, setIsCreatingJob] = useState(false);
   const [viewMode, setViewMode] = useState<"calendar" | "scheduler">("calendar");
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     console.log("JobsPage mounted");
@@ -34,14 +36,18 @@ export default function JobsPage() {
             <p className="text-muted-foreground mt-1">Manage and track all transportation jobs</p>
           </div>
           
-          <div className="flex flex-wrap items-center gap-2">
-            <Tabs defaultValue={viewMode} onValueChange={(value) => setViewMode(value as "calendar" | "scheduler")}>
-              <TabsList>
-                <TabsTrigger value="calendar" className="flex items-center gap-1">
+          <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+            <Tabs 
+              defaultValue={viewMode} 
+              onValueChange={(value) => setViewMode(value as "calendar" | "scheduler")}
+              className="w-full sm:w-auto"
+            >
+              <TabsList className="w-full sm:w-auto">
+                <TabsTrigger value="calendar" className="flex items-center gap-1 flex-1 sm:flex-initial">
                   <Calendar className="h-4 w-4" />
                   Calendar
                 </TabsTrigger>
-                <TabsTrigger value="scheduler" className="flex items-center gap-1">
+                <TabsTrigger value="scheduler" className="flex items-center gap-1 flex-1 sm:flex-initial">
                   <LayoutDashboard className="h-4 w-4" />
                   Scheduler
                 </TabsTrigger>
@@ -50,12 +56,12 @@ export default function JobsPage() {
             
             <Dialog open={isCreatingJob} onOpenChange={setIsCreatingJob}>
               <DialogTrigger asChild>
-                <Button className="ml-2">
+                <Button className="ml-0 sm:ml-2 w-full sm:w-auto mt-2 sm:mt-0">
                   <Plus className="mr-2 h-4 w-4" />
                   Create Job
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-4xl">
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                 <DialogTitle>Create New Job</DialogTitle>
                 <DialogDescription>Fill in the details to create a new job.</DialogDescription>
                 <JobCreation onComplete={() => setIsCreatingJob(false)} />

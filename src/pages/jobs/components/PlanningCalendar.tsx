@@ -2,19 +2,21 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, Search, Filter as FilterIcon } from "lucide-react";
+import { CalendarIcon, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InputWithIcon } from "@/components/ui/input-with-icon";
 import { DayWithJobs } from "./calendar/DayWithJobs";
 import { JobsPanel } from "./calendar/JobsPanel";
 import { mockJobEvents, getMockJobDetailsForDate } from "./calendar/mockJobData";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function PlanningCalendar() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedJobs, setSelectedJobs] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState<"all" | "scheduled" | "in-progress">("all");
+  const isMobile = useIsMobile();
 
   const handleDateSelect = (newDate: Date | undefined) => {
     setDate(newDate);
@@ -40,21 +42,21 @@ export default function PlanningCalendar() {
 
   return (
     <Card className="bg-white border border-border/40 shadow-sm overflow-hidden">
-      <div className="p-5 border-b border-border/40">
-        <div className="flex items-center justify-between">
+      <div className="p-3 sm:p-5 border-b border-border/40">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <CalendarIcon className="h-5 w-5 text-blue-500" />
             Planning Calendar
           </h3>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             <InputWithIcon
               icon={Search}
               placeholder="Search jobs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-[200px] h-9"
+              className="w-full sm:w-[200px] h-9"
             />
-            <Button variant="outline" size="sm" className="h-9">
+            <Button variant="outline" size="sm" className="h-9 whitespace-nowrap">
               April 2025
             </Button>
           </div>
@@ -62,8 +64,8 @@ export default function PlanningCalendar() {
       </div>
       
       <div className="flex flex-col lg:flex-row">
-        <div className="lg:w-2/3 p-4 lg:border-r border-border/40">
-          <div className="bg-gray-50/70 p-4 rounded-lg">
+        <div className="lg:w-2/3 p-2 sm:p-4 lg:border-r border-border/40">
+          <div className="bg-gray-50/70 p-2 sm:p-4 rounded-lg">
             <Calendar
               mode="single"
               selected={date}
@@ -115,7 +117,7 @@ export default function PlanningCalendar() {
           </div>
         </div>
         
-        <div className="lg:w-1/3 p-4 bg-gray-50/30">
+        <div className="lg:w-1/3 p-2 sm:p-4 bg-gray-50/30">
           <JobsPanel date={date} selectedJobs={selectedJobs} />
         </div>
       </div>
