@@ -75,7 +75,7 @@ const CustomerDocumentsSection = ({ customer }: CustomerDocumentsSectionProps) =
                     </div>
                   </div>
                   <div className="flex flex-col items-end space-y-2">
-                    <Badge variant={status.variant as any}>
+                    <Badge variant={status.variant}>
                       {status.label}
                     </Badge>
                     <Button variant="ghost" size="sm" className="flex items-center">

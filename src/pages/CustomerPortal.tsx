@@ -9,9 +9,9 @@ import CustomerPortalDashboard from '@/components/customer-portal/CustomerPortal
 import CustomerProfileForm from '@/components/customer-portal/CustomerProfileForm';
 import CustomerDocumentsSection from '@/components/customer-portal/CustomerDocumentsSection';
 
-// Update the mock customer data to use number id instead of string
+// Updated mock customer data to match Document interface
 const customerData = {
-  id: 1001,  // Changed from string to number
+  id: 1001,
   name: "Acme Logistics Ltd",
   contact: "Jane Smith",
   email: "jane@acmelogistics.com",
@@ -20,9 +20,33 @@ const customerData = {
   creditLimit: 50000,
   lastOrder: "2023-04-01",
   documents: [
-    { id: 1, name: "Insurance Certificate", type: "PDF", uploadDate: "2023-01-15", expiryDate: "2023-12-31" },
-    { id: 2, name: "VAT Registration", type: "PDF", uploadDate: "2023-02-20", expiryDate: "2024-02-20" },
-    { id: 3, name: "Terms Agreement", type: "DOCX", uploadDate: "2023-03-01", expiryDate: null }
+    { 
+      id: "1", 
+      name: "Insurance Certificate", 
+      type: "contract", 
+      dateUploaded: "2023-01-15", 
+      expiryDate: "2023-12-31",
+      filePath: "/documents/insurance.pdf",
+      fileSize: "1.2 MB"
+    },
+    { 
+      id: "2", 
+      name: "VAT Registration", 
+      type: "terms", 
+      dateUploaded: "2023-02-20", 
+      expiryDate: "2024-02-20",
+      filePath: "/documents/vat.pdf",
+      fileSize: "0.8 MB"
+    },
+    { 
+      id: "3", 
+      name: "Terms Agreement", 
+      type: "terms", 
+      dateUploaded: "2023-03-01", 
+      expiryDate: null,
+      filePath: "/documents/terms.docx",
+      fileSize: "0.5 MB"
+    }
   ],
   jobs: [
     { id: "JOB-1001", reference: "DEL-5678", from: "London", to: "Manchester", value: 1250, date: "2023-03-28" },
