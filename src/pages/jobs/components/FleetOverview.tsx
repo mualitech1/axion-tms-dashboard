@@ -1,74 +1,96 @@
 
 import { Card } from "@/components/ui/card";
+import { CheckCircle2, Clock, AlertTriangle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, Clock, AlertCircle } from "lucide-react";
 
 export default function FleetOverview() {
+  // Mock data
+  const fleetStats = {
+    available: { count: 18, total: 25, percentage: 72 },
+    inTransit: { count: 5, total: 25, percentage: 20 },
+    maintenance: { count: 2, total: 25, percentage: 8 },
+    utilization: 28,
+    today: { total: 12, completed: 3, pending: 8, delayed: 1 }
+  };
+
   return (
-    <Card className="p-6 bg-white shadow-sm border">
-      <h3 className="text-lg font-semibold mb-4">Fleet Overview</h3>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-500" />
-              <span className="text-sm font-medium">Available Fleet</span>
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <Card className="bg-white p-5 border border-border/40 shadow-sm">
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-full bg-green-50">
+              <CheckCircle2 className="h-5 w-5 text-green-500" />
             </div>
-            <span className="text-sm font-bold bg-green-50 px-2 py-1 rounded text-green-700">18/25</span>
+            <h3 className="font-medium text-sm">Available Fleet</h3>
           </div>
-          <Progress value={72} className="h-2" />
-          <p className="text-xs text-muted-foreground">72% of fleet available for assignments</p>
+          <span className="text-lg font-semibold text-green-600">
+            {fleetStats.available.count}/{fleetStats.available.total}
+          </span>
         </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+        <Progress value={fleetStats.available.percentage} className="h-2 my-2" />
+        <p className="text-xs text-muted-foreground">{fleetStats.available.percentage}% of fleet available for assignments</p>
+      </Card>
+      
+      <Card className="bg-white p-5 border border-border/40 shadow-sm">
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-full bg-amber-50">
               <Clock className="h-5 w-5 text-amber-500" />
-              <span className="text-sm font-medium">In Transit</span>
             </div>
-            <span className="text-sm font-bold bg-amber-50 px-2 py-1 rounded text-amber-700">5/25</span>
+            <h3 className="font-medium text-sm">In Transit</h3>
           </div>
-          <Progress value={20} className="h-2" />
-          <p className="text-xs text-muted-foreground">20% of fleet currently on the road</p>
+          <span className="text-lg font-semibold text-amber-600">
+            {fleetStats.inTransit.count}/{fleetStats.inTransit.total}
+          </span>
         </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-red-500" />
-              <span className="text-sm font-medium">Maintenance</span>
+        <Progress value={fleetStats.inTransit.percentage} className="h-2 my-2 bg-muted/30" />
+        <p className="text-xs text-muted-foreground">{fleetStats.inTransit.percentage}% of fleet currently on the road</p>
+      </Card>
+      
+      <Card className="bg-white p-5 border border-border/40 shadow-sm">
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-full bg-red-50">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
             </div>
-            <span className="text-sm font-bold bg-red-50 px-2 py-1 rounded text-red-700">2/25</span>
+            <h3 className="font-medium text-sm">Maintenance</h3>
           </div>
-          <Progress value={8} className="h-2" />
-          <p className="text-xs text-muted-foreground">8% of fleet under maintenance</p>
+          <span className="text-lg font-semibold text-red-600">
+            {fleetStats.maintenance.count}/{fleetStats.maintenance.total}
+          </span>
         </div>
-
-        <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium">Vehicle Utilization</span>
-            <span className="text-sm font-bold">28%</span>
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div>
-              <p className="text-muted-foreground">Today's Jobs</p>
-              <p className="font-medium">12</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Completed</p>
-              <p className="font-medium">3</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Delayed</p>
-              <p className="font-medium">1</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Pending</p>
-              <p className="font-medium">8</p>
-            </div>
+        <Progress value={fleetStats.maintenance.percentage} className="h-2 my-2 bg-muted/30" />
+        <p className="text-xs text-muted-foreground">{fleetStats.maintenance.percentage}% of fleet under maintenance</p>
+      </Card>
+      
+      <Card className="bg-white p-5 border border-border/40 shadow-sm">
+        <div>
+          <h3 className="font-medium text-sm mb-2">Vehicle Utilization</h3>
+          <div className="flex items-center gap-2 mb-1">
+            <Progress value={fleetStats.utilization} className="h-2 flex-grow bg-muted/30" />
+            <span className="text-lg font-semibold">{fleetStats.utilization}%</span>
           </div>
         </div>
-      </div>
-    </Card>
+        
+        <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-1">
+          <div className="flex justify-between items-center">
+            <span className="text-xs text-muted-foreground">Today's Jobs</span>
+            <span className="text-sm font-medium">{fleetStats.today.total}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-xs text-muted-foreground">Completed</span>
+            <span className="text-sm font-medium text-green-600">{fleetStats.today.completed}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-xs text-muted-foreground">Delayed</span>
+            <span className="text-sm font-medium text-red-600">{fleetStats.today.delayed}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-xs text-muted-foreground">Pending</span>
+            <span className="text-sm font-medium text-amber-600">{fleetStats.today.pending}</span>
+          </div>
+        </div>
+      </Card>
+    </div>
   );
 }

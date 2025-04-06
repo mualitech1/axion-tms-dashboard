@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { Filter, Calendar, CalendarRange, ArrowDown, ArrowUp } from "lucide-react";
+import { Filter, Calendar, ArrowDown, ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -78,7 +79,7 @@ export function AdvancedFilters({ onFilterChange, activeFiltersCount }: Advanced
         <Button 
           variant="outline" 
           size="sm" 
-          className="relative h-9 gap-1 px-3"
+          className="h-9 gap-1 px-3 border-border/40"
         >
           <Filter className="h-4 w-4" />
           <span>Filters</span>
@@ -92,10 +93,12 @@ export function AdvancedFilters({ onFilterChange, activeFiltersCount }: Advanced
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[320px] p-4" align="end">
-        <div className="space-y-4">
+      <PopoverContent className="w-[320px] p-0" align="end">
+        <div className="p-4 border-b border-border/40">
           <h4 className="font-medium">Filter Jobs</h4>
-          
+        </div>
+        
+        <div className="p-4 space-y-4">
           <div>
             <label className="text-sm font-medium block mb-2">Status</label>
             <Select
@@ -180,7 +183,7 @@ export function AdvancedFilters({ onFilterChange, activeFiltersCount }: Advanced
                   handleFilterChange("endDate", date);
                 }
               }}
-              className={cn("pointer-events-auto rounded border p-3")}
+              className="rounded border p-3"
               initialFocus
             />
           </div>
@@ -206,6 +209,7 @@ export function AdvancedFilters({ onFilterChange, activeFiltersCount }: Advanced
                 variant="outline"
                 size="icon"
                 onClick={() => handleFilterChange("sortDirection", filters.sortDirection === "asc" ? "desc" : "asc")}
+                className="bg-gray-50/60"
               >
                 {filters.sortDirection === "asc" ? (
                   <ArrowUp className="h-4 w-4" />
@@ -215,15 +219,15 @@ export function AdvancedFilters({ onFilterChange, activeFiltersCount }: Advanced
               </Button>
             </div>
           </div>
-          
-          <div className="flex justify-between pt-2">
-            <Button variant="ghost" size="sm" onClick={clearFilters}>
-              Clear filters
-            </Button>
-            <Button size="sm" onClick={() => setIsOpen(false)}>
-              Apply filters
-            </Button>
-          </div>
+        </div>
+        
+        <div className="flex justify-between p-4 pt-2 border-t border-border/40 bg-muted/10">
+          <Button variant="ghost" size="sm" onClick={clearFilters}>
+            Clear filters
+          </Button>
+          <Button size="sm" onClick={() => setIsOpen(false)}>
+            Apply filters
+          </Button>
         </div>
       </PopoverContent>
     </Popover>

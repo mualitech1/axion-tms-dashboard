@@ -1,5 +1,5 @@
 
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Calendar as CalendarIconOutline } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { JobCard } from "./JobCard";
@@ -14,12 +14,12 @@ export function JobsPanel({ date, selectedJobs }: JobsPanelProps) {
   const isMobile = useIsMobile();
   
   return (
-    <div className="border rounded-md p-3 md:p-4 bg-muted/20">
-      <div className="flex items-center justify-between mb-3">
+    <div className="h-full">
+      <div className="flex items-center justify-between mb-4">
         <h4 className="font-medium flex items-center gap-2 text-sm md:text-base">
           {date ? (
             <>
-              <CalendarIcon className="h-4 w-4 text-tms-blue" />
+              <CalendarIcon className="h-4 w-4 text-primary" />
               <span className="truncate">
                 Jobs for {format(date, isMobile ? "MMM d" : "MMMM d, yyyy")}
               </span>
@@ -40,12 +40,14 @@ export function JobsPanel({ date, selectedJobs }: JobsPanelProps) {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center h-[220px] md:h-[320px] text-center">
-          <CalendarIcon className="h-10 w-10 md:h-12 md:w-12 text-muted-foreground/50 mb-2" />
+        <div className="flex flex-col items-center justify-center h-[220px] md:h-[280px] text-center bg-gray-50/70 rounded-lg py-8">
+          <div className="p-3 rounded-full bg-primary/5 mb-3">
+            <CalendarIconOutline className="h-8 w-8 md:h-10 md:w-10 text-muted-foreground/70" />
+          </div>
           <p className="text-muted-foreground font-medium text-sm md:text-base">
             {date ? "No jobs scheduled for this date." : "Please select a date to view scheduled jobs."}
           </p>
-          <p className="text-xs md:text-sm text-muted-foreground mt-1">
+          <p className="text-xs md:text-sm text-muted-foreground mt-2">
             {date && "Click 'Create New Job' to schedule something for this day."}
           </p>
         </div>

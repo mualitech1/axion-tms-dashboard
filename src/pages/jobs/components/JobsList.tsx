@@ -41,12 +41,12 @@ export default function JobsList({ openJobCreation }: JobsListProps) {
     );
     
     // Apply status filter
-    if (filters.status) {
+    if (filters.status && filters.status !== "all") {
       result = result.filter(job => job.status === filters.status);
     }
     
     // Apply priority filter
-    if (filters.priority) {
+    if (filters.priority && filters.priority !== "all") {
       result = result.filter(job => job.priority === filters.priority);
     }
     
@@ -92,62 +92,66 @@ export default function JobsList({ openJobCreation }: JobsListProps) {
   };
   
   const EmptyState = () => (
-    <div className="text-center py-12 text-muted-foreground bg-gray-50 rounded-lg">
-      <Search className="h-10 w-10 text-muted-foreground/50 mx-auto mb-2" />
+    <div className="text-center py-12 text-muted-foreground bg-gray-50/70 rounded-lg">
+      <Search className="h-10 w-10 text-muted-foreground/50 mx-auto mb-3" />
       <p className="font-medium">No jobs found</p>
-      <p className="text-sm mt-1">Try adjusting your search or filters</p>
+      <p className="text-sm mt-1 mb-4">Try adjusting your search or filters</p>
       <Button 
         variant="outline" 
         size="sm" 
         onClick={openJobCreation} 
-        className="mt-4"
+        className="gap-1"
       >
-        <Plus className="h-4 w-4 mr-1" />
+        <Plus className="h-4 w-4" />
         Create New Job
       </Button>
     </div>
   );
 
   return (
-    <Card className="p-6 bg-white shadow-sm border h-full">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">Jobs</h3>
-        <Button size="sm" onClick={openJobCreation} className="gap-1">
-          <Plus className="h-4 w-4" />
-          New Job
-        </Button>
-      </div>
-      
-      <div className="flex flex-col gap-3 mb-4">
-        <div className="flex gap-2">
-          <InputWithIcon
-            icon={Search}
-            placeholder="Search jobs..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full"
-          />
-          <AdvancedFilters 
-            onFilterChange={handleFilterChange}
-            activeFiltersCount={activeFiltersCount}
-          />
+    <Card className="bg-white border border-border/40 shadow-sm h-full">
+      <div className="p-5 border-b border-border/40">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold">Jobs</h3>
+          <Button onClick={openJobCreation} size="sm" className="gap-1">
+            <Plus className="h-4 w-4" />
+            New Job
+          </Button>
         </div>
         
-        {activeFiltersCount > 0 && (
-          <div className="text-xs text-muted-foreground px-2">
-            {activeFiltersCount} {activeFiltersCount === 1 ? 'filter' : 'filters'} applied
+        <div className="flex flex-col gap-3">
+          <div className="flex gap-2">
+            <InputWithIcon
+              icon={Search}
+              placeholder="Search jobs..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full h-9"
+            />
+            <AdvancedFilters 
+              onFilterChange={handleFilterChange}
+              activeFiltersCount={activeFiltersCount}
+            />
           </div>
-        )}
+          
+          {activeFiltersCount > 0 && (
+            <div className="text-xs text-muted-foreground px-2 -mt-1">
+              {activeFiltersCount} {activeFiltersCount === 1 ? 'filter' : 'filters'} applied
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="space-y-3 overflow-y-auto max-h-[calc(100vh-400px)] pr-1">
-        {filteredJobs.length > 0 ? (
-          filteredJobs.map((job) => (
-            <JobCard key={job.id} job={job} />
-          ))
-        ) : (
-          <EmptyState />
-        )}
+      <div className="p-4">
+        <div className="space-y-3 overflow-y-auto max-h-[calc(100vh-400px)] pr-1">
+          {filteredJobs.length > 0 ? (
+            filteredJobs.map((job) => (
+              <JobCard key={job.id} job={job} />
+            ))
+          ) : (
+            <EmptyState />
+          )}
+        </div>
       </div>
     </Card>
   );

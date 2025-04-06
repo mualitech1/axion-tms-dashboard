@@ -1,7 +1,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Calendar, User2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Job } from "./mockJobData";
 
@@ -10,17 +10,27 @@ interface JobCardProps {
 }
 
 export function JobCard({ job }: JobCardProps) {
-  console.log("Rendering job card for job ID:", job.id);
   return (
     <Link to={`/jobs/${job.id}`}>
-      <Card className="p-4 hover:bg-accent/50 cursor-pointer transition-colors border">
+      <Card className="p-4 hover:bg-accent/30 cursor-pointer transition-all duration-200 border border-border/40 group shadow-sm hover:shadow">
         <div className="flex items-start justify-between">
-          <div>
+          <div className="flex-grow">
             <div className="flex items-center gap-2">
-              <h4 className="font-medium">{job.title}</h4>
-              <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground" />
+              <h4 className="font-medium group-hover:text-primary truncate">{job.title}</h4>
+              <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <p className="text-sm text-muted-foreground">{job.client}</p>
+            
+            <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <User2 className="h-3.5 w-3.5" />
+                <span className="truncate max-w-[120px]">{job.client}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Calendar className="h-3.5 w-3.5" />
+                <span>{job.time}</span>
+              </div>
+            </div>
+            
             <div className="flex items-center gap-2 mt-2">
               <Badge 
                 variant={
@@ -42,9 +52,6 @@ export function JobCard({ job }: JobCardProps) {
                 {job.priority} priority
               </Badge>
             </div>
-          </div>
-          <div className="text-right">
-            <p className="text-sm font-medium bg-muted/30 px-2 py-1 rounded">{job.time}</p>
           </div>
         </div>
       </Card>
