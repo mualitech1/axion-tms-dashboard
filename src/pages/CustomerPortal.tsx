@@ -8,6 +8,7 @@ import CustomerPortalNavigation from '@/components/customer-portal/CustomerPorta
 import CustomerPortalDashboard from '@/components/customer-portal/CustomerPortalDashboard';
 import CustomerProfileForm from '@/components/customer-portal/CustomerProfileForm';
 import CustomerDocumentsSection from '@/components/customer-portal/CustomerDocumentsSection';
+import CustomerEmailSystem from '@/components/customer-portal/CustomerEmailSystem';
 import { Customer, Document } from '@/types/customer';
 import { customerPortalData, hasExpiringDocuments } from '@/data/customerPortalData';
 import { toast } from "@/hooks/use-toast";
@@ -77,6 +78,10 @@ export default function CustomerPortal() {
                     customer={customer}
                   />
                 } 
+              />
+              <Route 
+                path="/communications" 
+                element={<CustomerEmailSystem customer={customer} />} 
               />
               <Route 
                 path="/rates" 
