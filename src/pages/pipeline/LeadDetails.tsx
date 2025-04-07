@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useForm } from 'react-hook-form';
+import { Button } from '@/components/ui/button';
 import { initialLeadsData } from './data/pipelineData';
 import { Lead, LeadStatus, LeadSource, ActivityType, Activity } from './data/pipelineTypes';
 import CollaborationTab from './components/collaboration/CollaborationTab';
