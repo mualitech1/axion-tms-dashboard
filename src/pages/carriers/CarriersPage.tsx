@@ -1,7 +1,7 @@
 
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { PlusCircle, FileCheck, CreditCard, MessageSquare, GitMerge } from 'lucide-react';
+import { PlusCircle, FileCheck, CreditCard, MessageSquare, GitMerge, FileBarChart } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,7 +11,6 @@ import FleetDistribution from './components/FleetDistribution';
 import UpcomingExpirations from './components/UpcomingExpirations';
 import { carrierData } from './data/carrierData';
 import { CarrierFilters, CarrierFilterOptions } from './components/filters/CarrierFilters';
-import { CarrierCapability } from './components/filters/CapabilityFilter';
 import { regionOptions } from './components/registration/sections/RegionalCoverageSection';
 
 export default function CarriersPage() {
@@ -112,6 +111,12 @@ export default function CarriersPage() {
               <Link to="/carriers/matching">
                 <GitMerge className="h-4 w-4 mr-2" />
                 Matching
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/carriers/reports">
+                <FileBarChart className="h-4 w-4 mr-2" />
+                Reports
               </Link>
             </Button>
             <Button asChild className="bg-tms-blue hover:bg-tms-blue/90">
