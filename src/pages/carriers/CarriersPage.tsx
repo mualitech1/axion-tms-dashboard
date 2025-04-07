@@ -13,7 +13,8 @@ import {
   FileText, 
   UserCircle2,
   LineChart,
-  Scale
+  Scale,
+  Broadcast
 } from 'lucide-react';
 
 export default function CarriersPage() {
@@ -115,6 +116,12 @@ export default function CarriersPage() {
             <Button variant="outline" size="sm">
               <MessageSquare className="mr-2 h-4 w-4" />
               Messaging
+            </Button>
+          </Link>
+          <Link to="/carriers/broadcast">
+            <Button variant="outline" size="sm">
+              <Broadcast className="mr-2 h-4 w-4" />
+              Broadcast
             </Button>
           </Link>
           <Link to="/carriers/register">

@@ -36,3 +36,28 @@ export interface MessageGroup {
   description?: string;
   createdAt: string;
 }
+
+export interface CarrierMessageGroup {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  filters: {
+    status?: string;
+    fleetType?: string;
+    complianceStatus?: string;
+    capabilities: string[];
+    regions: string[];
+  };
+}
+
+export interface BroadcastMessage {
+  id: string;
+  subject: string;
+  content: string;
+  sentAt: string;
+  recipientGroupId: string;
+  recipientGroupName: string;
+  recipientCount: number;
+  readCount: number;
+}
