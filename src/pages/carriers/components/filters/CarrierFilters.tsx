@@ -136,14 +136,14 @@ export function CarrierFilters({
                 <div className="space-y-2">
                   <Label>Region</Label>
                   <Select
-                    value={filters.region || ""}
-                    onValueChange={(value) => handleFilterChange("region", value === "" ? null : value)}
+                    value={filters.region || "any-region"}
+                    onValueChange={(value) => handleFilterChange("region", value === "any-region" ? null : value)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Any region" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any region</SelectItem>
+                      <SelectItem value="any-region">Any region</SelectItem>
                       {regionOptions.map((region) => (
                         <SelectItem key={region} value={region}>{region}</SelectItem>
                       ))}
@@ -154,14 +154,14 @@ export function CarrierFilters({
                 <div className="space-y-2">
                   <Label>Fleet Type</Label>
                   <Select
-                    value={filters.fleetType || ""}
-                    onValueChange={(value) => handleFilterChange("fleetType", value === "" ? null : value)}
+                    value={filters.fleetType || "any-fleet"}
+                    onValueChange={(value) => handleFilterChange("fleetType", value === "any-fleet" ? null : value)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Any fleet" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any fleet</SelectItem>
+                      <SelectItem value="any-fleet">Any fleet</SelectItem>
                       {fleetOptions.map((fleet) => (
                         <SelectItem key={fleet} value={fleet}>{fleet}</SelectItem>
                       ))}
@@ -173,14 +173,14 @@ export function CarrierFilters({
               <div className="space-y-2">
                 <Label>Compliance Status</Label>
                 <Select
-                  value={filters.complianceStatus || ""}
-                  onValueChange={(value) => handleFilterChange("complianceStatus", value === "" ? null : value)}
+                  value={filters.complianceStatus || "any-status"}
+                  onValueChange={(value) => handleFilterChange("complianceStatus", value === "any-status" ? null : value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Any compliance status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Any status</SelectItem>
+                    <SelectItem value="any-status">Any status</SelectItem>
                     {complianceOptions.map((status) => (
                       <SelectItem key={status} value={status}>{status}</SelectItem>
                     ))}
