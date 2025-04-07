@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   LineChart,
@@ -16,7 +15,7 @@ import {
   Cell,
   TooltipProps,
 } from "recharts";
-import { ChartLineUp, PieChart as PieChartIcon, BarChart as BarChartIcon } from "lucide-react";
+import { LineChart as LineChartIcon, PieChart as PieChartIcon, BarChart as BarChartIcon } from "lucide-react";
 import { ComplianceStatusData } from "../../data/types/performanceTypes";
 
 interface PerformanceOverTimeChartProps {
@@ -28,7 +27,7 @@ export function PerformanceOverTimeChart({ data }: PerformanceOverTimeChartProps
     <Card>
       <CardHeader>
         <CardTitle className="text-lg flex items-center">
-          <ChartLineUp className="h-5 w-5 mr-2 text-tms-blue" />
+          <LineChartIcon className="h-5 w-5 mr-2 text-tms-blue" />
           Performance Trends
         </CardTitle>
       </CardHeader>

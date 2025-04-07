@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, FileChart, FileLineChart, FilePieChart, Download } from "lucide-react";
+import { ArrowLeft, FileText, LineChart, PieChart, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MainLayout from "@/components/layout/MainLayout";
@@ -84,15 +84,15 @@ export default function CarrierReports() {
             <Tabs defaultValue="dashboard">
               <TabsList className="mb-4">
                 <TabsTrigger value="dashboard">
-                  <FileChart className="h-4 w-4 mr-2" />
+                  <FileText className="h-4 w-4 mr-2" />
                   Dashboard
                 </TabsTrigger>
                 <TabsTrigger value="performance">
-                  <FileLineChart className="h-4 w-4 mr-2" />
+                  <LineChart className="h-4 w-4 mr-2" />
                   Performance
                 </TabsTrigger>
                 <TabsTrigger value="compliance">
-                  <FilePieChart className="h-4 w-4 mr-2" />
+                  <PieChart className="h-4 w-4 mr-2" />
                   Compliance
                 </TabsTrigger>
               </TabsList>

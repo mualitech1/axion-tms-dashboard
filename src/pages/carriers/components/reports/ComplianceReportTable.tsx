@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { ComplianceReportItem } from "../../data/types/performanceTypes";
-import { FileAlert } from "lucide-react";
+import { FileWarning } from "lucide-react";
 
 interface ComplianceReportTableProps {
   data: ComplianceReportItem[];
@@ -61,7 +61,7 @@ export default function ComplianceReportTable({ data }: ComplianceReportTablePro
             <TableRow>
               <TableCell colSpan={7} className="text-center py-4">
                 <div className="flex flex-col items-center justify-center text-muted-foreground">
-                  <FileAlert className="h-12 w-12 mb-2" />
+                  <FileWarning className="h-12 w-12 mb-2" />
                   <p>No compliance data available</p>
                 </div>
               </TableCell>

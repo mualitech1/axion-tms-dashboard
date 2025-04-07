@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ChartLineUp, Clock, FileTextCheck, AlertTriangle, Star } from "lucide-react";
+import { LineChart, Clock, FileCheck, AlertTriangle, Star } from "lucide-react";
 import { CarrierPerformanceMetrics } from "../../data/types/performanceTypes";
 
 interface PerformanceMetricsCardProps {
@@ -13,7 +13,7 @@ export default function PerformanceMetricsCard({ metrics }: PerformanceMetricsCa
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center">
-          <ChartLineUp className="h-5 w-5 mr-2 text-tms-blue" />
+          <LineChart className="h-5 w-5 mr-2 text-tms-blue" />
           {metrics.carrierName}
           <span className="text-sm font-normal text-muted-foreground ml-2">
             ({metrics.period})
@@ -35,7 +35,7 @@ export default function PerformanceMetricsCard({ metrics }: PerformanceMetricsCa
         <div className="space-y-1">
           <div className="flex justify-between items-center text-sm">
             <div className="flex items-center">
-              <FileTextCheck className="h-4 w-4 mr-2 text-tms-green" />
+              <FileCheck className="h-4 w-4 mr-2 text-tms-green" />
               <span className="font-medium">Compliance Score</span>
             </div>
             <span className="font-semibold">{metrics.complianceScore}%</span>
