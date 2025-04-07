@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -14,7 +13,7 @@ import {
   UserCircle2,
   LineChart,
   Scale,
-  Broadcast
+  Radio
 } from 'lucide-react';
 
 export default function CarriersPage() {
@@ -27,7 +26,6 @@ export default function CarriersPage() {
   };
   
   const handleFilterChange = (filters: any) => {
-    // Count active filters
     let count = 0;
     if (filters.status) count++;
     if (filters.region) count++;
@@ -39,7 +37,6 @@ export default function CarriersPage() {
     
     setActiveFiltersCount(count);
     
-    // Apply filters
     let filtered = [...carriers];
     
     if (searchTerm) {
@@ -85,7 +82,6 @@ export default function CarriersPage() {
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
-    // Re-trigger filter logic with new search term
     handleFilterChange({});
   };
 
@@ -120,7 +116,7 @@ export default function CarriersPage() {
           </Link>
           <Link to="/carriers/broadcast">
             <Button variant="outline" size="sm">
-              <Broadcast className="mr-2 h-4 w-4" />
+              <Radio className="mr-2 h-4 w-4" />
               Broadcast
             </Button>
           </Link>

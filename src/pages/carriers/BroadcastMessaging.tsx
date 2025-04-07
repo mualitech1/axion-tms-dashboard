@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
-import { Broadcast, Mail, Users } from 'lucide-react';
+import { Radio, Mail, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ComposeMessage from './messaging/components/ComposeMessage';
@@ -145,7 +144,7 @@ export default function BroadcastMessaging() {
               <span>Compose</span>
             </TabsTrigger>
             <TabsTrigger value="history" className="flex items-center">
-              <Broadcast className="mr-2 h-4 w-4" />
+              <Radio className="mr-2 h-4 w-4" />
               <span>Message History</span>
             </TabsTrigger>
             <TabsTrigger value="groups" className="flex items-center">
