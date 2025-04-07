@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { PlusCircle, FileCheck, CreditCard } from 'lucide-react';
@@ -12,6 +11,7 @@ import UpcomingExpirations from './components/UpcomingExpirations';
 import { carrierData } from './data/carrierData';
 import { CarrierFilters, CarrierFilterOptions } from './components/filters/CarrierFilters';
 import { CarrierCapability } from './components/filters/CapabilityFilter';
+import { regionOptions } from './components/registration/sections/RegionalCoverageSection';
 
 export default function CarriersPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,10 +21,10 @@ export default function CarriersPage() {
     fleetType: null,
     complianceStatus: null,
     favorites: false,
-    capabilities: []
+    capabilities: [],
+    regions: []
   });
   
-  // Calculate active filters count
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (filterOptions.status) count++;
@@ -33,13 +33,12 @@ export default function CarriersPage() {
     if (filterOptions.complianceStatus) count++;
     if (filterOptions.favorites) count++;
     if (filterOptions.capabilities.length > 0) count++;
+    if (filterOptions.regions.length > 0) count++;
     return count;
   }, [filterOptions]);
   
-  // Filter carriers based on search term and filter options
   const filteredCarriers = useMemo(() => {
     return carrierData.filter(carrier => {
-      // Apply text search filter
       const matchesSearch = 
         carrier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         carrier.region.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -47,27 +46,28 @@ export default function CarriersPage() {
         
       if (!matchesSearch) return false;
       
-      // Apply status filter
       if (filterOptions.status && carrier.status !== filterOptions.status) return false;
       
-      // Apply region filter
       if (filterOptions.region && 
           filterOptions.region !== 'All Regions' && 
           carrier.region !== filterOptions.region) return false;
       
-      // Apply fleet type filter
+      if (filterOptions.regions.length > 0) {
+        const operatesInSelectedRegion = filterOptions.regions.some(
+          regionId => carrier.operatingRegions?.includes(regionId)
+        );
+        if (!operatesInSelectedRegion) return false;
+      }
+      
       if (filterOptions.fleetType && 
           filterOptions.fleetType !== 'All Types' && 
           carrier.fleet !== filterOptions.fleetType) return false;
       
-      // Apply compliance status filter
       if (filterOptions.complianceStatus && 
           carrier.complianceStatus !== filterOptions.complianceStatus) return false;
       
-      // Apply favorites filter
       if (filterOptions.favorites && !carrier.favorite) return false;
       
-      // Apply capabilities filter
       if (filterOptions.capabilities.length > 0) {
         const hasCapability = filterOptions.capabilities.some(capability => 
           carrier.capabilities.includes(capability as string)
@@ -117,6 +117,7 @@ export default function CarriersPage() {
             activeFiltersCount={activeFiltersCount}
             onFilterChange={setFilterOptions}
             className="mb-4"
+            regionOptions={regionOptions}
           />
           
           <Tabs defaultValue="all">

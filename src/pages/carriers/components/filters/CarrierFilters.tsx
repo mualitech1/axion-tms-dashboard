@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Search, Filter, X } from "lucide-react";
+import { Search, Filter, X, MapPin, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -9,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { CapabilityFilter, CarrierCapability } from "./CapabilityFilter";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
 export interface CarrierFiltersProps {
@@ -17,6 +17,7 @@ export interface CarrierFiltersProps {
   activeFiltersCount: number;
   onFilterChange: (filters: CarrierFilterOptions) => void;
   className?: string;
+  regionOptions?: { id: string; label: string; description?: string }[];
 }
 
 export interface CarrierFilterOptions {
@@ -26,6 +27,7 @@ export interface CarrierFilterOptions {
   complianceStatus: string | null;
   favorites: boolean;
   capabilities: CarrierCapability[];
+  regions?: string[];
 }
 
 const statusOptions = ["Active", "Inactive", "Issue"];
@@ -38,7 +40,8 @@ export function CarrierFilters({
   onSearchChange,
   activeFiltersCount,
   onFilterChange,
-  className
+  className,
+  regionOptions = []
 }: CarrierFiltersProps) {
   const [open, setOpen] = useState(false);
   const [filters, setFilters] = useState<CarrierFilterOptions>({
@@ -47,7 +50,8 @@ export function CarrierFilters({
     fleetType: null,
     complianceStatus: null,
     favorites: false,
-    capabilities: []
+    capabilities: [],
+    regions: []
   });
 
   const handleFilterChange = <K extends keyof CarrierFilterOptions>(
@@ -66,10 +70,19 @@ export function CarrierFilters({
       fleetType: null,
       complianceStatus: null,
       favorites: false,
-      capabilities: []
+      capabilities: [],
+      regions: []
     };
     setFilters(defaultFilters);
     onFilterChange(defaultFilters);
+  };
+
+  const toggleRegion = (regionId: string) => {
+    const currentRegions = filters.regions || [];
+    const newRegions = currentRegions.includes(regionId)
+      ? currentRegions.filter(id => id !== regionId)
+      : [...currentRegions, regionId];
+    handleFilterChange('regions', newRegions);
   };
 
   return (
@@ -170,6 +183,68 @@ export function CarrierFilters({
                 </div>
               </div>
               
+              {regionOptions.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium">Regional Coverage</Label>
+                    {filters.regions && filters.regions.length > 0 && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-6 px-2 text-xs"
+                        onClick={() => handleFilterChange('regions', [])}
+                      >
+                        Clear
+                      </Button>
+                    )}
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2 border rounded-md p-2 bg-muted/20">
+                    {filters.regions && filters.regions.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {filters.regions.map(regionId => {
+                          const region = regionOptions.find(r => r.id === regionId);
+                          return (
+                            <Badge 
+                              key={regionId} 
+                              className="bg-primary/20 text-primary hover:bg-primary/30 cursor-pointer"
+                              onClick={() => toggleRegion(regionId)}
+                            >
+                              <MapPin className="h-3 w-3 mr-1" />
+                              {region?.label || regionId}
+                              <X className="h-3 w-3 ml-1" />
+                            </Badge>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="text-xs text-muted-foreground py-1">
+                        <Globe className="h-3 w-3 inline mr-1" />
+                        No regions selected
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2 mt-2 max-h-40 overflow-y-auto border rounded p-2">
+                    {regionOptions.map((region) => (
+                      <div key={region.id} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`region-${region.id}`}
+                          checked={filters.regions?.includes(region.id)}
+                          onCheckedChange={() => toggleRegion(region.id)}
+                        />
+                        <label 
+                          htmlFor={`region-${region.id}`}
+                          className="text-sm cursor-pointer"
+                        >
+                          {region.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
               <div className="space-y-2">
                 <Label>Compliance Status</Label>
                 <Select
@@ -225,6 +300,11 @@ export function CarrierFilters({
       {activeFiltersCount > 0 && (
         <div className="text-xs text-muted-foreground px-2">
           {activeFiltersCount} {activeFiltersCount === 1 ? 'filter' : 'filters'} applied
+          {filters.regions && filters.regions.length > 0 && (
+            <span className="ml-1">
+              (including {filters.regions.length} {filters.regions.length === 1 ? 'region' : 'regions'})
+            </span>
+          )}
         </div>
       )}
     </div>
