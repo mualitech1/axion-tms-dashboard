@@ -1,8 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { 
   Home, Users, Truck, UserCircle, Settings, 
-  BarChart2, CreditCard, FileText, Menu, X
+  BarChart2, CreditCard, FileText, Menu, X,
+  Kanban
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -146,6 +148,7 @@ export default function Sidebar() {
             <NavItem to="/jobs" icon={Truck} label="Jobs" isCollapsed={isCollapsed} />
             <NavItem to="/customers" icon={Users} label="Customers" isCollapsed={isCollapsed} />
             <NavItem to="/carriers" icon={Truck} label="Carriers" isCollapsed={isCollapsed} />
+            <NavItem to="/pipeline" icon={Kanban} label="Sales Pipeline" isCollapsed={isCollapsed} />
             <NavItem to="/invoices" icon={FileText} label="Invoices" isCollapsed={isCollapsed} />
             <NavItem to="/finance" icon={CreditCard} label="Finance" isCollapsed={isCollapsed} />
           </NavSection>

@@ -11,6 +11,7 @@ import Jobs from "./pages/Jobs";
 import Customers from "./pages/Customers";
 import CustomerPortal from "./pages/CustomerPortal";
 import Carriers from "./pages/Carriers";
+import Pipeline from "./pages/Pipeline";
 import Users from "./pages/Users";
 import Settings from "./pages/Settings";
 import Analytics from "./pages/Analytics";
@@ -34,6 +35,7 @@ const App = () => {
             <Route path="/customers/*" element={<Customers />} />
             <Route path="/customer-portal/*" element={<CustomerPortal />} />
             <Route path="/carriers/*" element={<Carriers />} />
+            <Route path="/pipeline/*" element={<Pipeline />} />
             <Route path="/users/*" element={<Users />} />
             <Route path="/analytics/*" element={<Analytics />} />
             <Route path="/finance/*" element={<Finance />} />
