@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
+import { useReminders } from '../../context/ReminderContext';
 
 interface ReminderDialogProps {
   open: boolean;
@@ -19,6 +20,7 @@ interface ReminderDialogProps {
 }
 
 export default function ReminderDialog({ open, onClose, leadId, company }: ReminderDialogProps) {
+  const { addReminder } = useReminders();
   const [title, setTitle] = useState('');
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [time, setTime] = useState('09:00');
@@ -58,12 +60,11 @@ export default function ReminderDialog({ open, onClose, leadId, company }: Remin
       return;
     }
     
-    // In a real app, this would be an API call to create a reminder
-    console.log('New reminder created:', {
-      id: `reminder-${Date.now()}`,
+    // Add the reminder to our context
+    addReminder({
+      title,
       leadId,
       company,
-      title,
       dateTime: reminderDate.toISOString(),
       notifyMinutesBefore: parseInt(notifyBefore)
     });

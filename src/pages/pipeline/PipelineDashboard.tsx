@@ -9,6 +9,7 @@ import PipelineOverview from './components/dashboard/PipelineOverview';
 import LeadsByStage from './components/dashboard/LeadsByStage';
 import RecentActivityPanel from './components/dashboard/RecentActivityPanel';
 import UpcomingTasksPanel from './components/dashboard/UpcomingTasksPanel';
+import ReminderOverviewCard from './components/dashboard/ReminderOverviewCard';
 
 export default function PipelineDashboard() {
   return (
@@ -49,10 +50,17 @@ export default function PipelineDashboard() {
           </div>
         </div>
         
-        {/* Recent Activity and Upcoming Tasks */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <RecentActivityPanel />
-          <UpcomingTasksPanel />
+        {/* Recent Activity, Upcoming Tasks and Reminders */}
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="md:col-span-1">
+            <RecentActivityPanel />
+          </div>
+          <div className="md:col-span-1">
+            <UpcomingTasksPanel />
+          </div>
+          <div className="md:col-span-1">
+            <ReminderOverviewCard />
+          </div>
         </div>
       </div>
     </MainLayout>
