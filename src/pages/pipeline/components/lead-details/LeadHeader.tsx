@@ -1,9 +1,16 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Bell } from 'lucide-react';
+import { ArrowLeft, Bell, UserPlus, FileCheck, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from '@/hooks/use-toast';
 import { Lead, LeadStatus } from '../../data/pipelineTypes';
 import NotificationsPanel from '../collaboration/NotificationsPanel';
 
@@ -13,6 +20,32 @@ interface LeadHeaderProps {
 }
 
 export default function LeadHeader({ lead, onSetReminder }: LeadHeaderProps) {
+  const [isOnboarding, setIsOnboarding] = useState(false);
+
+  const initiateOnboarding = () => {
+    setIsOnboarding(true);
+    toast({
+      title: "Onboarding initiated",
+      description: `Customer onboarding process started for ${lead.company}`,
+    });
+    
+    // In a real application, this would connect to your TMS onboarding system
+    setTimeout(() => {
+      setIsOnboarding(false);
+      toast({
+        title: "Onboarding ready",
+        description: "Customer has been added to the onboarding queue",
+      });
+    }, 2000);
+  };
+
+  const sendWelcomeEmail = () => {
+    toast({
+      title: "Welcome email triggered",
+      description: "Welcome email has been queued for sending",
+    });
+  };
+
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between mb-4">
@@ -43,10 +76,37 @@ export default function LeadHeader({ lead, onSetReminder }: LeadHeaderProps) {
           </div>
         </div>
         <div className="space-x-2">
-          <Button variant="outline">Edit Lead</Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">Integration Actions</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={initiateOnboarding}>
+                <UserPlus className="mr-2 h-4 w-4" />
+                <span>Start Onboarding</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={sendWelcomeEmail}>
+                <Mail className="mr-2 h-4 w-4" />
+                <span>Send Welcome Email</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.open('/customers', '_blank')}>
+                <FileCheck className="mr-2 h-4 w-4" />
+                <span>View in Customer Portal</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button>Schedule Meeting</Button>
         </div>
       </div>
+      
+      {isOnboarding && (
+        <div className="mt-4 p-2 bg-blue-50 border border-blue-200 rounded flex items-center justify-between">
+          <div className="flex items-center">
+            <UserPlus className="h-4 w-4 mr-2 text-blue-500" />
+            <span className="text-sm">Onboarding in progress...</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
