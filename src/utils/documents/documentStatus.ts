@@ -31,13 +31,13 @@ export const isDocumentExpired = (doc: Document): boolean => {
  */
 export const getDocumentStatus = (doc: Document): {
   label: string;
-  variant: 'destructive' | 'warning' | 'outline' | 'default';
+  variant: 'destructive' | 'secondary' | 'outline' | 'default';
 } => {
   if (isDocumentExpired(doc)) {
     return { label: 'Expired', variant: 'destructive' };
   }
   if (isDocumentExpiringSoon(doc)) {
-    return { label: 'Expiring Soon', variant: 'warning' };
+    return { label: 'Expiring Soon', variant: 'secondary' };
   }
   return { label: 'Valid', variant: 'outline' };
 };

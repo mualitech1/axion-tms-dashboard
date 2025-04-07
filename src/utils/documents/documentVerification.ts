@@ -62,7 +62,7 @@ export const getRequiredDocumentTypes = (): Array<{
  */
 export const getDocumentVerificationLabel = (status: VerificationStatus | undefined): {
   label: string;
-  variant: 'default' | 'outline' | 'destructive' | 'warning';
+  variant: 'default' | 'outline' | 'destructive' | 'secondary';
 } => {
   switch (status) {
     case VerificationStatus.VERIFIED:
@@ -71,6 +71,6 @@ export const getDocumentVerificationLabel = (status: VerificationStatus | undefi
       return { label: 'Rejected', variant: 'destructive' };
     case VerificationStatus.PENDING:
     default:
-      return { label: 'Pending Verification', variant: 'warning' };
+      return { label: 'Pending Verification', variant: 'secondary' };
   }
 };
