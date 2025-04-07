@@ -8,6 +8,7 @@ import CarrierRegistration from './carriers/CarrierRegistration';
 import CarrierMessaging from './carriers/CarrierMessaging';
 import CarrierMatching from './carriers/CarrierMatching';
 import CarrierReports from './carriers/CarrierReports';
+import CarrierPortal from './carriers/CarrierPortal';
 
 export default function Carriers() {
   return (
@@ -20,6 +21,7 @@ export default function Carriers() {
       <Route path="/messaging" element={<CarrierMessaging />} />
       <Route path="/matching" element={<CarrierMatching />} />
       <Route path="/reports" element={<CarrierReports />} />
+      <Route path="/portal" element={<CarrierPortal />} />
       <Route path="*" element={<Navigate to="/carriers" replace />} />
     </Routes>
   );

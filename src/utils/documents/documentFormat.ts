@@ -1,44 +1,25 @@
 
-import { Document } from '@/types/customer';
-
 /**
- * Returns a formatted display size for a file
+ * Format document date to a human-readable format
  */
-export const formatFileSize = (size: string | number): string => {
-  if (typeof size === 'string') {
-    // Try to parse the string as a number if it looks numeric
-    const parsed = parseFloat(size);
-    if (!isNaN(parsed)) {
-      size = parsed;
-    } else {
-      return size;
-    }
-  }
-  
-  const bytes = Number(size);
-  if (isNaN(bytes)) return '0 Bytes';
-  
-  const units = ['Bytes', 'KB', 'MB', 'GB'];
-  let i = 0;
-  let formattedSize = bytes;
-  
-  while (formattedSize >= 1024 && i < units.length - 1) {
-    formattedSize /= 1024;
-    i++;
-  }
-  
-  return `${formattedSize.toFixed(1)} ${units[i]}`;
+export const formatDocumentDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric' 
+  });
 };
 
 /**
- * Format date to localized string
+ * Format file size to a human-readable format
  */
-export const formatDocumentDate = (dateString: string | null | undefined): string => {
-  if (!dateString) return 'No date';
-  
-  return new Date(dateString).toLocaleDateString('en-GB', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
+export const formatFileSize = (bytes: number): string => {
+  if (bytes < 1024) {
+    return bytes + ' B';
+  } else if (bytes < 1048576) {
+    return (bytes / 1024).toFixed(1) + ' KB';
+  } else {
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  }
 };

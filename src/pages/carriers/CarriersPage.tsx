@@ -1,170 +1,69 @@
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PlusCircle, FileCheck, CreditCard, MessageSquare, GitMerge, FileBarChart } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CarrierTable from './components/CarrierTable';
-import CarrierOverview from './components/CarrierOverview';
-import FleetDistribution from './components/FleetDistribution';
-import UpcomingExpirations from './components/UpcomingExpirations';
-import { carrierData } from './data/carrierData';
-import { CarrierFilters, CarrierFilterOptions } from './components/filters/CarrierFilters';
-import { regionOptions } from './components/registration/sections/RegionalCoverageSection';
+import CarrierFilters from './components/filters/CarrierFilters';
+import { carriers } from './data/carrierList';
+import { Carrier } from './data/types/carrierTypes';
+import { Button } from "@/components/ui/button";
+import { 
+  PlusCircle,
+  MessageSquare,
+  FileText, 
+  UserCircle2,
+  LineChart,
+  Scale
+} from 'lucide-react';
 
 export default function CarriersPage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterOptions, setFilterOptions] = useState<CarrierFilterOptions>({
-    status: null,
-    region: null,
-    fleetType: null,
-    complianceStatus: null,
-    favorites: false,
-    capabilities: [],
-    regions: []
-  });
+  const [filteredCarriers, setFilteredCarriers] = useState<Carrier[]>(carriers);
   
-  const activeFiltersCount = useMemo(() => {
-    let count = 0;
-    if (filterOptions.status) count++;
-    if (filterOptions.region) count++;
-    if (filterOptions.fleetType) count++;
-    if (filterOptions.complianceStatus) count++;
-    if (filterOptions.favorites) count++;
-    if (filterOptions.capabilities.length > 0) count++;
-    if (filterOptions.regions && filterOptions.regions.length > 0) count++;
-    return count;
-  }, [filterOptions]);
-  
-  const filteredCarriers = useMemo(() => {
-    return carrierData.filter(carrier => {
-      const matchesSearch = 
-        carrier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        carrier.region.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        carrier.fleet.toLowerCase().includes(searchTerm.toLowerCase());
-        
-      if (!matchesSearch) return false;
-      
-      if (filterOptions.status && carrier.status !== filterOptions.status) return false;
-      
-      if (filterOptions.region && 
-          filterOptions.region !== 'All Regions' && 
-          carrier.region !== filterOptions.region) return false;
-      
-      if (filterOptions.regions && filterOptions.regions.length > 0) {
-        const operatesInSelectedRegion = filterOptions.regions.some(
-          regionId => carrier.operatingRegions?.includes(regionId)
-        );
-        if (!operatesInSelectedRegion) return false;
-      }
-      
-      if (filterOptions.fleetType && 
-          filterOptions.fleetType !== 'All Types' && 
-          carrier.fleet !== filterOptions.fleetType) return false;
-      
-      if (filterOptions.complianceStatus && 
-          carrier.complianceStatus !== filterOptions.complianceStatus) return false;
-      
-      if (filterOptions.favorites && !carrier.favorite) return false;
-      
-      if (filterOptions.capabilities.length > 0) {
-        const hasCapability = filterOptions.capabilities.some(capability => 
-          carrier.capabilities.includes(capability as string)
-        );
-        if (!hasCapability) return false;
-      }
-      
-      return true;
-    });
-  }, [searchTerm, filterOptions]);
-  
+  const handleFiltersChange = (filtered: Carrier[]) => {
+    setFilteredCarriers(filtered);
+  };
+
   return (
-    <MainLayout title="Carriers">
-      <div className="animate-fade-in">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl font-semibold text-tms-gray-800">Carrier Management</h1>
-            <p className="text-tms-gray-600">Manage your carrier network and compliance</p>
-          </div>
-          
-          <div className="flex flex-wrap gap-2">
-            <Button asChild variant="outline">
-              <Link to="/carriers/compliance">
-                <FileCheck className="h-4 w-4 mr-2" />
-                Compliance
-              </Link>
+    <MainLayout title="Carrier Management">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Carriers</h1>
+        <div className="flex space-x-2">
+          <Link to="/carriers/portal">
+            <Button variant="outline" size="sm">
+              <UserCircle2 className="mr-2 h-4 w-4" />
+              Carrier Portal
             </Button>
-            <Button asChild variant="outline">
-              <Link to="/carriers/payments">
-                <CreditCard className="h-4 w-4 mr-2" />
-                Payments
-              </Link>
+          </Link>
+          <Link to="/carriers/reports">
+            <Button variant="outline" size="sm">
+              <LineChart className="mr-2 h-4 w-4" />
+              Reports
             </Button>
-            <Button asChild variant="outline">
-              <Link to="/carriers/messaging">
-                <MessageSquare className="h-4 w-4 mr-2" />
-                Messaging
-              </Link>
+          </Link>
+          <Link to="/carriers/compliance">
+            <Button variant="outline" size="sm">
+              <Scale className="mr-2 h-4 w-4" />
+              Compliance
             </Button>
-            <Button asChild variant="outline">
-              <Link to="/carriers/matching">
-                <GitMerge className="h-4 w-4 mr-2" />
-                Matching
-              </Link>
+          </Link>
+          <Link to="/carriers/messaging">
+            <Button variant="outline" size="sm">
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Messaging
             </Button>
-            <Button asChild variant="outline">
-              <Link to="/carriers/reports">
-                <FileBarChart className="h-4 w-4 mr-2" />
-                Reports
-              </Link>
+          </Link>
+          <Link to="/carriers/register">
+            <Button size="sm">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add Carrier
             </Button>
-            <Button asChild className="bg-tms-blue hover:bg-tms-blue/90">
-              <Link to="/carriers/register">
-                <PlusCircle className="h-4 w-4 mr-2" />
-                Add Carrier
-              </Link>
-            </Button>
-          </div>
+          </Link>
         </div>
-        
-        <div className="mb-6">
-          <CarrierFilters
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            activeFiltersCount={activeFiltersCount}
-            onFilterChange={setFilterOptions}
-            className="mb-4"
-            regionOptions={regionOptions}
-          />
-          
-          <Tabs defaultValue="all">
-            <TabsList>
-              <TabsTrigger value="all">All Carriers</TabsTrigger>
-              <TabsTrigger value="active">Active</TabsTrigger>
-              <TabsTrigger value="issues">Compliance Issues</TabsTrigger>
-              <TabsTrigger value="favorite">Favorites</TabsTrigger>
-            </TabsList>
-            <TabsContent value="all" className="mt-2">
-              <CarrierTable carriers={filteredCarriers} />
-            </TabsContent>
-            <TabsContent value="active" className="mt-2">
-              <CarrierTable carriers={filteredCarriers.filter(c => c.status === 'Active')} />
-            </TabsContent>
-            <TabsContent value="issues" className="mt-2">
-              <CarrierTable carriers={filteredCarriers.filter(c => c.status === 'Issue')} />
-            </TabsContent>
-            <TabsContent value="favorite" className="mt-2">
-              <CarrierTable carriers={filteredCarriers.filter(c => c.favorite)} />
-            </TabsContent>
-          </Tabs>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <CarrierOverview />
-          <FleetDistribution />
-          <UpcomingExpirations />
-        </div>
+      </div>
+      
+      <div className="space-y-4">
+        <CarrierFilters onFiltersChange={handleFiltersChange} />
+        <CarrierTable carriers={filteredCarriers} />
       </div>
     </MainLayout>
   );
