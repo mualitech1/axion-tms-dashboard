@@ -1,6 +1,7 @@
+
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { PlusCircle, FileCheck, CreditCard } from 'lucide-react';
+import { PlusCircle, FileCheck, CreditCard, MessageSquare } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -99,6 +100,12 @@ export default function CarriersPage() {
               <Link to="/carriers/payments">
                 <CreditCard className="h-4 w-4 mr-2" />
                 Payments
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/carriers/messaging">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Messaging
               </Link>
             </Button>
             <Button asChild className="bg-tms-blue hover:bg-tms-blue/90">
