@@ -5,14 +5,9 @@ import {
   AlertCircle, 
   CheckCircle, 
   Truck,
-  MoreHorizontal,
-  Thermometer,
-  AlertTriangle,
-  Package,
-  Globe,
-  Boxes
+  MoreHorizontal
 } from 'lucide-react';
-import { Carrier } from '../data/carrierData';
+import { Carrier, capabilityIcons, capabilityLabels } from '../data/carrierData';
 import { 
   Table, 
   TableHeader, 
@@ -35,29 +30,6 @@ import {
 interface CarrierTableProps {
   carriers: Carrier[];
 }
-
-// Map capability to icon for display
-const capabilityIcons: Record<string, React.ReactNode> = {
-  'curtain-side': <Truck size={16} />,
-  'temperature-controlled': <Thermometer size={16} />,
-  'adr': <AlertTriangle size={16} />,
-  'container': <Package size={16} />,
-  'traction-only': <Truck size={16} />,
-  'rigid': <Boxes size={16} />,
-  'eu-transport': <Globe size={16} />,
-  'deep-sea': <Globe size={16} />
-};
-
-const capabilityLabels: Record<string, string> = {
-  'curtain-side': 'Curtain-side',
-  'temperature-controlled': 'Temperature Controlled',
-  'adr': 'ADR (Hazardous Goods)',
-  'container': 'Container Transport',
-  'traction-only': 'Traction Only',
-  'rigid': 'Rigid Vehicles',
-  'eu-transport': 'EU Transport',
-  'deep-sea': 'Deep-Sea Capabilities'
-};
 
 export default function CarrierTable({ carriers }: CarrierTableProps) {
   const [favorites, setFavorites] = useState<number[]>([]);
