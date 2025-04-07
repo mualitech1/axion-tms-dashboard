@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -14,13 +13,17 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useForm } from 'react-hook-form';
 import { 
   ArrowLeft, User, Building, Phone, Mail, DollarSign, 
-  BarChart3, Calendar, Tag, Clock, Users, History
+  BarChart3, Calendar, Tag, Clock, Users, History,
+  Bell, MessageSquare
 } from 'lucide-react';
 import { initialLeadsData } from './data/pipelineData';
 import { Lead, LeadStatus, LeadSource, ActivityType, Activity } from './data/pipelineTypes';
 import { formatCurrency } from '@/lib/utils';
+import CollaborationTab from './components/collaboration/CollaborationTab';
+import NotificationsPanel from './components/collaboration/NotificationsPanel';
+import ReminderDialog from './components/collaboration/ReminderDialog';
+import { toast } from '@/hooks/use-toast';
 
-// Mock activities for demonstration
 const mockActivities: Activity[] = [
   {
     id: 'activity-1',
@@ -56,7 +59,6 @@ const mockActivities: Activity[] = [
   }
 ];
 
-// Custom field types
 type FieldType = 'text' | 'number' | 'date' | 'checkbox' | 'select';
 
 interface CustomField {
@@ -64,7 +66,7 @@ interface CustomField {
   name: string;
   type: FieldType;
   value: any;
-  options?: string[]; // For select fields
+  options?: string[];
 }
 
 export default function LeadDetails() {
@@ -77,22 +79,19 @@ export default function LeadDetails() {
     { id: 'field2', name: 'Budget Confirmed', type: 'checkbox', value: true },
     { id: 'field3', name: 'Next Meeting', type: 'date', value: '2025-04-15' }
   ]);
+  const [showReminderDialog, setShowReminderDialog] = useState(false);
   
-  // Setup form
   const form = useForm<Lead>({
     defaultValues: lead || undefined
   });
 
-  // Fetch lead data
   useEffect(() => {
-    // In a real app, this would be an API call
     const foundLead = initialLeadsData.find(lead => lead.id === id);
     if (foundLead) {
       setLead(foundLead);
       form.reset(foundLead);
     }
     
-    // Get activities
     setActivities(mockActivities.filter(activity => activity.leadId === id));
   }, [id, form]);
   
@@ -110,7 +109,7 @@ export default function LeadDetails() {
       type: ActivityType.NOTE,
       description: activityText,
       timestamp: new Date().toISOString(),
-      userId: 'current-user' // In a real app, this would come from auth
+      userId: 'current-user'
     };
     
     setActivities([newActivity, ...activities]);
@@ -126,6 +125,10 @@ export default function LeadDetails() {
       case ActivityType.STAGE_CHANGED: return <BarChart3 className="h-4 w-4 mr-2" />;
       default: return <History className="h-4 w-4 mr-2" />;
     }
+  };
+  
+  const handleSetReminder = () => {
+    setShowReminderDialog(true);
   };
   
   if (!lead) {
@@ -150,13 +153,21 @@ export default function LeadDetails() {
   return (
     <MainLayout title={`Lead: ${lead.company}`}>
       <div className="mb-6">
-        <div className="flex items-center mb-4">
+        <div className="flex items-center justify-between mb-4">
           <Link to="/pipeline/board">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Pipeline
             </Button>
           </Link>
+          
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleSetReminder}>
+              <Bell className="h-4 w-4 mr-2" />
+              Set Reminder
+            </Button>
+            <NotificationsPanel />
+          </div>
         </div>
         
         <div className="flex justify-between items-start">
@@ -180,10 +191,10 @@ export default function LeadDetails() {
         <TabsList>
           <TabsTrigger value="details">Lead Details</TabsTrigger>
           <TabsTrigger value="activity">Activity</TabsTrigger>
+          <TabsTrigger value="collaboration">Collaboration</TabsTrigger>
           <TabsTrigger value="custom">Custom Fields</TabsTrigger>
         </TabsList>
         
-        {/* Lead Details Tab */}
         <TabsContent value="details" className="space-y-4">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
@@ -380,7 +391,6 @@ export default function LeadDetails() {
           </div>
         </TabsContent>
         
-        {/* Activity Tab */}
         <TabsContent value="activity" className="space-y-4">
           <Card>
             <CardHeader>
@@ -426,7 +436,10 @@ export default function LeadDetails() {
           </Card>
         </TabsContent>
         
-        {/* Custom Fields Tab */}
+        <TabsContent value="collaboration" className="space-y-4">
+          <CollaborationTab leadId={lead.id} company={lead.company} />
+        </TabsContent>
+        
         <TabsContent value="custom" className="space-y-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -454,6 +467,13 @@ export default function LeadDetails() {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      <ReminderDialog
+        open={showReminderDialog}
+        onClose={() => setShowReminderDialog(false)}
+        leadId={lead.id}
+        company={lead.company}
+      />
     </MainLayout>
   );
 }

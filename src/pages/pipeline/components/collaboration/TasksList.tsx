@@ -1,12 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { TaskPriority } from '../../data/pipelineTypes';
 import { toast } from '@/hooks/use-toast';
 
-// Sample tasks data
-const upcomingTasks = [
+// Sample tasks data (in a real app, this would come from an API)
+const initialTasks = [
   {
     id: 'task-1',
     leadId: 'lead-1',
@@ -64,19 +66,42 @@ const upcomingTasks = [
   }
 ];
 
-export default function UpcomingTasks() {
-  const handleCheckboxChange = (taskId: string, checked: boolean) => {
-    if (checked) {
+interface TasksListProps {
+  leadId?: string;
+  limit?: number;
+}
+
+export default function TasksList({ leadId, limit }: TasksListProps) {
+  const [tasks, setTasks] = useState(initialTasks);
+  
+  const filteredTasks = leadId 
+    ? tasks.filter(task => task.leadId === leadId)
+    : tasks;
+    
+  const displayTasks = limit 
+    ? filteredTasks.slice(0, limit)
+    : filteredTasks;
+    
+  const handleTaskCompletion = (taskId: string, completed: boolean) => {
+    setTasks(tasks.map(task => 
+      task.id === taskId ? { ...task, completed } : task
+    ));
+    
+    if (completed) {
       toast({
         title: "Task Completed",
         description: "The task has been marked as complete",
       });
     }
   };
-
+  
+  if (filteredTasks.length === 0) {
+    return <p className="text-muted-foreground text-center p-4">No tasks available.</p>;
+  }
+  
   return (
     <div className="space-y-3">
-      {upcomingTasks.map((task) => {
+      {displayTasks.map((task) => {
         const dueDate = new Date(task.dueDate);
         const formattedDueDate = format(dueDate, 'MMM d');
         
@@ -88,12 +113,13 @@ export default function UpcomingTasks() {
             <Checkbox 
               id={task.id} 
               className="mt-0.5" 
-              onCheckedChange={(checked) => handleCheckboxChange(task.id, checked as boolean)}
+              checked={task.completed}
+              onCheckedChange={(checked) => handleTaskCompletion(task.id, checked as boolean)}
             />
             <div className="grid gap-1.5 leading-none">
               <label
                 htmlFor={task.id}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className={`text-sm font-medium leading-none ${task.completed ? 'line-through text-muted-foreground' : ''}`}
               >
                 {task.title}
               </label>
@@ -103,10 +129,21 @@ export default function UpcomingTasks() {
                   {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                 </span>
               </p>
+              <div className="mt-1">
+                <Badge variant="outline" className="text-xs">
+                  {task.assignedToName}
+                </Badge>
+              </div>
             </div>
           </div>
         );
       })}
+      
+      {limit && filteredTasks.length > limit && (
+        <div className="text-center">
+          <Button variant="link" size="sm">View all tasks</Button>
+        </div>
+      )}
     </div>
   );
 }
