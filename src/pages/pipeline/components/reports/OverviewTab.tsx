@@ -14,7 +14,7 @@ interface OverviewTabProps {
 export default function OverviewTab({ data, stages }: OverviewTabProps) {
   return (
     <div className="space-y-4">
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
         <PipelineMetrics data={data} />
       </div>
       
