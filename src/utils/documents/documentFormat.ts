@@ -14,12 +14,15 @@ export const formatDocumentDate = (dateString: string): string => {
 /**
  * Format file size to a human-readable format
  */
-export const formatFileSize = (bytes: number): string => {
-  if (bytes < 1024) {
-    return bytes + ' B';
-  } else if (bytes < 1048576) {
-    return (bytes / 1024).toFixed(1) + ' KB';
+export const formatFileSize = (bytes: number | string): string => {
+  // Convert string to number if it's a string
+  const size = typeof bytes === 'string' ? parseFloat(bytes) : bytes;
+  
+  if (size < 1024) {
+    return size + ' B';
+  } else if (size < 1048576) {
+    return (size / 1024).toFixed(1) + ' KB';
   } else {
-    return (bytes / 1048576).toFixed(1) + ' MB';
+    return (size / 1048576).toFixed(1) + ' MB';
   }
 };

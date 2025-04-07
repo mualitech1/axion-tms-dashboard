@@ -75,7 +75,7 @@ export default function CarriersPage() {
     
     if (filters.regions && filters.regions.length) {
       filtered = filtered.filter(carrier => 
-        filters.regions.some((regionId: string) => carrier.coverageAreas?.includes(regionId))
+        filters.regions.some((regionId: string) => carrier.operatingRegions?.includes(regionId))
       );
     }
     
