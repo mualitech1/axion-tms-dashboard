@@ -1,6 +1,7 @@
 
 import React from 'react';
 import DashboardMetric from './DashboardMetric';
+import { BarChart2 } from 'lucide-react';
 
 export default function DashboardMetrics() {
   return (
