@@ -42,11 +42,11 @@ export default function SalesFunnelChart({ data, stages, simplified = false }: S
           <p className="font-medium">{data.name}</p>
           <p className="text-sm text-muted-foreground">Leads: {data.count}</p>
           <p className="text-sm text-muted-foreground">Value: {formatCurrency(data.value)}</p>
-          {index => index > 0 ? (
+          {data.conversionRate && data.name !== chartData[0].name && (
             <p className="text-sm text-muted-foreground">
               Conversion: {data.conversionRate.toFixed(1)}%
             </p>
-          ) : null}
+          )}
         </div>
       );
     }
