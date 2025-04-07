@@ -33,7 +33,7 @@ export default function CarriersPage() {
     if (filterOptions.complianceStatus) count++;
     if (filterOptions.favorites) count++;
     if (filterOptions.capabilities.length > 0) count++;
-    if (filterOptions.regions.length > 0) count++;
+    if (filterOptions.regions && filterOptions.regions.length > 0) count++;
     return count;
   }, [filterOptions]);
   
@@ -52,7 +52,7 @@ export default function CarriersPage() {
           filterOptions.region !== 'All Regions' && 
           carrier.region !== filterOptions.region) return false;
       
-      if (filterOptions.regions.length > 0) {
+      if (filterOptions.regions && filterOptions.regions.length > 0) {
         const operatesInSelectedRegion = filterOptions.regions.some(
           regionId => carrier.operatingRegions?.includes(regionId)
         );

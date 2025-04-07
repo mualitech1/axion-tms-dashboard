@@ -17,7 +17,7 @@ export interface CarrierFiltersProps {
   activeFiltersCount: number;
   onFilterChange: (filters: CarrierFilterOptions) => void;
   className?: string;
-  regionOptions?: { id: string; label: string; description?: string }[];
+  regionOptions?: Array<{ id: string; label: string; description?: string }>;
 }
 
 export interface CarrierFilterOptions {
@@ -31,7 +31,7 @@ export interface CarrierFilterOptions {
 }
 
 const statusOptions = ["Active", "Inactive", "Issue"];
-const regionOptions = ["London", "Manchester", "Birmingham", "Glasgow", "Liverpool", "Belfast", "All Regions"];
+const regionOptionsLegacy = ["London", "Manchester", "Birmingham", "Glasgow", "Liverpool", "Belfast", "All Regions"];
 const fleetOptions = ["LGV", "HGV", "Mixed Fleet", "Multimodal", "All Types"];
 const complianceOptions = ["Compliant", "Non-Compliant", "Action Required"];
 
@@ -157,7 +157,7 @@ export function CarrierFilters({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="any-region">Any region</SelectItem>
-                      {regionOptions.map((region) => (
+                      {regionOptionsLegacy.map((region) => (
                         <SelectItem key={region} value={region}>{region}</SelectItem>
                       ))}
                     </SelectContent>
