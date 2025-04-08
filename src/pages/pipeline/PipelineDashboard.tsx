@@ -2,7 +2,7 @@
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, ListTodo } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import MetricsCards from './components/dashboard/MetricsCards';
 import PipelineOverview from './components/dashboard/PipelineOverview';
@@ -26,6 +26,12 @@ export default function PipelineDashboard() {
             <Link to="/pipeline/board">
               <Button variant="outline">Board View</Button>
             </Link>
+            <Link to="/pipeline/tasks">
+              <Button variant="outline">
+                <ListTodo className="h-4 w-4 mr-2" />
+                Tasks
+              </Button>
+            </Link>
             <Link to="/pipeline/lead/new">
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
@@ -36,31 +42,29 @@ export default function PipelineDashboard() {
         </div>
       </div>
       
-      <div className="space-y-6">
-        {/* Metrics Cards */}
-        <MetricsCards />
-        
-        {/* Pipeline Overview and Leads by Stage */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="md:col-span-2">
-            <PipelineOverview />
-          </div>
-          <div>
-            <LeadsByStage />
-          </div>
+      {/* Metrics Cards */}
+      <MetricsCards />
+      
+      {/* Pipeline Overview and Leads by Stage */}
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="md:col-span-2">
+          <PipelineOverview />
         </div>
-        
-        {/* Recent Activity, Upcoming Tasks and Reminders */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="md:col-span-1">
-            <RecentActivityPanel />
-          </div>
-          <div className="md:col-span-1">
-            <UpcomingTasksPanel />
-          </div>
-          <div className="md:col-span-1">
-            <ReminderOverviewCard />
-          </div>
+        <div>
+          <LeadsByStage />
+        </div>
+      </div>
+      
+      {/* Recent Activity, Upcoming Tasks and Reminders */}
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="md:col-span-1">
+          <RecentActivityPanel />
+        </div>
+        <div className="md:col-span-1">
+          <UpcomingTasksPanel />
+        </div>
+        <div className="md:col-span-1">
+          <ReminderOverviewCard />
         </div>
       </div>
     </MainLayout>
