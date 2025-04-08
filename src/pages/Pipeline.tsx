@@ -22,7 +22,7 @@ export default function Pipeline() {
         <Route path="/settings" element={<PipelineSettings />} />
         <Route path="/reminders" element={<PipelineReminders />} />
         <Route path="/tasks" element={<PipelineTasks />} />
-        <Route path="*" element={<Navigate to="/pipeline" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </ReminderProvider>
   );
