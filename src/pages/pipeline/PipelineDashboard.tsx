@@ -23,16 +23,16 @@ export default function PipelineDashboard() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Link to="/pipeline/board">
+            <Link to="/sales-pipeline/board">
               <Button variant="outline">Board View</Button>
             </Link>
-            <Link to="/pipeline/tasks">
+            <Link to="/sales-pipeline/tasks">
               <Button variant="outline">
                 <ListTodo className="h-4 w-4 mr-2" />
                 Tasks
               </Button>
             </Link>
-            <Link to="/pipeline/lead/new">
+            <Link to="/sales-pipeline/lead/new">
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
                 Add New Lead

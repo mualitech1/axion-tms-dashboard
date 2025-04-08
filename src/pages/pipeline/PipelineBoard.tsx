@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, Filter, SortAsc } from 'lucide-react';
 import KanbanBoard from './components/kanban/KanbanBoard';
 import { pipelineStages, initialLeadsData } from './data/pipelineData';
+import { Link } from 'react-router-dom';
 
 export default function PipelineBoard() {
   const [leads, setLeads] = useState(initialLeadsData);
@@ -55,10 +56,12 @@ export default function PipelineBoard() {
             <SortAsc className="mr-2 h-4 w-4" />
             Sort
           </Button>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add New Lead
-          </Button>
+          <Link to="/sales-pipeline/lead/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Add New Lead
+            </Button>
+          </Link>
         </div>
       </div>
 

@@ -1,7 +1,9 @@
 
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import PipelineSidebar from './PipelineSidebar';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -12,7 +14,9 @@ interface MainLayoutProps {
 
 export default function MainLayout({ children, title }: MainLayoutProps) {
   const isMobile = useIsMobile();
+  const location = useLocation();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const isPipelinePath = location.pathname.startsWith('/sales-pipeline');
 
   useEffect(() => {
     if (isMobile) {
@@ -29,9 +33,17 @@ export default function MainLayout({ children, title }: MainLayoutProps) {
         isMobile ? "ml-0" : (isSidebarCollapsed ? "ml-16" : "ml-64")
       )}>
         <Header title={title} />
-        <main className="p-4 md:p-6 lg:p-8">
-          {children}
-        </main>
+        
+        <div className="flex">
+          {isPipelinePath && !isMobile && <PipelineSidebar />}
+          
+          <main className={cn(
+            "p-4 md:p-6 lg:p-8 flex-1",
+            isPipelinePath && !isMobile && "border-l"
+          )}>
+            {children}
+          </main>
+        </div>
       </div>
     </div>
   );

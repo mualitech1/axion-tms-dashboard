@@ -9,20 +9,24 @@ import PipelineReminders from './pipeline/PipelineReminders';
 import PipelineTasks from './pipeline/PipelineTasks';
 import { ReminderProvider } from './pipeline/context/ReminderContext';
 import AutoReminder from './pipeline/components/reminders/AutoReminder';
+import { toast } from '@/hooks/use-toast';
 
 export default function Pipeline() {
   return (
     <ReminderProvider>
       <AutoReminder />
       <Routes>
-        <Route path="/" element={<PipelineDashboard />} />
+        <Route path="/" element={<Navigate to="/sales-pipeline/dashboard" replace />} />
+        <Route path="/dashboard" element={<PipelineDashboard />} />
         <Route path="/board" element={<PipelineBoard />} />
         <Route path="/lead/:id" element={<LeadDetails />} />
         <Route path="/reports" element={<PipelineReports />} />
         <Route path="/settings" element={<PipelineSettings />} />
         <Route path="/reminders" element={<PipelineReminders />} />
         <Route path="/tasks" element={<PipelineTasks />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/tasks/calendar" element={<PipelineTasks defaultTab="calendar" />} />
+        <Route path="/tasks/tags" element={<PipelineTasks defaultTab="tags" />} />
+        <Route path="*" element={<Navigate to="/sales-pipeline/dashboard" replace />} />
       </Routes>
     </ReminderProvider>
   );

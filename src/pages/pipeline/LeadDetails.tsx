@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useForm } from 'react-hook-form';
@@ -13,7 +12,6 @@ import { toast } from '@/hooks/use-toast';
 
 // Import the refactored components
 import LeadHeader from './components/lead-details/LeadHeader';
-import LeadNotFound from './components/lead-details/LeadNotFound';
 import DetailsTab from './components/lead-details/DetailsTab';
 import ActivityTab from './components/lead-details/ActivityTab';
 import IntegrationTab from './components/lead-details/IntegrationTab';
@@ -58,6 +56,7 @@ const mockActivities: Activity[] = [
 
 export default function LeadDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [lead, setLead] = useState<Lead | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [activityText, setActivityText] = useState('');
@@ -77,10 +76,17 @@ export default function LeadDetails() {
     if (foundLead) {
       setLead(foundLead);
       form.reset(foundLead);
+    } else {
+      toast({
+        title: "Lead not found",
+        description: "The lead you're looking for doesn't exist or has been deleted",
+        variant: "destructive"
+      });
+      navigate("/sales-pipeline/board");
     }
     
     setActivities(mockActivities.filter(activity => activity.leadId === id));
-  }, [id, form]);
+  }, [id, form, navigate]);
   
   const handleSave = (data: Lead) => {
     console.log('Saving lead:', data);
@@ -114,7 +120,7 @@ export default function LeadDetails() {
   };
   
   if (!lead) {
-    return <LeadNotFound />;
+    return null; // Will redirect via useEffect
   }
   
   return (

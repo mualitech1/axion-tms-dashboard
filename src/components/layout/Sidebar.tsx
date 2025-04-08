@@ -4,7 +4,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { 
   Home, Users, Truck, UserCircle, Settings, 
   BarChart2, CreditCard, FileText, Menu, X,
-  Kanban
+  Kanban, LayoutDashboard, ListTodo
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -14,11 +14,14 @@ interface NavItemProps {
   icon: React.ElementType;
   label: string;
   isCollapsed: boolean;
+  hasSubmenu?: boolean;
 }
 
-const NavItem = ({ to, icon: Icon, label, isCollapsed }: NavItemProps) => {
+const NavItem = ({ to, icon: Icon, label, isCollapsed, hasSubmenu = false }: NavItemProps) => {
   const location = useLocation();
-  const isActive = location.pathname === to;
+  const isActive = hasSubmenu 
+    ? location.pathname.startsWith(to) 
+    : location.pathname === to;
 
   return (
     <NavLink 
@@ -148,7 +151,64 @@ export default function Sidebar() {
             <NavItem to="/jobs" icon={Truck} label="Jobs" isCollapsed={isCollapsed} />
             <NavItem to="/customers" icon={Users} label="Customers" isCollapsed={isCollapsed} />
             <NavItem to="/carriers" icon={Truck} label="Carriers" isCollapsed={isCollapsed} />
-            <NavItem to="/pipeline" icon={Kanban} label="Sales Pipeline" isCollapsed={isCollapsed} />
+            
+            {/* Sales Pipeline with submenu structure */}
+            <NavItem 
+              to="/sales-pipeline/dashboard" 
+              icon={Kanban} 
+              label="Sales Pipeline" 
+              isCollapsed={isCollapsed}
+              hasSubmenu={true}
+            />
+            
+            {/* Sales Pipeline submenu items (only visible when not collapsed) */}
+            {!isCollapsed && (
+              <div className="ml-7 space-y-1 border-l pl-2 border-tms-gray-200 mt-1">
+                <NavLink 
+                  to="/sales-pipeline/dashboard"
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center py-1 px-2 text-sm rounded-md transition-colors",
+                      isActive ? "text-tms-blue font-medium" : "text-tms-gray-600 hover:text-tms-blue"
+                    )
+                  }
+                >
+                  <LayoutDashboard className="h-3.5 w-3.5 mr-1.5" />
+                  <span>Dashboard</span>
+                </NavLink>
+                
+                <NavLink 
+                  to="/sales-pipeline/board"
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center py-1 px-2 text-sm rounded-md transition-colors",
+                      isActive ? "text-tms-blue font-medium" : "text-tms-gray-600 hover:text-tms-blue"
+                    )
+                  }
+                >
+                  <Kanban className="h-3.5 w-3.5 mr-1.5" />
+                  <span>Pipeline Board</span>
+                </NavLink>
+                
+                <NavLink 
+                  to="/sales-pipeline/tasks"
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center py-1 px-2 text-sm rounded-md transition-colors",
+                      isActive || 
+                      location.pathname === '/sales-pipeline/tasks/calendar' || 
+                      location.pathname === '/sales-pipeline/tasks/tags'
+                        ? "text-tms-blue font-medium" 
+                        : "text-tms-gray-600 hover:text-tms-blue"
+                    )
+                  }
+                >
+                  <ListTodo className="h-3.5 w-3.5 mr-1.5" />
+                  <span>Task Management</span>
+                </NavLink>
+              </div>
+            )}
+            
             <NavItem to="/invoices" icon={FileText} label="Invoices" isCollapsed={isCollapsed} />
             <NavItem to="/finance" icon={CreditCard} label="Finance" isCollapsed={isCollapsed} />
           </NavSection>

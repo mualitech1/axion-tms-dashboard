@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,7 +8,11 @@ import TaskBoard from './components/tasks/TaskBoard';
 import TaskCalendar from './components/tasks/TaskCalendar';
 import TaskTags from './components/tasks/TaskTags';
 
-export default function PipelineTasks() {
+interface PipelineTasksProps {
+  defaultTab?: 'board' | 'calendar' | 'tags';
+}
+
+export default function PipelineTasks({ defaultTab = 'board' }: PipelineTasksProps) {
   const [view, setView] = useState<'all' | 'team' | 'mine'>('all');
   
   return (
@@ -49,7 +53,7 @@ export default function PipelineTasks() {
         </div>
       </div>
       
-      <Tabs defaultValue="board" className="space-y-4">
+      <Tabs defaultValue={defaultTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="board" className="flex items-center gap-1">
             <ListTodo className="h-4 w-4" />
