@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { formatDistanceToNow, format, isPast, isToday, addMinutes } from 'date-fns';
 import { Clock, Calendar, CheckCircle, X, Bell } from 'lucide-react';
@@ -9,7 +10,20 @@ import { useReminders, Reminder } from '../../context/ReminderContext';
 import { toast } from '@/hooks/use-toast';
 
 export default function ReminderPanel() {
-  const { activeReminders, markAsCompleted, deleteReminder } = useReminders();
+  // Safely handle the case when the component is rendered outside of ReminderProvider
+  let reminderContext;
+  try {
+    reminderContext = useReminders();
+  } catch (error) {
+    // If useReminders throws an error, we're not within a ReminderProvider
+    return (
+      <Button variant="ghost" size="icon" className="relative">
+        <Bell className="h-5 w-5" />
+      </Button>
+    );
+  }
+  
+  const { activeReminders, markAsCompleted, deleteReminder } = reminderContext;
   const [open, setOpen] = useState(false);
   
   const completeReminder = (reminder: Reminder) => {
