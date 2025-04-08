@@ -6,6 +6,7 @@ import LeadDetails from './pipeline/LeadDetails';
 import PipelineReports from './pipeline/PipelineReports';
 import PipelineSettings from './pipeline/PipelineSettings';
 import PipelineReminders from './pipeline/PipelineReminders';
+import PipelineTasks from './pipeline/PipelineTasks';
 import { ReminderProvider } from './pipeline/context/ReminderContext';
 import AutoReminder from './pipeline/components/reminders/AutoReminder';
 
@@ -20,6 +21,7 @@ export default function Pipeline() {
         <Route path="/reports" element={<PipelineReports />} />
         <Route path="/settings" element={<PipelineSettings />} />
         <Route path="/reminders" element={<PipelineReminders />} />
+        <Route path="/tasks" element={<PipelineTasks />} />
         <Route path="*" element={<Navigate to="/pipeline" replace />} />
       </Routes>
     </ReminderProvider>
