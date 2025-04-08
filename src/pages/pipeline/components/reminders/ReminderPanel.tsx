@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { formatDistanceToNow, format, isPast, isToday, addMinutes } from 'date-fns';
 import { Clock, Calendar, CheckCircle, X, Bell } from 'lucide-react';
@@ -51,7 +50,7 @@ export default function ReminderPanel() {
     } else if (isPast(notificationTime)) {
       return {
         label: "Due Soon",
-        variant: "warning" as const,
+        variant: "secondary" as const,
       };
     } else if (isToday(reminderTime)) {
       return {
