@@ -70,26 +70,26 @@ export default function TaskCalendar({ viewFilter }: TaskCalendarProps) {
     setEditingTask(null);
   };
   
-  // Render day with task indicators
-  const renderDay = (day: Date) => {
+  // Generate calendar day modifiers to show indicators for days with tasks
+  const getDayClassNames = (day: Date): string => {
     const dayTasks = getTasksForDay(day);
-    
-    return (
-      <div className="relative">
-        <div>{format(day, 'd')}</div>
-        {dayTasks.length > 0 && (
-          <div className="absolute bottom-0 left-0 right-0 flex justify-center pb-1">
-            <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
-            {dayTasks.length > 1 && (
-              <div className="h-1.5 w-1.5 rounded-full bg-primary ml-0.5"></div>
-            )}
-            {dayTasks.length > 2 && (
-              <div className="h-1.5 w-1.5 rounded-full bg-primary ml-0.5"></div>
-            )}
-          </div>
-        )}
-      </div>
-    );
+    if (dayTasks.length === 0) return '';
+    return 'bg-primary/5 rounded-md';
+  };
+
+  // Create modifiers for the calendar
+  const modifiers = {
+    hasTask: (day: Date) => getTasksForDay(day).length > 0,
+    today: new Date()
+  };
+
+  // Create modifier styles
+  const modifiersStyles = {
+    hasTask: {
+      fontWeight: 'bold',
+      border: '2px solid',
+      borderColor: 'hsl(var(--primary) / 0.2)'
+    }
   };
   
   return (
@@ -101,7 +101,8 @@ export default function TaskCalendar({ viewFilter }: TaskCalendarProps) {
             selected={date}
             onSelect={handleDateSelect}
             className="rounded-md border"
-            renderDay={renderDay}
+            modifiers={modifiers}
+            modifiersStyles={modifiersStyles}
           />
         </CardContent>
       </Card>
