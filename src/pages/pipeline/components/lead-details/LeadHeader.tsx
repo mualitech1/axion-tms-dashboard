@@ -1,112 +1,157 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Bell, UserPlus, FileCheck, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
+import { Separator } from '@/components/ui/separator';
+import { 
+  ArrowLeft, 
+  Clock, 
+  BellPlus, 
+  Calendar, 
+  Mail, 
+  MoreHorizontal,
+  Briefcase
+} from 'lucide-react';
+import { format } from 'date-fns';
+import { Lead } from '../../data/pipelineTypes';
+import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { toast } from '@/hooks/use-toast';
-import { Lead, LeadStatus } from '../../data/pipelineTypes';
-import NotificationsPanel from '../collaboration/NotificationsPanel';
+} from '@/components/ui/dropdown-menu';
 
 interface LeadHeaderProps {
   lead: Lead;
   onSetReminder: () => void;
+  onStartOnboarding?: () => void;
 }
 
-export default function LeadHeader({ lead, onSetReminder }: LeadHeaderProps) {
-  const [isOnboarding, setIsOnboarding] = useState(false);
-
-  const initiateOnboarding = () => {
-    setIsOnboarding(true);
-    toast({
-      title: "Onboarding initiated",
-      description: `Customer onboarding process started for ${lead.company}`,
-    });
-    
-    // In a real application, this would connect to your TMS onboarding system
-    setTimeout(() => {
-      setIsOnboarding(false);
-      toast({
-        title: "Onboarding ready",
-        description: "Customer has been added to the onboarding queue",
-      });
-    }, 2000);
+export default function LeadHeader({ lead, onSetReminder, onStartOnboarding }: LeadHeaderProps) {
+  const formatDate = (dateString: string) => {
+    return format(new Date(dateString), 'MMM d, yyyy');
   };
-
-  const sendWelcomeEmail = () => {
-    toast({
-      title: "Welcome email triggered",
-      description: "Welcome email has been queued for sending",
-    });
+  
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-100 text-green-800';
+      case 'inactive':
+        return 'bg-gray-100 text-gray-800';
+      case 'archived':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   };
-
+  
   return (
-    <div className="mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <Link to="/pipeline/board">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="h-4 w-4 mr-2" />
+    <div className="pb-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <Link to="/sales-pipeline/board">
+          <Button variant="ghost" size="sm" className="gap-1">
+            <ArrowLeft className="h-4 w-4" />
             Back to Pipeline
           </Button>
         </Link>
         
-        <div className="flex items-center gap-2">
+        <div className="flex gap-2">
+          {onStartOnboarding && (
+            <Button onClick={onStartOnboarding} size="sm">
+              <Briefcase className="h-4 w-4 mr-2" />
+              Start Onboarding
+            </Button>
+          )}
           <Button variant="outline" size="sm" onClick={onSetReminder}>
-            <Bell className="h-4 w-4 mr-2" />
+            <BellPlus className="h-4 w-4 mr-2" />
             Set Reminder
           </Button>
-          <NotificationsPanel />
-        </div>
-      </div>
-      
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">{lead.company}</h1>
-          <div className="flex items-center text-muted-foreground">
-            <span className="mr-2">{lead.contact}, {lead.title}</span>
-            <Badge variant={lead.status === LeadStatus.ACTIVE ? "default" : "destructive"}>
-              {lead.status}
-            </Badge>
-          </div>
-        </div>
-        <div className="space-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">Integration Actions</Button>
+              <Button variant="outline" size="sm">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={initiateOnboarding}>
-                <UserPlus className="mr-2 h-4 w-4" />
-                <span>Start Onboarding</span>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <Calendar className="h-4 w-4 mr-2" />
+                Schedule Meeting
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={sendWelcomeEmail}>
-                <Mail className="mr-2 h-4 w-4" />
-                <span>Send Welcome Email</span>
+              <DropdownMenuItem>
+                <Mail className="h-4 w-4 mr-2" />
+                Send Email
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => window.open('/customers', '_blank')}>
-                <FileCheck className="mr-2 h-4 w-4" />
-                <span>View in Customer Portal</span>
+              <Separator className="my-1" />
+              <DropdownMenuItem className="text-red-600">
+                Delete Lead
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button>Schedule Meeting</Button>
         </div>
       </div>
       
-      {isOnboarding && (
-        <div className="mt-4 p-2 bg-blue-50 border border-blue-200 rounded flex items-center justify-between">
-          <div className="flex items-center">
-            <UserPlus className="h-4 w-4 mr-2 text-blue-500" />
-            <span className="text-sm">Onboarding in progress...</span>
+      <div>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-2xl font-bold">{lead.company}</h1>
+            <div className="flex items-center gap-2 mt-1">
+              <Badge className={getStatusColor(lead.status)}>
+                {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
+              </Badge>
+              
+              <div className="text-sm text-muted-foreground flex items-center">
+                <Clock className="h-4 w-4 mr-1" />
+                Created {formatDate(lead.created)}
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-right">
+            <div className="flex items-center gap-2">
+              <div className="text-sm">Estimated value</div>
+              <div className="font-bold text-lg">
+                ${lead.value.toLocaleString()}
+              </div>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {lead.probability}% probability • ${(lead.value * lead.probability / 100).toLocaleString()} weighted
+            </div>
           </div>
         </div>
-      )}
+      </div>
+      
+      <div className="flex justify-between bg-muted p-4 rounded-lg">
+        <div>
+          <div className="text-sm text-muted-foreground">Contact</div>
+          <div>{lead.contact}</div>
+          <div className="text-sm">{lead.title}</div>
+        </div>
+        
+        <div>
+          <div className="text-sm text-muted-foreground">Phone</div>
+          <div>{lead.phone}</div>
+        </div>
+        
+        <div>
+          <div className="text-sm text-muted-foreground">Email</div>
+          <div>{lead.email}</div>
+        </div>
+        
+        <div>
+          <div className="text-sm text-muted-foreground">Stage</div>
+          <div className="font-medium">
+            {lead.stage.split('-').map(word => 
+              word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ')}
+          </div>
+        </div>
+        
+        <div>
+          <div className="text-sm text-muted-foreground">Last Activity</div>
+          <div>{formatDate(lead.lastActivity)}</div>
+        </div>
+      </div>
     </div>
   );
 }
