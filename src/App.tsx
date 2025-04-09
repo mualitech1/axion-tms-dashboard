@@ -19,6 +19,12 @@ import Finance from "./pages/Finance";
 import Invoices from "./pages/Invoices";
 import NotFound from "./pages/NotFound";
 
+// Customer specific pages
+import CustomersList from "./pages/customers/CustomersList";
+import CustomerDetails from "./pages/customers/CustomerDetails";
+import CustomerDocumentsPage from "./pages/customers/CustomerDocumentsPage";
+import CustomerPortalAccess from "./pages/customers/CustomerPortalAccess";
+
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -32,7 +38,15 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/jobs/*" element={<Jobs />} />
-            <Route path="/customers/*" element={<Customers />} />
+            
+            {/* Improved Customers routing structure */}
+            <Route path="/customers" element={<Customers />}>
+              <Route index element={<CustomersList />} />
+              <Route path=":customerId" element={<CustomerDetails />} />
+              <Route path=":customerId/documents" element={<CustomerDocumentsPage />} />
+              <Route path=":customerId/portal" element={<CustomerPortalAccess />} />
+            </Route>
+            
             <Route path="/customer-portal/*" element={<CustomerPortal />} />
             <Route path="/carriers/*" element={<Carriers />} />
             <Route path="/pipeline/*" element={<Pipeline />} />

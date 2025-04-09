@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Building, Search, Filter, Download, MoreHorizontal 
 } from 'lucide-react';
@@ -24,6 +25,7 @@ interface CustomerTableProps {
 
 const CustomerTable = ({ customers, onViewDetails }: CustomerTableProps) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
   
   // Filter customers based on search term
   const filteredCustomers = customers.filter(
@@ -32,6 +34,11 @@ const CustomerTable = ({ customers, onViewDetails }: CustomerTableProps) => {
       customer.contact.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Navigate to customer details page instead of opening dialog
+  const handleRowClick = (customer: Customer) => {
+    navigate(`/customers/${customer.id}`);
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-card mb-6">
@@ -76,7 +83,7 @@ const CustomerTable = ({ customers, onViewDetails }: CustomerTableProps) => {
             {filteredCustomers.length > 0 ? (
               filteredCustomers.map((customer) => (
                 <TableRow key={customer.id} className="hover:bg-tms-gray-100 cursor-pointer"
-                  onClick={() => onViewDetails(customer)}
+                  onClick={() => handleRowClick(customer)}
                 >
                   <TableCell>
                     <div className="flex items-center">
@@ -124,10 +131,24 @@ const CustomerTable = ({ customers, onViewDetails }: CustomerTableProps) => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onViewDetails(customer)}>View Details</DropdownMenuItem>
-                        <DropdownMenuItem>Edit Customer</DropdownMenuItem>
-                        <DropdownMenuItem>View Orders</DropdownMenuItem>
-                        <DropdownMenuItem className="text-tms-red">Deactivate</DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/customers/${customer.id}`);
+                        }}>
+                          View Details
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/customers/${customer.id}/documents`);
+                        }}>
+                          Documents
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/customers/${customer.id}/portal`);
+                        }}>
+                          Portal Access
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
