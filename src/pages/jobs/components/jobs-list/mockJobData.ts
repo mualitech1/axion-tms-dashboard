@@ -1,6 +1,22 @@
 
 // Mock data for the Jobs List
-export const mockJobs = [
+export interface Job {
+  id: number;
+  title: string;
+  client: string;
+  status: string;
+  priority: string;
+  date: string;
+  origin: string;
+  destination: string;
+  assignedTo: string;
+  notes: string;
+  contact: string;
+  contactPhone: string;
+  time?: string; // Optional property that can be derived from date
+}
+
+export const mockJobs: Job[] = [
   {
     id: 1001,
     title: "Warehouse Delivery",
@@ -114,3 +130,13 @@ export const mockJobs = [
     contactPhone: "713-555-1357"
   }
 ];
+
+// Helper function to format the time from the date property
+export function getTimeFromDate(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString('en-US', { 
+    hour: 'numeric', 
+    minute: '2-digit',
+    hour12: true 
+  });
+}

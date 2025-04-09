@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { mockJobs } from "./components/jobs-list/mockJobData";
+import { mockJobs, getTimeFromDate } from "./components/jobs-list/mockJobData";
 import { JobDetailHeader } from "./components/job-detail/JobDetailHeader";
 import { JobStatusCard } from "./components/job-detail/JobStatusCard";
 import { JobDetailsTab } from "./components/job-detail/JobDetailsTab";
@@ -19,6 +19,9 @@ export default function JobDetailPage() {
   // Find the job from mock data - in a real app, this would be an API call
   const job = mockJobs.find(j => j.id === jobId) || mockJobs[0]; // Fallback to first job if not found
   
+  // Get formatted time from the date string
+  const jobTime = getTimeFromDate(job.date);
+  
   // State for tabs
   const [activeTab, setActiveTab] = useState("details");
   
@@ -31,7 +34,7 @@ export default function JobDetailPage() {
         <JobStatusCard 
           status={job.status}
           priority={job.priority}
-          time={job.time}
+          time={jobTime}
           jobId={jobId}
         />
         
