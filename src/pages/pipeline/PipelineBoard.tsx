@@ -69,15 +69,15 @@ export default function PipelineBoard() {
         description: `${lead.company} has been added to your customers.`,
       });
       
-      // Option to navigate to the customers page
-      const viewCustomerBtn = document.createElement('button');
-      viewCustomerBtn.innerText = 'View Customer';
-      viewCustomerBtn.onclick = () => navigate('/customers');
-      
+      // Replace the DOM button creation with a proper React Button component wrapped in a function
       toast({
         title: "Customer Portal Activated",
         description: "The customer can now access their portal.",
-        action: viewCustomerBtn,
+        action: (
+          <Button variant="outline" size="sm" onClick={() => navigate('/customers')}>
+            View Customer
+          </Button>
+        ),
       });
     }, 1000);
   };
