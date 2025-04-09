@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar as CalendarIcon, Upload, FileText, X, AlertCircle } from "lucide-react";
+import { Calendar as CalendarIcon, Upload, FileText, X, AlertCircle, Check } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
@@ -27,6 +27,8 @@ export function DocumentUploadModal({ open, onClose, onDocumentUpload }: Documen
   const [expiryDate, setExpiryDate] = useState<Date | undefined>(undefined);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,15 +74,34 @@ export function DocumentUploadModal({ open, onClose, onDocumentUpload }: Documen
     return Object.keys(newErrors).length === 0;
   };
 
+  const simulateFileUpload = async () => {
+    // In a real app, this would be a fetch/axios request to upload the file
+    return new Promise<string>((resolve) => {
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 10;
+        setUploadProgress(progress);
+        
+        if (progress >= 100) {
+          clearInterval(interval);
+          // In a real app, this would be the URL returned by the server
+          const uploadedFileUrl = `/customer-uploads/${Date.now()}-${file?.name}`;
+          resolve(uploadedFileUrl);
+        }
+      }, 200);
+    });
+  };
+
   const handleUpload = async () => {
     if (!validateForm()) return;
     
     setIsUploading(true);
+    setUploadProgress(0);
+    setUploadSuccess(false);
     
     try {
-      // In a real application, you would upload the file to a server here
-      // For now, we'll simulate an upload with a delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Simulate file upload to /customer-uploads directory
+      const fileUrl = await simulateFileUpload();
       
       // Create a new document object
       const newDocument: Document = {
@@ -89,17 +110,21 @@ export function DocumentUploadModal({ open, onClose, onDocumentUpload }: Documen
         type: documentType,
         dateUploaded: new Date().toISOString().split('T')[0],
         expiryDate: expiryDate ? expiryDate.toISOString().split('T')[0] : null,
-        filePath: `/documents/${file?.name || 'unknown'}`,
+        filePath: fileUrl,
         fileSize: `${(file?.size ? file.size / (1024 * 1024) : 0).toFixed(1)} MB`
       };
       
-      onDocumentUpload(newDocument);
-      toast({
-        title: "Document uploaded",
-        description: "Your document has been successfully uploaded.",
-      });
-      resetForm();
-      onClose();
+      setUploadSuccess(true);
+      
+      setTimeout(() => {
+        onDocumentUpload(newDocument);
+        toast({
+          title: "Document uploaded",
+          description: `${documentName} has been successfully uploaded to /customer-uploads.`,
+        });
+        resetForm();
+        onClose();
+      }, 500);
     } catch (error) {
       toast({
         title: "Upload failed",
@@ -117,6 +142,8 @@ export function DocumentUploadModal({ open, onClose, onDocumentUpload }: Documen
     setDocumentType('other');
     setExpiryDate(undefined);
     setErrors({});
+    setUploadProgress(0);
+    setUploadSuccess(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -271,6 +298,30 @@ export function DocumentUploadModal({ open, onClose, onDocumentUpload }: Documen
               </PopoverContent>
             </Popover>
           </div>
+          
+          {/* Upload progress */}
+          {isUploading && (
+            <div className="space-y-2">
+              <div className="flex justify-between text-xs">
+                <span>Uploading to /customer-uploads...</span>
+                <span>{uploadProgress}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
+            </div>
+          )}
+          
+          {/* Success indicator */}
+          {uploadSuccess && (
+            <div className="flex items-center text-green-600">
+              <Check className="h-4 w-4 mr-1" />
+              <span>File uploaded successfully to /customer-uploads</span>
+            </div>
+          )}
         </div>
         
         <DialogFooter>
@@ -283,7 +334,7 @@ export function DocumentUploadModal({ open, onClose, onDocumentUpload }: Documen
             disabled={isUploading}
           >
             {isUploading ? (
-              <>Uploading...</>
+              <>Uploading to /customer-uploads...</>
             ) : (
               <>
                 <Upload className="h-4 w-4 mr-1" /> Upload Document
