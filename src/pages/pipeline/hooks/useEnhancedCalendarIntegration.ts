@@ -1,37 +1,13 @@
-import { useState, useEffect } from 'react';
+
+import { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { useCalendarIntegration } from '@/hooks/use-calendar-integration';
 import { Lead } from '../data/pipelineTypes';
+import { providers, CalendarProvider } from './calendar/calendarProviders';
+import { UseEnhancedCalendarIntegrationProps, EnhancedCalendarIntegrationReturn, MeetingDetails } from './calendar/calendarTypes';
+import { createMeetingEvent, handleCalendarError } from './calendar/calendarUtils';
 
-interface CalendarProvider {
-  name: string;
-  type: 'google' | 'outlook' | 'ical';
-  icon: string;
-}
-
-const providers: CalendarProvider[] = [
-  {
-    name: 'Google Calendar',
-    type: 'google',
-    icon: 'google'
-  },
-  {
-    name: 'Outlook Calendar',
-    type: 'outlook',
-    icon: 'microsoft'
-  },
-  {
-    name: 'iCalendar',
-    type: 'ical',
-    icon: 'calendar'
-  }
-];
-
-interface UseEnhancedCalendarIntegrationProps {
-  onEventCreated?: (eventData: any) => void;
-}
-
-export const useEnhancedCalendarIntegration = (props?: UseEnhancedCalendarIntegrationProps) => {
+export const useEnhancedCalendarIntegration = (props?: UseEnhancedCalendarIntegrationProps): EnhancedCalendarIntegrationReturn => {
   const baseCalendarIntegration = useCalendarIntegration();
   const [activeProvider, setActiveProvider] = useState<CalendarProvider | null>(null);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'failed'>('idle');
@@ -69,28 +45,11 @@ export const useEnhancedCalendarIntegration = (props?: UseEnhancedCalendarIntegr
       
       return false;
     } catch (error) {
-      console.error('Error connecting to calendar provider:', error);
-      setSyncStatus('failed');
-      
-      toast({
-        title: "Connection failed",
-        description: `Failed to connect to ${providerType} calendar`,
-        variant: "destructive"
-      });
-      
-      return false;
+      return handleCalendarError(error, `Failed to connect to ${providerType} calendar`);
     }
   };
   
-  const scheduleMeeting = async (
-    lead: Lead,
-    meetingDetails: {
-      title: string;
-      startTime: string;
-      endTime: string;
-      description?: string;
-    }
-  ) => {
+  const scheduleMeeting = async (lead: Lead, meetingDetails: MeetingDetails) => {
     if (!baseCalendarIntegration.isConnected) {
       toast({
         title: "Calendar not connected",
@@ -100,16 +59,7 @@ export const useEnhancedCalendarIntegration = (props?: UseEnhancedCalendarIntegr
       return null;
     }
     
-    const event = {
-      title: meetingDetails.title,
-      startTime: meetingDetails.startTime,
-      endTime: meetingDetails.endTime,
-      description: meetingDetails.description || `Meeting with ${lead.company}`,
-      location: 'Virtual Meeting',
-      attendees: [
-        `${lead.contact} <${lead.email}>`
-      ]
-    };
+    const event = createMeetingEvent(lead, meetingDetails);
     
     try {
       const result = await baseCalendarIntegration.createEvent(event);
@@ -162,16 +112,7 @@ export const useEnhancedCalendarIntegration = (props?: UseEnhancedCalendarIntegr
       
       return true;
     } catch (error) {
-      console.error('Error syncing calendar:', error);
-      setSyncStatus('failed');
-      
-      toast({
-        title: "Sync failed",
-        description: "Failed to sync your calendar",
-        variant: "destructive"
-      });
-      
-      return false;
+      return handleCalendarError(error, "Failed to sync your calendar");
     }
   };
   
@@ -186,7 +127,7 @@ export const useEnhancedCalendarIntegration = (props?: UseEnhancedCalendarIntegr
     
     const leadMeetings = baseCalendarIntegration.events.filter(event => 
       event.title.toLowerCase().includes('client') ||
-      event.attendees?.some(attendee => attendee.includes('@'))
+      event.attendees?.some((attendee: string) => attendee.includes('@'))
     );
     
     return leadMeetings;
