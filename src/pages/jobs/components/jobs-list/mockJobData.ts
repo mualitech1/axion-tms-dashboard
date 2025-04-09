@@ -1,103 +1,116 @@
 
-export interface Job {
-  id: number;
-  title: string;
-  client: string;
-  status: "scheduled" | "in-progress" | "completed" | "cancelled";
-  priority: "low" | "medium" | "high";
-  time?: string;
-  date: string;  // ISO date string format
-  assignedTo?: string;
-  location?: string;
-}
-
-export const mockJobs: Job[] = [
+// Mock data for the Jobs List
+export const mockJobs = [
   {
-    id: 1,
-    title: "Container Delivery to Port",
-    client: "Global Logistics Inc.",
-    status: "scheduled",
-    priority: "high",
-    time: "09:00 AM",
-    date: "2025-04-08T09:00:00",
-    assignedTo: "John Smith",
-    location: "Port of Seattle"
+    id: 1001,
+    title: "Warehouse Delivery",
+    client: "Acme Corp",
+    status: "Scheduled",
+    priority: "High",
+    date: "2025-04-10T10:00:00",
+    origin: "Austin, TX",
+    destination: "Dallas, TX",
+    assignedTo: "Truck #105 / John D.",
+    notes: "Temperature-controlled delivery",
+    contact: "Jane Smith",
+    contactPhone: "512-555-1234"
   },
   {
-    id: 2,
-    title: "Warehouse Pickup",
-    client: "Amazon Distribution",
-    status: "in-progress",
-    priority: "medium",
-    time: "02:30 PM",
-    date: "2025-04-06T14:30:00",
-    assignedTo: "Maria Rodriguez",
-    location: "South Distribution Center"
+    id: 1002,
+    title: "Retail Store Delivery",
+    client: "RetailMax",
+    status: "In Transit",
+    priority: "Medium",
+    date: "2025-04-09T14:30:00",
+    origin: "Houston, TX",
+    destination: "San Antonio, TX",
+    assignedTo: "Truck #108 / Alice M.",
+    notes: "Time-sensitive delivery",
+    contact: "Bob Johnson",
+    contactPhone: "713-555-6789"
   },
   {
-    id: 3,
-    title: "Cross-dock Operation",
-    client: "Swift Transfer LLC",
-    status: "completed",
-    priority: "medium",
-    time: "11:00 AM",
-    date: "2025-04-05T11:00:00",
-    assignedTo: "David Chen",
-    location: "Central Facility"
+    id: 1003,
+    title: "Factory Equipment Pickup",
+    client: "Industrial Machines Inc",
+    status: "Completed",
+    priority: "Low",
+    date: "2025-04-09T09:00:00",
+    origin: "Dallas, TX",
+    destination: "Fort Worth, TX",
+    assignedTo: "Truck #102 / Michael B.",
+    notes: "Heavy equipment, special handling required",
+    contact: "Sarah Williams",
+    contactPhone: "214-555-4321"
   },
   {
-    id: 4,
-    title: "Refrigerated Goods Transport",
-    client: "Fresh Foods Co.",
-    status: "scheduled",
-    priority: "high",
-    time: "06:00 AM",
-    date: "2025-04-09T06:00:00",
-    assignedTo: "Alex Johnson",
-    location: "Cold Storage Facility"
+    id: 1004,
+    title: "Medical Supplies",
+    client: "MediHealth Inc",
+    status: "Delayed",
+    priority: "High",
+    date: "2025-04-09T08:15:00",
+    origin: "Austin, TX",
+    destination: "Houston, TX",
+    assignedTo: "Truck #110 / David L.",
+    notes: "Critical medical supplies, handle with care",
+    contact: "Emma Davis",
+    contactPhone: "512-555-9876"
   },
   {
-    id: 5,
-    title: "Return Empty Containers",
-    client: "Oceanic Shipping",
-    status: "cancelled",
-    priority: "low",
-    time: "03:00 PM",
-    date: "2025-04-05T15:00:00",
-    assignedTo: "Sam Wilson",
-    location: "Container Yard"
+    id: 1005,
+    title: "Food Distribution",
+    client: "Fresh Foods Co",
+    status: "Scheduled",
+    priority: "Medium",
+    date: "2025-04-10T07:00:00",
+    origin: "San Antonio, TX",
+    destination: "Austin, TX",
+    assignedTo: "Truck #107 / Sophia R.",
+    notes: "Refrigerated truck required",
+    contact: "Mark Brown",
+    contactPhone: "210-555-3456"
   },
   {
-    id: 6,
-    title: "Hazardous Materials Transport",
-    client: "ChemCorp Industries",
-    status: "scheduled",
-    priority: "high",
-    time: "10:30 AM",
-    date: "2025-04-10T10:30:00",
-    assignedTo: "Jessica Lee",
-    location: "Chemical Processing Plant"
+    id: 1006,
+    title: "Office Furniture Delivery",
+    client: "Modern Office Inc",
+    status: "Scheduled",
+    priority: "Low",
+    date: "2025-04-11T11:00:00",
+    origin: "Fort Worth, TX",
+    destination: "Dallas, TX",
+    assignedTo: "Truck #103 / Robert J.",
+    notes: "Fragile furniture, careful handling required",
+    contact: "Linda Wilson",
+    contactPhone: "817-555-7890"
   },
   {
-    id: 7,
-    title: "Equipment Relocation",
-    client: "Construction Partners",
-    status: "in-progress",
-    priority: "medium",
-    time: "08:00 AM",
-    date: "2025-04-07T08:00:00",
-    assignedTo: "Michael Brown",
-    location: "Downtown Construction Site"
+    id: 1007,
+    title: "Electronics Shipment",
+    client: "TechWorld",
+    status: "In Transit",
+    priority: "High",
+    date: "2025-04-09T13:45:00",
+    origin: "Dallas, TX",
+    destination: "Houston, TX",
+    assignedTo: "Truck #112 / James H.",
+    notes: "High-value electronics, secured transport",
+    contact: "Thomas Miller",
+    contactPhone: "214-555-2468"
   },
   {
-    id: 8,
-    title: "Long-haul Freight Delivery",
-    client: "National Distributors",
-    status: "scheduled",
-    priority: "medium",
-    time: "05:00 AM",
-    date: "2025-04-11T05:00:00",
-    assignedTo: "Robert Taylor",
-    location: "Interstate 5"
+    id: 1008,
+    title: "Construction Materials",
+    client: "BuildRight Construction",
+    status: "Scheduled",
+    priority: "Medium",
+    date: "2025-04-11T09:30:00",
+    origin: "Houston, TX",
+    destination: "Austin, TX",
+    assignedTo: "Truck #114 / William T.",
+    notes: "Heavy load, oversize transport permit obtained",
+    contact: "Amanda Garcia",
+    contactPhone: "713-555-1357"
   }
 ];

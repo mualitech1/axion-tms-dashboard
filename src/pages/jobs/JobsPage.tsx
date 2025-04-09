@@ -1,7 +1,8 @@
 
 import { useState, useEffect } from "react";
-import { Calendar, LayoutDashboard, Plus } from "lucide-react";
+import { Calendar, LayoutDashboard, Map, Plus, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
 import { 
   Dialog, 
   DialogContent, 
@@ -14,17 +15,28 @@ import JobCreation from "./components/JobCreation";
 import FleetOverview from "./components/FleetOverview";
 import PlanningCalendar from "./components/PlanningCalendar";
 import JobsList from "./components/JobsList";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import JobsMap from "./components/JobsMap";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function JobsPage() {
   const [isCreatingJob, setIsCreatingJob] = useState(false);
-  const [viewMode, setViewMode] = useState<"calendar" | "scheduler">("calendar");
+  const [viewMode, setViewMode] = useState<"list" | "calendar" | "map">("list");
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const isMobile = useIsMobile();
   
   useEffect(() => {
     console.log("JobsPage mounted");
   }, []);
+
+  const navigateDate = (direction: 'prev' | 'next') => {
+    const newDate = new Date(selectedDate);
+    if (direction === 'prev') {
+      newDate.setDate(newDate.getDate() - 1);
+    } else {
+      newDate.setDate(newDate.getDate() + 1);
+    }
+    setSelectedDate(newDate);
+  };
   
   return (
     <MainLayout title="Jobs Dashboard">
@@ -32,69 +44,113 @@ export default function JobsPage() {
         {/* Page Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-tms-gray-800">Dashboard</h1>
+            <h1 className="text-2xl font-semibold text-tms-gray-800">Jobs Dashboard</h1>
             <p className="text-muted-foreground mt-1">Manage and track all transportation jobs</p>
-          </div>
-          
-          <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-            <Tabs 
-              defaultValue={viewMode} 
-              onValueChange={(value) => setViewMode(value as "calendar" | "scheduler")}
-              className="w-full sm:w-auto"
-            >
-              <TabsList className="w-full sm:w-auto">
-                <TabsTrigger value="calendar" className="flex items-center gap-1 flex-1 sm:flex-initial">
-                  <Calendar className="h-4 w-4" />
-                  Calendar
-                </TabsTrigger>
-                <TabsTrigger value="scheduler" className="flex items-center gap-1 flex-1 sm:flex-initial">
-                  <LayoutDashboard className="h-4 w-4" />
-                  Scheduler
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-            
-            <Dialog open={isCreatingJob} onOpenChange={setIsCreatingJob}>
-              <DialogTrigger asChild>
-                <Button className="ml-0 sm:ml-2 w-full sm:w-auto mt-2 sm:mt-0">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create Job
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                <DialogTitle>Create New Job</DialogTitle>
-                <DialogDescription>Fill in the details to create a new job.</DialogDescription>
-                <JobCreation onComplete={() => setIsCreatingJob(false)} />
-              </DialogContent>
-            </Dialog>
           </div>
         </div>
 
         {/* Fleet Overview Section */}
-        <div>
-          <h2 className="text-lg font-medium mb-3 text-tms-gray-800">Fleet Overview</h2>
-          <FleetOverview />
+        <FleetOverview />
+        
+        {/* Action Bar */}
+        <div className="grid grid-cols-1 gap-4">
+          <div className="bg-white p-4 rounded-lg border border-border/40 shadow-sm">
+            <div className="flex flex-col sm:flex-row justify-between gap-4">
+              <div className="flex flex-wrap gap-2 items-center">
+                <div className="flex rounded-lg border shadow-sm">
+                  <Button 
+                    variant={viewMode === "list" ? "default" : "ghost"} 
+                    size="sm" 
+                    className="rounded-r-none"
+                    onClick={() => setViewMode("list")}
+                  >
+                    <LayoutDashboard className="h-4 w-4 mr-2" />
+                    List
+                  </Button>
+                  <Button 
+                    variant={viewMode === "calendar" ? "default" : "ghost"} 
+                    size="sm" 
+                    className="rounded-none border-x"
+                    onClick={() => setViewMode("calendar")}
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Calendar
+                  </Button>
+                  <Button 
+                    variant={viewMode === "map" ? "default" : "ghost"} 
+                    size="sm" 
+                    className="rounded-l-none"
+                    onClick={() => setViewMode("map")}
+                  >
+                    <Map className="h-4 w-4 mr-2" />
+                    Map
+                  </Button>
+                </div>
+                
+                <div className="flex items-center rounded-lg border shadow-sm">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-9 w-9 rounded-r-none border-r"
+                    onClick={() => navigateDate('prev')}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <div className="px-3 py-1.5 text-sm">
+                    {format(selectedDate, "MMMM d, yyyy")}
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-9 w-9 rounded-l-none border-l"
+                    onClick={() => navigateDate('next')}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <Button variant="outline" size="sm" className="shadow-sm">
+                  <Filter className="h-4 w-4 mr-2" />
+                  Filters
+                </Button>
+              </div>
+              
+              <Dialog open={isCreatingJob} onOpenChange={setIsCreatingJob}>
+                <DialogTrigger asChild>
+                  <Button className="whitespace-nowrap shadow-sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create New Job
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                  <DialogTitle>Create New Job</DialogTitle>
+                  <DialogDescription>Fill in the details to create a new job.</DialogDescription>
+                  <JobCreation onComplete={() => setIsCreatingJob(false)} />
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
         </div>
         
-        {/* Planning Calendar & Jobs List Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            {viewMode === "calendar" ? (
-              <PlanningCalendar />
-            ) : (
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-border/40 h-[500px] flex flex-col items-center justify-center">
-                <LayoutDashboard className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Scheduler View</h3>
-                <p className="text-muted-foreground text-center max-w-md">
-                  The advanced scheduler view is coming soon. Select calendar view to see the current planning calendar.
-                </p>
-              </div>
-            )}
-          </div>
+        {/* Main Content Area - Changes based on viewMode */}
+        <div>
+          {viewMode === "list" && (
+            <JobsList 
+              selectedDate={selectedDate} 
+              openJobCreation={() => setIsCreatingJob(true)}
+            />
+          )}
           
-          <div className="lg:col-span-1">
-            <JobsList openJobCreation={() => setIsCreatingJob(true)} />
-          </div>
+          {viewMode === "calendar" && (
+            <PlanningCalendar 
+              selectedDate={selectedDate}
+              onDateChange={setSelectedDate}
+            />
+          )}
+          
+          {viewMode === "map" && (
+            <JobsMap selectedDate={selectedDate} />
+          )}
         </div>
       </div>
     </MainLayout>

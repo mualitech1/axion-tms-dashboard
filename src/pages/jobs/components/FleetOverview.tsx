@@ -1,6 +1,6 @@
 
 import { Card } from "@/components/ui/card";
-import { CheckCircle2, Clock, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Clock, AlertTriangle, Activity } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 export default function FleetOverview() {
@@ -65,7 +65,13 @@ export default function FleetOverview() {
       
       <Card className="bg-white p-4 sm:p-5 border border-border/40 shadow-sm">
         <div>
-          <h3 className="font-medium text-sm mb-2">Vehicle Utilization</h3>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-2 rounded-full bg-blue-50">
+              <Activity className="h-5 w-5 text-blue-500" />
+            </div>
+            <h3 className="font-medium text-sm">Vehicle Utilization</h3>
+          </div>
+          
           <div className="flex items-center gap-2 mb-1">
             <Progress value={fleetStats.utilization} className="h-2 flex-grow bg-muted/30" />
             <span className="text-lg font-semibold">{fleetStats.utilization}%</span>

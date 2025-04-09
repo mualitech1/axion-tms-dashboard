@@ -1,18 +1,34 @@
-import { Card } from "@/components/ui/card";
+
+import { useState } from "react";
+import { Search, Filter, SortAsc, SortDesc } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Plus, Search } from "lucide-react";
 import { InputWithIcon } from "@/components/ui/input-with-icon";
-import { useState, useMemo } from "react";
-import { JobCard } from "./jobs-list/JobCard";
-import { mockJobs } from "./jobs-list/mockJobData";
+import { format } from "date-fns";
 import { AdvancedFilters } from "./jobs-list/AdvancedFilters";
+import { mockJobs } from "./jobs-list/mockJobData";
 import { FilterOptions } from "./jobs-list/filters/types";
 
 interface JobsListProps {
+  selectedDate: Date;
   openJobCreation: () => void;
 }
 
-export default function JobsList({ openJobCreation }: JobsListProps) {
+// Helper function to filter jobs by date
+const filterJobsByDate = (jobs: any[], selectedDate: Date) => {
+  return jobs.filter(job => {
+    const jobDate = new Date(job.date);
+    return (
+      jobDate.getDate() === selectedDate.getDate() &&
+      jobDate.getMonth() === selectedDate.getMonth() &&
+      jobDate.getFullYear() === selectedDate.getFullYear()
+    );
+  });
+};
+
+export default function JobsList({ selectedDate, openJobCreation }: JobsListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState<FilterOptions>({
     status: null,
@@ -22,138 +38,239 @@ export default function JobsList({ openJobCreation }: JobsListProps) {
     sortBy: "date",
     sortDirection: "desc",
   });
+  const [sortColumn, setSortColumn] = useState<string>("id");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   
-  const activeFiltersCount = useMemo(() => {
-    let count = 0;
-    if (filters.status) count++;
-    if (filters.priority) count++;
-    if (filters.startDate) count++;
-    if (filters.endDate) count++;
-    if (filters.sortBy !== "date" || filters.sortDirection !== "desc") count++;
-    return count;
-  }, [filters]);
-  
-  const filteredJobs = useMemo(() => {
-    // First apply text search filter
-    let result = mockJobs.filter(job => 
-      job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      job.client.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    
-    // Apply status filter
-    if (filters.status && filters.status !== "all") {
-      result = result.filter(job => job.status === filters.status);
-    }
-    
-    // Apply priority filter
-    if (filters.priority && filters.priority !== "all") {
-      result = result.filter(job => job.priority === filters.priority);
-    }
-    
-    // Apply date range filters
-    if (filters.startDate || filters.endDate) {
-      result = result.filter(job => {
-        // Convert job.date string to Date object
-        const jobDate = new Date(job.date);
+  // Filter jobs by selected date and search term
+  const filteredJobs = mockJobs
+    .filter(job => {
+      const jobDate = new Date(job.date);
+      const sameDate = 
+        jobDate.getDate() === selectedDate.getDate() &&
+        jobDate.getMonth() === selectedDate.getMonth() &&
+        jobDate.getFullYear() === selectedDate.getFullYear();
         
-        if (filters.startDate && filters.endDate) {
-          return jobDate >= filters.startDate && jobDate <= filters.endDate;
-        } else if (filters.startDate) {
-          return jobDate >= filters.startDate;
-        } else if (filters.endDate) {
-          return jobDate <= filters.endDate;
-        }
-        return true;
-      });
-    }
+      const matchesSearch = 
+        searchTerm === "" ||
+        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.origin.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.id.toString().includes(searchTerm);
+        
+      return sameDate && matchesSearch;
+    });
+  
+  // Sorting function
+  const sortedJobs = [...filteredJobs].sort((a, b) => {
+    let comparison = 0;
     
-    // Apply sorting
-    result.sort((a, b) => {
-      let comparison = 0;
-      
-      if (filters.sortBy === "date") {
+    switch (sortColumn) {
+      case "id":
+        comparison = a.id - b.id;
+        break;
+      case "client":
+        comparison = a.client.localeCompare(b.client);
+        break;
+      case "origin":
+        comparison = a.origin.localeCompare(b.origin);
+        break;
+      case "destination":
+        comparison = a.destination.localeCompare(b.destination);
+        break;
+      case "date":
         comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
-      } else if (filters.sortBy === "priority") {
+        break;
+      case "priority":
         const priorityValues = { high: 3, medium: 2, low: 1 };
         comparison = (priorityValues[a.priority as keyof typeof priorityValues] || 0) - 
                     (priorityValues[b.priority as keyof typeof priorityValues] || 0);
-      } else if (filters.sortBy === "client") {
-        comparison = a.client.localeCompare(b.client);
-      }
-      
-      return filters.sortDirection === "asc" ? comparison : -comparison;
-    });
+        break;
+      case "status":
+        comparison = a.status.localeCompare(b.status);
+        break;
+      default:
+        comparison = 0;
+    }
     
-    return result;
-  }, [searchTerm, filters]);
+    return sortDirection === "asc" ? comparison : -comparison;
+  });
   
-  const handleFilterChange = (newFilters: FilterOptions) => {
-    setFilters(newFilters);
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
   };
   
+  const renderSortIcon = (column: string) => {
+    if (sortColumn !== column) return null;
+    return sortDirection === "asc" ? <SortAsc className="h-3 w-3 ml-1" /> : <SortDesc className="h-3 w-3 ml-1" />;
+  };
+  
+  // Status badge rendering
+  const getStatusBadge = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "scheduled":
+        return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Scheduled</Badge>;
+      case "in transit":
+        return <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">In Transit</Badge>;
+      case "completed":
+        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Completed</Badge>;
+      case "delayed":
+        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Delayed</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+  
+  // Priority badge rendering
+  const getPriorityBadge = (priority: string) => {
+    switch (priority.toLowerCase()) {
+      case "high":
+        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">High</Badge>;
+      case "medium":
+        return <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">Medium</Badge>;
+      case "low":
+        return <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200">Low</Badge>;
+      default:
+        return <Badge variant="outline">{priority}</Badge>;
+    }
+  };
+  
+  // Empty state component
   const EmptyState = () => (
-    <div className="text-center py-8 sm:py-12 text-muted-foreground bg-gray-50/70 rounded-lg">
-      <Search className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground/50 mx-auto mb-3" />
-      <p className="font-medium">No jobs found</p>
-      <p className="text-sm mt-1 mb-4">Try adjusting your search or filters</p>
-      <Button 
-        variant="outline" 
-        size="sm" 
-        onClick={openJobCreation} 
-        className="gap-1"
-      >
-        <Plus className="h-4 w-4" />
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+      <div className="rounded-full bg-muted p-3 mb-3">
+        <Search className="h-6 w-6 text-muted-foreground" />
+      </div>
+      <h3 className="font-medium text-lg mb-1">No jobs found</h3>
+      <p className="text-muted-foreground mb-4">
+        No jobs scheduled for {format(selectedDate, "MMMM d, yyyy")}
+      </p>
+      <Button onClick={openJobCreation}>
         Create New Job
       </Button>
     </div>
   );
 
   return (
-    <Card className="bg-white border border-border/40 shadow-sm h-full">
-      <div className="p-3 sm:p-5 border-b border-border/40">
+    <Card className="shadow-sm border-border/40">
+      <CardHeader className="pb-3 border-b">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
-          <h3 className="text-lg font-semibold">Jobs</h3>
-          <Button onClick={openJobCreation} size="sm" className="gap-1 w-full sm:w-auto">
-            <Plus className="h-4 w-4" />
-            New Job
-          </Button>
-        </div>
-        
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-col sm:flex-row gap-2">
+          <CardTitle>Jobs List</CardTitle>
+          <div className="flex gap-2 w-full sm:w-auto">
             <InputWithIcon
               icon={Search}
               placeholder="Search jobs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full h-9"
-            />
-            <AdvancedFilters 
-              onFilterChange={handleFilterChange}
-              activeFiltersCount={activeFiltersCount}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-[250px]"
             />
           </div>
-          
-          {activeFiltersCount > 0 && (
-            <div className="text-xs text-muted-foreground px-2 -mt-1">
-              {activeFiltersCount} {activeFiltersCount === 1 ? 'filter' : 'filters'} applied
-            </div>
-          )}
         </div>
-      </div>
-
-      <div className="p-2 sm:p-4">
-        <div className="space-y-3 overflow-y-auto max-h-[calc(100vh-400px)] pr-1">
-          {filteredJobs.length > 0 ? (
-            filteredJobs.map((job) => (
-              <JobCard key={job.id} job={job} />
-            ))
-          ) : (
-            <EmptyState />
-          )}
-        </div>
-      </div>
+      </CardHeader>
+      <CardContent className="p-0">
+        {sortedJobs.length > 0 ? (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead 
+                    className="cursor-pointer hover:bg-muted/30 transition-colors"
+                    onClick={() => handleSort("id")}
+                  >
+                    <div className="flex items-center">
+                      Job ID {renderSortIcon("id")}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer hover:bg-muted/30 transition-colors"
+                    onClick={() => handleSort("status")}
+                  >
+                    <div className="flex items-center">
+                      Status {renderSortIcon("status")}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer hover:bg-muted/30 transition-colors"
+                    onClick={() => handleSort("priority")}
+                  >
+                    <div className="flex items-center">
+                      Priority {renderSortIcon("priority")}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer hover:bg-muted/30 transition-colors"
+                    onClick={() => handleSort("client")}
+                  >
+                    <div className="flex items-center">
+                      Customer {renderSortIcon("client")}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer hover:bg-muted/30 transition-colors"
+                    onClick={() => handleSort("origin")}
+                  >
+                    <div className="flex items-center">
+                      Origin {renderSortIcon("origin")}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer hover:bg-muted/30 transition-colors"
+                    onClick={() => handleSort("destination")}
+                  >
+                    <div className="flex items-center">
+                      Destination {renderSortIcon("destination")}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer hover:bg-muted/30 transition-colors"
+                    onClick={() => handleSort("date")}
+                  >
+                    <div className="flex items-center">
+                      Pickup Time {renderSortIcon("date")}
+                    </div>
+                  </TableHead>
+                  <TableHead>Assigned To</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedJobs.map((job) => (
+                  <TableRow 
+                    key={job.id}
+                    className="hover:bg-muted/20 cursor-pointer"
+                  >
+                    <TableCell className="font-medium">#{job.id}</TableCell>
+                    <TableCell>{getStatusBadge(job.status)}</TableCell>
+                    <TableCell>{getPriorityBadge(job.priority)}</TableCell>
+                    <TableCell>{job.client}</TableCell>
+                    <TableCell>{job.origin}</TableCell>
+                    <TableCell>{job.destination}</TableCell>
+                    <TableCell>{format(new Date(job.date), "MMM d, HH:mm")}</TableCell>
+                    <TableCell>{job.assignedTo || "Unassigned"}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" size="sm">
+                          View
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          Edit
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        ) : (
+          <EmptyState />
+        )}
+      </CardContent>
     </Card>
   );
 }
