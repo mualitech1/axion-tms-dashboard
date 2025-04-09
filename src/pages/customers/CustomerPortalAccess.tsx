@@ -18,7 +18,9 @@ export default function CustomerPortalAccess() {
 
   useEffect(() => {
     // In a real app, this would be an API call
-    const foundCustomer = customerData.find(c => c.id === customerId);
+    // Convert the string ID from URL params to a number for comparison
+    const numericId = customerId ? parseInt(customerId, 10) : -1;
+    const foundCustomer = customerData.find(c => c.id === numericId);
     setCustomer(foundCustomer || null);
     // Set portal status based on customer data
     setPortalEnabled(foundCustomer?.status === 'Active');
