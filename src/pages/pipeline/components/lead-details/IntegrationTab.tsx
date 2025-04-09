@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Calendar, CalendarDays, Mail, Send, ArrowRight, Briefcase } from 'lucide-react';
+import { Calendar, CalendarDays, Mail, Send, ArrowRight, Briefcase, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from "@/components/ui/progress";

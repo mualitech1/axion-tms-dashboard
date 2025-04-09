@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { Lead } from '../data/pipelineTypes';
@@ -30,11 +29,9 @@ export function useTMSIntegration() {
   const [onboardingProcesses, setOnboardingProcesses] = useState<OnboardingProcess[]>([]);
   const [isPending, setIsPending] = useState(false);
   
-  // Connect to the TMS system
   const connectToTMS = async (): Promise<boolean> => {
     setIsPending(true);
     
-    // Simulate connection to TMS
     return new Promise(resolve => {
       setTimeout(() => {
         setStatus('connected');
@@ -48,7 +45,6 @@ export function useTMSIntegration() {
     });
   };
   
-  // Disconnect from the TMS system
   const disconnectFromTMS = () => {
     setStatus('disconnected');
     toast({
@@ -57,7 +53,6 @@ export function useTMSIntegration() {
     });
   };
   
-  // Create default onboarding steps
   const createDefaultSteps = (): OnboardingStep[] => {
     return [
       {
@@ -98,7 +93,6 @@ export function useTMSIntegration() {
     ];
   };
   
-  // Start the onboarding process for a won deal
   const startOnboardingProcess = async (lead: Lead): Promise<OnboardingProcess | null> => {
     if (status !== 'connected') {
       toast({
@@ -111,10 +105,8 @@ export function useTMSIntegration() {
     
     setIsPending(true);
     
-    // In a real app, this would make an API call to the TMS system
     console.log('Starting onboarding process for lead:', lead);
     
-    // Simulate API call
     return new Promise(resolve => {
       setTimeout(() => {
         const newProcess: OnboardingProcess = {
@@ -140,11 +132,10 @@ export function useTMSIntegration() {
     });
   };
   
-  // Update the status of an onboarding step
   const updateStepStatus = async (
     processId: string,
     stepId: string,
-    status: OnboardingStep['status']
+    stepStatus: OnboardingStep['status']
   ): Promise<boolean> => {
     if (status !== 'connected') {
       return false;
@@ -154,15 +145,13 @@ export function useTMSIntegration() {
       const updatedProcesses = prev.map(process => {
         if (process.id === processId) {
           const updatedSteps = process.steps.map(step => 
-            step.id === stepId ? { ...step, status } : step
+            step.id === stepId ? { ...step, status: stepStatus } : step
           );
           
-          // Calculate the new current step index
           const completedStepsCount = updatedSteps.filter(
             step => step.status === 'completed'
           ).length;
           
-          // If all steps are completed, mark the process as completed
           const newStatus = completedStepsCount === updatedSteps.length 
             ? 'completed' 
             : process.status;
@@ -188,7 +177,6 @@ export function useTMSIntegration() {
     return true;
   };
   
-  // Get the onboarding process for a specific lead
   const getOnboardingForLead = (leadId: string): OnboardingProcess | null => {
     return onboardingProcesses.find(process => process.leadId === leadId) || null;
   };

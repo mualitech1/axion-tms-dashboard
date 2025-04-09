@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { useCalendarIntegration } from '@/hooks/use-calendar-integration';
@@ -38,7 +37,6 @@ export const useEnhancedCalendarIntegration = (props?: UseEnhancedCalendarIntegr
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'failed'>('idle');
   const [lastSynced, setLastSynced] = useState<string | null>(null);
   
-  // Connect to a calendar provider with enhanced functionality
   const connectEnhancedProvider = async (providerType: 'google' | 'outlook' | 'ical'): Promise<boolean> => {
     try {
       toast({
@@ -52,7 +50,6 @@ export const useEnhancedCalendarIntegration = (props?: UseEnhancedCalendarIntegr
         const provider = providers.find(p => p.type === providerType) || providers[0];
         setActiveProvider(provider);
         
-        // Simulate initial sync
         setSyncStatus('syncing');
         await new Promise(resolve => setTimeout(resolve, 1500));
         
@@ -85,7 +82,6 @@ export const useEnhancedCalendarIntegration = (props?: UseEnhancedCalendarIntegr
     }
   };
   
-  // Schedule a meeting with a lead
   const scheduleMeeting = async (
     lead: Lead,
     meetingDetails: {
@@ -111,10 +107,7 @@ export const useEnhancedCalendarIntegration = (props?: UseEnhancedCalendarIntegr
       description: meetingDetails.description || `Meeting with ${lead.company}`,
       location: 'Virtual Meeting',
       attendees: [
-        {
-          email: lead.email,
-          name: lead.contact
-        }
+        `${lead.contact} <${lead.email}>`
       ]
     };
     
@@ -147,7 +140,6 @@ export const useEnhancedCalendarIntegration = (props?: UseEnhancedCalendarIntegr
     }
   };
   
-  // Sync calendar events (would normally pull from API)
   const syncCalendar = async () => {
     if (!baseCalendarIntegration.isConnected) {
       return false;
@@ -156,7 +148,6 @@ export const useEnhancedCalendarIntegration = (props?: UseEnhancedCalendarIntegr
     setSyncStatus('syncing');
     
     try {
-      // Simulate API call to sync calendar
       await new Promise(resolve => setTimeout(resolve, 2000));
       await baseCalendarIntegration.getUpcomingEvents();
       
@@ -184,18 +175,15 @@ export const useEnhancedCalendarIntegration = (props?: UseEnhancedCalendarIntegr
     }
   };
   
-  // Get meetings for a specific lead
   const getLeadMeetings = async (leadId: string) => {
     if (!baseCalendarIntegration.isConnected) {
       return [];
     }
     
-    // In a real app, this would filter events by the lead's email
     console.log(`Loading meetings for lead ${leadId}`);
     
     await baseCalendarIntegration.getUpcomingEvents();
     
-    // Filter events that might be related to this lead (demo purposes)
     const leadMeetings = baseCalendarIntegration.events.filter(event => 
       event.title.toLowerCase().includes('client') ||
       event.attendees?.some(attendee => attendee.includes('@'))
