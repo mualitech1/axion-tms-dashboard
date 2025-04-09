@@ -44,23 +44,23 @@ const CustomerAlertsDashboard: React.FC<CustomerAlertsDashboardProps> = ({ custo
         </TabsList>
         
         <TabsContent value="all" className="mt-0">
-          <CustomerAlerts allCustomers={customers} />
+          <CustomerAlerts customers={customers} />
         </TabsContent>
         
         <TabsContent value="documents" className="mt-0">
-          <CustomerAlerts allCustomers={customers.filter(customer => 
+          <CustomerAlerts customers={customers.filter(customer => 
             customer.documents?.some(doc => doc.expiryDate) || customer.acceptedTerms === false
           )} />
         </TabsContent>
         
         <TabsContent value="contracts" className="mt-0">
-          <CustomerAlerts allCustomers={customers.filter(customer => 
+          <CustomerAlerts customers={customers.filter(customer => 
             customer.rateCards?.some(card => card.validTo)
           )} />
         </TabsContent>
         
         <TabsContent value="credit" className="mt-0">
-          <CustomerAlerts allCustomers={customers.filter(customer => 
+          <CustomerAlerts customers={customers.filter(customer => 
             customer.creditLimit !== undefined
           )} />
         </TabsContent>

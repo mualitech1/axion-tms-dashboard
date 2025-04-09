@@ -1,7 +1,7 @@
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Customer } from "@/types/customer";
-import { BadgeClock, AlertTriangle, Check } from "lucide-react";
+import { BadgeCheck, AlertTriangle, Check } from "lucide-react";
 
 interface CustomerAlertsProps {
   customers: Customer[];
@@ -37,7 +37,7 @@ const CustomerAlerts = ({ customers }: CustomerAlertsProps) => {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {customersWithExpiringDocs > 0 && (
         <Alert className="bg-amber-50 text-amber-800 border-amber-200">
-          <BadgeClock className="h-4 w-4" />
+          <BadgeCheck className="h-4 w-4" />
           <AlertTitle>Expiring Documents</AlertTitle>
           <AlertDescription>
             {customersWithExpiringDocs} customer{customersWithExpiringDocs !== 1 ? 's' : ''} with 
