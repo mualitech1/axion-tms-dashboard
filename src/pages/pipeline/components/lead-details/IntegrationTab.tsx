@@ -1,6 +1,9 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, Calendar, Mail, Truck } from 'lucide-react';
+import { Lead } from '../../data/pipelineTypes';
+import { EnhancedCalendarIntegrationReturn } from '../../hooks/calendar/calendarTypes';
 
 interface IntegrationItemProps {
   label: string;
@@ -32,9 +35,27 @@ const IntegrationItem: React.FC<IntegrationItemProps> = ({ label, description, c
 
 interface IntegrationTabProps {
   leadId?: string;
+  lead?: Lead;
+  enhancedEmail?: any;
+  enhancedCalendar?: EnhancedCalendarIntegrationReturn;
+  tmsIntegration?: any;
 }
 
-export default function IntegrationTab({ leadId }: IntegrationTabProps) {
+export default function IntegrationTab({ 
+  leadId, 
+  lead,
+  enhancedEmail,
+  enhancedCalendar,
+  tmsIntegration
+}: IntegrationTabProps) {
+  // Use leadId from prop or from lead object if available
+  const currentLeadId = leadId || (lead && lead.id);
+  
+  // Determine connection status for each integration
+  const calendarConnected = enhancedCalendar ? enhancedCalendar.isConnected : false;
+  const emailConnected = enhancedEmail ? enhancedEmail.activeProvider !== null : false;
+  const tmsConnected = tmsIntegration ? tmsIntegration.status === 'connected' : false;
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -45,19 +66,19 @@ export default function IntegrationTab({ leadId }: IntegrationTabProps) {
           <IntegrationItem
             label="Calendar Integration"
             description="Sync your calendar to schedule meetings and track events."
-            connected={false}
+            connected={calendarConnected}
             icon={Calendar}
           />
           <IntegrationItem
             label="Email Integration"
             description="Connect your email to send and receive messages directly."
-            connected={false}
+            connected={emailConnected}
             icon={Mail}
           />
           <IntegrationItem
             label="TMS Integration"
             description="Integrate with your Transportation Management System for logistics."
-            connected={false}
+            connected={tmsConnected}
             icon={Truck}
           />
         </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -253,7 +252,8 @@ export default function LeadDetails() {
         
         <TabsContent value="integration" className="space-y-4">
           <IntegrationTab 
-            lead={lead} 
+            leadId={lead.id} 
+            lead={lead}
             enhancedEmail={enhancedEmail}
             enhancedCalendar={enhancedCalendar}
             tmsIntegration={tmsIntegration}
