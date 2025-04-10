@@ -16,7 +16,7 @@ import { toast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileCheck } from "lucide-react";
 
-// Define job status as a type for proper type checking
+// Define job status as a union type for proper type checking
 type JobStatus = "in-progress" | "scheduled" | "completed" | "ready-for-invoicing";
 
 export default function JobDetailPage() {
@@ -70,7 +70,10 @@ export default function JobDetailPage() {
   };
 
   const canMarkReadyForInvoicing = jobStatus === "completed" && documentsUploaded && rateConfirmed;
-  const isCompleted = jobStatus === "completed" || jobStatus === "ready-for-invoicing";
+  
+  // Create a boolean variable to check if the job is completed or ready for invoicing
+  // This will help avoid TypeScript's strict literal type checking issues
+  const isCompleted = (jobStatus === "completed" || jobStatus === "ready-for-invoicing") as boolean;
   
   return (
     <MainLayout title="Job Details">
