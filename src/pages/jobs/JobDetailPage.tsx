@@ -16,6 +16,9 @@ import { toast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileCheck } from "lucide-react";
 
+// Define job status as a type for proper type checking
+type JobStatus = "in-progress" | "scheduled" | "completed" | "ready-for-invoicing";
+
 export default function JobDetailPage() {
   const { id } = useParams<{ id: string }>();
   const jobId = parseInt(id || "0");
@@ -30,7 +33,7 @@ export default function JobDetailPage() {
   const [activeTab, setActiveTab] = useState("details");
   
   // State for job status
-  const [jobStatus, setJobStatus] = useState(job.status);
+  const [jobStatus, setJobStatus] = useState<JobStatus>(job.status as JobStatus);
   
   // State to track document upload status
   const [documentsUploaded, setDocumentsUploaded] = useState(false);
@@ -46,11 +49,11 @@ export default function JobDetailPage() {
   
   // Update rate confirmation status
   useEffect(() => {
-    // Fix the type comparison by checking string values correctly
+    // Use proper type checking for status values
     setRateConfirmed(jobStatus === "completed" || jobStatus === "ready-for-invoicing");
   }, [jobStatus]);
   
-  const handleStatusChange = (newStatus: string) => {
+  const handleStatusChange = (newStatus: JobStatus) => {
     setJobStatus(newStatus);
     toast({
       title: "Status Updated",
@@ -109,7 +112,7 @@ export default function JobDetailPage() {
                       Mark Ready for Invoicing
                     </Button>
                     
-                    <Select value={jobStatus} onValueChange={handleStatusChange}>
+                    <Select value={jobStatus} onValueChange={(value: JobStatus) => handleStatusChange(value)}>
                       <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Change Status" />
                       </SelectTrigger>
@@ -157,6 +160,7 @@ export default function JobDetailPage() {
               
               <TabsContent value="documents">
                 <JobDocumentsTab 
+                  jobId={jobId}
                   onDocumentsUploaded={() => {
                     setDocumentsUploaded(true);
                     localStorage.setItem(`job-${jobId}-documents`, 'true');

@@ -22,6 +22,7 @@ type Document = {
 };
 
 interface JobDocumentsTabProps {
+  jobId: number; // Add jobId prop
   onDocumentsUploaded: () => void;
   isCompleted: boolean;
 }
@@ -56,7 +57,7 @@ const mockDocuments: Document[] = [
   }
 ];
 
-export function JobDocumentsTab({ onDocumentsUploaded, isCompleted }: JobDocumentsTabProps) {
+export function JobDocumentsTab({ jobId, onDocumentsUploaded, isCompleted }: JobDocumentsTabProps) {
   const [documents, setDocuments] = useState<Document[]>(mockDocuments);
   const [isDragging, setIsDragging] = useState(false);
   const [activeCategory, setActiveCategory] = useState<DocumentCategory | "all">("all");
