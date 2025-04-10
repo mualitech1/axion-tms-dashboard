@@ -11,7 +11,7 @@ import { Customer } from "@/types/customer";
 
 // Mock customer data for demonstration
 const mockCustomer: Customer = {
-  id: "cust-001",
+  id: 1001, // Changed from string to number to match Customer type
   name: "Acme Logistics",
   contact: "John Doe",
   email: "john@acmelogistics.com",
@@ -25,7 +25,7 @@ const mockCustomer: Customer = {
       filePath: "/documents/insurance.pdf",
       dateUploaded: "2024-01-15",
       expiryDate: "2025-01-15",
-      fileSize: 1024000,
+      fileSize: "1.2 MB", // Changed from number to string to match type
       status: "valid"
     },
     {
@@ -33,7 +33,7 @@ const mockCustomer: Customer = {
       name: "Terms Agreement",
       filePath: "/documents/agreement.pdf",
       dateUploaded: "2023-12-10",
-      fileSize: 512000
+      fileSize: "0.5 MB" // Changed from number to string to match type
     }
   ],
   address: {
@@ -44,20 +44,22 @@ const mockCustomer: Customer = {
   },
   jobs: [
     {
-      id: 1,
+      id: "JOB-1001", // Changed from number to string to match type
       reference: "JOB-2024-001",
       from: "Chicago, IL",
       to: "Detroit, MI",
       date: "2024-03-20",
-      value: 3200
+      value: 3200,
+      status: "Completed" // Added status to match expected job format
     },
     {
-      id: 2,
+      id: "JOB-1002", // Changed from number to string to match type
       reference: "JOB-2024-002",
       from: "Detroit, MI",
       to: "Columbus, OH",
       date: "2024-03-25",
-      value: 2700
+      value: 2700,
+      status: "Completed" // Added status to match expected job format
     }
   ],
   lastOrder: "2024-03-25"
