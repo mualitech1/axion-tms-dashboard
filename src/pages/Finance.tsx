@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ArrowDown, ArrowUp, DollarSign, Filter, PlusCircle, FileText } from "lucide-react";
+import { ArrowDown, ArrowUp, DollarSign, Filter, PlusCircle, FileText, CreditCard } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 
@@ -73,7 +73,7 @@ export default function Finance() {
       </div>
 
       {/* Finance navigation cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <Link to="/invoices">
           <Card className="hover:border-primary transition-colors cursor-pointer">
             <CardHeader className="pb-2">
@@ -117,6 +117,22 @@ export default function Finance() {
             <CardContent>
               <p className="text-sm text-muted-foreground">
                 Manage and resolve invoice disputes
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link to="/finance/payment-runs">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-md font-medium flex items-center">
+                <CreditCard className="h-5 w-5 mr-2 text-muted-foreground" />
+                Payment Runs
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Prepare and track batch payments
               </p>
             </CardContent>
           </Card>
