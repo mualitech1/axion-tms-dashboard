@@ -436,7 +436,7 @@ export default function PaymentRuns() {
                             title="Export Batch" 
                             onClick={() => handleExportBatch(batch.id)}
                           >
-                            <FileExport className="h-4 w-4 text-blue-600" />
+                            <FileText className="h-4 w-4 text-blue-600" />
                           </Button>
                         )}
                         
@@ -685,3 +685,4 @@ export default function PaymentRuns() {
     </MainLayout>
   );
 }
+
