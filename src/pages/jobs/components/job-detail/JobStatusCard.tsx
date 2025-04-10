@@ -6,8 +6,11 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 
+// Use the same JobStatus type as in JobDetailPage
+type JobStatus = "in-progress" | "scheduled" | "completed" | "ready-for-invoicing";
+
 interface JobStatusCardProps {
-  status: string;
+  status: JobStatus;
   priority: string;
   time: string;
   jobId: number;
