@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Upload, FileText, Truck, History } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -31,13 +30,20 @@ export default function CarrierPortal() {
     <MainLayout title="Carrier Portal">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Link to="/carriers">
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-            </Link>
-            <h1 className="text-2xl font-bold tracking-tight">Carrier Portal</h1>
+          <div>
+            <Button 
+              variant="outline"
+              size="sm"
+              asChild
+              className="mb-2 flex items-center"
+            >
+              <Link to="/carriers">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Carriers
+              </Link>
+            </Button>
+            <h1 className="text-2xl font-semibold">Carrier Portal</h1>
+            <p className="text-muted-foreground mt-1">{carrier.name}</p>
           </div>
           
           <div className="flex items-center space-x-2">

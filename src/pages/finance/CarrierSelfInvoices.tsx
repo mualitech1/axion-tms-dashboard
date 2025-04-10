@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import MainLayout from "@/components/layout/MainLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -13,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { InputWithIcon } from "@/components/ui/input-with-icon";
 import { format } from "date-fns";
-import { CalendarIcon, CheckCircle, Download, Eye, Filter, FileText, HelpCircle, Search, X } from "lucide-react";
+import { ArrowLeft, CalendarIcon, CheckCircle, Download, Eye, Filter, FileText, HelpCircle, Search, X } from "lucide-react";
 import { DateRange } from "react-day-picker";
 
 // Mock data for self-invoices
@@ -219,189 +220,213 @@ export default function CarrierSelfInvoices() {
 
   return (
     <MainLayout title="Carrier Self-Invoices">
-      <DashboardHeader
-        title="Carrier Self-Invoices"
-        subtitle="View and manage automatically generated self-billing statements for carriers"
-      />
-
-      <Card className="mb-6">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-xl">Filters</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="w-full sm:w-auto">
-              <InputWithIcon
-                placeholder="Search by invoice # or carrier"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full sm:w-[250px]"
-                icon={Search}
-              />
-            </div>
-
-            <div className="w-full sm:w-auto">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-[180px]">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All">All Statuses</SelectItem>
-                  <SelectItem value="Pending Review">Pending Review</SelectItem>
-                  <SelectItem value="Approved for Payment">Approved for Payment</SelectItem>
-                  <SelectItem value="Payment Scheduled">Payment Scheduled</SelectItem>
-                  <SelectItem value="Paid">Paid</SelectItem>
-                  <SelectItem value="Query Raised">Query Raised</SelectItem>
-                  <SelectItem value="On Hold">On Hold</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="w-full sm:w-auto">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full sm:w-[240px] justify-start text-left font-normal"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formatDateRange()}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    initialFocus
-                    mode="range"
-                    defaultMonth={dateRange.from}
-                    selected={dateRange}
-                    onSelect={setDateRange}
-                    numberOfMonths={2}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            <Button variant="outline" size="icon" onClick={() => {
-              setSearchQuery("");
-              setStatusFilter("All");
-              setDateRange({ from: undefined, to: undefined });
-            }}>
-              <X className="h-4 w-4" />
+      <div className="space-y-6">
+        {/* Back button header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <Button 
+              variant="outline"
+              size="sm"
+              asChild
+              className="mb-2 flex items-center"
+            >
+              <Link to="/finance">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Finance
+              </Link>
             </Button>
+            <h1 className="text-2xl font-semibold">Carrier Self-Invoices</h1>
+            <p className="text-muted-foreground mt-1">
+              View and manage automatically generated self-billing statements for carriers
+            </p>
           </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Self-Invoice Statements</CardTitle>
-          <div className="flex gap-2">
-            <Button variant="outline" size="icon">
-              <Filter className="h-4 w-4" />
-            </Button>
-            <Button>Generate New Statement</Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Statement #</TableHead>
-                <TableHead>Carrier</TableHead>
-                <TableHead>Period Covered</TableHead>
-                <TableHead>Generation Date</TableHead>
-                <TableHead>Total Amount (£)</TableHead>
-                <TableHead>VAT (£)</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredInvoices.map((invoice) => (
-                <TableRow key={invoice.id}>
-                  <TableCell className="font-medium">{invoice.id}</TableCell>
-                  <TableCell>{invoice.carrierName}</TableCell>
-                  <TableCell>
-                    {format(new Date(invoice.periodStart), "dd/MM/yyyy")} - {format(new Date(invoice.periodEnd), "dd/MM/yyyy")}
-                  </TableCell>
-                  <TableCell>{format(new Date(invoice.generationDate), "dd/MM/yyyy")}</TableCell>
-                  <TableCell>£{invoice.totalAmount.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</TableCell>
-                  <TableCell>£{invoice.vatAmount.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</TableCell>
-                  <TableCell>{getStatusBadge(invoice.status)}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="icon" title="View Statement PDF" onClick={() => handleDownloadPdf(invoice.id)}>
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      
-                      {invoice.status === "Pending Review" && (
-                        <Button variant="ghost" size="icon" title="Approve for Payment" onClick={() => handleApprovePayment(invoice.id)}>
-                          <CheckCircle className="h-4 w-4 text-green-600" />
-                        </Button>
-                      )}
-                      
-                      <Button variant="ghost" size="icon" title="Raise Query" onClick={() => handleRaiseQuery(invoice.id)}>
-                        <HelpCircle className="h-4 w-4 text-amber-600" />
-                      </Button>
-                      
-                      <Button variant="ghost" size="icon" title="View Linked Jobs" onClick={() => handleViewJobs(invoice.id)}>
-                        <FileText className="h-4 w-4" />
-                      </Button>
-                      
-                      <Button variant="ghost" size="icon" title="Download PDF">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+          
+          <Button>
+            <FileText className="h-4 w-4 mr-2" />
+            Generate New Statement
+          </Button>
+        </div>
 
-      {/* Modal for viewing linked jobs */}
-      <Dialog open={isJobsModalOpen} onOpenChange={setIsJobsModalOpen}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Linked Jobs for Statement {selectedInvoice}</DialogTitle>
-          </DialogHeader>
-          <div className="mt-4">
+        {/* Filter card */}
+        <Card className="mb-6">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-xl">Filters</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="w-full sm:w-auto">
+                <InputWithIcon
+                  placeholder="Search by invoice # or carrier"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full sm:w-[250px]"
+                  icon={Search}
+                />
+              </div>
+
+              <div className="w-full sm:w-auto">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full sm:w-[180px]">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">All Statuses</SelectItem>
+                    <SelectItem value="Pending Review">Pending Review</SelectItem>
+                    <SelectItem value="Approved for Payment">Approved for Payment</SelectItem>
+                    <SelectItem value="Payment Scheduled">Payment Scheduled</SelectItem>
+                    <SelectItem value="Paid">Paid</SelectItem>
+                    <SelectItem value="Query Raised">Query Raised</SelectItem>
+                    <SelectItem value="On Hold">On Hold</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="w-full sm:w-auto">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full sm:w-[240px] justify-start text-left font-normal"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {formatDateRange()}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      initialFocus
+                      mode="range"
+                      defaultMonth={dateRange.from}
+                      selected={dateRange}
+                      onSelect={setDateRange}
+                      numberOfMonths={2}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <Button variant="outline" size="icon" onClick={() => {
+                setSearchQuery("");
+                setStatusFilter("All");
+                setDateRange({ from: undefined, to: undefined });
+              }}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Self-Invoice Statements</CardTitle>
+            <div className="flex gap-2">
+              <Button variant="outline" size="icon">
+                <Filter className="h-4 w-4" />
+              </Button>
+              <Button>Generate New Statement</Button>
+            </div>
+          </CardHeader>
+          <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Job Ref</TableHead>
-                  <TableHead>Job Date</TableHead>
-                  <TableHead>Load Details</TableHead>
-                  <TableHead>Rate (£)</TableHead>
-                  <TableHead>Notes</TableHead>
+                  <TableHead>Statement #</TableHead>
+                  <TableHead>Carrier</TableHead>
+                  <TableHead>Period Covered</TableHead>
+                  <TableHead>Generation Date</TableHead>
+                  <TableHead>Total Amount (£)</TableHead>
+                  <TableHead>VAT (£)</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockLinkedJobs.map((job) => (
-                  <TableRow key={job.jobRef}>
-                    <TableCell className="font-medium">
-                      <Button variant="link" className="p-0" asChild>
-                        <a href={`/jobs/${job.jobRef}`}>{job.jobRef}</a>
-                      </Button>
+                {filteredInvoices.map((invoice) => (
+                  <TableRow key={invoice.id}>
+                    <TableCell className="font-medium">{invoice.id}</TableCell>
+                    <TableCell>{invoice.carrierName}</TableCell>
+                    <TableCell>
+                      {format(new Date(invoice.periodStart), "dd/MM/yyyy")} - {format(new Date(invoice.periodEnd), "dd/MM/yyyy")}
                     </TableCell>
-                    <TableCell>{job.jobDate}</TableCell>
-                    <TableCell>{job.loadDetails}</TableCell>
-                    <TableCell>£{job.rate.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</TableCell>
-                    <TableCell>{job.notes}</TableCell>
+                    <TableCell>{format(new Date(invoice.generationDate), "dd/MM/yyyy")}</TableCell>
+                    <TableCell>£{invoice.totalAmount.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</TableCell>
+                    <TableCell>£{invoice.vatAmount.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</TableCell>
+                    <TableCell>{getStatusBadge(invoice.status)}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button variant="ghost" size="icon" title="View Statement PDF" onClick={() => handleDownloadPdf(invoice.id)}>
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        
+                        {invoice.status === "Pending Review" && (
+                          <Button variant="ghost" size="icon" title="Approve for Payment" onClick={() => handleApprovePayment(invoice.id)}>
+                            <CheckCircle className="h-4 w-4 text-green-600" />
+                          </Button>
+                        )}
+                        
+                        <Button variant="ghost" size="icon" title="Raise Query" onClick={() => handleRaiseQuery(invoice.id)}>
+                          <HelpCircle className="h-4 w-4 text-amber-600" />
+                        </Button>
+                        
+                        <Button variant="ghost" size="icon" title="View Linked Jobs" onClick={() => handleViewJobs(invoice.id)}>
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                        
+                        <Button variant="ghost" size="icon" title="Download PDF">
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-            <div className="mt-6 border-t pt-4">
-              <div className="flex justify-between text-sm font-medium">
-                <span>Total Jobs: {mockLinkedJobs.length}</span>
-                <span>Total Value: £{mockLinkedJobs.reduce((sum, job) => sum + job.rate, 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+          </CardContent>
+        </Card>
+
+        {/* Modal for viewing linked jobs */}
+        <Dialog open={isJobsModalOpen} onOpenChange={setIsJobsModalOpen}>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>Linked Jobs for Statement {selectedInvoice}</DialogTitle>
+            </DialogHeader>
+            <div className="mt-4">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Job Ref</TableHead>
+                    <TableHead>Job Date</TableHead>
+                    <TableHead>Load Details</TableHead>
+                    <TableHead>Rate (£)</TableHead>
+                    <TableHead>Notes</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {mockLinkedJobs.map((job) => (
+                    <TableRow key={job.jobRef}>
+                      <TableCell className="font-medium">
+                        <Button variant="link" className="p-0" asChild>
+                          <a href={`/jobs/${job.jobRef}`}>{job.jobRef}</a>
+                        </Button>
+                      </TableCell>
+                      <TableCell>{job.jobDate}</TableCell>
+                      <TableCell>{job.loadDetails}</TableCell>
+                      <TableCell>£{job.rate.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</TableCell>
+                      <TableCell>{job.notes}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <div className="mt-6 border-t pt-4">
+                <div className="flex justify-between text-sm font-medium">
+                  <span>Total Jobs: {mockLinkedJobs.length}</span>
+                  <span>Total Value: £{mockLinkedJobs.reduce((sum, job) => sum + job.rate, 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </div>
               </div>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      </div>
     </MainLayout>
   );
 }

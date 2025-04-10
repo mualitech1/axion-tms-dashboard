@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,6 +26,9 @@ import CustomerDetails from "./pages/customers/CustomerDetails";
 import CustomerDocumentsPage from "./pages/customers/CustomerDocumentsPage";
 import CustomerPortalAccess from "./pages/customers/CustomerPortalAccess";
 
+// Pipeline specific pages
+import PipelineReports from "./pages/pipeline/PipelineReports";
+
 const queryClient = new QueryClient();
 
 function App() {
@@ -49,6 +53,7 @@ function App() {
             <Route path="/customer-portal/*" element={<CustomerPortal />} />
             <Route path="/carriers/*" element={<Carriers />} />
             <Route path="/pipeline/*" element={<Pipeline />} />
+            <Route path="/pipeline/reports" element={<PipelineReports />} />
             <Route path="/sales-pipeline/*" element={<Pipeline />} />
             <Route path="/users/*" element={<Users />} />
             <Route path="/analytics/*" element={<Analytics />} />
