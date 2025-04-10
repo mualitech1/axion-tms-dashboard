@@ -1,5 +1,5 @@
 
-import { ArrowLeft, Mail, X } from "lucide-react";
+import { ArrowLeft, Mail, X, SendHorizontal } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -28,6 +28,10 @@ export function JobDetailHeader({ jobId, title, client }: JobDetailHeaderProps) 
         </div>
         
         <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-50">
+            <SendHorizontal className="mr-2 h-4 w-4" />
+            Send Order Confirmation
+          </Button>
           <Button variant="outline" size="sm">
             <Mail className="mr-2 h-4 w-4" />
             Email Job
