@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Search, Filter, SortAsc, SortDesc } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,13 +9,13 @@ import { format } from "date-fns";
 import { AdvancedFilters } from "./jobs-list/AdvancedFilters";
 import { mockJobs } from "./jobs-list/mockJobData";
 import { FilterOptions } from "./jobs-list/filters/types";
+import { Link, useNavigate } from "react-router-dom";
 
 interface JobsListProps {
   selectedDate: Date;
   openJobCreation: () => void;
 }
 
-// Helper function to filter jobs by date
 const filterJobsByDate = (jobs: any[], selectedDate: Date) => {
   return jobs.filter(job => {
     const jobDate = new Date(job.date);
@@ -29,6 +28,7 @@ const filterJobsByDate = (jobs: any[], selectedDate: Date) => {
 };
 
 export default function JobsList({ selectedDate, openJobCreation }: JobsListProps) {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState<FilterOptions>({
     status: null,
@@ -41,7 +41,6 @@ export default function JobsList({ selectedDate, openJobCreation }: JobsListProp
   const [sortColumn, setSortColumn] = useState<string>("id");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   
-  // Filter jobs by selected date and search term
   const filteredJobs = mockJobs
     .filter(job => {
       const jobDate = new Date(job.date);
@@ -55,13 +54,12 @@ export default function JobsList({ selectedDate, openJobCreation }: JobsListProp
         job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         job.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
         job.origin.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.destination.toLowerCase().includes(searchTerm) ||
         job.id.toString().includes(searchTerm);
         
       return sameDate && matchesSearch;
     });
   
-  // Sorting function
   const sortedJobs = [...filteredJobs].sort((a, b) => {
     let comparison = 0;
     
@@ -110,7 +108,6 @@ export default function JobsList({ selectedDate, openJobCreation }: JobsListProp
     return sortDirection === "asc" ? <SortAsc className="h-3 w-3 ml-1" /> : <SortDesc className="h-3 w-3 ml-1" />;
   };
   
-  // Status badge rendering
   const getStatusBadge = (status: string) => {
     switch (status.toLowerCase()) {
       case "scheduled":
@@ -126,7 +123,6 @@ export default function JobsList({ selectedDate, openJobCreation }: JobsListProp
     }
   };
   
-  // Priority badge rendering
   const getPriorityBadge = (priority: string) => {
     switch (priority.toLowerCase()) {
       case "high":
@@ -140,7 +136,10 @@ export default function JobsList({ selectedDate, openJobCreation }: JobsListProp
     }
   };
   
-  // Empty state component
+  const handleViewJob = (jobId: number) => {
+    navigate(`/jobs/${jobId}`);
+  };
+
   const EmptyState = () => (
     <div className="flex flex-col items-center justify-center py-12 text-center">
       <div className="rounded-full bg-muted p-3 mb-3">
@@ -243,6 +242,7 @@ export default function JobsList({ selectedDate, openJobCreation }: JobsListProp
                   <TableRow 
                     key={job.id}
                     className="hover:bg-muted/20 cursor-pointer"
+                    onClick={() => handleViewJob(job.id)}
                   >
                     <TableCell className="font-medium">#{job.id}</TableCell>
                     <TableCell>{getStatusBadge(job.status)}</TableCell>
@@ -252,12 +252,23 @@ export default function JobsList({ selectedDate, openJobCreation }: JobsListProp
                     <TableCell>{job.destination}</TableCell>
                     <TableCell>{format(new Date(job.date), "MMM d, HH:mm")}</TableCell>
                     <TableCell>{job.assignedTo || "Unassigned"}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex justify-end gap-2">
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewJob(job.id);
+                          }}
+                        >
                           View
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           Edit
                         </Button>
                       </div>
