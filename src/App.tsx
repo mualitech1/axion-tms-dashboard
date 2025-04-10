@@ -19,6 +19,7 @@ import Finance from "./pages/Finance";
 import Invoices from "./pages/Invoices";
 import NotFound from "./pages/NotFound";
 import CarrierSelfInvoices from "./pages/finance/CarrierSelfInvoices";
+import DisputeManagement from "./pages/finance/DisputeManagement";
 
 // Customer specific pages
 import CustomersList from "./pages/customers/CustomersList";
@@ -60,6 +61,7 @@ function App() {
             <Route path="/finance" element={<Finance />} />
             <Route path="/invoices" element={<Invoices />} />
             <Route path="/finance/carrier-self-invoices" element={<CarrierSelfInvoices />} />
+            <Route path="/finance/disputes" element={<DisputeManagement />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

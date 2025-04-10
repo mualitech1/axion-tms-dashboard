@@ -5,8 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ArrowDown, ArrowUp, DollarSign, Filter, PlusCircle } from "lucide-react";
+import { ArrowDown, ArrowUp, DollarSign, Filter, PlusCircle, FileText } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
 
 const recentTransactions = [
   { id: 1, date: "2023-11-30", description: "Customer Payment - Acme Corp", amount: 12450, type: "income" },
@@ -69,6 +70,57 @@ export default function Finance() {
             <p className="text-xs text-muted-foreground mt-1">-8.3% from previous month</p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Finance navigation cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <Link to="/invoices">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-md font-medium flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-muted-foreground" />
+                Customer Invoices
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Manage and generate customer invoices
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link to="/finance/carrier-self-invoices">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-md font-medium flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-muted-foreground" />
+                Carrier Self-Invoices
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Manage carrier self-billing statements
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link to="/finance/disputes">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-md font-medium flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-muted-foreground" />
+                Invoice Disputes
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Manage and resolve invoice disputes
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       <Tabs defaultValue="transactions" className="mb-6">
