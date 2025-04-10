@@ -11,7 +11,7 @@ import { Customer } from "@/types/customer";
 
 // Mock customer data for demonstration
 const mockCustomer: Customer = {
-  id: 1001, // Changed from string to number to match Customer type
+  id: 1001,
   name: "Acme Logistics",
   contact: "John Doe",
   email: "john@acmelogistics.com",
@@ -22,18 +22,20 @@ const mockCustomer: Customer = {
     {
       id: "doc-1",
       name: "Insurance Certificate",
+      type: "insurance", // Added required type property
       filePath: "/documents/insurance.pdf",
       dateUploaded: "2024-01-15",
       expiryDate: "2025-01-15",
-      fileSize: "1.2 MB", // Changed from number to string to match type
-      status: "valid"
+      fileSize: "1.2 MB",
+      verificationStatus: "pending" // Using verificationStatus instead of status
     },
     {
       id: "doc-2",
       name: "Terms Agreement",
+      type: "terms", // Added required type property
       filePath: "/documents/agreement.pdf",
       dateUploaded: "2023-12-10",
-      fileSize: "0.5 MB" // Changed from number to string to match type
+      fileSize: "0.5 MB"
     }
   ],
   address: {
@@ -44,22 +46,22 @@ const mockCustomer: Customer = {
   },
   jobs: [
     {
-      id: "JOB-1001", // Changed from number to string to match type
+      id: "JOB-1001",
       reference: "JOB-2024-001",
       from: "Chicago, IL",
       to: "Detroit, MI",
       date: "2024-03-20",
       value: 3200,
-      status: "Completed" // Added status to match expected job format
+      status: "Completed"
     },
     {
-      id: "JOB-1002", // Changed from number to string to match type
+      id: "JOB-1002",
       reference: "JOB-2024-002",
       from: "Detroit, MI",
       to: "Columbus, OH",
       date: "2024-03-25",
       value: 2700,
-      status: "Completed" // Added status to match expected job format
+      status: "Completed"
     }
   ],
   lastOrder: "2024-03-25"
