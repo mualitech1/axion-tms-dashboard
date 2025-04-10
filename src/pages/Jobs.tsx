@@ -5,6 +5,10 @@ import JobDetailPage from './jobs/JobDetailPage';
 
 export default function Jobs() {
   console.log("Jobs component rendered");
+  
+  // Log to verify routes are registered
+  console.log("Jobs routes registered: / (JobsPage) and /:id (JobDetailPage)");
+  
   return (
     <Routes>
       <Route index element={<JobsPage />} />

@@ -33,6 +33,8 @@ export default function JobsList({ selectedDate, openJobCreation }: JobsListProp
       return sameDate && matchesSearch;
     });
 
+  console.log("Current filtered jobs:", filteredJobs.length); // Debug log
+
   return (
     <Card className="shadow-sm border-border/40">
       <CardHeader className="pb-3 border-b">

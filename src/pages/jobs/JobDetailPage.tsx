@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,11 +20,32 @@ import { FileCheck } from "lucide-react";
 type JobStatus = "in-progress" | "scheduled" | "completed" | "ready-for-invoicing";
 
 export default function JobDetailPage() {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const jobId = parseInt(id || "0");
   
+  console.log("JobDetailPage rendered with ID:", id);
+  
   // Find the job from mock data - in a real app, this would be an API call
-  const job = mockJobs.find(j => j.id === jobId) || mockJobs[0]; // Fallback to first job if not found
+  const job = mockJobs.find(j => j.id === jobId);
+  
+  // If job not found, show error and provide navigation option
+  if (!job) {
+    console.log("Job not found for ID:", jobId);
+    return (
+      <MainLayout title="Job Not Found">
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <h1 className="text-2xl font-semibold mb-2">Job Not Found</h1>
+          <p className="text-muted-foreground mb-4">
+            The job with ID {jobId} could not be found.
+          </p>
+          <Button onClick={() => navigate("/jobs")}>
+            Return to Jobs Dashboard
+          </Button>
+        </div>
+      </MainLayout>
+    );
+  }
   
   // Get formatted time from the date string
   const jobTime = getTimeFromDate(job.date);
