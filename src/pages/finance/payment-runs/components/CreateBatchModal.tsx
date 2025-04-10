@@ -79,6 +79,7 @@ export function CreateBatchModal({
                     onSelect={setPaymentDate}
                     initialFocus
                     disabled={(date) => date < new Date()}
+                    className="pointer-events-auto"
                   />
                 </PopoverContent>
               </Popover>
