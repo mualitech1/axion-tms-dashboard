@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import MainLayout from "@/components/layout/MainLayout";
@@ -15,6 +14,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { InputWithIcon } from "@/components/ui/input-with-icon";
 import { format } from "date-fns";
 import { CalendarIcon, CheckCircle, Download, Eye, Filter, FileText, HelpCircle, Search, X } from "lucide-react";
+import { DateRange } from "react-day-picker";
 
 // Mock data for self-invoices
 const mockSelfInvoices = [
@@ -152,10 +152,7 @@ const getStatusBadge = (status: string) => {
 export default function CarrierSelfInvoices() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [dateRange, setDateRange] = useState<{
-    from: Date | undefined;
-    to: Date | undefined;
-  }>({
+  const [dateRange, setDateRange] = useState<DateRange>({
     from: undefined,
     to: undefined,
   });
