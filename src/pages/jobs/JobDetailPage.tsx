@@ -49,8 +49,11 @@ export default function JobDetailPage() {
   
   // Update rate confirmation status
   useEffect(() => {
-    const isCompleted = jobStatus === "completed" || jobStatus === "ready-for-invoicing";
-    setRateConfirmed(isCompleted);
+    // Create a helper function to safely check the status
+    const checkIfCompleted = (status: JobStatus): boolean => {
+      return status === "completed" || status === "ready-for-invoicing";
+    };
+    setRateConfirmed(checkIfCompleted(jobStatus));
   }, [jobStatus]);
   
   const handleStatusChange = (newStatus: JobStatus) => {
@@ -69,11 +72,15 @@ export default function JobDetailPage() {
     });
   };
 
+  // Helper function to safely check if job is completed or ready for invoicing
+  const isJobCompleted = (status: JobStatus): boolean => {
+    return status === "completed" || status === "ready-for-invoicing";
+  };
+
   const canMarkReadyForInvoicing = jobStatus === "completed" && documentsUploaded && rateConfirmed;
   
-  // Create a boolean variable to check if the job is completed or ready for invoicing
-  // This will help avoid TypeScript's strict literal type checking issues
-  const isCompleted = (jobStatus === "completed" || jobStatus === "ready-for-invoicing") as boolean;
+  // Use the helper function to create our boolean flag
+  const isCompleted = isJobCompleted(jobStatus);
   
   return (
     <MainLayout title="Job Details">
@@ -92,7 +99,7 @@ export default function JobDetailPage() {
         <div className="md:col-span-2">
           <Card className="p-5 bg-white h-full">
             {/* Status change controls for completed jobs */}
-            {jobStatus === "completed" && (
+            {isJobCompleted(jobStatus) && (
               <div className="mb-4 p-3 border rounded-md bg-blue-50">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                   <div className="flex items-center gap-2">

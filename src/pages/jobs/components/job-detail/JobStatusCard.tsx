@@ -3,7 +3,7 @@ import { Truck, Calendar, FileText, DollarSign } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 
 // Use the same JobStatus type as in JobDetailPage
@@ -17,7 +17,16 @@ interface JobStatusCardProps {
 }
 
 export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardProps) {
-  const [rateConfirmed, setRateConfirmed] = useState(status === "completed" || status === "ready-for-invoicing");
+  // Helper function to safely check if status is completed or ready for invoicing
+  const isJobCompleted = (status: JobStatus): boolean => {
+    return status === "completed" || status === "ready-for-invoicing";
+  };
+  
+  const [rateConfirmed, setRateConfirmed] = useState(isJobCompleted(status));
+  
+  useEffect(() => {
+    setRateConfirmed(isJobCompleted(status));
+  }, [status]);
   
   const handleConfirmRate = () => {
     setRateConfirmed(true);
@@ -27,7 +36,7 @@ export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardPr
     });
   };
   
-  const isCompleted = status === "completed" || status === "ready-for-invoicing";
+  const isCompleted = isJobCompleted(status);
   
   return (
     <Card className="p-5 md:col-span-3 bg-white">
