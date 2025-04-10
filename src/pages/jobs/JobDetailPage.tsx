@@ -46,6 +46,7 @@ export default function JobDetailPage() {
   
   // Update rate confirmation status
   useEffect(() => {
+    // Fix the type comparison by checking string values correctly
     setRateConfirmed(jobStatus === "completed" || jobStatus === "ready-for-invoicing");
   }, [jobStatus]);
   
@@ -156,7 +157,6 @@ export default function JobDetailPage() {
               
               <TabsContent value="documents">
                 <JobDocumentsTab 
-                  jobId={jobId}
                   onDocumentsUploaded={() => {
                     setDocumentsUploaded(true);
                     localStorage.setItem(`job-${jobId}-documents`, 'true');

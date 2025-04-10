@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { UploadCloud, File, Trash2, FileText, FileImage, Loader2, X, FolderOpen, Check, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,6 +20,11 @@ type Document = {
   progress?: number; // For upload progress
   status?: "uploading" | "complete" | "error";
 };
+
+interface JobDocumentsTabProps {
+  onDocumentsUploaded: () => void;
+  isCompleted: boolean;
+}
 
 const mockDocuments: Document[] = [
   {
@@ -52,7 +56,7 @@ const mockDocuments: Document[] = [
   }
 ];
 
-export function JobDocumentsTab() {
+export function JobDocumentsTab({ onDocumentsUploaded, isCompleted }: JobDocumentsTabProps) {
   const [documents, setDocuments] = useState<Document[]>(mockDocuments);
   const [isDragging, setIsDragging] = useState(false);
   const [activeCategory, setActiveCategory] = useState<DocumentCategory | "all">("all");
@@ -68,7 +72,6 @@ export function JobDocumentsTab() {
   };
 
   const simulateFileUpload = (file: File, category: DocumentCategory): Promise<Document> => {
-    // Create a document object with initial progress
     const newDoc: Document = {
       id: `doc${Math.random().toString(36).substr(2, 9)}`,
       name: file.name,
@@ -80,10 +83,8 @@ export function JobDocumentsTab() {
       status: "uploading"
     };
     
-    // Add to documents list immediately to show progress
     setDocuments(prev => [...prev, newDoc]);
     
-    // Simulate upload progress
     return new Promise((resolve) => {
       const interval = setInterval(() => {
         setDocuments(prev => prev.map(doc => {
@@ -95,7 +96,7 @@ export function JobDocumentsTab() {
                 ...doc, 
                 progress: 100, 
                 status: "complete",
-                url: URL.createObjectURL(file) // Create local URL for preview
+                url: URL.createObjectURL(file)
               };
             }
             return { ...doc, progress: newProgress };
@@ -104,7 +105,6 @@ export function JobDocumentsTab() {
         }));
       }, 500);
       
-      // Resolve after "upload" is complete
       setTimeout(() => {
         clearInterval(interval);
         resolve({
@@ -131,13 +131,11 @@ export function JobDocumentsTab() {
     if (e.target.files && e.target.files.length > 0) {
       const files = Array.from(e.target.files);
       await processFiles(files, activeCategory === "all" ? "other" : activeCategory);
-      // Reset the input so the same file can be uploaded again if needed
       e.target.value = '';
     }
   };
   
   const processFiles = async (files: File[], category: DocumentCategory) => {
-    // Validate files
     const validFiles = files.filter(file => {
       const extension = file.name.split('.').pop()?.toLowerCase();
       const validExtensions = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'txt', 'xls', 'xlsx'];
@@ -155,7 +153,6 @@ export function JobDocumentsTab() {
     if (validFiles.length === 0) return;
     
     try {
-      // Process all valid files with simulated upload
       const uploadPromises = validFiles.map(file => simulateFileUpload(file, category));
       await Promise.all(uploadPromises);
       
@@ -163,6 +160,8 @@ export function JobDocumentsTab() {
         title: "Upload complete",
         description: `Successfully uploaded ${validFiles.length} file${validFiles.length > 1 ? 's' : ''}.`,
       });
+      
+      onDocumentsUploaded();
     } catch (error) {
       toast({
         title: "Upload failed",
@@ -173,15 +172,12 @@ export function JobDocumentsTab() {
   };
   
   const handleDelete = (id: string) => {
-    // Find the document to get its URL
     const docToDelete = documents.find(doc => doc.id === id);
     
-    // Revoke object URL if it exists to prevent memory leaks
     if (docToDelete?.url && docToDelete.url.startsWith('blob:')) {
       URL.revokeObjectURL(docToDelete.url);
     }
     
-    // Remove from documents list
     setDocuments(documents.filter(doc => doc.id !== id));
     
     toast({
@@ -312,9 +308,7 @@ export function JobDocumentsTab() {
           </div>
         </TabsContent>
         
-        {/* The content for category-specific tabs will automatically be filtered by the TabsContent */}
         <TabsContent value="invoices" className="mt-0">
-          {/* Upload area for invoices category */}
           <div
             className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
               isDragging ? "border-blue-500 bg-blue-50" : "border-gray-200"
@@ -331,7 +325,6 @@ export function JobDocumentsTab() {
             </p>
           </div>
           <div className="space-y-2 mt-4">
-            {/* Same document card component as above, but filtered for invoices */}
             {filteredDocuments.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <FolderOpen className="h-10 w-10 mx-auto text-muted-foreground/50 mb-2" />
@@ -341,10 +334,8 @@ export function JobDocumentsTab() {
                 </Button>
               </div>
             ) : (
-              // Same document cards as in "all" tab, automatically filtered by the activeCategory state
               filteredDocuments.map((doc) => (
                 <Card key={doc.id} className="p-3">
-                  {/* Same document card content as above */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       {getFileIcon(doc.type)}
@@ -395,9 +386,7 @@ export function JobDocumentsTab() {
           </div>
         </TabsContent>
         
-        {/* Similar structure for other tabs */}
         <TabsContent value="contracts" className="mt-0">
-          {/* Similar upload area for contracts */}
           <div
             className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
               isDragging ? "border-blue-500 bg-blue-50" : "border-gray-200"
@@ -413,7 +402,6 @@ export function JobDocumentsTab() {
               or click to browse
             </p>
           </div>
-          {/* Similar document list */}
           <div className="space-y-2 mt-4">
             {filteredDocuments.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
@@ -424,10 +412,8 @@ export function JobDocumentsTab() {
                 </Button>
               </div>
             )}
-            {/* Same document cards structure as above */}
             {filteredDocuments.map((doc) => (
               <Card key={doc.id} className="p-3">
-                {/* Same content structure as above */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       {getFileIcon(doc.type)}
@@ -478,7 +464,6 @@ export function JobDocumentsTab() {
         </TabsContent>
         
         <TabsContent value="receipts" className="mt-0">
-          {/* Similar structure for receipts tab */}
           <div
             className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
               isDragging ? "border-blue-500 bg-blue-50" : "border-gray-200"
@@ -506,7 +491,6 @@ export function JobDocumentsTab() {
             )}
             {filteredDocuments.map((doc) => (
               <Card key={doc.id} className="p-3">
-                {/* Same content structure as above */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       {getFileIcon(doc.type)}
@@ -557,7 +541,6 @@ export function JobDocumentsTab() {
         </TabsContent>
         
         <TabsContent value="other" className="mt-0">
-          {/* Similar structure for Other tab */}
           <div
             className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
               isDragging ? "border-blue-500 bg-blue-50" : "border-gray-200"
@@ -585,7 +568,6 @@ export function JobDocumentsTab() {
             )}
             {filteredDocuments.map((doc) => (
               <Card key={doc.id} className="p-3">
-                {/* Same content structure as above */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       {getFileIcon(doc.type)}
