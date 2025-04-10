@@ -49,8 +49,8 @@ export default function JobDetailPage() {
   
   // Update rate confirmation status
   useEffect(() => {
-    // Use proper type checking for status values
-    setRateConfirmed(jobStatus === "completed" || jobStatus === "ready-for-invoicing");
+    const isCompleted = jobStatus === "completed" || jobStatus === "ready-for-invoicing";
+    setRateConfirmed(isCompleted);
   }, [jobStatus]);
   
   const handleStatusChange = (newStatus: JobStatus) => {
@@ -70,6 +70,7 @@ export default function JobDetailPage() {
   };
 
   const canMarkReadyForInvoicing = jobStatus === "completed" && documentsUploaded && rateConfirmed;
+  const isCompleted = jobStatus === "completed" || jobStatus === "ready-for-invoicing";
   
   return (
     <MainLayout title="Job Details">
@@ -165,7 +166,7 @@ export default function JobDetailPage() {
                     setDocumentsUploaded(true);
                     localStorage.setItem(`job-${jobId}-documents`, 'true');
                   }}
-                  isCompleted={jobStatus === "completed" || jobStatus === "ready-for-invoicing"}
+                  isCompleted={isCompleted}
                 />
               </TabsContent>
             </Tabs>
