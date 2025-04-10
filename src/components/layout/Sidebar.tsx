@@ -1,10 +1,11 @@
-
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { 
   Home, Users, Truck, UserCircle, Settings, 
   BarChart2, CreditCard, FileText, Menu, X,
-  Kanban, LayoutDashboard, ListTodo
+  Kanban, LayoutDashboard, ListTodo,
+  DollarSign,
+  Clipboard
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';

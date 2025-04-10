@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +17,7 @@ import Analytics from "./pages/Analytics";
 import Finance from "./pages/Finance";
 import Invoices from "./pages/Invoices";
 import NotFound from "./pages/NotFound";
+import CarrierSelfInvoices from "./pages/finance/CarrierSelfInvoices";
 
 // Customer specific pages
 import CustomersList from "./pages/customers/CustomersList";
@@ -27,8 +27,7 @@ import CustomerPortalAccess from "./pages/customers/CustomerPortalAccess";
 
 const queryClient = new QueryClient();
 
-const App = () => {
-  console.log("App component rendered");
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -53,15 +52,15 @@ const App = () => {
             <Route path="/sales-pipeline/*" element={<Pipeline />} />
             <Route path="/users/*" element={<Users />} />
             <Route path="/analytics/*" element={<Analytics />} />
-            <Route path="/finance/*" element={<Finance />} />
-            <Route path="/invoices/*" element={<Invoices />} />
-            <Route path="/settings/*" element={<Settings />} />
+            <Route path="/finance" element={<Finance />} />
+            <Route path="/invoices" element={<Invoices />} />
+            <Route path="/finance/carrier-self-invoices" element={<CarrierSelfInvoices />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   );
-};
+}
 
 export default App;
