@@ -1,4 +1,3 @@
-
 // Mock data for the Jobs List
 export interface Job {
   id: number;
@@ -16,7 +15,65 @@ export interface Job {
   time?: string; // Optional property that can be derived from date
 }
 
+// Helper function to get today's date in ISO format for demo jobs
+const getTodayISOString = () => {
+  const today = new Date();
+  today.setHours(9, 0, 0, 0); // Set to 9:00 AM
+  return today.toISOString();
+};
+
+// Helper function to get today's date plus X hours in ISO format
+const getTimeToday = (hours: number) => {
+  const today = new Date();
+  today.setHours(hours, 0, 0, 0);
+  return today.toISOString();
+};
+
 export const mockJobs: Job[] = [
+  // Today's jobs - these will always show on the current date
+  {
+    id: 2001,
+    title: "Today's Urgent Delivery",
+    client: "Global Logistics",
+    status: "Scheduled",
+    priority: "High",
+    date: getTimeToday(10), // 10:00 AM today
+    origin: "London, UK",
+    destination: "Manchester, UK",
+    assignedTo: "Truck #201 / Emma W.",
+    notes: "Time-sensitive documents",
+    contact: "Robert Smith",
+    contactPhone: "020-555-1234"
+  },
+  {
+    id: 2002,
+    title: "Office Equipment Transfer",
+    client: "TechStart Co",
+    status: "In Transit",
+    priority: "Medium",
+    date: getTimeToday(13), // 1:00 PM today
+    origin: "Bristol, UK",
+    destination: "Bath, UK",
+    assignedTo: "Truck #205 / Jack T.",
+    notes: "Fragile electronics, handle with care",
+    contact: "Lisa Jones",
+    contactPhone: "0117-555-6789"
+  },
+  {
+    id: 2003,
+    title: "Retail Store Delivery",
+    client: "Fashion Express",
+    status: "Scheduled",
+    priority: "Low",
+    date: getTimeToday(15), // 3:00 PM today
+    origin: "Birmingham, UK",
+    destination: "Liverpool, UK",
+    assignedTo: "Truck #210 / Sarah M.",
+    notes: "Seasonal inventory update",
+    contact: "Daniel White",
+    contactPhone: "0121-555-3344"
+  },
+  // Original mock data
   {
     id: 1001,
     title: "Warehouse Delivery",
