@@ -1,9 +1,10 @@
 
-import { useState, useRef } from "react";
-import { UploadCloud, File, Trash2, FileText, FileImage, Loader2, X, FolderOpen, Check } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { UploadCloud, File, Trash2, FileText, FileImage, Loader2, X, FolderOpen, Check, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 

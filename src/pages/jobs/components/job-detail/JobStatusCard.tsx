@@ -1,7 +1,10 @@
 
-import { Truck, Calendar, FileText } from "lucide-react";
+import { Truck, Calendar, FileText, DollarSign } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { toast } from "@/hooks/use-toast";
 
 interface JobStatusCardProps {
   status: string;
@@ -11,6 +14,18 @@ interface JobStatusCardProps {
 }
 
 export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardProps) {
+  const [rateConfirmed, setRateConfirmed] = useState(status === "completed" || status === "ready-for-invoicing");
+  
+  const handleConfirmRate = () => {
+    setRateConfirmed(true);
+    toast({
+      title: "Rate confirmed",
+      description: "The final rate has been confirmed for this job."
+    });
+  };
+  
+  const isCompleted = status === "completed" || status === "ready-for-invoicing";
+  
   return (
     <Card className="p-5 md:col-span-3 bg-white">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -24,9 +39,10 @@ export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardPr
               <Badge 
                 variant={
                   status === "in-progress" ? "default" :
-                  status === "scheduled" ? "secondary" : "outline"
+                  status === "scheduled" ? "secondary" :
+                  status === "ready-for-invoicing" ? "outline" : "outline"
                 }
-                className="capitalize text-sm"
+                className={`capitalize text-sm ${status === "ready-for-invoicing" ? "bg-green-100 text-green-800 border-green-200" : ""}`}
               >
                 {status}
               </Badge>
@@ -60,6 +76,53 @@ export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardPr
             </p>
           </div>
         </div>
+      </div>
+      
+      {/* Rate confirmation section */}
+      <div className="mt-4 pt-3 border-t">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <DollarSign className="h-5 w-5 text-tms-blue" />
+            <div>
+              <p className="text-sm font-medium">Rate Confirmation</p>
+              <p className="text-xs text-muted-foreground">Confirm the final rate for invoicing</p>
+            </div>
+          </div>
+          
+          <div>
+            {rateConfirmed ? (
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                Rate Confirmed
+              </Badge>
+            ) : (
+              <Button 
+                size="sm"
+                variant="outline" 
+                disabled={!isCompleted}
+                onClick={handleConfirmRate}
+              >
+                Confirm Final Rate
+              </Button>
+            )}
+          </div>
+        </div>
+        
+        {rateConfirmed && (
+          <div className="mt-2 p-2 bg-muted/30 rounded-md border">
+            <div className="flex justify-between items-center text-sm">
+              <span>Base Rate:</span>
+              <span className="font-medium">£450.00</span>
+            </div>
+            <div className="flex justify-between items-center text-sm mt-1">
+              <span>Extra Charges:</span>
+              <span className="font-medium">£35.00</span>
+            </div>
+            <div className="flex justify-between items-center text-sm mt-1 pt-1 border-t">
+              <span>Final Rate:</span>
+              <span className="font-medium">£485.00</span>
+            </div>
+          </div>
+        )}
       </div>
     </Card>
   );
