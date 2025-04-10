@@ -13,6 +13,12 @@ export function QuickNavigation() {
         <Button variant="outline" size="sm" asChild>
           <Link to="/jobs/1">Sample Job Detail</Link>
         </Button>
+        <Button variant="outline" size="sm" asChild>
+          <Link to="/customer-portal/dashboard">Customer Dashboard</Link>
+        </Button>
+        <Button variant="outline" size="sm" asChild>
+          <Link to="/customer-portal/profile">Customer Profile</Link>
+        </Button>
       </div>
     </div>
   );
