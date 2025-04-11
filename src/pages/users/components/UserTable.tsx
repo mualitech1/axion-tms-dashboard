@@ -7,6 +7,7 @@ import UserTableSorting from './UserTableSorting';
 import UserTableActions from './UserTableActions';
 import UserStatusDisplay from './UserStatusDisplay';
 import UserRoleBadge from './UserRoleBadge';
+import UserTableExport from './UserTableExport';
 import { useUserFiltering } from '../hooks/useUserFiltering';
 
 interface UserTableProps {
@@ -51,24 +52,29 @@ export default function UserTable({
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row md:justify-between gap-4">
-        <UserTableFilters
-          searchTerm={searchTerm}
-          onSearchChange={onSearchChange}
-          showFilters={showFilters}
-          setShowFilters={setShowFilters}
-          roleFilter={roleFilter}
-          onRoleFilterChange={onRoleFilterChange}
-          statusFilter={statusFilter}
-          onStatusFilterChange={onStatusFilterChange}
-          availableRoles={availableRoles}
-        />
+        <div className="flex-1">
+          <UserTableFilters
+            searchTerm={searchTerm}
+            onSearchChange={onSearchChange}
+            showFilters={showFilters}
+            setShowFilters={setShowFilters}
+            roleFilter={roleFilter}
+            onRoleFilterChange={onRoleFilterChange}
+            statusFilter={statusFilter}
+            onStatusFilterChange={onStatusFilterChange}
+            availableRoles={availableRoles}
+          />
+        </div>
         
-        <UserTableSorting 
-          sortField={sortField}
-          handleSort={handleSort}
-          sortDirection={sortDirection}
-          setSortDirection={setSortDirection}
-        />
+        <div className="flex items-center gap-3">
+          <UserTableExport users={filteredUsers} />
+          <UserTableSorting 
+            sortField={sortField}
+            handleSort={handleSort}
+            sortDirection={sortDirection}
+            setSortDirection={setSortDirection}
+          />
+        </div>
       </div>
       
       <div className="rounded-md border">
