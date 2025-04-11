@@ -117,12 +117,29 @@ export function useInvoiceForm() {
     form.setValue("dueDate", newDueDate.toISOString().split('T')[0]);
   };
 
+  const resetForm = () => {
+    form.reset({
+      customer: "",
+      issueDate: getTodayDate(),
+      dueDate: getDefaultDueDate(),
+      paymentTerms: "net15",
+      notes: "",
+      items: [{ description: "", quantity: "1", rate: "", amount: "0" }]
+    });
+  };
+
+  const setFormValues = (values: Partial<InvoiceFormValues>) => {
+    form.reset(values);
+  };
+
   return {
     form,
     handleItemChange,
     addInvoiceItem,
     removeInvoiceItem,
     calculateTotal,
-    handlePaymentTermsChange
+    handlePaymentTermsChange,
+    resetForm,
+    setFormValues
   };
 }

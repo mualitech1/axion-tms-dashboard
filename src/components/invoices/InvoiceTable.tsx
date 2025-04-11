@@ -3,13 +3,15 @@ import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpDown, Calendar, Download, Eye } from "lucide-react";
+import { ArrowUpDown, Calendar, Download, Eye, Edit } from "lucide-react";
+import { InvoiceData } from "./create-invoice-dialog/CreateInvoiceDialog";
 
 interface InvoiceTableProps {
-  invoices: any[];
+  invoices: InvoiceData[];
+  onEditInvoice?: (invoice: InvoiceData) => void;
 }
 
-export function InvoiceTable({ invoices }: InvoiceTableProps) {
+export function InvoiceTable({ invoices, onEditInvoice }: InvoiceTableProps) {
   return (
     <div className="rounded-md border overflow-hidden">
       <Table>
@@ -69,6 +71,14 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2 justify-end">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="h-8 w-8"
+                      onClick={() => onEditInvoice?.(invoice)}
+                    >
+                      <Edit className="h-3.5 w-3.5" />
+                    </Button>
                     <Button variant="outline" size="icon" className="h-8 w-8">
                       <Eye className="h-3.5 w-3.5" />
                     </Button>

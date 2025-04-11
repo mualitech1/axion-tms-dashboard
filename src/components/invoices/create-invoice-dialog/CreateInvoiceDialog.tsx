@@ -13,19 +13,41 @@ import { InvoiceDetailsForm } from "./InvoiceDetailsForm";
 import { InvoiceLineItems } from "./InvoiceLineItems";
 import { useInvoiceForm } from "./hooks/useInvoiceForm";
 
+export interface InvoiceData {
+  id: string;
+  customer: string;
+  date: string;
+  dueDate: string;
+  amount: number;
+  status: "pending" | "paid";
+  notes?: string;
+  items: {
+    description: string;
+    quantity: string;
+    rate: string;
+    amount: string;
+  }[];
+}
+
 interface CreateInvoiceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onInvoiceCreated: (invoice: any) => void;
+  onInvoiceCreated: (invoice: InvoiceData) => void;
+  onInvoiceUpdated?: (invoice: InvoiceData) => void;
+  editInvoice?: InvoiceData | null;
 }
 
 export function CreateInvoiceDialog({ 
   open, 
   onOpenChange, 
-  onInvoiceCreated 
+  onInvoiceCreated,
+  onInvoiceUpdated,
+  editInvoice = null
 }: CreateInvoiceDialogProps) {
   const [activeTab, setActiveTab] = useState("details");
   const { toast } = useToast();
+  const isEditMode = !!editInvoice;
+  
   const {
     form,
     handleItemChange,
@@ -33,32 +55,79 @@ export function CreateInvoiceDialog({
     removeInvoiceItem,
     calculateTotal,
     handlePaymentTermsChange,
+    resetForm,
+    setFormValues
   } = useInvoiceForm();
+  
+  // Set form values when editing an invoice or when the component mounts with an editInvoice
+  useState(() => {
+    if (isEditMode && editInvoice) {
+      setFormValues({
+        customer: editInvoice.customer,
+        issueDate: editInvoice.date,
+        dueDate: editInvoice.dueDate,
+        notes: editInvoice.notes || "",
+        paymentTerms: getPaymentTermsFromDates(editInvoice.date, editInvoice.dueDate),
+        items: editInvoice.items
+      });
+    }
+  });
+
+  // Helper function to determine payment terms from dates
+  function getPaymentTermsFromDates(issueDate: string, dueDate: string): string {
+    const issue = new Date(issueDate);
+    const due = new Date(dueDate);
+    const diffDays = Math.round((due.getTime() - issue.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays <= 15) return "net15";
+    if (diffDays <= 30) return "net30";
+    return "net60";
+  }
 
   const handleSubmit = form.handleSubmit((data) => {
-    // Generate a new invoice ID
-    const newId = `INV-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`;
-    
-    const newInvoice = {
-      id: newId,
-      customer: data.customer,
-      date: data.issueDate,
-      dueDate: data.dueDate,
-      amount: calculateTotal(),
-      status: "pending",
-      notes: data.notes,
-      items: data.items
-    };
+    if (isEditMode && editInvoice) {
+      // Update existing invoice
+      const updatedInvoice: InvoiceData = {
+        ...editInvoice,
+        customer: data.customer,
+        date: data.issueDate,
+        dueDate: data.dueDate,
+        amount: calculateTotal(),
+        notes: data.notes,
+        items: data.items
+      };
 
-    onInvoiceCreated(newInvoice);
-    
-    toast({
-      title: "Invoice created",
-      description: `Invoice ${newId} has been created successfully.`,
-    });
+      onInvoiceUpdated?.(updatedInvoice);
+      
+      toast({
+        title: "Invoice updated",
+        description: `Invoice ${editInvoice.id} has been updated successfully.`,
+      });
+    } else {
+      // Create new invoice
+      const newId = `INV-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`;
+      
+      const newInvoice: InvoiceData = {
+        id: newId,
+        customer: data.customer,
+        date: data.issueDate,
+        dueDate: data.dueDate,
+        amount: calculateTotal(),
+        status: "pending",
+        notes: data.notes,
+        items: data.items
+      };
+
+      onInvoiceCreated(newInvoice);
+      
+      toast({
+        title: "Invoice created",
+        description: `Invoice ${newId} has been created successfully.`,
+      });
+    }
 
     // Reset form and close dialog
-    form.reset();
+    resetForm();
     setActiveTab("details");
     onOpenChange(false);
   });
@@ -78,12 +147,13 @@ export function CreateInvoiceDialog({
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
       if (!isOpen) {
-        form.reset();
+        resetForm();
+        setActiveTab("details");
       }
       onOpenChange(isOpen);
     }}>
       <DialogContent className="sm:max-w-[650px] p-0 overflow-hidden bg-white">
-        <InvoiceDialogHeader />
+        <InvoiceDialogHeader isEditMode={isEditMode} />
         
         <Form {...form}>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -129,7 +199,7 @@ export function CreateInvoiceDialog({
                       type="submit"
                       className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                     >
-                      Create Invoice
+                      {isEditMode ? "Update Invoice" : "Create Invoice"}
                     </Button>
                   </DialogFooter>
                 </TabsContent>

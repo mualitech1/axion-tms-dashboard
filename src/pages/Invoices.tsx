@@ -8,7 +8,7 @@ import { InvoiceStatusTabs } from "@/components/invoices/InvoiceStatusTabs";
 import { InvoiceFilters } from "@/components/invoices/InvoiceFilters";
 import { InvoiceTable } from "@/components/invoices/InvoiceTable";
 import { CreateJobDialog } from "@/components/invoices/CreateJobDialog";
-import { CreateInvoiceDialog } from "@/components/invoices/create-invoice-dialog/CreateInvoiceDialog";
+import { CreateInvoiceDialog, InvoiceData } from "@/components/invoices/create-invoice-dialog/CreateInvoiceDialog";
 import { invoices as mockInvoices } from "@/components/invoices/mockData";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,7 +17,8 @@ export default function Invoices() {
   const [createJobOpen, setCreateJobOpen] = useState(false);
   const [createInvoiceOpen, setCreateInvoiceOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
-  const [invoicesList, setInvoicesList] = useState(mockInvoices);
+  const [invoicesList, setInvoicesList] = useState<InvoiceData[]>(mockInvoices);
+  const [editingInvoice, setEditingInvoice] = useState<InvoiceData | null>(null);
   const { toast } = useToast();
   
   const filteredInvoices = invoicesList
@@ -32,9 +33,23 @@ export default function Invoices() {
       return true;
     });
 
-  const handleInvoiceCreated = (newInvoice: any) => {
+  const handleInvoiceCreated = (newInvoice: InvoiceData) => {
     // Add the new invoice to the list
     setInvoicesList(current => [newInvoice, ...current]);
+  };
+  
+  const handleInvoiceUpdated = (updatedInvoice: InvoiceData) => {
+    // Update the invoice in the list
+    setInvoicesList(current => 
+      current.map(invoice => 
+        invoice.id === updatedInvoice.id ? updatedInvoice : invoice
+      )
+    );
+  };
+  
+  const handleEditInvoice = (invoice: InvoiceData) => {
+    setEditingInvoice(invoice);
+    setCreateInvoiceOpen(true);
   };
 
   // Calculate summary statistics
@@ -74,10 +89,16 @@ export default function Invoices() {
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             onCreateJob={() => setCreateJobOpen(true)}
-            onCreateInvoice={() => setCreateInvoiceOpen(true)}
+            onCreateInvoice={() => {
+              setEditingInvoice(null);
+              setCreateInvoiceOpen(true);
+            }}
           />
           
-          <InvoiceTable invoices={filteredInvoices} />
+          <InvoiceTable 
+            invoices={filteredInvoices}
+            onEditInvoice={handleEditInvoice}
+          />
         </CardContent>
       </Card>
 
@@ -88,8 +109,15 @@ export default function Invoices() {
 
       <CreateInvoiceDialog 
         open={createInvoiceOpen}
-        onOpenChange={setCreateInvoiceOpen}
+        onOpenChange={(isOpen) => {
+          setCreateInvoiceOpen(isOpen);
+          if (!isOpen) {
+            setEditingInvoice(null);
+          }
+        }}
         onInvoiceCreated={handleInvoiceCreated}
+        onInvoiceUpdated={handleInvoiceUpdated}
+        editInvoice={editingInvoice}
       />
     </MainLayout>
   );
