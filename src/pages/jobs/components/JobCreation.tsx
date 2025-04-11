@@ -16,17 +16,22 @@ import {
 import { format } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { CalendarIcon, MapPin, Truck, User, Plus, Trash } from "lucide-react";
+import { CalendarIcon, MapPin, Truck, User, Plus, Trash, Briefcase, Building, DollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel
+  FormLabel,
+  FormDescription
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { InputWithIcon } from "@/components/ui/input-with-icon";
+import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Address {
   companyName: string;
@@ -44,6 +49,8 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
   const [additionalStops, setAdditionalStops] = useState<Address[]>([]);
+  const [currentStep, setCurrentStep] = useState<number>(1);
+  const [formCompletion, setFormCompletion] = useState<number>(25);
   const { toast } = useToast();
   
   const form = useForm({
@@ -56,6 +63,7 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
       productType: "",
       totalWeight: "",
       additionalInformation: "",
+      saveTemplate: false,
       collection: {
         companyName: "",
         contactName: "",
@@ -74,6 +82,22 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
       }
     }
   });
+
+  const totalSteps = 3;
+  
+  const nextStep = () => {
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1);
+      setFormCompletion((currentStep + 1) * (100 / totalSteps));
+    }
+  };
+  
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+      setFormCompletion((currentStep - 1) * (100 / totalSteps));
+    }
+  };
 
   const addStop = () => {
     setAdditionalStops([...additionalStops, {
@@ -140,7 +164,7 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
               <FormItem>
                 <FormLabel>Company Name</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Enter company name" />
+                  <InputWithIcon icon={Building} placeholder="Enter company name" {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -153,7 +177,7 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
               <FormItem>
                 <FormLabel>Contact Name</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Enter contact name" />
+                  <InputWithIcon icon={User} placeholder="Enter contact name" {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -218,10 +242,7 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
               <FormItem className="col-span-2">
                 <FormLabel>Address Line 1</FormLabel>
                 <FormControl>
-                  <div className="relative">
-                    <Input {...field} placeholder="Enter address" className="pl-10" />
-                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  </div>
+                  <InputWithIcon icon={MapPin} placeholder="Enter address" {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -259,23 +280,34 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
 
   const renderAdditionalStop = (stop: Address, index: number) => {
     return (
-      <div key={index} className="p-4 border rounded-md mb-4">
+      <div key={index} className="p-6 border rounded-lg mb-5 shadow-sm bg-slate-50/50">
         <div className="flex justify-between mb-3">
-          <h4 className="font-medium">Additional Stop {index + 1}</h4>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => removeStop(index)}
-            className="h-7 w-7 p-0"
-          >
-            <Trash className="h-4 w-4 text-muted-foreground" />
-          </Button>
+          <h4 className="font-medium text-base flex items-center">
+            <MapPin className="h-4 w-4 mr-2 text-blue-500" />
+            Additional Stop {index + 1}
+          </h4>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => removeStop(index)}
+                  className="h-8 w-8 p-0 rounded-full hover:bg-red-100 hover:text-red-600 transition-colors"
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Remove this stop</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Company Name</Label>
-            <Input 
+            <InputWithIcon 
+              icon={Building}
               value={stop.companyName}
               onChange={(e) => updateAdditionalStop(index, "companyName", e.target.value)}
               placeholder="Enter company name"
@@ -284,7 +316,8 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
           
           <div className="space-y-2">
             <Label>Contact Name</Label>
-            <Input 
+            <InputWithIcon 
+              icon={User}
               value={stop.contactName}
               onChange={(e) => updateAdditionalStop(index, "contactName", e.target.value)}
               placeholder="Enter contact name"
@@ -293,15 +326,12 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
           
           <div className="col-span-2 space-y-2">
             <Label>Address Line 1</Label>
-            <div className="relative">
-              <Input 
-                value={stop.addressLine1}
-                onChange={(e) => updateAdditionalStop(index, "addressLine1", e.target.value)}
-                placeholder="Enter address"
-                className="pl-10"
-              />
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            </div>
+            <InputWithIcon 
+              icon={MapPin}
+              value={stop.addressLine1}
+              onChange={(e) => updateAdditionalStop(index, "addressLine1", e.target.value)}
+              placeholder="Enter address"
+            />
           </div>
           
           <div className="space-y-2">
@@ -325,16 +355,13 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
       </div>
     );
   };
-
-  return (
-    <Card className="border-none shadow-none">
-      <CardHeader className="px-0">
-        <CardTitle>Create New Job</CardTitle>
-      </CardHeader>
-      <CardContent className="px-0">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-3">
+  
+  const renderCurrentStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="jobTitle"
@@ -342,7 +369,7 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
                   <FormItem>
                     <FormLabel>Job Title</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter job title" required />
+                      <InputWithIcon icon={Briefcase} placeholder="Enter job title" {...field} required />
                     </FormControl>
                   </FormItem>
                 )}
@@ -356,7 +383,8 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
                     <FormLabel>Customer</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="px-10">
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <SelectValue placeholder="Select customer" />
                         </SelectTrigger>
                       </FormControl>
@@ -370,7 +398,9 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
                   </FormItem>
                 )}
               />
-              
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="date">Job Date</Label>
                 <Popover>
@@ -406,7 +436,8 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
                     <FormLabel>Vehicle Type</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="px-10">
+                          <Truck className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <SelectValue placeholder="Select vehicle type" />
                         </SelectTrigger>
                       </FormControl>
@@ -420,7 +451,9 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
                   </FormItem>
                 )}
               />
-              
+            </div>
+            
+            <div className="grid gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="priority"
@@ -451,7 +484,7 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
                   <FormItem>
                     <FormLabel>Rate (£)</FormLabel>
                     <FormControl>
-                      <Input {...field} type="number" placeholder="Enter rate" />
+                      <InputWithIcon icon={DollarSign} type="number" placeholder="Enter rate" {...field} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -485,44 +518,34 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
                 )}
               />
             </div>
-            
-            <div className="border-t pt-6">
+          </div>
+        );
+      case 2:
+        return (
+          <div>
+            <div className="mb-6">
               <Tabs defaultValue="collection" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-6">
                   <TabsTrigger value="collection">Collection Details</TabsTrigger>
                   <TabsTrigger value="delivery">Delivery Details</TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="collection">
+                <TabsContent value="collection" className="bg-white p-6 rounded-lg border shadow-sm">
                   <AddressForm prefix="collection" label="Collection Details" />
                 </TabsContent>
                 
-                <TabsContent value="delivery">
+                <TabsContent value="delivery" className="bg-white p-6 rounded-lg border shadow-sm">
                   <AddressForm prefix="delivery" label="Delivery Details" />
                 </TabsContent>
               </Tabs>
             </div>
             
-            <FormField
-              control={form.control}
-              name="additionalInformation"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Additional Information</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      {...field} 
-                      placeholder="Enter any additional information about this job"
-                      className="min-h-[120px]"
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            
             {additionalStops.length > 0 && (
-              <div className="border-t pt-6">
-                <h3 className="text-md font-medium mb-4">Additional Stops</h3>
+              <div className="border-t pt-6 mt-6">
+                <h3 className="text-lg font-medium mb-4 flex items-center">
+                  <MapPin className="h-5 w-5 mr-2 text-blue-500" />
+                  Additional Stops
+                </h3>
                 {additionalStops.map((stop, index) => renderAdditionalStop(stop, index))}
               </div>
             )}
@@ -531,21 +554,149 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
               type="button"
               variant="outline"
               onClick={addStop}
-              className="w-full"
+              className="w-full mt-4 py-6 border-dashed border-2 hover:bg-blue-50 hover:border-blue-300 transition-colors"
             >
               <Plus className="mr-2 h-4 w-4" /> Add Additional Stop
             </Button>
+          </div>
+        );
+      case 3:
+        return (
+          <div className="space-y-6">
+            <div className="bg-white p-6 rounded-lg border shadow-sm">
+              <FormField
+                control={form.control}
+                name="additionalInformation"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Additional Information</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        {...field} 
+                        placeholder="Enter any additional information about this job"
+                        className="min-h-[150px]"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Include any special instructions or requirements for this job
+                    </FormDescription>
+                  </FormItem>
+                )}
+              />
+            </div>
             
-            <div className="flex justify-end gap-2 pt-4 border-t">
-              <Button variant="outline" type="button" onClick={onComplete}>
-                Cancel
-              </Button>
-              <Button variant="outline" type="button">
-                Save as Draft
-              </Button>
-              <Button type="submit">
-                Create Job
-              </Button>
+            <div className="bg-white p-6 rounded-lg border shadow-sm">
+              <h3 className="text-lg font-medium mb-4">Job Summary</h3>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Job Title</h4>
+                    <p className="font-medium">{form.watch('jobTitle') || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Customer</h4>
+                    <p className="font-medium">{form.watch('customer') || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Vehicle Type</h4>
+                    <p className="font-medium">{form.watch('vehicleType') || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Priority</h4>
+                    <p className="font-medium capitalize">{form.watch('priority') || 'Not specified'}</p>
+                  </div>
+                </div>
+                
+                <FormField
+                  control={form.control}
+                  name="saveTemplate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 mt-6">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>
+                          Save as template
+                        </FormLabel>
+                        <FormDescription>
+                          Use these settings for future jobs
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <Card className="border shadow-md rounded-xl overflow-hidden">
+      <CardHeader className="bg-gradient-to-r from-blue-600/90 to-indigo-600 text-white">
+        <CardTitle className="text-xl flex items-center">
+          <Briefcase className="h-5 w-5 mr-2" />
+          Create New Job
+        </CardTitle>
+        <Progress value={formCompletion} className="h-2 mt-2" indicatorClassName="bg-white/90" />
+      </CardHeader>
+      <CardContent className="p-6">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+            {renderCurrentStep()}
+            
+            <div className="flex justify-between pt-4 border-t mt-6">
+              {currentStep > 1 ? (
+                <Button 
+                  variant="outline" 
+                  type="button" 
+                  onClick={prevStep}
+                  className="flex items-center gap-2"
+                >
+                  Back
+                </Button>
+              ) : (
+                <Button variant="outline" type="button" onClick={onComplete}>
+                  Cancel
+                </Button>
+              )}
+              
+              {currentStep < totalSteps ? (
+                <Button 
+                  type="button" 
+                  onClick={nextStep}
+                  className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white transition-all duration-200"
+                >
+                  Continue
+                </Button>
+              ) : (
+                <Button 
+                  type="submit"
+                  disabled={form.formState.isSubmitting}
+                  className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white transition-all duration-200"
+                >
+                  {form.formState.isSubmitting ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Creating Job...
+                    </>
+                  ) : (
+                    <>
+                      Create Job
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
           </form>
         </Form>
