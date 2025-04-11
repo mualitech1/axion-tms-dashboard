@@ -24,12 +24,14 @@ import {
   CreditCard,
   FileText,
   CheckCircle,
-  X
+  X,
+  AlertCircle
 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import ContactDetailsForm from './ContactDetailsForm';
 import { Customer } from '@/types/customer';
+import { Progress } from '@/components/ui/progress';
 
 const customerSchema = z.object({
   name: z.string().min(2, { message: 'Company name is required' }),
@@ -57,6 +59,7 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
   const [primaryContact, setPrimaryContact] = useState<any>(null);
   const [invoiceContact, setInvoiceContact] = useState<any>(null);
   const [operationsContact, setOperationsContact] = useState<any>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { toast } = useToast();
   
@@ -77,7 +80,26 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
     },
   });
 
-  const onSubmit = (values: CustomerFormValues) => {
+  // Calculate form completion percentage
+  const calculateCompletionPercentage = () => {
+    let totalFields = 7; // Base required fields (name, street, city, postal, country, status, creditLimit)
+    let completedFields = 0;
+    
+    const values = form.getValues();
+    if (values.name) completedFields++;
+    if (values.address.street) completedFields++;
+    if (values.address.city) completedFields++;
+    if (values.address.postcode) completedFields++;
+    if (values.address.country) completedFields++;
+    if (values.status) completedFields++;
+    if (primaryContact) completedFields++; // Add 1 for primary contact
+    
+    return Math.round((completedFields / totalFields) * 100);
+  };
+
+  const completion = calculateCompletionPercentage();
+
+  const onSubmit = async (values: CustomerFormValues) => {
     // Validation check for required contacts
     if (!primaryContact) {
       toast({
@@ -89,44 +111,86 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
       return;
     }
 
-    // Create the complete customer object with contacts
-    const newCustomer = {
-      ...values,
-      id: Date.now(), // temporary ID for demo
-      contacts: [
-        { ...primaryContact, isPrimary: true, role: 'Primary' },
-        ...(invoiceContact ? [{ ...invoiceContact, role: 'Invoice' }] : []),
-        ...(operationsContact ? [{ ...operationsContact, role: 'Operations' }] : []),
-      ],
-      // Add required properties from Customer type
-      contact: primaryContact ? primaryContact.name : '',
-      email: primaryContact ? primaryContact.email : '',
-      phone: primaryContact ? primaryContact.phone : '',
-      lastOrder: '-'
-    };
-    
-    console.log('New Customer:', newCustomer);
-    
-    // Now call the onAddCustomer prop if it exists
-    if (onAddCustomer) {
-      onAddCustomer(newCustomer as Customer);
+    setIsSubmitting(true);
+
+    try {
+      // Create the complete customer object with contacts
+      const newCustomer = {
+        ...values,
+        id: Date.now(), // temporary ID for demo
+        contacts: [
+          { ...primaryContact, isPrimary: true, role: 'Primary' },
+          ...(invoiceContact ? [{ ...invoiceContact, role: 'Invoice' }] : []),
+          ...(operationsContact ? [{ ...operationsContact, role: 'Operations' }] : []),
+        ],
+        // Add required properties from Customer type
+        contact: primaryContact ? primaryContact.name : '',
+        email: primaryContact ? primaryContact.email : '',
+        phone: primaryContact ? primaryContact.phone : '',
+        lastOrder: '-',
+        // Add empty collections for related data
+        documents: [],
+        rateCards: [],
+        jobs: []
+      };
+      
+      console.log('New Customer:', newCustomer);
+      
+      // Simulate API call with timeout
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Now call the onAddCustomer prop if it exists
+      if (onAddCustomer) {
+        onAddCustomer(newCustomer as Customer);
+      }
+      
+      toast({
+        title: "Customer Created Successfully",
+        description: `${values.name} has been added to your customer list`,
+      });
+      
+      onClose();
+    } catch (error) {
+      console.error("Error creating customer:", error);
+      toast({
+        title: "Error",
+        description: "There was a problem creating the customer. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    toast({
-      title: "Customer Added",
-      description: `${values.name} has been successfully added`,
-    });
-    
-    onClose();
   };
 
   return (
     <div className="py-4">
+      {/* Progress indicator */}
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-1">
+          <span className="text-sm text-muted-foreground">Completion</span>
+          <span className="text-sm font-medium">{completion}%</span>
+        </div>
+        <Progress value={completion} className="h-2" />
+      </div>
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-3 mb-6">
-          <TabsTrigger value="general">General Information</TabsTrigger>
-          <TabsTrigger value="contacts">Contact Details</TabsTrigger>
-          <TabsTrigger value="terms">Terms & Credit</TabsTrigger>
+          <TabsTrigger value="general">
+            General Information
+            {form.formState.errors.name || 
+             form.formState.errors.address?.street ||
+             form.formState.errors.address?.city ||
+             form.formState.errors.address?.postcode ||
+             form.formState.errors.address?.country ? 
+              <AlertCircle className="ml-2 h-4 w-4 text-destructive" /> : null}
+          </TabsTrigger>
+          <TabsTrigger value="contacts">
+            Contact Details
+            {!primaryContact ? <AlertCircle className="ml-2 h-4 w-4 text-destructive" /> : null}
+          </TabsTrigger>
+          <TabsTrigger value="terms">
+            Terms & Credit
+          </TabsTrigger>
         </TabsList>
         
         <Form {...form}>
@@ -388,7 +452,9 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                 </Button>
               </div>
               
-              <Button type="submit">Save Customer</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Creating..." : "Save Customer"}
+              </Button>
             </div>
           </form>
         </Form>
