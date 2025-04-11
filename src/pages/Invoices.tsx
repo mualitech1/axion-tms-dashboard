@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -13,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CreateInvoiceDialog } from "@/components/invoices/CreateInvoiceDialog";
 
 // Mock invoice data
 const invoices = [
@@ -69,13 +71,15 @@ const invoices = [
 export default function Invoices() {
   const [searchQuery, setSearchQuery] = useState("");
   const [createJobOpen, setCreateJobOpen] = useState(false);
+  const [createInvoiceOpen, setCreateInvoiceOpen] = useState(false);
   const [jobTitle, setJobTitle] = useState("");
   const [jobClient, setJobClient] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [activeTab, setActiveTab] = useState("all");
+  const [invoicesList, setInvoicesList] = useState(invoices);
   const { toast } = useToast();
   
-  const filteredInvoices = invoices
+  const filteredInvoices = invoicesList
     .filter(invoice => 
       invoice.customer.toLowerCase().includes(searchQuery.toLowerCase()) || 
       invoice.id.toLowerCase().includes(searchQuery.toLowerCase())
@@ -111,12 +115,17 @@ export default function Invoices() {
     setCreateJobOpen(false);
   };
 
+  const handleInvoiceCreated = (newInvoice: any) => {
+    // Add the new invoice to the list
+    setInvoicesList(current => [newInvoice, ...current]);
+  };
+
   // Calculate summary statistics
-  const totalAmount = invoices.reduce((sum, inv) => sum + inv.amount, 0);
-  const pendingAmount = invoices
+  const totalAmount = invoicesList.reduce((sum, inv) => sum + inv.amount, 0);
+  const pendingAmount = invoicesList
     .filter(inv => inv.status === "pending")
     .reduce((sum, inv) => sum + inv.amount, 0);
-  const paidAmount = invoices
+  const paidAmount = invoicesList
     .filter(inv => inv.status === "paid")
     .reduce((sum, inv) => sum + inv.amount, 0);
 
@@ -136,7 +145,7 @@ export default function Invoices() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-blue-500" />
-                <span className="text-2xl font-bold">{invoices.length}</span>
+                <span className="text-2xl font-bold">{invoicesList.length}</span>
               </div>
               <span className="text-lg font-semibold">${totalAmount.toLocaleString()}</span>
             </div>
@@ -152,7 +161,7 @@ export default function Invoices() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-amber-500" />
-                <span className="text-2xl font-bold">{invoices.filter(inv => inv.status === "pending").length}</span>
+                <span className="text-2xl font-bold">{invoicesList.filter(inv => inv.status === "pending").length}</span>
               </div>
               <span className="text-lg font-semibold text-amber-500">${pendingAmount.toLocaleString()}</span>
             </div>
@@ -168,7 +177,7 @@ export default function Invoices() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-green-500" />
-                <span className="text-2xl font-bold">{invoices.filter(inv => inv.status === "paid").length}</span>
+                <span className="text-2xl font-bold">{invoicesList.filter(inv => inv.status === "paid").length}</span>
               </div>
               <span className="text-lg font-semibold text-green-500">${paidAmount.toLocaleString()}</span>
             </div>
@@ -231,7 +240,10 @@ export default function Invoices() {
                 <Briefcase className="h-4 w-4" />
                 <span className="hidden sm:inline">Create Job</span>
               </Button>
-              <Button className="gap-1 bg-blue-600 hover:bg-blue-700">
+              <Button 
+                className="gap-1 bg-blue-600 hover:bg-blue-700"
+                onClick={() => setCreateInvoiceOpen(true)}
+              >
                 <PlusCircle className="h-4 w-4" />
                 <span className="hidden sm:inline">New Invoice</span>
               </Button>
@@ -360,6 +372,12 @@ export default function Invoices() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <CreateInvoiceDialog 
+        open={createInvoiceOpen}
+        onOpenChange={setCreateInvoiceOpen}
+        onInvoiceCreated={handleInvoiceCreated}
+      />
     </MainLayout>
   );
 }
