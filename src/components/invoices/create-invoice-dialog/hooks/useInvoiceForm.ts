@@ -26,6 +26,7 @@ const invoiceSchema = z.object({
 });
 
 export type InvoiceFormValues = z.infer<typeof invoiceSchema>;
+export type InvoiceItem = z.infer<typeof invoiceItemSchema>;
 
 export function useInvoiceForm() {
   // Helper functions for dates

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -11,7 +11,7 @@ import { InvoiceDialogHeader } from "./DialogHeader";
 import { InvoiceTabs } from "./InvoiceTabs";
 import { InvoiceDetailsForm } from "./InvoiceDetailsForm";
 import { InvoiceLineItems } from "./InvoiceLineItems";
-import { useInvoiceForm } from "./hooks/useInvoiceForm";
+import { useInvoiceForm, InvoiceItem } from "./hooks/useInvoiceForm";
 
 export interface InvoiceData {
   id: string;
@@ -21,12 +21,7 @@ export interface InvoiceData {
   amount: number;
   status: "pending" | "paid";
   notes?: string;
-  items: {
-    description: string;
-    quantity: string;
-    rate: string;
-    amount: string;
-  }[];
+  items: InvoiceItem[];
 }
 
 interface CreateInvoiceDialogProps {
@@ -59,19 +54,27 @@ export function CreateInvoiceDialog({
     setFormValues
   } = useInvoiceForm();
   
-  // Set form values when editing an invoice or when the component mounts with an editInvoice
-  useState(() => {
+  // Set form values when editing an invoice
+  useEffect(() => {
     if (isEditMode && editInvoice) {
+      // Ensure all items have the required properties
+      const formattedItems = editInvoice.items.map(item => ({
+        description: item.description || "",
+        quantity: item.quantity || "1",
+        rate: item.rate || "",
+        amount: item.amount || "0"
+      }));
+      
       setFormValues({
         customer: editInvoice.customer,
         issueDate: editInvoice.date,
         dueDate: editInvoice.dueDate,
         notes: editInvoice.notes || "",
         paymentTerms: getPaymentTermsFromDates(editInvoice.date, editInvoice.dueDate),
-        items: editInvoice.items
+        items: formattedItems
       });
     }
-  });
+  }, [isEditMode, editInvoice, setFormValues]);
 
   // Helper function to determine payment terms from dates
   function getPaymentTermsFromDates(issueDate: string, dueDate: string): string {
