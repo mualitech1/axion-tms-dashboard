@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   Select,
   SelectContent,
@@ -50,19 +51,26 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
       jobTitle: "",
       vehicleType: "",
       priority: "medium",
+      customer: "",
+      rate: "",
+      productType: "",
+      totalWeight: "",
+      additionalInformation: "",
       collection: {
         companyName: "",
         contactName: "",
         addressLine1: "",
         city: "",
-        postCode: ""
+        postCode: "",
+        reference: ""
       },
       delivery: {
         companyName: "",
         contactName: "",
         addressLine1: "",
         city: "",
-        postCode: ""
+        postCode: "",
+        reference: ""
       }
     }
   });
@@ -150,6 +158,58 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
               </FormItem>
             )}
           />
+          
+          <FormField
+            control={form.control}
+            name={`${prefix}.reference`}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{prefix === "collection" ? "Collection Reference" : "Delivery Reference"}</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder={`Enter ${prefix === "collection" ? "collection" : "delivery"} reference`} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          
+          <div className="space-y-2">
+            <Label htmlFor={`${prefix}-date`}>Date & Time Window</Label>
+            <div className="flex gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    id={`${prefix}-date`}
+                    variant={"outline"}
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, "PP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              <Select>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Time" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="morning">Morning</SelectItem>
+                  <SelectItem value="afternoon">Afternoon</SelectItem>
+                  <SelectItem value="specific">Specific Time</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           
           <FormField
             control={form.control}
@@ -274,7 +334,7 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
       <CardContent className="px-0">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-3">
               <FormField
                 control={form.control}
                 name="jobTitle"
@@ -288,8 +348,31 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
                 )}
               />
               
+              <FormField
+                control={form.control}
+                name="customer"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Customer</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select customer" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="acme">Acme Corp</SelectItem>
+                        <SelectItem value="globex">Globex Corporation</SelectItem>
+                        <SelectItem value="stark">Stark Industries</SelectItem>
+                        <SelectItem value="wayne">Wayne Enterprises</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+              
               <div className="space-y-2">
-                <Label htmlFor="date">Date</Label>
+                <Label htmlFor="date">Job Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -360,6 +443,47 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
                   </FormItem>
                 )}
               />
+              
+              <FormField
+                control={form.control}
+                name="rate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Rate (£)</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="number" placeholder="Enter rate" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="productType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Product Type</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter product type" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="totalWeight"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Total Weight (KG)</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter total weight" type="number" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             </div>
             
             <div className="border-t pt-6">
@@ -378,6 +502,23 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
                 </TabsContent>
               </Tabs>
             </div>
+            
+            <FormField
+              control={form.control}
+              name="additionalInformation"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Additional Information</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      {...field} 
+                      placeholder="Enter any additional information about this job"
+                      className="min-h-[120px]"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
             
             {additionalStops.length > 0 && (
               <div className="border-t pt-6">
@@ -398,6 +539,9 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
             <div className="flex justify-end gap-2 pt-4 border-t">
               <Button variant="outline" type="button" onClick={onComplete}>
                 Cancel
+              </Button>
+              <Button variant="outline" type="button">
+                Save as Draft
               </Button>
               <Button type="submit">
                 Create Job

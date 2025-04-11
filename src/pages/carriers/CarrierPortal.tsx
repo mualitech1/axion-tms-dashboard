@@ -1,6 +1,7 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Upload, FileText, Truck, History } from 'lucide-react';
+import { ArrowLeft, Upload, FileText, Truck, History, Receipt } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MainLayout from '@/components/layout/MainLayout';
@@ -112,6 +113,10 @@ export default function CarrierPortal() {
                   <History className="h-4 w-4 mr-2" />
                   Job History
                 </TabsTrigger>
+                <TabsTrigger value="invoices">
+                  <Receipt className="h-4 w-4 mr-2" />
+                  Self-Invoices
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="documents" className="space-y-4">
@@ -120,6 +125,16 @@ export default function CarrierPortal() {
               
               <TabsContent value="jobs" className="space-y-4">
                 <CarrierJobHistory carrierId={carrier.id} />
+              </TabsContent>
+              
+              <TabsContent value="invoices" className="space-y-4">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="p-4 border rounded-md text-center">
+                      <p className="text-muted-foreground">Carrier self-invoices content will be displayed here</p>
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
             </Tabs>
           </div>

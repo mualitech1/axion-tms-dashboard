@@ -45,11 +45,12 @@ const CustomerDetailDialog = ({ customer, open, onOpenChange }: CustomerDetailDi
         </DialogHeader>
         
         <Tabs defaultValue="general" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-5 mb-4">
+          <TabsList className="grid grid-cols-6 mb-4">
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="contacts">Contacts</TabsTrigger>
             <TabsTrigger value="documents">Documents</TabsTrigger>
             <TabsTrigger value="rates">Rate Cards</TabsTrigger>
+            <TabsTrigger value="invoices">Invoices</TabsTrigger>
             <TabsTrigger value="history">Job History</TabsTrigger>
           </TabsList>
           
@@ -67,6 +68,12 @@ const CustomerDetailDialog = ({ customer, open, onOpenChange }: CustomerDetailDi
           
           <TabsContent value="rates" className="mt-0">
             <CustomerRateCards customer={customer} />
+          </TabsContent>
+          
+          <TabsContent value="invoices" className="mt-0">
+            <div className="p-4 border rounded-md text-center">
+              <p className="text-muted-foreground">Customer invoices content will be displayed here</p>
+            </div>
           </TabsContent>
           
           <TabsContent value="history" className="mt-0">
