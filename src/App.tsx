@@ -30,6 +30,7 @@ import CustomerPortalAccess from "./pages/customers/CustomerPortalAccess";
 
 // Pipeline specific pages
 import PipelineReports from "./pages/pipeline/PipelineReports";
+import PipelineSettings from "./pages/pipeline/PipelineSettings";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,7 @@ function App() {
             <Route path="/carriers/*" element={<Carriers />} />
             <Route path="/pipeline/*" element={<Pipeline />} />
             <Route path="/pipeline/reports" element={<PipelineReports />} />
+            <Route path="/pipeline/settings" element={<PipelineSettings />} />
             <Route path="/sales-pipeline/*" element={<Pipeline />} />
             <Route path="/users/*" element={<Users />} />
             <Route path="/analytics/*" element={<Analytics />} />
@@ -64,6 +66,7 @@ function App() {
             <Route path="/finance/carrier-self-invoices" element={<CarrierSelfInvoices />} />
             <Route path="/finance/disputes" element={<DisputeManagement />} />
             <Route path="/finance/payment-runs" element={<PaymentRuns />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
