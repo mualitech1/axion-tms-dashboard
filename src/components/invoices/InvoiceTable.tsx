@@ -1,10 +1,9 @@
-
 import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpDown, Calendar, Download, Eye, Edit, Trash2 } from "lucide-react";
-import { InvoiceData } from "./create-invoice-dialog/CreateInvoiceDialog";
+import { InvoiceData } from "./create-invoice-dialog/types";
 import { Switch } from "@/components/ui/switch";
 
 interface InvoiceTableProps {
@@ -112,8 +111,7 @@ export function InvoiceTable({
                         onCheckedChange={(checked) => 
                           onStatusChange(invoice.id, checked ? "paid" : "pending")
                         }
-                        size="sm"
-                        className="ml-2"
+                        className="ml-2 scale-75 origin-left"
                       />
                     )}
                   </div>
