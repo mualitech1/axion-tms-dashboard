@@ -8,7 +8,7 @@ import { InvoiceStatusTabs } from "@/components/invoices/InvoiceStatusTabs";
 import { InvoiceFilters } from "@/components/invoices/InvoiceFilters";
 import { InvoiceTable } from "@/components/invoices/InvoiceTable";
 import { CreateJobDialog } from "@/components/invoices/CreateJobDialog";
-import { CreateInvoiceDialog } from "@/components/invoices/CreateInvoiceDialog";
+import { CreateInvoiceDialog } from "@/components/invoices/create-invoice-dialog/CreateInvoiceDialog";
 import { invoices as mockInvoices } from "@/components/invoices/mockData";
 import { useToast } from "@/hooks/use-toast";
 
