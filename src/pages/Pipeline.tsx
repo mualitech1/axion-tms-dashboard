@@ -9,6 +9,7 @@ import PipelineReminders from './pipeline/PipelineReminders';
 import PipelineTasks from './pipeline/PipelineTasks';
 import { ReminderProvider } from './pipeline/context/ReminderContext';
 import AutoReminder from './pipeline/components/reminders/AutoReminder';
+import CreateLeadPage from './pipeline/components/leads/CreateLeadPage';
 import { toast } from '@/hooks/use-toast';
 
 export default function Pipeline() {
@@ -19,6 +20,7 @@ export default function Pipeline() {
         <Route path="/" element={<Navigate to="/sales-pipeline/dashboard" replace />} />
         <Route path="/dashboard" element={<PipelineDashboard />} />
         <Route path="/board" element={<PipelineBoard />} />
+        <Route path="/lead/new" element={<CreateLeadPage />} />
         <Route path="/lead/:id" element={<LeadDetails />} />
         <Route path="/reports" element={<PipelineReports />} />
         <Route path="/settings" element={<PipelineSettings />} />
