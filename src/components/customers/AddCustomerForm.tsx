@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -25,7 +25,10 @@ import {
   FileText,
   CheckCircle,
   X,
-  AlertCircle
+  AlertCircle,
+  ArrowRight,
+  ArrowLeft,
+  Save
 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
@@ -60,6 +63,7 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
   const [invoiceContact, setInvoiceContact] = useState<any>(null);
   const [operationsContact, setOperationsContact] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formCompletion, setFormCompletion] = useState(0);
   
   const { toast } = useToast();
   
@@ -80,24 +84,34 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
     },
   });
 
+  // Watch form fields for completion percentage calculation
+  const watchedFields = form.watch();
+  
   // Calculate form completion percentage
-  const calculateCompletionPercentage = () => {
-    let totalFields = 7; // Base required fields (name, street, city, postal, country, status, creditLimit)
-    let completedFields = 0;
-    
-    const values = form.getValues();
-    if (values.name) completedFields++;
-    if (values.address.street) completedFields++;
-    if (values.address.city) completedFields++;
-    if (values.address.postcode) completedFields++;
-    if (values.address.country) completedFields++;
-    if (values.status) completedFields++;
-    if (primaryContact) completedFields++; // Add 1 for primary contact
-    
-    return Math.round((completedFields / totalFields) * 100);
-  };
+  useEffect(() => {
+    const calculateCompletion = () => {
+      let totalFields = 7; // Base required fields (name, street, city, postal, country, status, creditLimit)
+      let completedFields = 0;
+      
+      const values = form.getValues();
+      if (values.name) completedFields++;
+      if (values.address.street) completedFields++;
+      if (values.address.city) completedFields++;
+      if (values.address.postcode) completedFields++;
+      if (values.address.country) completedFields++;
+      if (values.status) completedFields++;
+      if (primaryContact) completedFields++; // Add 1 for primary contact
+      
+      const percentage = Math.round((completedFields / totalFields) * 100);
+      return Math.min(percentage, 100); // Cap at 100%
+    };
 
-  const completion = calculateCompletionPercentage();
+    setFormCompletion(calculateCompletion());
+  }, [watchedFields, primaryContact, form]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
 
   const onSubmit = async (values: CustomerFormValues) => {
     // Validation check for required contacts
@@ -162,88 +176,125 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
     }
   };
 
-  return (
-    <div className="py-4">
-      {/* Progress indicator */}
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-1">
-          <span className="text-sm text-muted-foreground">Completion</span>
-          <span className="text-sm font-medium">{completion}%</span>
-        </div>
-        <Progress value={completion} className="h-2" />
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-3 mb-6">
-          <TabsTrigger value="general">
-            General Information
-            {form.formState.errors.name || 
+  const getTabIndicatorClass = (tabName: string) => {
+    // Return appropriate indicator based on tab validation status
+    if (tabName === 'general') {
+      return form.formState.errors.name || 
              form.formState.errors.address?.street ||
              form.formState.errors.address?.city ||
              form.formState.errors.address?.postcode ||
              form.formState.errors.address?.country ? 
-              <AlertCircle className="ml-2 h-4 w-4 text-destructive" /> : null}
+              <AlertCircle className="ml-2 h-4 w-4 text-destructive animate-pulse" /> : null;
+    }
+    if (tabName === 'contacts') {
+      return !primaryContact ? <AlertCircle className="ml-2 h-4 w-4 text-destructive animate-pulse" /> : null;
+    }
+    return null;
+  };
+
+  // Define color classes for the progress bar based on completion percentage
+  const getProgressColor = () => {
+    if (formCompletion < 30) return "bg-red-500";
+    if (formCompletion < 70) return "bg-amber-500"; 
+    return "bg-emerald-500";
+  };
+
+  return (
+    <div className="py-6 animate-fade-in">
+      {/* Progress indicator */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-medium text-muted-foreground">Completion</span>
+          <span className="text-sm font-bold text-primary">{formCompletion}%</span>
+        </div>
+        <Progress 
+          value={formCompletion} 
+          className="h-2 rounded-full bg-gray-100" 
+          indicatorClassName={getProgressColor()}
+        />
+      </div>
+
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+        <TabsList className="grid grid-cols-3 mb-8 rounded-lg bg-muted/50 p-1">
+          <TabsTrigger 
+            value="general" 
+            className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-md transition-all duration-200 flex items-center space-x-2"
+          >
+            <Building className="h-4 w-4" />
+            <span>Company Information</span>
+            {getTabIndicatorClass('general')}
           </TabsTrigger>
-          <TabsTrigger value="contacts">
-            Contact Details
-            {!primaryContact ? <AlertCircle className="ml-2 h-4 w-4 text-destructive" /> : null}
+          <TabsTrigger 
+            value="contacts"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-md transition-all duration-200 flex items-center space-x-2"
+          >
+            <User className="h-4 w-4" />
+            <span>Contact Details</span>
+            {getTabIndicatorClass('contacts')}
           </TabsTrigger>
-          <TabsTrigger value="terms">
-            Terms & Credit
+          <TabsTrigger 
+            value="terms"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-md transition-all duration-200 flex items-center space-x-2"
+          >
+            <FileText className="h-4 w-4" />
+            <span>Terms & Credit</span>
           </TabsTrigger>
         </TabsList>
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <TabsContent value="general" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Company Name</FormLabel>
-                      <FormControl>
-                        <InputWithIcon icon={Building} {...field} placeholder="Enter company name" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <TabsContent value="general" className="space-y-6 animate-fade-in">
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <h3 className="text-lg font-semibold mb-4 text-gray-800">Company Details</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-medium">Company Name</FormLabel>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
+                          <InputWithIcon icon={Building} {...field} placeholder="Enter company name" />
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Active">Active</SelectItem>
-                          <SelectItem value="On Hold">On Hold</SelectItem>
-                          <SelectItem value="Inactive">Inactive</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-medium">Status</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-white">
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Active">Active</SelectItem>
+                            <SelectItem value="On Hold">On Hold</SelectItem>
+                            <SelectItem value="Inactive">Inactive</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
               
-              <div>
-                <h3 className="text-md font-medium mb-2">Address Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <h3 className="text-lg font-semibold mb-4 text-gray-800">Address Details</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <FormField
                     control={form.control}
                     name="address.street"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Street Address</FormLabel>
+                        <FormLabel className="font-medium">Street Address</FormLabel>
                         <FormControl>
                           <Input {...field} placeholder="Enter street address" />
                         </FormControl>
@@ -257,7 +308,7 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                     name="address.city"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>City</FormLabel>
+                        <FormLabel className="font-medium">City</FormLabel>
                         <FormControl>
                           <Input {...field} placeholder="Enter city" />
                         </FormControl>
@@ -271,7 +322,7 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                     name="address.postcode"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Postcode</FormLabel>
+                        <FormLabel className="font-medium">Postcode</FormLabel>
                         <FormControl>
                           <Input {...field} placeholder="Enter postcode" />
                         </FormControl>
@@ -285,7 +336,7 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                     name="address.country"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Country</FormLabel>
+                        <FormLabel className="font-medium">Country</FormLabel>
                         <FormControl>
                           <Input {...field} placeholder="Enter country" />
                         </FormControl>
@@ -300,14 +351,13 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                 control={form.control}
                 name="notes"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Additional Notes</FormLabel>
+                  <FormItem className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <FormLabel className="font-medium text-gray-800">Additional Notes</FormLabel>
                     <FormControl>
                       <Textarea 
                         placeholder="Enter any additional notes about this customer" 
-                        className="resize-none" 
+                        className="resize-none min-h-[100px] bg-white" 
                         {...field}
-                        rows={3}
                       />
                     </FormControl>
                     <FormMessage />
@@ -316,67 +366,73 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
               />
             </TabsContent>
             
-            <TabsContent value="contacts" className="space-y-6">
-              <div className="space-y-6">
-                <div className="border border-gray-200 rounded-md p-4">
-                  <h3 className="text-md font-semibold mb-2 flex items-center">
-                    Primary Contact 
-                    <span className="text-red-500 ml-1">*</span>
-                    <span className="text-xs text-gray-500 ml-2 font-normal">(Required)</span>
-                  </h3>
-                  <ContactDetailsForm
-                    onSave={(contact) => setPrimaryContact(contact)}
-                    existingContact={primaryContact}
-                    contactType="primary"
-                  />
+            <TabsContent value="contacts" className="space-y-6 animate-fade-in">
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div className="flex items-center mb-4">
+                  <span className="bg-red-50 text-red-600 text-xs font-medium px-2.5 py-1 rounded-full border border-red-100 flex items-center">
+                    <span className="w-2 h-2 bg-red-600 rounded-full mr-1.5"></span>
+                    Required
+                  </span>
                 </div>
-                
-                <div className="border border-gray-200 rounded-md p-4">
-                  <h3 className="text-md font-semibold mb-2">Invoice Contact</h3>
-                  <ContactDetailsForm
-                    onSave={(contact) => setInvoiceContact(contact)}
-                    existingContact={invoiceContact}
-                    contactType="invoice"
-                  />
-                </div>
-                
-                <div className="border border-gray-200 rounded-md p-4">
-                  <h3 className="text-md font-semibold mb-2">Operations Contact</h3>
-                  <ContactDetailsForm
-                    onSave={(contact) => setOperationsContact(contact)}
-                    existingContact={operationsContact}
-                    contactType="operations"
-                  />
-                </div>
+                <h3 className="text-lg font-semibold mb-2 text-gray-800">Primary Contact</h3>
+                <p className="text-sm text-gray-500 mb-4">This contact will be the main point of contact for this customer</p>
+                <ContactDetailsForm
+                  onSave={(contact) => setPrimaryContact(contact)}
+                  existingContact={primaryContact}
+                  contactType="primary"
+                />
+              </div>
+              
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <h3 className="text-lg font-semibold mb-2 text-gray-800">Invoice Contact</h3>
+                <p className="text-sm text-gray-500 mb-4">This contact will receive invoices and payment requests</p>
+                <ContactDetailsForm
+                  onSave={(contact) => setInvoiceContact(contact)}
+                  existingContact={invoiceContact}
+                  contactType="invoice"
+                />
+              </div>
+              
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <h3 className="text-lg font-semibold mb-2 text-gray-800">Operations Contact</h3>
+                <p className="text-sm text-gray-500 mb-4">This contact will handle day-to-day operational matters</p>
+                <ContactDetailsForm
+                  onSave={(contact) => setOperationsContact(contact)}
+                  existingContact={operationsContact}
+                  contactType="operations"
+                />
               </div>
             </TabsContent>
             
-            <TabsContent value="terms" className="space-y-6">
-              <FormField
-                control={form.control}
-                name="creditLimit"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Credit Limit (£)</FormLabel>
-                    <FormControl>
-                      <InputWithIcon 
-                        icon={CreditCard} 
-                        type="number"
-                        {...field} 
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                        placeholder="Enter credit limit" 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <TabsContent value="terms" className="space-y-6 animate-fade-in">
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <h3 className="text-lg font-semibold mb-4 text-gray-800">Financial Details</h3>
+                <FormField
+                  control={form.control}
+                  name="creditLimit"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-medium">Credit Limit (£)</FormLabel>
+                      <FormControl>
+                        <InputWithIcon 
+                          icon={CreditCard} 
+                          type="number"
+                          {...field} 
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          placeholder="Enter credit limit" 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               
               <FormField
                 control={form.control}
                 name="acceptedTerms"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormItem className="flex flex-row items-start space-x-4 p-6 bg-white rounded-xl shadow-sm border border-gray-100">
                     <FormControl>
                       <div className="flex h-6 items-center space-x-2">
                         <input
@@ -386,35 +442,35 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                           className="h-5 w-5 rounded border-gray-300 text-tms-blue focus:ring-tms-blue"
                         />
                         {field.value ? (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <CheckCircle className="h-5 w-5 text-emerald-500" />
                         ) : (
-                          <X className="h-4 w-4 text-red-500" />
+                          <X className="h-5 w-5 text-red-500" />
                         )}
                       </div>
                     </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Terms & Conditions</FormLabel>
+                    <div className="space-y-1">
+                      <FormLabel className="text-base font-medium">Terms & Conditions</FormLabel>
                       <p className="text-sm text-muted-foreground">
-                        Customer has accepted the terms and conditions
+                        Customer has accepted the terms and conditions of service
                       </p>
                     </div>
                   </FormItem>
                 )}
               />
               
-              <div className="border rounded-md p-4">
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                 <div className="flex items-center mb-4">
                   <FileText className="h-5 w-5 mr-2 text-tms-blue" />
-                  <h3 className="text-md font-medium">Upload Terms & Agreements</h3>
+                  <h3 className="text-lg font-medium text-gray-800">Upload Terms & Agreements</h3>
                 </div>
                 <div className="flex items-center justify-center w-full">
-                  <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                  <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-36 border-2 border-gray-200 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <svg className="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <svg className="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                       </svg>
-                      <p className="mb-1 text-sm text-gray-500">Click to upload or drag and drop</p>
-                      <p className="text-xs text-gray-500">PDF, DOC, or DOCX (MAX. 10MB)</p>
+                      <p className="mb-2 text-sm text-gray-500">Click to upload or drag and drop</p>
+                      <p className="text-xs text-gray-400">PDF, DOC, or DOCX (MAX. 10MB)</p>
                     </div>
                     <input id="dropzone-file" type="file" className="hidden" />
                   </label>
@@ -423,7 +479,7 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
             </TabsContent>
             
             {/* Form action buttons that are always visible */}
-            <div className="flex justify-between pt-4 border-t">
+            <div className="flex justify-between pt-6 border-t border-gray-200">
               <div className="space-x-2">
                 <Button 
                   type="button" 
@@ -434,7 +490,9 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                     if (activeTab === "terms") setActiveTab("contacts");
                   }}
                   disabled={activeTab === "general"}
+                  className="transition-all duration-200 flex items-center gap-2"
                 >
+                  <ArrowLeft className="h-4 w-4" />
                   Previous
                 </Button>
                 
@@ -447,13 +505,32 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                   }}
                   disabled={activeTab === "terms"}
                   variant="secondary"
+                  className="transition-all duration-200 flex items-center gap-2 bg-gray-100 hover:bg-gray-200"
                 >
                   Next
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
               
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Creating..." : "Save Customer"}
+              <Button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="transition-all duration-200 flex items-center gap-2 bg-tms-blue hover:bg-tms-blue/90"
+              >
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4" />
+                    Save Customer
+                  </>
+                )}
               </Button>
             </div>
           </form>
