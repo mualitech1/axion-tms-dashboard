@@ -5,8 +5,25 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Shield, Key, Lock } from 'lucide-react';
+import TwoFactorSetup from '@/pages/users/components/TwoFactorSetup';
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SecuritySettings() {
+  const [require2FA, setRequire2FA] = useState(false);
+  const { toast } = useToast();
+  
+  const handleRequire2FAChange = (checked: boolean) => {
+    setRequire2FA(checked);
+    
+    toast({
+      title: checked ? "2FA Requirement Enabled" : "2FA Requirement Disabled",
+      description: checked 
+        ? "Two-factor authentication is now required for all users." 
+        : "Two-factor authentication requirement has been disabled.",
+    });
+  };
+  
   return (
     <div className="space-y-6">
       <div className="space-y-1">
@@ -43,6 +60,7 @@ export default function SecuritySettings() {
         </Button>
       </div>
       
+      {/* Two-Factor Authentication Section */}
       <div className="pt-4 border-t border-tms-gray-200">
         <div className="space-y-1 mb-4">
           <h3 className="text-lg font-medium text-tms-gray-800">Two-Factor Authentication</h3>
@@ -55,10 +73,17 @@ export default function SecuritySettings() {
               <Label htmlFor="require-2fa" className="mb-1 block">Require 2FA</Label>
               <p className="text-sm text-tms-gray-500">Require two-factor authentication for all users</p>
             </div>
-            <Switch id="require-2fa" />
+            <Switch 
+              id="require-2fa" 
+              checked={require2FA}
+              onCheckedChange={handleRequire2FAChange}
+            />
           </div>
           
-          <div className="space-y-2">
+          {/* Setup or manage your own 2FA */}
+          <TwoFactorSetup />
+          
+          <div className="space-y-2 mt-4">
             <Label htmlFor="2fa-method">Default 2FA Method</Label>
             <Select defaultValue="app">
               <SelectTrigger id="2fa-method">

@@ -6,14 +6,15 @@ import RolePermissionsTable from './RolePermissionsTable';
 import CreateUserDialog from './CreateUserDialog';
 import { User } from '../types';
 import { Button } from '@/components/ui/button';
-import { UserPlus } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { UserPlus, Shield } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface UserContentSectionProps {
   userData: User[];
+  onManage2FA?: (userId: string) => void;
 }
 
-export default function UserContentSection({ userData: initialUserData }: UserContentSectionProps) {
+export default function UserContentSection({ userData: initialUserData, onManage2FA }: UserContentSectionProps) {
   const [userData, setUserData] = useState<User[]>(initialUserData);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<string[]>([]);
@@ -81,10 +82,21 @@ export default function UserContentSection({ userData: initialUserData }: UserCo
     <>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-tms-gray-800">Users</h2>
-        <Button onClick={() => setCreateDialogOpen(true)}>
-          <UserPlus className="mr-2 h-4 w-4" />
-          Add User
-        </Button>
+        <div className="flex space-x-2">
+          <Button variant="outline" onClick={() => {
+            toast({
+              title: "Security Audit",
+              description: "Security audit has been initiated. Results will be available soon.",
+            });
+          }}>
+            <Shield className="mr-2 h-4 w-4" />
+            Security Audit
+          </Button>
+          <Button onClick={() => setCreateDialogOpen(true)}>
+            <UserPlus className="mr-2 h-4 w-4" />
+            Add User
+          </Button>
+        </div>
       </div>
       
       <UserTable 
@@ -93,6 +105,7 @@ export default function UserContentSection({ userData: initialUserData }: UserCo
         onSearchChange={setSearchTerm}
         onEditUser={handleEditUser}
         onToggleUserStatus={handleToggleUserStatus}
+        onManage2FA={onManage2FA}
         roleFilter={roleFilter}
         onRoleFilterChange={setRoleFilter}
         statusFilter={statusFilter}
