@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import { User } from '../types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -96,8 +95,10 @@ export default function UserTable({
         } else if (sortField === 'role') {
           comparison = a.role.localeCompare(b.role);
         } else if (sortField === 'lastLogin') {
-          const dateA = a.lastLogin ? new Date(a.lastLogin).getTime() : 0;
-          const dateB = b.lastLogin ? new Date(b.lastLogin).getTime() : 0;
+          const dateA = a.lastLogin ? new Date(a.lastLogin).getTime() : 
+                       (a.lastActive ? new Date(a.lastActive).getTime() : 0);
+          const dateB = b.lastLogin ? new Date(b.lastLogin).getTime() : 
+                       (b.lastActive ? new Date(b.lastActive).getTime() : 0);
           comparison = dateA - dateB;
         } else if (sortField === 'status') {
           comparison = a.status.localeCompare(b.status);
@@ -252,7 +253,7 @@ export default function UserTable({
                       {user.role}
                     </Badge>
                   </TableCell>
-                  <TableCell>{user.lastLogin}</TableCell>
+                  <TableCell>{user.lastLogin || user.lastActive}</TableCell>
                   <TableCell>
                     <div className="flex items-center">
                       <Switch 
@@ -286,7 +287,7 @@ export default function UserTable({
                           <Edit2 className="mr-2 h-4 w-4" /> Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => {
-                          if (onManage2FA) onManage2FA(user.id);
+                          if (onManage2FA) onManage2FA(user.id.toString());
                         }}>
                           <Shield className="mr-2 h-4 w-4" /> Manage 2FA
                         </DropdownMenuItem>

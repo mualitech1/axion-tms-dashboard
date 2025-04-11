@@ -7,6 +7,7 @@ export interface User {
   department: string;
   status: string;
   lastActive: string;
+  lastLogin?: string; // Added lastLogin property as optional
 }
 
 export interface UserLog {
