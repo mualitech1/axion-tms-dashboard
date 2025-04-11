@@ -1,9 +1,22 @@
 
-import { UserPlus, Settings, Shield } from 'lucide-react';
+import { UserPlus, Settings, Shield, Download, Upload, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-export default function UserPageHeader() {
+interface UserPageHeaderProps {
+  onCreateUserClick: () => void;
+}
+
+export default function UserPageHeader({ onCreateUserClick }: UserPageHeaderProps) {
   return (
     <div className="mb-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
@@ -12,10 +25,40 @@ export default function UserPageHeader() {
           <p className="text-tms-gray-600">Manage system users and permissions</p>
         </div>
         
-        <Button className="bg-tms-blue hover:bg-tms-blue/90">
-          <UserPlus className="h-4 w-4 mr-2" />
-          Add User
-        </Button>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <Filter className="h-4 w-4 mr-2" />
+                Actions
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel>User Management</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem>
+                  <Download className="h-4 w-4 mr-2" />
+                  <span>Export Users</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Upload className="h-4 w-4 mr-2" />
+                  <span>Import Users</span>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Settings className="h-4 w-4 mr-2" />
+                <span>User Settings</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
+          <Button className="bg-tms-blue hover:bg-tms-blue/90" onClick={onCreateUserClick}>
+            <UserPlus className="h-4 w-4 mr-2" />
+            Add User
+          </Button>
+        </div>
       </div>
       
       <div className="flex items-center justify-between">

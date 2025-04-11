@@ -1,5 +1,6 @@
 
-import { Search, Filter, MoreHorizontal, FileText, Activity } from 'lucide-react';
+import { useState } from 'react';
+import { Search, Filter, MoreHorizontal, FileText, Activity, UserCog, UserMinus, UserPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { 
   Table, TableBody, TableCell, TableHead, 
@@ -14,38 +15,73 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { User } from '../types';
+import UserTableFilters from './UserTableFilters';
+import { useToast } from '@/components/ui/use-toast';
 
 interface UserTableProps {
   users: User[];
   searchTerm: string;
   onSearchChange: (value: string) => void;
+  onEditUser: (user: User) => void;
+  onToggleUserStatus: (user: User) => void;
+  roleFilter: string[];
+  onRoleFilterChange: (roles: string[]) => void;
+  statusFilter: string[];
+  onStatusFilterChange: (statuses: string[]) => void;
 }
 
-export default function UserTable({ users, searchTerm, onSearchChange }: UserTableProps) {
+export default function UserTable({ 
+  users, 
+  searchTerm, 
+  onSearchChange,
+  onEditUser,
+  onToggleUserStatus,
+  roleFilter,
+  onRoleFilterChange,
+  statusFilter,
+  onStatusFilterChange
+}: UserTableProps) {
+  const { toast } = useToast();
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('');
+  };
+  
+  const handleToggleStatus = (user: User) => {
+    onToggleUserStatus(user);
+    
+    toast({
+      title: `User ${user.status === 'Active' ? 'Deactivated' : 'Activated'}`,
+      description: `${user.name} has been ${user.status === 'Active' ? 'deactivated' : 'activated'}.`,
+      variant: user.status === 'Active' ? 'destructive' : 'default',
+    });
+  };
+
+  // Filter users based on search term and filters
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = searchTerm === '' || 
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesRole = roleFilter.length === 0 || roleFilter.includes(user.role);
+    const matchesStatus = statusFilter.length === 0 || statusFilter.includes(user.status);
+    
+    return matchesSearch && matchesRole && matchesStatus;
+  });
+  
   return (
     <div className="bg-white rounded-lg shadow-card mb-6">
-      <div className="p-4 border-b border-tms-gray-200">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="relative w-full sm:w-96">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-tms-gray-500" />
-            <Input
-              placeholder="Search users..."
-              className="pl-10 w-full"
-              value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
-            />
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="h-9">
-              <Filter className="h-4 w-4 mr-2" />
-              Filter
-            </Button>
-          </div>
-        </div>
-      </div>
+      <UserTableFilters
+        searchTerm={searchTerm}
+        onSearchChange={onSearchChange}
+        roleFilter={roleFilter}
+        onRoleFilterChange={onRoleFilterChange}
+        statusFilter={statusFilter}
+        onStatusFilterChange={onStatusFilterChange}
+      />
       
       <div className="overflow-x-auto">
         <Table>
@@ -55,19 +91,19 @@ export default function UserTable({ users, searchTerm, onSearchChange }: UserTab
               <TableHead>Role & Department</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Last Active</TableHead>
-              <TableHead className="w-[120px]">Actions</TableHead>
+              <TableHead className="w-[120px] text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.length > 0 ? (
-              users.map((user) => (
+            {filteredUsers.length > 0 ? (
+              filteredUsers.map((user) => (
                 <TableRow key={user.id} className="hover:bg-tms-gray-100">
                   <TableCell>
                     <div className="flex items-center">
                       <Avatar className="h-9 w-9 mr-3">
                         <AvatarImage src={`https://avatars.dicebear.com/api/initials/${user.name.replace(/\s+/g, '-')}.svg`} alt={user.name} />
                         <AvatarFallback className="bg-tms-blue-light text-tms-blue">
-                          {user.name.split(' ').map(n => n[0]).join('')}
+                          {getInitials(user.name)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
@@ -102,10 +138,10 @@ export default function UserTable({ users, searchTerm, onSearchChange }: UserTab
                     })}
                   </TableCell>
                   <TableCell>
-                    <div className="flex space-x-2">
+                    <div className="flex justify-end space-x-2">
                       <Button asChild variant="outline" size="icon" className="h-8 w-8">
                         <Link to={`/users/details/${user.id}`}>
-                          <FileText className="h-4 w-4" />
+                          <UserCog className="h-4 w-4" />
                         </Link>
                       </Button>
                       <Button asChild variant="outline" size="icon" className="h-8 w-8">
@@ -120,16 +156,20 @@ export default function UserTable({ users, searchTerm, onSearchChange }: UserTab
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>Edit User</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onEditUser(user)}>
+                            Edit User
+                          </DropdownMenuItem>
                           <DropdownMenuItem asChild>
                             <Link to={`/users/logs/${user.id}`}>View Activity Log</Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem>Reset Password</DropdownMenuItem>
-                          {user.status === 'Active' ? (
-                            <DropdownMenuItem className="text-tms-red">Deactivate User</DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem className="text-tms-green">Activate User</DropdownMenuItem>
-                          )}
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            onClick={() => handleToggleStatus(user)}
+                            className={user.status === 'Active' ? 'text-red-600 hover:text-red-700' : 'text-green-600 hover:text-green-700'}
+                          >
+                            {user.status === 'Active' ? 'Deactivate User' : 'Activate User'}
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
