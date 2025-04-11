@@ -1,136 +1,194 @@
 
-import { Input } from '@/components/ui/input';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Card, CardContent } from '@/components/ui/card';
-import { Building, Globe, LayoutGrid } from 'lucide-react';
+import { 
+  Building, 
+  Phone, 
+  Mail, 
+  Globe, 
+  Moon, 
+  Sun, 
+  Languages, 
+  UserCog 
+} from 'lucide-react';
 
 export default function GeneralSettings() {
-  return (
-    <div className="space-y-8 max-w-4xl mx-auto">
-      <SettingsSection 
-        icon={Building}
-        title="Company Information" 
-        description="Update your company details"
-        className="bg-gradient-to-br from-white to-tms-blue/5"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2.5">
-            <Label htmlFor="company-name" className="text-muted-foreground">Company Name</Label>
-            <Input id="company-name" defaultValue="IKB Transport" className="border-tms-gray-300 focus:border-tms-blue transition-colors" />
-          </div>
-          
-          <div className="space-y-2.5">
-            <Label htmlFor="phone" className="text-muted-foreground">Phone Number</Label>
-            <Input id="phone" defaultValue="+44 20 1234 5678" className="border-tms-gray-300 focus:border-tms-blue transition-colors" />
-          </div>
-          
-          <div className="space-y-2.5">
-            <Label htmlFor="email" className="text-muted-foreground">Email Address</Label>
-            <Input id="email" defaultValue="info@ikbtransport.com" className="border-tms-gray-300 focus:border-tms-blue transition-colors" />
-          </div>
-          
-          <div className="space-y-2.5">
-            <Label htmlFor="website" className="text-muted-foreground">Website</Label>
-            <Input id="website" defaultValue="https://ikbtransport.com" className="border-tms-gray-300 focus:border-tms-blue transition-colors" />
-          </div>
-        </div>
-      </SettingsSection>
-      
-      <SettingsSection 
-        icon={Globe}
-        title="Regional Settings" 
-        description="Configure location preferences"
-        className="bg-gradient-to-br from-white to-tms-green-light/30"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2.5">
-            <Label htmlFor="timezone" className="text-muted-foreground">Timezone</Label>
-            <Select defaultValue="europe-london">
-              <SelectTrigger id="timezone" className="bg-white border-tms-gray-300 focus:border-tms-blue transition-colors">
-                <SelectValue placeholder="Select timezone" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="europe-london">Europe/London (GMT+00:00)</SelectItem>
-                <SelectItem value="europe-paris">Europe/Paris (GMT+01:00)</SelectItem>
-                <SelectItem value="america-newyork">America/New York (GMT-05:00)</SelectItem>
-                <SelectItem value="asia-tokyo">Asia/Tokyo (GMT+09:00)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2.5">
-            <Label htmlFor="currency" className="text-muted-foreground">Currency</Label>
-            <Select defaultValue="gbp">
-              <SelectTrigger id="currency" className="bg-white border-tms-gray-300 focus:border-tms-blue transition-colors">
-                <SelectValue placeholder="Select currency" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="gbp">British Pound (£)</SelectItem>
-                <SelectItem value="eur">Euro (€)</SelectItem>
-                <SelectItem value="usd">US Dollar ($)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </SettingsSection>
-      
-      <SettingsSection 
-        icon={LayoutGrid}
-        title="System Preferences" 
-        description="Adjust system behavior"
-        className="bg-gradient-to-br from-white to-tms-yellow-light/30"
-      >
-        <div className="space-y-6">
-          <div className="flex items-center justify-between p-4 rounded-lg bg-white border border-tms-gray-200 shadow-sm hover:border-tms-gray-300 transition-colors">
-            <div>
-              <Label htmlFor="auto-refresh" className="text-sm font-medium mb-1 block">Automatic Data Refresh</Label>
-              <p className="text-sm text-muted-foreground">Automatically refresh data every 5 minutes</p>
-            </div>
-            <Switch id="auto-refresh" className="data-[state=checked]:bg-tms-blue data-[state=checked]:border-tms-blue" defaultChecked />
-          </div>
-          
-          <div className="flex items-center justify-between p-4 rounded-lg bg-white border border-tms-gray-200 shadow-sm hover:border-tms-gray-300 transition-colors">
-            <div>
-              <Label htmlFor="show-notifications" className="text-sm font-medium mb-1 block">Desktop Notifications</Label>
-              <p className="text-sm text-muted-foreground">Show desktop notifications for important events</p>
-            </div>
-            <Switch id="show-notifications" className="data-[state=checked]:bg-tms-blue data-[state=checked]:border-tms-blue" defaultChecked />
-          </div>
-          
-          <div className="flex items-center justify-between p-4 rounded-lg bg-white border border-tms-gray-200 shadow-sm hover:border-tms-gray-300 transition-colors">
-            <div>
-              <Label htmlFor="compact-view" className="text-sm font-medium mb-1 block">Compact View</Label>
-              <p className="text-sm text-muted-foreground">Display more information in a compact layout</p>
-            </div>
-            <Switch id="compact-view" className="data-[state=checked]:bg-tms-blue data-[state=checked]:border-tms-blue" />
-          </div>
-        </div>
-      </SettingsSection>
-    </div>
-  );
-}
+  const [theme, setTheme] = useState("system");
+  
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i: number) => ({ 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        delay: i * 0.15,
+        duration: 0.5
+      } 
+    })
+  };
 
-function SettingsSection({ 
-  title, 
-  description, 
-  children, 
-  icon: Icon,
-  className = ""
-}) {
   return (
-    <Card className={`overflow-hidden transition-all hover:shadow-md ${className}`}>
-      <div className="px-6 py-4 flex gap-3 items-center border-b border-tms-gray-200">
-        <div className="p-2 rounded-full bg-white shadow-sm">
-          {Icon && <Icon className="w-5 h-5 text-tms-blue" />}
+    <div className="space-y-8 text-gray-300">
+      <motion.div 
+        custom={0}
+        initial="hidden"
+        animate="visible"
+        variants={cardVariants}
+        className="space-y-2"
+      >
+        <div className="flex items-center space-x-2">
+          <Building className="h-5 w-5 text-[#1EAEDB]" />
+          <h3 className="text-lg font-medium text-white">Organization</h3>
         </div>
-        <div>
-          <h3 className="text-lg font-medium text-tms-gray-800">{title}</h3>
-          <p className="text-sm text-tms-gray-600">{description}</p>
+        <p className="text-sm text-gray-400 mb-4">Update your organization details</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="company-name">Company Name</Label>
+            <div className="relative">
+              <Input 
+                id="company-name" 
+                defaultValue="Aximo Logistics" 
+                className="bg-[#111827]/50 border-[#1EAEDB]/20 text-white placeholder:text-gray-500 focus:ring-[#1EAEDB]/50 focus:border-[#1EAEDB]/50"
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="company-phone">Phone</Label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+              <Input 
+                id="company-phone" 
+                defaultValue="+1 (555) 123-4567" 
+                className="pl-10 bg-[#111827]/50 border-[#1EAEDB]/20 text-white placeholder:text-gray-500 focus:ring-[#1EAEDB]/50 focus:border-[#1EAEDB]/50"
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="company-email">Email</Label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+              <Input 
+                id="company-email" 
+                defaultValue="contact@aximo.ai" 
+                className="pl-10 bg-[#111827]/50 border-[#1EAEDB]/20 text-white placeholder:text-gray-500 focus:ring-[#1EAEDB]/50 focus:border-[#1EAEDB]/50"
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="company-website">Website</Label>
+            <div className="relative">
+              <Globe className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+              <Input 
+                id="company-website" 
+                defaultValue="https://aximo.ai" 
+                className="pl-10 bg-[#111827]/50 border-[#1EAEDB]/20 text-white placeholder:text-gray-500 focus:ring-[#1EAEDB]/50 focus:border-[#1EAEDB]/50"
+              />
+            </div>
+          </div>
         </div>
-      </div>
-      <CardContent className="p-6">{children}</CardContent>
-    </Card>
+      </motion.div>
+      
+      <motion.div 
+        custom={1}
+        initial="hidden"
+        animate="visible"
+        variants={cardVariants}
+        className="space-y-4 pt-4 border-t border-[#1EAEDB]/10"
+      >
+        <div className="flex items-center space-x-2">
+          <UserCog className="h-5 w-5 text-[#1EAEDB]" />
+          <h3 className="text-lg font-medium text-white">Preferences</h3>
+        </div>
+        <p className="text-sm text-gray-400 mb-4">Customize your application experience</p>
+        
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="theme" className="text-white">Theme</Label>
+              <p className="text-xs text-gray-400">Select your preferred appearance</p>
+            </div>
+            <Select defaultValue={theme} onValueChange={setTheme}>
+              <SelectTrigger className="w-[180px] bg-[#111827]/50 border-[#1EAEDB]/20 text-white">
+                <SelectValue placeholder="Select theme" />
+              </SelectTrigger>
+              <SelectContent className="bg-[#1A1F2C] border-[#1EAEDB]/20 text-white">
+                <SelectItem value="light" className="focus:bg-[#1EAEDB]/20 focus:text-white">
+                  <div className="flex items-center">
+                    <Sun className="h-4 w-4 mr-2" />
+                    Light
+                  </div>
+                </SelectItem>
+                <SelectItem value="dark" className="focus:bg-[#1EAEDB]/20 focus:text-white">
+                  <div className="flex items-center">
+                    <Moon className="h-4 w-4 mr-2" />
+                    Dark
+                  </div>
+                </SelectItem>
+                <SelectItem value="system" className="focus:bg-[#1EAEDB]/20 focus:text-white">
+                  <div className="flex items-center">
+                    <div className="flex h-4 w-4 items-center justify-center mr-2">
+                      <Sun className="h-3 w-3 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                      <Moon className="absolute h-3 w-3 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                    </div>
+                    System
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="language" className="text-white">Language</Label>
+              <p className="text-xs text-gray-400">Choose your preferred language</p>
+            </div>
+            <Select defaultValue="en">
+              <SelectTrigger className="w-[180px] bg-[#111827]/50 border-[#1EAEDB]/20 text-white">
+                <SelectValue placeholder="Select language" />
+              </SelectTrigger>
+              <SelectContent className="bg-[#1A1F2C] border-[#1EAEDB]/20 text-white">
+                <SelectItem value="en" className="focus:bg-[#1EAEDB]/20 focus:text-white">English</SelectItem>
+                <SelectItem value="fr" className="focus:bg-[#1EAEDB]/20 focus:text-white">French</SelectItem>
+                <SelectItem value="de" className="focus:bg-[#1EAEDB]/20 focus:text-white">German</SelectItem>
+                <SelectItem value="es" className="focus:bg-[#1EAEDB]/20 focus:text-white">Spanish</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-white">Animations</Label>
+              <p className="text-xs text-gray-400">Enable UI animations and transitions</p>
+            </div>
+            <Switch defaultChecked className="data-[state=checked]:bg-[#1EAEDB]" />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-white">Analytics</Label>
+              <p className="text-xs text-gray-400">Allow collection of anonymous usage data</p>
+            </div>
+            <Switch defaultChecked className="data-[state=checked]:bg-[#1EAEDB]" />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-white">AI Recommendations</Label>
+              <p className="text-xs text-gray-400">Receive AI-powered suggestions based on usage</p>
+            </div>
+            <Switch defaultChecked className="data-[state=checked]:bg-[#1EAEDB]" />
+          </div>
+        </div>
+      </motion.div>
+    </div>
   );
 }
