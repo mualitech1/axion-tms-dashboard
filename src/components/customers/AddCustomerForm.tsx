@@ -28,13 +28,17 @@ import {
   AlertCircle,
   ArrowRight,
   ArrowLeft,
-  Save
+  Save,
+  Map,
+  Briefcase,
+  ChevronsRight
 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import ContactDetailsForm from './ContactDetailsForm';
 import { Customer } from '@/types/customer';
 import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 
 const customerSchema = z.object({
   name: z.string().min(2, { message: 'Company name is required' }),
@@ -201,24 +205,36 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
 
   return (
     <div className="py-6 animate-fade-in">
-      {/* Progress indicator */}
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-muted-foreground">Completion</span>
-          <span className="text-sm font-bold text-primary">{formCompletion}%</span>
+      {/* Header with completion status */}
+      <div className="mb-6">
+        <div className="flex flex-col space-y-2">
+          <h2 className="text-2xl font-bold tracking-tight">Add New Customer</h2>
+          <p className="text-muted-foreground">
+            Fill in the details to create a new customer record
+          </p>
         </div>
-        <Progress 
-          value={formCompletion} 
-          className="h-2 rounded-full bg-gray-100" 
-          indicatorClassName={getProgressColor()}
-        />
+        <div className="mt-4">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium">Completion</span>
+            <span className="text-sm font-bold text-primary">{formCompletion}%</span>
+          </div>
+          <Progress 
+            value={formCompletion} 
+            className="h-2 rounded-full bg-gray-100" 
+            indicatorClassName={getProgressColor()}
+          />
+        </div>
       </div>
 
+      {/* Main form with enhanced tabs */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid grid-cols-3 mb-8 rounded-lg bg-muted/50 p-1">
+        <TabsList className="grid grid-cols-3 mb-8 p-1 bg-muted/50 rounded-xl">
           <TabsTrigger 
             value="general" 
-            className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-md transition-all duration-200 flex items-center space-x-2"
+            className={cn(
+              "data-[state=active]:bg-white data-[state=active]:shadow-lg rounded-lg py-3 transition-all duration-300",
+              "flex items-center gap-2"
+            )}
           >
             <Building className="h-4 w-4" />
             <span>Company Information</span>
@@ -226,7 +242,10 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
           </TabsTrigger>
           <TabsTrigger 
             value="contacts"
-            className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-md transition-all duration-200 flex items-center space-x-2"
+            className={cn(
+              "data-[state=active]:bg-white data-[state=active]:shadow-lg rounded-lg py-3 transition-all duration-300",
+              "flex items-center gap-2"
+            )}
           >
             <User className="h-4 w-4" />
             <span>Contact Details</span>
@@ -234,7 +253,10 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
           </TabsTrigger>
           <TabsTrigger 
             value="terms"
-            className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-md transition-all duration-200 flex items-center space-x-2"
+            className={cn(
+              "data-[state=active]:bg-white data-[state=active]:shadow-lg rounded-lg py-3 transition-all duration-300",
+              "flex items-center gap-2"
+            )}
           >
             <FileText className="h-4 w-4" />
             <span>Terms & Credit</span>
@@ -244,9 +266,12 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <TabsContent value="general" className="space-y-6 animate-fade-in">
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 className="text-lg font-semibold mb-4 text-gray-800">Company Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                <div className="flex items-center mb-4 gap-2">
+                  <Briefcase className="h-5 w-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-gray-800">Company Details</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
                     name="name"
@@ -286,9 +311,12 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                 </div>
               </div>
               
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 className="text-lg font-semibold mb-4 text-gray-800">Address Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                <div className="flex items-center mb-4 gap-2">
+                  <Map className="h-5 w-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-gray-800">Address Details</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
                     name="address.street"
@@ -296,7 +324,7 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                       <FormItem>
                         <FormLabel className="font-medium">Street Address</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Enter street address" />
+                          <Input {...field} placeholder="Enter street address" className="bg-white" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -310,7 +338,7 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                       <FormItem>
                         <FormLabel className="font-medium">City</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Enter city" />
+                          <Input {...field} placeholder="Enter city" className="bg-white" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -324,7 +352,7 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                       <FormItem>
                         <FormLabel className="font-medium">Postcode</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Enter postcode" />
+                          <Input {...field} placeholder="Enter postcode" className="bg-white" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -338,7 +366,7 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                       <FormItem>
                         <FormLabel className="font-medium">Country</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Enter country" />
+                          <Input {...field} placeholder="Enter country" className="bg-white" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -351,12 +379,12 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                 control={form.control}
                 name="notes"
                 render={({ field }) => (
-                  <FormItem className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                  <FormItem className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
                     <FormLabel className="font-medium text-gray-800">Additional Notes</FormLabel>
                     <FormControl>
                       <Textarea 
                         placeholder="Enter any additional notes about this customer" 
-                        className="resize-none min-h-[100px] bg-white" 
+                        className="resize-none min-h-[120px] bg-white border border-gray-200" 
                         {...field}
                       />
                     </FormControl>
@@ -364,17 +392,32 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                   </FormItem>
                 )}
               />
+
+              <div className="mt-4 flex justify-between">
+                <div></div> {/* Empty div for spacing */}
+                <Button 
+                  type="button" 
+                  onClick={() => setActiveTab("contacts")}
+                  className="bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 flex items-center gap-2"
+                >
+                  Continue to Contacts 
+                  <ChevronsRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
             </TabsContent>
             
             <TabsContent value="contacts" className="space-y-6 animate-fade-in">
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <div className="flex items-center mb-4">
+              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <User className="h-5 w-5 text-blue-600" />
+                    <h3 className="text-lg font-semibold text-gray-800">Primary Contact</h3>
+                  </div>
                   <span className="bg-red-50 text-red-600 text-xs font-medium px-2.5 py-1 rounded-full border border-red-100 flex items-center">
                     <span className="w-2 h-2 bg-red-600 rounded-full mr-1.5"></span>
                     Required
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-gray-800">Primary Contact</h3>
                 <p className="text-sm text-gray-500 mb-4">This contact will be the main point of contact for this customer</p>
                 <ContactDetailsForm
                   onSave={(contact) => setPrimaryContact(contact)}
@@ -383,8 +426,11 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                 />
               </div>
               
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 className="text-lg font-semibold mb-2 text-gray-800">Invoice Contact</h3>
+              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                <div className="flex items-center gap-2 mb-4">
+                  <Mail className="h-5 w-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold mb-0">Invoice Contact</h3>
+                </div>
                 <p className="text-sm text-gray-500 mb-4">This contact will receive invoices and payment requests</p>
                 <ContactDetailsForm
                   onSave={(contact) => setInvoiceContact(contact)}
@@ -393,8 +439,11 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                 />
               </div>
               
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 className="text-lg font-semibold mb-2 text-gray-800">Operations Contact</h3>
+              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                <div className="flex items-center gap-2 mb-4">
+                  <Phone className="h-5 w-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold mb-0">Operations Contact</h3>
+                </div>
                 <p className="text-sm text-gray-500 mb-4">This contact will handle day-to-day operational matters</p>
                 <ContactDetailsForm
                   onSave={(contact) => setOperationsContact(contact)}
@@ -402,11 +451,35 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                   contactType="operations"
                 />
               </div>
+
+              <div className="mt-4 flex justify-between">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setActiveTab("general")}
+                  className="flex items-center gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Company Info
+                </Button>
+                
+                <Button 
+                  type="button" 
+                  onClick={() => setActiveTab("terms")}
+                  className="bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 flex items-center gap-2"
+                >
+                  Continue to Terms
+                  <ChevronsRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
             </TabsContent>
             
             <TabsContent value="terms" className="space-y-6 animate-fade-in">
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 className="text-lg font-semibold mb-4 text-gray-800">Financial Details</h3>
+              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                <div className="flex items-center gap-2 mb-4">
+                  <CreditCard className="h-5 w-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-gray-800">Financial Details</h3>
+                </div>
                 <FormField
                   control={form.control}
                   name="creditLimit"
@@ -432,14 +505,14 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                 control={form.control}
                 name="acceptedTerms"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-4 p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+                  <FormItem className="flex flex-row items-start space-x-4 p-6 bg-white rounded-xl shadow-md border border-gray-100">
                     <FormControl>
                       <div className="flex h-6 items-center space-x-2">
                         <input
                           type="checkbox"
                           checked={field.value}
                           onChange={field.onChange}
-                          className="h-5 w-5 rounded border-gray-300 text-tms-blue focus:ring-tms-blue"
+                          className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
                         />
                         {field.value ? (
                           <CheckCircle className="h-5 w-5 text-emerald-500" />
@@ -458,13 +531,13 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                 )}
               />
               
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <div className="flex items-center mb-4">
-                  <FileText className="h-5 w-5 mr-2 text-tms-blue" />
+              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                <div className="flex items-center gap-2 mb-4">
+                  <FileText className="h-5 w-5 text-blue-600" />
                   <h3 className="text-lg font-medium text-gray-800">Upload Terms & Agreements</h3>
                 </div>
                 <div className="flex items-center justify-center w-full">
-                  <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-36 border-2 border-gray-200 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                  <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-36 border-2 border-gray-200 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <svg className="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
@@ -476,63 +549,40 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                   </label>
                 </div>
               </div>
-            </TabsContent>
-            
-            {/* Form action buttons that are always visible */}
-            <div className="flex justify-between pt-6 border-t border-gray-200">
-              <div className="space-x-2">
+
+              <div className="mt-4 flex justify-between">
                 <Button 
                   type="button" 
                   variant="outline" 
-                  onClick={() => {
-                    if (activeTab === "general") return;
-                    if (activeTab === "contacts") setActiveTab("general");
-                    if (activeTab === "terms") setActiveTab("contacts");
-                  }}
-                  disabled={activeTab === "general"}
-                  className="transition-all duration-200 flex items-center gap-2"
+                  onClick={() => setActiveTab("contacts")}
+                  className="flex items-center gap-2"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  Previous
+                  Back to Contacts
                 </Button>
                 
                 <Button 
-                  type="button" 
-                  onClick={() => {
-                    if (activeTab === "terms") return;
-                    if (activeTab === "general") setActiveTab("contacts");
-                    if (activeTab === "contacts") setActiveTab("terms");
-                  }}
-                  disabled={activeTab === "terms"}
-                  variant="secondary"
-                  className="transition-all duration-200 flex items-center gap-2 bg-gray-100 hover:bg-gray-200"
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 flex items-center gap-2"
                 >
-                  Next
-                  <ArrowRight className="h-4 w-4" />
+                  {isSubmitting ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Creating Customer...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4" />
+                      Save Customer
+                    </>
+                  )}
                 </Button>
               </div>
-              
-              <Button 
-                type="submit" 
-                disabled={isSubmitting}
-                className="transition-all duration-200 flex items-center gap-2 bg-tms-blue hover:bg-tms-blue/90"
-              >
-                {isSubmitting ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Creating...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4" />
-                    Save Customer
-                  </>
-                )}
-              </Button>
-            </div>
+            </TabsContent>
           </form>
         </Form>
       </Tabs>
