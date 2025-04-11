@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   ArrowLeft, FileText, LayoutDashboard, Users, 
-  Receipt, Clock, ExternalLink, Bell, FileInvoice
+  Receipt, Clock, ExternalLink, Bell
 } from 'lucide-react';
 import CustomerGeneralInfo from '@/components/customers/CustomerGeneralInfo';
 import CustomerContacts from '@/components/customers/CustomerContacts';
@@ -130,7 +129,7 @@ export default function CustomerDetails() {
                 Rate Cards
               </TabsTrigger>
               <TabsTrigger value="invoices" className="data-[state=active]:bg-muted">
-                <FileInvoice className="h-4 w-4 mr-2" />
+                <FileText className="h-4 w-4 mr-2" />
                 Invoices
               </TabsTrigger>
               <TabsTrigger value="history" className="data-[state=active]:bg-muted">
@@ -162,12 +161,12 @@ export default function CustomerDetails() {
                 <div className="mb-4 flex justify-between items-center">
                   <h3 className="text-xl font-medium">Customer Invoices</h3>
                   <Button size="sm">
-                    <FileInvoice className="h-4 w-4 mr-2" />
+                    <FileText className="h-4 w-4 mr-2" />
                     Generate Invoice
                   </Button>
                 </div>
                 <div className="bg-slate-50 p-8 rounded-md text-center">
-                  <FileInvoice className="h-12 w-12 mx-auto mb-2 text-slate-400" />
+                  <FileText className="h-12 w-12 mx-auto mb-2 text-slate-400" />
                   <p className="text-muted-foreground">No invoices found for this customer</p>
                   <p className="text-sm text-muted-foreground mt-1">Create your first invoice by clicking the button above</p>
                 </div>

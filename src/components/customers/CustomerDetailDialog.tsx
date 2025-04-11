@@ -14,7 +14,7 @@ import {
   TabsTrigger 
 } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { FileInvoice } from "lucide-react";
+import { FileText } from "lucide-react";
 import CustomerGeneralInfo from './CustomerGeneralInfo';
 import CustomerContacts from './CustomerContacts';
 import CustomerDocuments from './CustomerDocuments';
@@ -86,12 +86,12 @@ const CustomerDetailDialog = ({ customer, open, onOpenChange }: CustomerDetailDi
               <div className="mb-4 flex justify-between items-center">
                 <h3 className="text-lg font-medium">Customer Invoices</h3>
                 <Button size="sm">
-                  <FileInvoice className="h-4 w-4 mr-2" />
+                  <FileText className="h-4 w-4 mr-2" />
                   Generate Invoice
                 </Button>
               </div>
               <div className="bg-slate-50 p-6 rounded-md text-center">
-                <FileInvoice className="h-10 w-10 mx-auto mb-2 text-slate-400" />
+                <FileText className="h-10 w-10 mx-auto mb-2 text-slate-400" />
                 <p className="text-muted-foreground">No invoices found for this customer</p>
                 <p className="text-sm text-muted-foreground mt-1">Create your first invoice by clicking the button above</p>
               </div>
