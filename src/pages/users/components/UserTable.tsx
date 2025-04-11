@@ -9,6 +9,8 @@ import UserStatusDisplay from './UserStatusDisplay';
 import UserRoleBadge from './UserRoleBadge';
 import UserTableExport from './UserTableExport';
 import { useUserFiltering } from '../hooks/useUserFiltering';
+import { Checkbox } from '@/components/ui/checkbox';
+import UserBulkActions from './UserBulkActions';
 
 interface UserTableProps {
   users: User[];
@@ -37,6 +39,7 @@ export default function UserTable({
 }: UserTableProps) {
   const [showFilters, setShowFilters] = useState(false);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   
   const availableRoles = useMemo(() => {
     return Array.from(new Set(users.map(user => user.role)));
@@ -48,6 +51,29 @@ export default function UserTable({
     roleFilter,
     statusFilter
   });
+
+  // Handle user selection
+  const handleSelectUser = (user: User, checked: boolean) => {
+    if (checked) {
+      setSelectedUsers(prev => [...prev, user]);
+    } else {
+      setSelectedUsers(prev => prev.filter(u => u.id !== user.id));
+    }
+  };
+
+  // Handle select all users
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedUsers(filteredUsers);
+    } else {
+      setSelectedUsers([]);
+    }
+  };
+
+  // Check if a user is selected
+  const isUserSelected = (userId: number) => {
+    return selectedUsers.some(user => user.id === userId);
+  };
 
   return (
     <div className="space-y-4">
@@ -67,6 +93,13 @@ export default function UserTable({
         </div>
         
         <div className="flex items-center gap-3">
+          {selectedUsers.length > 0 && (
+            <UserBulkActions 
+              selectedUsers={selectedUsers} 
+              onClearSelection={() => setSelectedUsers([])}
+              availableRoles={availableRoles}
+            />
+          )}
           <UserTableExport users={filteredUsers} />
           <UserTableSorting 
             sortField={sortField}
@@ -81,6 +114,13 @@ export default function UserTable({
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[40px]">
+                <Checkbox 
+                  checked={filteredUsers.length > 0 && selectedUsers.length === filteredUsers.length}
+                  onCheckedChange={handleSelectAll}
+                  aria-label="Select all users" 
+                />
+              </TableHead>
               <TableHead className="w-[200px]">Name</TableHead>
               <TableHead className="w-[250px]">Email</TableHead>
               <TableHead>Role</TableHead>
@@ -92,13 +132,20 @@ export default function UserTable({
           <TableBody>
             {filteredUsers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
                   No users found.
                 </TableCell>
               </TableRow>
             ) : (
               filteredUsers.map((user) => (
                 <TableRow key={user.id}>
+                  <TableCell>
+                    <Checkbox 
+                      checked={isUserSelected(user.id)}
+                      onCheckedChange={(checked) => handleSelectUser(user, !!checked)}
+                      aria-label={`Select user ${user.name}`}
+                    />
+                  </TableCell>
                   <TableCell className="font-medium">{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
