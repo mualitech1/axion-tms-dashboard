@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -193,20 +192,21 @@ export default function Invoices() {
                 <TabsTrigger value="paid">Paid</TabsTrigger>
               </TabsList>
             </Tabs>
-            <Select 
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="sm:hidden w-full"
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="paid">Paid</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="sm:hidden w-full">
+              <Select 
+                value={activeTab}
+                onValueChange={setActiveTab}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardHeader>
 
