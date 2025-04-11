@@ -11,7 +11,7 @@ interface ChartData {
 
 interface ChartProps {
   title: string;
-  data: ChartData[];
+  data: any[]; // Use a more generic type to accept different data structures
   type?: 'line' | 'bar';
   className?: string;
   height?: number;
