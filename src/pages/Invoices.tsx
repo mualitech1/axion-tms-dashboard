@@ -5,12 +5,15 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, Eye, Filter, PlusCircle, Search, Briefcase } from "lucide-react";
+import { FileText, Download, Eye, Filter, PlusCircle, Search, Briefcase, Calendar, ArrowUpDown } from "lucide-react";
 import { InputWithIcon } from "@/components/ui/input-with-icon";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Mock invoice data
 const invoices = [
@@ -69,12 +72,21 @@ export default function Invoices() {
   const [createJobOpen, setCreateJobOpen] = useState(false);
   const [jobTitle, setJobTitle] = useState("");
   const [jobClient, setJobClient] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [activeTab, setActiveTab] = useState("all");
   const { toast } = useToast();
   
-  const filteredInvoices = invoices.filter(invoice => 
-    invoice.customer.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    invoice.id.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredInvoices = invoices
+    .filter(invoice => 
+      invoice.customer.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      invoice.id.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .filter(invoice => {
+      if (activeTab === "all") return true;
+      if (activeTab === "pending") return invoice.status === "pending";
+      if (activeTab === "paid") return invoice.status === "paid";
+      return true;
+    });
 
   const handleCreateJob = () => {
     // Simple validation
@@ -88,7 +100,6 @@ export default function Invoices() {
     }
 
     // Here we would typically send the data to an API
-    // For demo purposes, we'll just show a success message
     toast({
       title: "Job created",
       description: `Job '${jobTitle}' for ${jobClient} has been created successfully.`,
@@ -101,58 +112,106 @@ export default function Invoices() {
     setCreateJobOpen(false);
   };
 
+  // Calculate summary statistics
+  const totalAmount = invoices.reduce((sum, inv) => sum + inv.amount, 0);
+  const pendingAmount = invoices
+    .filter(inv => inv.status === "pending")
+    .reduce((sum, inv) => sum + inv.amount, 0);
+  const paidAmount = invoices
+    .filter(inv => inv.status === "paid")
+    .reduce((sum, inv) => sum + inv.amount, 0);
+
   return (
     <MainLayout title="Invoices">
       <DashboardHeader
-        title="Invoices"
-        subtitle="Manage and track your customer invoices"
+        title="Invoices Management"
+        subtitle="Track, manage, and create customer invoices"
       />
 
       <div className="grid gap-6 md:grid-cols-3 mb-6">
-        <Card>
+        <Card className="bg-white hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Invoices</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-tms-blue" />
-              <span className="text-2xl font-bold">156</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-blue-500" />
+                <span className="text-2xl font-bold">{invoices.length}</span>
+              </div>
+              <span className="text-lg font-semibold">${totalAmount.toLocaleString()}</span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">Last 12 months</p>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-white hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Pending Invoices</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-amber-500" />
-              <span className="text-2xl font-bold">24</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-amber-500" />
+                <span className="text-2xl font-bold">{invoices.filter(inv => inv.status === "pending").length}</span>
+              </div>
+              <span className="text-lg font-semibold text-amber-500">${pendingAmount.toLocaleString()}</span>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">$42,450 outstanding</p>
+            <p className="text-xs text-muted-foreground mt-1">Outstanding amount</p>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-white hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Paid Invoices</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-green-500" />
-              <span className="text-2xl font-bold">132</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-green-500" />
+                <span className="text-2xl font-bold">{invoices.filter(inv => inv.status === "paid").length}</span>
+              </div>
+              <span className="text-lg font-semibold text-green-500">${paidAmount.toLocaleString()}</span>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">$178,320 collected</p>
+            <p className="text-xs text-muted-foreground mt-1">Collected amount</p>
           </CardContent>
         </Card>
       </div>
       
-      <Card>
+      <Card className="bg-white shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Invoice Management</CardTitle>
           <div className="flex flex-col sm:flex-row gap-2">
+            <Tabs 
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="hidden sm:flex"
+            >
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="pending">Pending</TabsTrigger>
+                <TabsTrigger value="paid">Paid</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <Select 
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="sm:hidden w-full"
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="paid">Paid</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardHeader>
+
+        <CardContent>
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
             <InputWithIcon
               placeholder="Search invoices..."
               value={searchQuery}
@@ -160,7 +219,7 @@ export default function Invoices() {
               className="w-full sm:w-[250px]"
               icon={Search}
             />
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full sm:w-auto justify-end">
               <Button variant="outline" size="icon">
                 <Filter className="h-4 w-4" />
               </Button>
@@ -170,59 +229,93 @@ export default function Invoices() {
                 onClick={() => setCreateJobOpen(true)}
               >
                 <Briefcase className="h-4 w-4" />
-                Create Job
+                <span className="hidden sm:inline">Create Job</span>
               </Button>
-              <Button className="gap-1">
+              <Button className="gap-1 bg-blue-600 hover:bg-blue-700">
                 <PlusCircle className="h-4 w-4" />
-                New Invoice
+                <span className="hidden sm:inline">New Invoice</span>
               </Button>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Invoice #</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Issue Date</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredInvoices.map((invoice) => (
-                <TableRow key={invoice.id}>
-                  <TableCell className="font-medium">{invoice.id}</TableCell>
-                  <TableCell>{invoice.customer}</TableCell>
-                  <TableCell>{invoice.date}</TableCell>
-                  <TableCell>{invoice.dueDate}</TableCell>
-                  <TableCell>${invoice.amount.toLocaleString()}</TableCell>
-                  <TableCell>
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                      invoice.status === "paid" 
-                        ? "bg-green-100 text-green-800" 
-                        : "bg-amber-100 text-amber-800"
-                    }`}>
-                      {invoice.status === "paid" ? "Paid" : "Pending"}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="icon">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="icon">
-                        <Download className="h-4 w-4" />
-                      </Button>
+          
+          <div className="rounded-md border overflow-hidden">
+            <Table>
+              <TableHeader className="bg-gray-50">
+                <TableRow>
+                  <TableHead className="font-semibold text-gray-700">Invoice #</TableHead>
+                  <TableHead className="font-semibold text-gray-700">Customer</TableHead>
+                  <TableHead className="font-semibold text-gray-700 hidden md:table-cell">
+                    <div className="flex items-center">
+                      Issue Date
+                      <ArrowUpDown className="ml-1 h-4 w-4" />
                     </div>
-                  </TableCell>
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700 hidden lg:table-cell">
+                    <div className="flex items-center">
+                      Due Date
+                      <ArrowUpDown className="ml-1 h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    <div className="flex items-center">
+                      Amount
+                      <ArrowUpDown className="ml-1 h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredInvoices.length > 0 ? (
+                  filteredInvoices.map((invoice) => (
+                    <TableRow key={invoice.id} className="hover:bg-gray-50">
+                      <TableCell className="font-medium">{invoice.id}</TableCell>
+                      <TableCell className="max-w-[150px] truncate">{invoice.customer}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <div className="flex items-center">
+                          <Calendar className="mr-2 h-3.5 w-3.5 text-gray-500" />
+                          {invoice.date}
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <div className="flex items-center">
+                          <Calendar className="mr-2 h-3.5 w-3.5 text-gray-500" />
+                          {invoice.dueDate}
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-semibold">${invoice.amount.toLocaleString()}</TableCell>
+                      <TableCell>
+                        <Badge className={`${
+                          invoice.status === "paid" 
+                            ? "bg-green-100 text-green-800 hover:bg-green-200" 
+                            : "bg-amber-100 text-amber-800 hover:bg-amber-200"
+                        }`}>
+                          {invoice.status === "paid" ? "Paid" : "Pending"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2 justify-end">
+                          <Button variant="outline" size="icon" className="h-8 w-8">
+                            <Eye className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button variant="outline" size="icon" className="h-8 w-8">
+                            <Download className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={7} className="h-24 text-center text-gray-500">
+                      No invoices found
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
