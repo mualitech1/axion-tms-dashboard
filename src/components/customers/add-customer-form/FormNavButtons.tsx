@@ -21,7 +21,7 @@ export const FormNavButtons = ({
 }: FormNavButtonsProps) => {
   return (
     <div className="mt-4 flex justify-between">
-      {prevStep && (
+      {prevStep ? (
         <Button 
           type="button" 
           variant="outline" 
