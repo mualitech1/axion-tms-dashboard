@@ -1,19 +1,14 @@
 
-import { useState } from "react";
-import { X, DollarSign } from "lucide-react";
+import { X, DollarSign, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatCurrency } from "@/lib/utils";
-
-interface InvoiceItem {
-  description: string;
-  quantity: string;
-  rate: string;
-  amount: string;
-}
+import { UseFormReturn } from "react-hook-form";
+import { InvoiceFormValues } from "./hooks/useInvoiceForm";
+import { FormMessage } from "@/components/ui/form";
 
 interface InvoiceLineItemsProps {
-  items: InvoiceItem[];
+  form: UseFormReturn<InvoiceFormValues>;
   handleItemChange: (index: number, field: string, value: string) => void;
   addInvoiceItem: () => void;
   removeInvoiceItem: (index: number) => void;
@@ -21,12 +16,15 @@ interface InvoiceLineItemsProps {
 }
 
 export function InvoiceLineItems({
-  items,
+  form,
   handleItemChange,
   addInvoiceItem,
   removeInvoiceItem,
   calculateTotal
 }: InvoiceLineItemsProps) {
+  const items = form.watch("items");
+  const formErrors = form.formState.errors;
+  
   return (
     <div className="space-y-4">
       <div className="border rounded-md overflow-hidden">
@@ -48,8 +46,15 @@ export function InvoiceLineItems({
                     value={item.description}
                     onChange={(e) => handleItemChange(index, "description", e.target.value)}
                     placeholder="Item description"
-                    className="border-0 px-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    className={`border-0 px-0 focus-visible:ring-0 focus-visible:ring-offset-0 ${
+                      formErrors.items?.[index]?.description ? "border-red-500" : ""
+                    }`}
                   />
+                  {formErrors.items?.[index]?.description && (
+                    <div className="text-xs text-red-500 mt-1 px-1">
+                      {formErrors.items[index]?.description?.message}
+                    </div>
+                  )}
                 </td>
                 <td className="px-4 py-2">
                   <Input
@@ -57,8 +62,15 @@ export function InvoiceLineItems({
                     onChange={(e) => handleItemChange(index, "quantity", e.target.value)}
                     type="number"
                     min="1"
-                    className="border-0 px-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    className={`border-0 px-0 focus-visible:ring-0 focus-visible:ring-offset-0 ${
+                      formErrors.items?.[index]?.quantity ? "border-red-500" : ""
+                    }`}
                   />
+                  {formErrors.items?.[index]?.quantity && (
+                    <div className="text-xs text-red-500 mt-1 px-1">
+                      {formErrors.items[index]?.quantity?.message}
+                    </div>
+                  )}
                 </td>
                 <td className="px-4 py-2">
                   <div className="relative">
@@ -69,8 +81,15 @@ export function InvoiceLineItems({
                       type="number"
                       min="0"
                       step="0.01"
-                      className="pl-5 border-0 px-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                      className={`pl-5 border-0 px-0 focus-visible:ring-0 focus-visible:ring-offset-0 ${
+                        formErrors.items?.[index]?.rate ? "border-red-500" : ""
+                      }`}
                     />
+                    {formErrors.items?.[index]?.rate && (
+                      <div className="text-xs text-red-500 mt-1 px-1">
+                        {formErrors.items[index]?.rate?.message}
+                      </div>
+                    )}
                   </div>
                 </td>
                 <td className="px-4 py-2 font-medium">
@@ -83,6 +102,7 @@ export function InvoiceLineItems({
                       size="sm" 
                       className="h-8 w-8 p-0" 
                       onClick={() => removeInvoiceItem(index)}
+                      type="button"
                     >
                       <X className="h-4 w-4 text-gray-500" />
                     </Button>
@@ -94,6 +114,10 @@ export function InvoiceLineItems({
         </table>
       </div>
 
+      {formErrors.items?.message && (
+        <div className="text-sm text-red-500 mt-1">{formErrors.items.message}</div>
+      )}
+
       <Button
         type="button"
         variant="outline"
@@ -101,7 +125,7 @@ export function InvoiceLineItems({
         onClick={addInvoiceItem}
         className="text-blue-600 border-dashed border-blue-300"
       >
-        + Add Another Line Item
+        <Plus className="h-4 w-4 mr-1" /> Add Another Line Item
       </Button>
 
       <div className="flex justify-between p-4 bg-gray-50 rounded-md mt-4">

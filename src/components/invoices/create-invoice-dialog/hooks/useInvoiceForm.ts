@@ -1,22 +1,31 @@
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 
-interface InvoiceItem {
-  description: string;
-  quantity: string;
-  rate: string;
-  amount: string;
-}
+// Define the validation schema using zod
+const invoiceItemSchema = z.object({
+  description: z.string().min(1, "Description is required"),
+  quantity: z.string().min(1, "Quantity is required").refine(val => !isNaN(Number(val)) && Number(val) > 0, {
+    message: "Quantity must be a positive number"
+  }),
+  rate: z.string().min(1, "Rate is required").refine(val => !isNaN(Number(val)) && Number(val) >= 0, {
+    message: "Rate must be a non-negative number"
+  }),
+  amount: z.string()
+});
 
-interface InvoiceDetails {
-  customer: string;
-  amount: string;
-  issueDate: string;
-  dueDate: string;
-  notes: string;
-  items: InvoiceItem[];
-  paymentTerms: string;
-}
+const invoiceSchema = z.object({
+  customer: z.string().min(1, "Customer is required"),
+  issueDate: z.string().min(1, "Issue date is required"),
+  dueDate: z.string().min(1, "Due date is required"),
+  paymentTerms: z.string().min(1, "Payment terms are required"),
+  notes: z.string().optional(),
+  items: z.array(invoiceItemSchema).min(1, "At least one item is required")
+});
+
+export type InvoiceFormValues = z.infer<typeof invoiceSchema>;
 
 export function useInvoiceForm() {
   // Helper functions for dates
@@ -31,74 +40,67 @@ export function useInvoiceForm() {
     return dueDate.toISOString().split('T')[0];
   }
 
-  const [invoiceDetails, setInvoiceDetails] = useState<InvoiceDetails>({
-    customer: "",
-    amount: "",
-    issueDate: getTodayDate(),
-    dueDate: getDefaultDueDate(),
-    notes: "",
-    items: [{ description: "", quantity: "1", rate: "", amount: "0" }],
-    paymentTerms: "net15",
+  // Set up react-hook-form with zod validation
+  const form = useForm<InvoiceFormValues>({
+    resolver: zodResolver(invoiceSchema),
+    defaultValues: {
+      customer: "",
+      issueDate: getTodayDate(),
+      dueDate: getDefaultDueDate(),
+      paymentTerms: "net15",
+      notes: "",
+      items: [{ description: "", quantity: "1", rate: "", amount: "0" }]
+    }
   });
 
-  const handleCustomerChange = (value: string) => {
-    setInvoiceDetails(prev => ({ ...prev, customer: value }));
+  const addInvoiceItem = () => {
+    const items = form.getValues("items");
+    form.setValue("items", [
+      ...items, 
+      { description: "", quantity: "1", rate: "", amount: "0" }
+    ]);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setInvoiceDetails(prev => ({ ...prev, [name]: value }));
+  const removeInvoiceItem = (index: number) => {
+    const items = form.getValues("items");
+    if (items.length > 1) {
+      const updatedItems = [...items];
+      updatedItems.splice(index, 1);
+      form.setValue("items", updatedItems);
+    }
   };
 
   const handleItemChange = (index: number, field: string, value: string) => {
-    const updatedItems = [...invoiceDetails.items];
+    const items = [...form.getValues("items")];
     
-    updatedItems[index] = { 
-      ...updatedItems[index], 
+    items[index] = { 
+      ...items[index], 
       [field]: value 
     };
     
     // Calculate amount if we have both quantity and rate
     if ((field === 'quantity' || field === 'rate') && 
-        updatedItems[index].quantity && 
-        updatedItems[index].rate) {
-      const quantity = parseFloat(updatedItems[index].quantity);
-      const rate = parseFloat(updatedItems[index].rate);
-      updatedItems[index].amount = (quantity * rate).toFixed(2);
+        items[index].quantity && 
+        items[index].rate) {
+      const quantity = parseFloat(items[index].quantity);
+      const rate = parseFloat(items[index].rate);
+      items[index].amount = (quantity * rate).toFixed(2);
     }
     
-    setInvoiceDetails(prev => ({
-      ...prev,
-      items: updatedItems
-    }));
-  };
-
-  const addInvoiceItem = () => {
-    setInvoiceDetails(prev => ({
-      ...prev,
-      items: [...prev.items, { description: "", quantity: "1", rate: "", amount: "0" }]
-    }));
-  };
-
-  const removeInvoiceItem = (index: number) => {
-    if (invoiceDetails.items.length > 1) {
-      const updatedItems = [...invoiceDetails.items];
-      updatedItems.splice(index, 1);
-      setInvoiceDetails(prev => ({
-        ...prev,
-        items: updatedItems
-      }));
-    }
+    form.setValue("items", items);
   };
 
   const calculateTotal = () => {
-    return invoiceDetails.items.reduce((sum, item) => {
+    const items = form.getValues("items");
+    return items.reduce((sum, item) => {
       return sum + parseFloat(item.amount || "0");
     }, 0);
   };
 
   const handlePaymentTermsChange = (value: string) => {
-    let newDueDate = new Date(invoiceDetails.issueDate);
+    form.setValue("paymentTerms", value);
+    
+    let newDueDate = new Date(form.getValues("issueDate"));
     
     switch(value) {
       case "net15":
@@ -112,34 +114,15 @@ export function useInvoiceForm() {
         break;
     }
     
-    setInvoiceDetails(prev => ({
-      ...prev,
-      paymentTerms: value,
-      dueDate: newDueDate.toISOString().split('T')[0]
-    }));
-  };
-
-  const resetForm = () => {
-    setInvoiceDetails({
-      customer: "",
-      amount: "",
-      issueDate: getTodayDate(),
-      dueDate: getDefaultDueDate(),
-      notes: "",
-      items: [{ description: "", quantity: "1", rate: "", amount: "0" }],
-      paymentTerms: "net15",
-    });
+    form.setValue("dueDate", newDueDate.toISOString().split('T')[0]);
   };
 
   return {
-    invoiceDetails,
-    handleCustomerChange,
-    handleInputChange,
+    form,
     handleItemChange,
     addInvoiceItem,
     removeInvoiceItem,
     calculateTotal,
-    handlePaymentTermsChange,
-    resetForm
+    handlePaymentTermsChange
   };
 }
