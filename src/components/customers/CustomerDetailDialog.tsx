@@ -14,6 +14,7 @@ import {
   TabsTrigger 
 } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { FileInvoice } from "lucide-react";
 import CustomerGeneralInfo from './CustomerGeneralInfo';
 import CustomerContacts from './CustomerContacts';
 import CustomerDocuments from './CustomerDocuments';
@@ -29,8 +30,18 @@ interface CustomerDetailDialogProps {
 
 const CustomerDetailDialog = ({ customer, open, onOpenChange }: CustomerDetailDialogProps) => {
   const [activeTab, setActiveTab] = useState("general");
+  const [isSaving, setIsSaving] = useState(false);
 
   if (!customer) return null;
+
+  const handleSave = () => {
+    setIsSaving(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsSaving(false);
+      onOpenChange(false);
+    }, 800);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -71,8 +82,19 @@ const CustomerDetailDialog = ({ customer, open, onOpenChange }: CustomerDetailDi
           </TabsContent>
           
           <TabsContent value="invoices" className="mt-0">
-            <div className="p-4 border rounded-md text-center">
-              <p className="text-muted-foreground">Customer invoices content will be displayed here</p>
+            <div className="p-6 border rounded-md">
+              <div className="mb-4 flex justify-between items-center">
+                <h3 className="text-lg font-medium">Customer Invoices</h3>
+                <Button size="sm">
+                  <FileInvoice className="h-4 w-4 mr-2" />
+                  Generate Invoice
+                </Button>
+              </div>
+              <div className="bg-slate-50 p-6 rounded-md text-center">
+                <FileInvoice className="h-10 w-10 mx-auto mb-2 text-slate-400" />
+                <p className="text-muted-foreground">No invoices found for this customer</p>
+                <p className="text-sm text-muted-foreground mt-1">Create your first invoice by clicking the button above</p>
+              </div>
             </div>
           </TabsContent>
           
@@ -83,7 +105,9 @@ const CustomerDetailDialog = ({ customer, open, onOpenChange }: CustomerDetailDi
         
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Close</Button>
-          <Button>Save Changes</Button>
+          <Button disabled={isSaving} onClick={handleSave}>
+            {isSaving ? 'Saving...' : 'Save Changes'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

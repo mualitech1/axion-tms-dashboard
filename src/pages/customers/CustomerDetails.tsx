@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   ArrowLeft, FileText, LayoutDashboard, Users, 
-  Receipt, Clock, ExternalLink, Bell
+  Receipt, Clock, ExternalLink, Bell, FileInvoice
 } from 'lucide-react';
 import CustomerGeneralInfo from '@/components/customers/CustomerGeneralInfo';
 import CustomerContacts from '@/components/customers/CustomerContacts';
@@ -16,20 +16,47 @@ import CustomerRateCards from '@/components/customers/CustomerRateCards';
 import { Customer } from '@/types/customer';
 import { customerData } from '@/data/customerMockData';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
 
 export default function CustomerDetails() {
   const { customerId } = useParams();
   const navigate = useNavigate();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [activeTab, setActiveTab] = useState('general');
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     // In a real app, this would be an API call
-    // Convert the string ID from URL params to a number for comparison
-    const numericId = customerId ? parseInt(customerId, 10) : -1;
-    const foundCustomer = customerData.find(c => c.id === numericId);
-    setCustomer(foundCustomer || null);
+    setIsLoading(true);
+    
+    setTimeout(() => {
+      // Convert the string ID from URL params to a number for comparison
+      const numericId = customerId ? parseInt(customerId, 10) : -1;
+      const foundCustomer = customerData.find(c => c.id === numericId);
+      setCustomer(foundCustomer || null);
+      setIsLoading(false);
+    }, 500); // Simulate API delay
   }, [customerId]);
+
+  const handleNotificationClick = () => {
+    toast({
+      title: "Notification Sent",
+      description: `A notification has been sent to ${customer?.name}`,
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <Card className="p-6">
+        <div className="flex flex-col space-y-3">
+          <div className="h-6 w-1/3 bg-gray-200 animate-pulse rounded"></div>
+          <div className="h-10 w-2/3 bg-gray-200 animate-pulse rounded"></div>
+          <div className="h-[300px] w-full bg-gray-100 animate-pulse rounded-md mt-4"></div>
+        </div>
+      </Card>
+    );
+  }
 
   if (!customer) {
     return (
@@ -76,7 +103,7 @@ export default function CustomerDetails() {
           <Button variant="outline" onClick={() => navigate(`/customers/${customerId}/documents`)}>
             <FileText className="h-4 w-4 mr-2" /> Documents
           </Button>
-          <Button>
+          <Button onClick={handleNotificationClick}>
             <Bell className="h-4 w-4 mr-2" /> Send Notification
           </Button>
         </div>
@@ -85,7 +112,7 @@ export default function CustomerDetails() {
       <Tabs defaultValue="general" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <Card>
           <CardHeader className="border-b pb-3">
-            <TabsList className="grid grid-cols-5">
+            <TabsList className="grid grid-cols-6">
               <TabsTrigger value="general" className="data-[state=active]:bg-muted">
                 <LayoutDashboard className="h-4 w-4 mr-2" />
                 General
@@ -101,6 +128,10 @@ export default function CustomerDetails() {
               <TabsTrigger value="rates" className="data-[state=active]:bg-muted">
                 <Receipt className="h-4 w-4 mr-2" />
                 Rate Cards
+              </TabsTrigger>
+              <TabsTrigger value="invoices" className="data-[state=active]:bg-muted">
+                <FileInvoice className="h-4 w-4 mr-2" />
+                Invoices
               </TabsTrigger>
               <TabsTrigger value="history" className="data-[state=active]:bg-muted">
                 <Clock className="h-4 w-4 mr-2" />
@@ -124,6 +155,23 @@ export default function CustomerDetails() {
             
             <TabsContent value="rates" className="mt-0">
               <CustomerRateCards customer={customer} />
+            </TabsContent>
+            
+            <TabsContent value="invoices" className="mt-0">
+              <div className="p-6 border rounded-md">
+                <div className="mb-4 flex justify-between items-center">
+                  <h3 className="text-xl font-medium">Customer Invoices</h3>
+                  <Button size="sm">
+                    <FileInvoice className="h-4 w-4 mr-2" />
+                    Generate Invoice
+                  </Button>
+                </div>
+                <div className="bg-slate-50 p-8 rounded-md text-center">
+                  <FileInvoice className="h-12 w-12 mx-auto mb-2 text-slate-400" />
+                  <p className="text-muted-foreground">No invoices found for this customer</p>
+                  <p className="text-sm text-muted-foreground mt-1">Create your first invoice by clicking the button above</p>
+                </div>
+              </div>
             </TabsContent>
             
             <TabsContent value="history" className="mt-0">
