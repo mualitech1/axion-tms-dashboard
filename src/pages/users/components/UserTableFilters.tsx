@@ -48,13 +48,13 @@ export default function UserTableFilters({
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row md:justify-between gap-4">
-        <div className="w-full md:w-1/3">
+        <div className="w-full md:w-2/5">
           <InputWithIcon
             icon={Search}
             placeholder="Search users..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full"
+            className="w-full border-gray-300 rounded-md"
           />
         </div>
         
@@ -62,7 +62,8 @@ export default function UserTableFilters({
           <Button 
             variant="outline" 
             onClick={() => setShowFilters(!showFilters)}
-            className={showFilters ? "bg-tms-gray-100" : ""}
+            className={showFilters ? "bg-gray-100" : ""}
+            size="sm"
           >
             <Filter className="mr-2 h-4 w-4" /> 
             Filters
@@ -76,17 +77,17 @@ export default function UserTableFilters({
       </div>
       
       {showFilters && (
-        <div className="p-4 bg-white rounded-lg border border-tms-gray-200 space-y-4">
+        <div className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm space-y-4">
           <h4 className="font-medium text-sm">Filter Users</h4>
           
           <div>
-            <h5 className="text-xs uppercase text-tms-gray-500 mb-2">Roles</h5>
+            <h5 className="text-xs uppercase text-gray-500 mb-2">Roles</h5>
             <div className="flex flex-wrap gap-2">
               {availableRoles.map((role) => (
                 <Badge
                   key={role}
                   variant={roleFilter.includes(role) ? "default" : "outline"}
-                  className="cursor-pointer"
+                  className={`cursor-pointer ${roleFilter.includes(role) ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
                   onClick={() => handleRoleFilterChange(role)}
                 >
                   {role}
@@ -96,18 +97,18 @@ export default function UserTableFilters({
           </div>
           
           <div>
-            <h5 className="text-xs uppercase text-tms-gray-500 mb-2">Status</h5>
+            <h5 className="text-xs uppercase text-gray-500 mb-2">Status</h5>
             <div className="flex gap-2">
               <Badge
                 variant={statusFilter.includes('Active') ? "default" : "outline"}
-                className="cursor-pointer bg-tms-green/90"
+                className={`cursor-pointer ${statusFilter.includes('Active') ? 'bg-green-500 hover:bg-green-600' : ''}`}
                 onClick={() => handleStatusFilterChange('Active')}
               >
                 Active
               </Badge>
               <Badge
                 variant={statusFilter.includes('Inactive') ? "default" : "outline"}
-                className="cursor-pointer bg-tms-red/90"
+                className={`cursor-pointer ${statusFilter.includes('Inactive') ? 'bg-red-500 hover:bg-red-600' : ''}`}
                 onClick={() => handleStatusFilterChange('Inactive')}
               >
                 Inactive

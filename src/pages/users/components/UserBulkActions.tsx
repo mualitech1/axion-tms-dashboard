@@ -95,31 +95,31 @@ export default function UserBulkActions({
   return (
     <>
       <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">
+        <span className="text-sm text-gray-600 font-medium">
           {selectedUsers.length} selected
         </span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="flex items-center">
+            <Button variant="outline" size="sm" className="flex items-center bg-white border-gray-300 text-gray-700">
               <Users className="mr-2 h-4 w-4" />
               Bulk Actions
               <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={handleBulkActivate}>
-              <Check className="mr-2 h-4 w-4" /> Activate Users
+          <DropdownMenuContent align="end" className="w-48 bg-white">
+            <DropdownMenuItem onClick={handleBulkActivate} className="cursor-pointer">
+              <Check className="mr-2 h-4 w-4 text-green-500" /> Activate Users
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleBulkDeactivate}>
-              <X className="mr-2 h-4 w-4" /> Deactivate Users
+            <DropdownMenuItem onClick={handleBulkDeactivate} className="cursor-pointer">
+              <X className="mr-2 h-4 w-4 text-red-500" /> Deactivate Users
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setIsRoleDialogOpen(true)}>
-              <UserPlus className="mr-2 h-4 w-4" /> Assign Role
+            <DropdownMenuItem onClick={() => setIsRoleDialogOpen(true)} className="cursor-pointer">
+              <UserPlus className="mr-2 h-4 w-4 text-blue-500" /> Assign Role
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
               onClick={() => setIsDeleteDialogOpen(true)}
-              className="text-destructive focus:text-destructive"
+              className="text-red-600 focus:text-red-600 cursor-pointer"
             >
               <Trash2 className="mr-2 h-4 w-4" /> Delete Users
             </DropdownMenuItem>
@@ -129,7 +129,7 @@ export default function UserBulkActions({
       
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Confirm Delete</DialogTitle>
             <DialogDescription>
@@ -140,12 +140,14 @@ export default function UserBulkActions({
             <Button 
               variant="outline" 
               onClick={() => setIsDeleteDialogOpen(false)}
+              className="border-gray-300 text-gray-700"
             >
               Cancel
             </Button>
             <Button 
               variant="destructive" 
               onClick={handleBulkDelete}
+              className="bg-red-500 hover:bg-red-600"
             >
               Delete
             </Button>
@@ -155,7 +157,7 @@ export default function UserBulkActions({
       
       {/* Role Assignment Dialog */}
       <Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Assign Role</DialogTitle>
             <DialogDescription>
@@ -164,7 +166,7 @@ export default function UserBulkActions({
           </DialogHeader>
           <div className="py-4">
             <Select onValueChange={setSelectedRole} value={selectedRole}>
-              <SelectTrigger>
+              <SelectTrigger className="w-full border-gray-300">
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent>
@@ -178,12 +180,14 @@ export default function UserBulkActions({
             <Button 
               variant="outline" 
               onClick={() => setIsRoleDialogOpen(false)}
+              className="border-gray-300 text-gray-700"
             >
               Cancel
             </Button>
             <Button 
               onClick={handleBulkRoleAssign}
               disabled={!selectedRole}
+              className="bg-blue-600 hover:bg-blue-700"
             >
               Assign Role
             </Button>

@@ -44,17 +44,17 @@ export default function UserTableExport({ users }: UserTableExportProps) {
           disabled={isExporting || users.length === 0} 
           variant="outline" 
           size="sm"
-          className="flex items-center gap-1"
+          className="flex items-center gap-1 bg-white border-gray-300 text-gray-700"
         >
           <Download className="w-4 h-4" />
           Export
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => handleExport('csv')}>
+      <DropdownMenuContent align="end" className="bg-white">
+        <DropdownMenuItem onClick={() => handleExport('csv')} className="cursor-pointer">
           Export as CSV
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleExport('excel')}>
+        <DropdownMenuItem onClick={() => handleExport('excel')} className="cursor-pointer">
           Export as Excel
         </DropdownMenuItem>
       </DropdownMenuContent>

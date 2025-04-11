@@ -1,31 +1,28 @@
 
-import { Switch } from '@/components/ui/switch';
 import { User } from '../types';
+import { Switch } from '@/components/ui/switch';
 
 interface UserStatusDisplayProps {
   user: User;
   onToggleUserStatus?: (user: User) => void;
 }
 
-export default function UserStatusDisplay({ 
-  user, 
-  onToggleUserStatus 
-}: UserStatusDisplayProps) {
+export default function UserStatusDisplay({ user, onToggleUserStatus }: UserStatusDisplayProps) {
+  const isActive = user.status === 'Active';
+
   return (
-    <div className="flex items-center">
+    <div className="flex items-center gap-2">
       <Switch 
-        checked={user.status === 'Active'} 
+        checked={isActive}
         onCheckedChange={() => {
-          if (onToggleUserStatus) onToggleUserStatus(user);
+          if (onToggleUserStatus) {
+            onToggleUserStatus(user);
+          }
         }}
-        className="scale-75 origin-left"
+        className="data-[state=checked]:bg-blue-600"
       />
-      <span className={`ml-2 text-xs ${
-        user.status === 'Active' 
-          ? 'text-tms-green' 
-          : 'text-tms-red'
-      }`}>
-        {user.status}
+      <span className={`text-sm ${isActive ? 'text-green-600' : 'text-red-600'}`}>
+        {isActive ? 'Active' : 'Inactive'}
       </span>
     </div>
   );

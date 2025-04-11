@@ -11,6 +11,7 @@ import UserTableExport from './UserTableExport';
 import { useUserFiltering } from '../hooks/useUserFiltering';
 import { Checkbox } from '@/components/ui/checkbox';
 import UserBulkActions from './UserBulkActions';
+import { ArrowUpDown } from 'lucide-react';
 
 interface UserTableProps {
   users: User[];
@@ -110,23 +111,48 @@ export default function UserTable({
         </div>
       </div>
       
-      <div className="rounded-md border">
+      <div className="rounded-md border bg-white">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-50">
             <TableRow>
-              <TableHead className="w-[40px]">
+              <TableHead className="w-[40px] py-3">
                 <Checkbox 
                   checked={filteredUsers.length > 0 && selectedUsers.length === filteredUsers.length}
                   onCheckedChange={handleSelectAll}
                   aria-label="Select all users" 
                 />
               </TableHead>
-              <TableHead className="w-[200px]">Name</TableHead>
-              <TableHead className="w-[250px]">Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Last Login</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="font-medium text-sm text-gray-600" onClick={() => handleSort('name')}>
+                <div className="flex items-center gap-1 cursor-pointer">
+                  Name
+                  <ArrowUpDown size={14} className="text-gray-400" />
+                </div>
+              </TableHead>
+              <TableHead className="font-medium text-sm text-gray-600" onClick={() => handleSort('email')}>
+                <div className="flex items-center gap-1 cursor-pointer">
+                  Email
+                  <ArrowUpDown size={14} className="text-gray-400" />
+                </div>
+              </TableHead>
+              <TableHead className="font-medium text-sm text-gray-600" onClick={() => handleSort('role')}>
+                <div className="flex items-center gap-1 cursor-pointer">
+                  Role
+                  <ArrowUpDown size={14} className="text-gray-400" />
+                </div>
+              </TableHead>
+              <TableHead className="font-medium text-sm text-gray-600" onClick={() => handleSort('lastLogin')}>
+                <div className="flex items-center gap-1 cursor-pointer">
+                  Last Login
+                  <ArrowUpDown size={14} className="text-gray-400" />
+                </div>
+              </TableHead>
+              <TableHead className="font-medium text-sm text-gray-600" onClick={() => handleSort('status')}>
+                <div className="flex items-center gap-1 cursor-pointer">
+                  Status
+                  <ArrowUpDown size={14} className="text-gray-400" />
+                </div>
+              </TableHead>
+              <TableHead className="text-right font-medium text-sm text-gray-600">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -138,7 +164,7 @@ export default function UserTable({
               </TableRow>
             ) : (
               filteredUsers.map((user) => (
-                <TableRow key={user.id}>
+                <TableRow key={user.id} className="hover:bg-gray-50">
                   <TableCell>
                     <Checkbox 
                       checked={isUserSelected(user.id)}

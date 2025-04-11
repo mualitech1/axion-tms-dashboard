@@ -1,64 +1,69 @@
 
-import { UsersIcon, Shield, UserCog, UserX } from 'lucide-react';
-import DashboardCard from '@/components/dashboard/DashboardCard';
+import { Card, CardContent } from "@/components/ui/card";
+import { Users, Check, X, ShieldCheck } from "lucide-react";
 
 interface UserOverviewProps {
   totalUsers: number;
   activeUsers: number;
-  adminUsers: number;
   inactiveUsers: number;
+  adminUsers: number;
 }
 
 export default function UserOverview({ 
-  totalUsers, activeUsers, adminUsers, inactiveUsers 
+  totalUsers, 
+  activeUsers, 
+  inactiveUsers, 
+  adminUsers 
 }: UserOverviewProps) {
   return (
-    <DashboardCard title="User Overview">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <div className="flex items-center">
-            <div className="bg-tms-blue-light p-2 rounded-full mr-3">
-              <UsersIcon className="h-4 w-4 text-tms-blue" />
-            </div>
-            <div>
-              <div className="text-2xl font-semibold text-tms-gray-800">{totalUsers}</div>
-              <div className="text-sm text-tms-gray-500">Total Users</div>
-            </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <Card>
+        <CardContent className="p-6 flex items-center">
+          <div className="bg-blue-100 p-3 rounded-full">
+            <Users className="h-6 w-6 text-blue-600" />
           </div>
-          
-          <div className="flex items-center">
-            <div className="bg-tms-green-light p-2 rounded-full mr-3">
-              <UserCog className="h-4 w-4 text-tms-green" />
-            </div>
-            <div>
-              <div className="text-2xl font-semibold text-tms-gray-800">{activeUsers}</div>
-              <div className="text-sm text-tms-gray-500">Active Users</div>
-            </div>
+          <div className="ml-4">
+            <p className="text-3xl font-semibold">{totalUsers}</p>
+            <p className="text-gray-500 text-sm">Total Users</p>
           </div>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="flex items-center">
-            <div className="bg-tms-blue-light p-2 rounded-full mr-3">
-              <Shield className="h-4 w-4 text-tms-blue" />
-            </div>
-            <div>
-              <div className="text-2xl font-semibold text-tms-gray-800">{adminUsers}</div>
-              <div className="text-sm text-tms-gray-500">Admin Users</div>
-            </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardContent className="p-6 flex items-center">
+          <div className="bg-green-100 p-3 rounded-full">
+            <Check className="h-6 w-6 text-green-600" />
           </div>
-          
-          <div className="flex items-center">
-            <div className="bg-tms-red-light p-2 rounded-full mr-3">
-              <UserX className="h-4 w-4 text-tms-red" />
-            </div>
-            <div>
-              <div className="text-2xl font-semibold text-tms-gray-800">{inactiveUsers}</div>
-              <div className="text-sm text-tms-gray-500">Inactive Users</div>
-            </div>
+          <div className="ml-4">
+            <p className="text-3xl font-semibold">{activeUsers}</p>
+            <p className="text-gray-500 text-sm">Active Users</p>
           </div>
-        </div>
-      </div>
-    </DashboardCard>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardContent className="p-6 flex items-center">
+          <div className="bg-red-100 p-3 rounded-full">
+            <X className="h-6 w-6 text-red-600" />
+          </div>
+          <div className="ml-4">
+            <p className="text-3xl font-semibold">{inactiveUsers}</p>
+            <p className="text-gray-500 text-sm">Inactive Users</p>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardContent className="p-6 flex items-center">
+          <div className="bg-purple-100 p-3 rounded-full">
+            <ShieldCheck className="h-6 w-6 text-purple-600" />
+          </div>
+          <div className="ml-4">
+            <p className="text-3xl font-semibold">{adminUsers}</p>
+            <p className="text-gray-500 text-sm">Admin Users</p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
