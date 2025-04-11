@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Form } from "@/components/ui/form";
 
@@ -88,50 +88,52 @@ export function CreateInvoiceDialog({
         <Form {...form}>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="px-6">
-              <InvoiceTabs activeTab={activeTab} setActiveTab={handleTabChange} />
-              
-              <TabsContent value="details" className="py-4 space-y-4">
-                <InvoiceDetailsForm 
-                  form={form}
-                  handlePaymentTermsChange={handlePaymentTermsChange}
-                />
+              <Tabs value={activeTab} onValueChange={handleTabChange}>
+                <InvoiceTabs activeTab={activeTab} setActiveTab={handleTabChange} />
+                
+                <TabsContent value="details" className="py-4 space-y-4">
+                  <InvoiceDetailsForm 
+                    form={form}
+                    handlePaymentTermsChange={handlePaymentTermsChange}
+                  />
 
-                <div className="flex justify-end pt-4">
-                  <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="mr-2">
-                    Cancel
-                  </Button>
-                  <Button type="button" onClick={() => handleTabChange("items")}>
-                    Next: Line Items
-                  </Button>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="items" className="py-4">
-                <InvoiceLineItems 
-                  form={form}
-                  handleItemChange={handleItemChange}
-                  addInvoiceItem={addInvoiceItem}
-                  removeInvoiceItem={removeInvoiceItem}
-                  calculateTotal={calculateTotal}
-                />
-
-                <DialogFooter className="flex justify-between gap-2 pt-6">
-                  <div className="flex gap-2">
-                    <Button type="button" variant="outline" onClick={() => setActiveTab("details")}>
-                      Back
-                    </Button>
-                    <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                  <div className="flex justify-end pt-4">
+                    <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="mr-2">
                       Cancel
                     </Button>
+                    <Button type="button" onClick={() => handleTabChange("items")}>
+                      Next: Line Items
+                    </Button>
                   </div>
-                  <Button 
-                    type="submit"
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                  >
-                    Create Invoice
-                  </Button>
-                </DialogFooter>
-              </TabsContent>
+                </TabsContent>
+
+                <TabsContent value="items" className="py-4">
+                  <InvoiceLineItems 
+                    form={form}
+                    handleItemChange={handleItemChange}
+                    addInvoiceItem={addInvoiceItem}
+                    removeInvoiceItem={removeInvoiceItem}
+                    calculateTotal={calculateTotal}
+                  />
+
+                  <DialogFooter className="flex justify-between gap-2 pt-6">
+                    <div className="flex gap-2">
+                      <Button type="button" variant="outline" onClick={() => setActiveTab("details")}>
+                        Back
+                      </Button>
+                      <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                        Cancel
+                      </Button>
+                    </div>
+                    <Button 
+                      type="submit"
+                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                    >
+                      Create Invoice
+                    </Button>
+                  </DialogFooter>
+                </TabsContent>
+              </Tabs>
             </div>
           </form>
         </Form>
