@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { InputWithIcon } from "@/components/ui/input-with-icon";
-import { CalendarIcon, Briefcase, User, Truck, DollarSign } from "lucide-react";
+import { CalendarIcon, Briefcase, User, Truck, PoundSterling } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { UseFormReturn } from "react-hook-form";
@@ -144,7 +144,7 @@ export function BasicInfoStep({ form, date, setDate }: BasicInfoStepProps) {
             <FormItem>
               <FormLabel>Rate (£)</FormLabel>
               <FormControl>
-                <InputWithIcon icon={DollarSign} type="number" placeholder="Enter rate" {...field} />
+                <InputWithIcon icon={PoundSterling} type="number" placeholder="Enter rate" {...field} />
               </FormControl>
             </FormItem>
           )}

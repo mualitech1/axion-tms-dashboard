@@ -1,5 +1,4 @@
-
-import { Building2, Calendar, CreditCard } from "lucide-react";
+import { Building2, Calendar, PoundSterling } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -98,7 +97,7 @@ export function InvoiceDetailsForm({
                     <SelectItem value="net60">Net 60 days</SelectItem>
                   </SelectContent>
                 </Select>
-                <CreditCard className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                <PoundSterling className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
               </div>
               <FormMessage />
             </FormItem>

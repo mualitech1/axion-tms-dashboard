@@ -2,7 +2,7 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { InputWithIcon } from '@/components/ui/input-with-icon';
 import { UseFormReturn } from 'react-hook-form';
-import { CreditCard, FileText, CheckCircle, X, Save } from 'lucide-react';
+import { PoundSterling, FileText, CheckCircle, X, Save } from 'lucide-react';
 import { CustomerFormValues } from './types';
 import { FormNavButtons } from './FormNavButtons';
 
@@ -18,7 +18,7 @@ export const TermsTab = ({ form, activeTab, setActiveTab, isSubmitting }: TermsT
     <div className="space-y-6 animate-fade-in">
       <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
         <div className="flex items-center gap-2 mb-4">
-          <CreditCard className="h-5 w-5 text-blue-600" />
+          <PoundSterling className="h-5 w-5 text-blue-600" />
           <h3 className="text-lg font-semibold text-gray-800">Financial Details</h3>
         </div>
         <FormField
@@ -29,7 +29,7 @@ export const TermsTab = ({ form, activeTab, setActiveTab, isSubmitting }: TermsT
               <FormLabel className="font-medium">Credit Limit (£)</FormLabel>
               <FormControl>
                 <InputWithIcon 
-                  icon={CreditCard} 
+                  icon={PoundSterling} 
                   type="number"
                   {...field} 
                   onChange={(e) => field.onChange(Number(e.target.value))}
