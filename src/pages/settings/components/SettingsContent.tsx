@@ -6,6 +6,7 @@ import GeneralSettings from './GeneralSettings';
 import SecuritySettings from './SecuritySettings';
 import NotificationSettings from './NotificationSettings';
 import IntegrationSettings from './IntegrationSettings';
+import AISettings from './AISettings';
 import { 
   Settings2, 
   Shield, 
@@ -93,26 +94,7 @@ export default function SettingsContent() {
           </TabsContent>
           
           <TabsContent value="ai" className="mt-0">
-            <div className="space-y-6 text-gray-300">
-              <div>
-                <h3 className="text-lg font-medium text-white mb-1">
-                  <span className="text-[#1EAEDB]">AXIMO</span> AI Configuration
-                </h3>
-                <p className="text-sm text-gray-400 mb-6">
-                  Customize how the AI logistics assistant interacts with your systems
-                </p>
-              </div>
-              
-              <div className="p-10 rounded-lg border border-[#1EAEDB]/20 bg-[#111827]/50 text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#1A1F2C] mb-4">
-                  <Brain className="h-8 w-8 text-[#1EAEDB]" />
-                </div>
-                <h3 className="text-lg font-medium text-white mb-2">AI Settings Coming Soon</h3>
-                <p className="text-gray-400 max-w-md mx-auto">
-                  Advanced AI configuration options will be available in the next update
-                </p>
-              </div>
-            </div>
+            <AISettings />
           </TabsContent>
         </div>
       </Tabs>
