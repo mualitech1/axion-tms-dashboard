@@ -108,15 +108,15 @@
   }
   
   .section-heading {
-    @apply text-xl font-semibold text-gray-800 mb-4;
+    @apply text-lg md:text-xl font-semibold text-gray-800 mb-3 md:mb-4;
   }
   
   .subtle-chip {
-    @apply inline-flex items-center rounded-full py-1 px-3 text-xs font-medium;
+    @apply inline-flex items-center rounded-full py-1 px-2 md:py-1 md:px-3 text-xs font-medium;
   }
   
   .page-container {
-    @apply p-4 md:p-6 lg:p-8 animate-fade-in;
+    @apply p-3 md:p-6 lg:p-8 animate-fade-in;
   }
   
   .page-transition {
@@ -128,7 +128,7 @@
   }
   
   .card-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6;
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6;
   }
 }
 
@@ -166,6 +166,28 @@
   input, select, textarea {
     font-size: 16px;
   }
+  
+  /* Additional mobile optimizations */
+  .mobile-p {
+    @apply p-3;
+  }
+  
+  .mobile-card {
+    @apply rounded-lg shadow-sm;
+  }
+  
+  .mobile-text {
+    @apply text-sm;
+  }
+  
+  .mobile-heading {
+    @apply text-lg;
+  }
+  
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
 
 /* Page transitions */
@@ -189,4 +211,22 @@
   opacity: 0;
   transform: scale(0.98);
   transition: opacity 300ms, transform 300ms;
+}
+
+/* Responsive table wrapper */
+.responsive-table-wrapper {
+  @apply w-full overflow-x-auto -mx-4 px-4;
+}
+
+@media (max-width: 768px) {
+  .responsive-table-wrapper table {
+    @apply min-w-[640px];
+  }
+}
+
+/* Responsive form layouts */
+@media (max-width: 640px) {
+  .form-layout-responsive {
+    @apply grid grid-cols-1 gap-4;
+  }
 }

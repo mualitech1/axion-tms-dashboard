@@ -25,7 +25,7 @@ export default function MainLayout({ children, title }: MainLayoutProps) {
   }, [isMobile]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex w-full">
+    <div className="min-h-screen bg-gray-50 flex w-full overflow-x-hidden">
       <Sidebar />
       
       <div className={cn(
@@ -38,7 +38,7 @@ export default function MainLayout({ children, title }: MainLayoutProps) {
           {isPipelinePath && !isMobile && <PipelineSidebar />}
           
           <main className={cn(
-            "p-4 md:p-6 lg:p-8 flex-1",
+            "p-2 sm:p-4 md:p-6 lg:p-8 flex-1 overflow-x-hidden",
             isPipelinePath && !isMobile && "border-l"
           )}>
             {children}
