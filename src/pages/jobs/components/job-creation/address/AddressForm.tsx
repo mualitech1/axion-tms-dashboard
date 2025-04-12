@@ -1,13 +1,14 @@
 
 import { InputWithIcon } from "@/components/ui/input-with-icon";
 import { Input } from "@/components/ui/input";
-import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import { FormField, FormItem, FormLabel, FormControl, FormDescription } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, Building, User, MapPin } from "lucide-react";
+import { CalendarIcon, Building, User, MapPin, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -24,7 +25,9 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
   
   return (
     <div className="space-y-4">
-      <h3 className="text-md font-medium">{label}</h3>
+      <h3 className="text-md font-medium flex items-center gap-2">
+        <span className="text-[#1EAEDB]">{label}</span>
+      </h3>
       <div className="grid grid-cols-2 gap-4">
         <FormField
           control={form.control}
@@ -57,9 +60,15 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
           name={`${prefix}.reference`}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{prefix === "collection" ? "Collection Reference" : "Delivery Reference"}</FormLabel>
+              <FormLabel>
+                {prefix === "collection" ? "Collection Reference" : "Delivery Reference"}
+              </FormLabel>
               <FormControl>
-                <Input {...field} placeholder={`Enter ${prefix === "collection" ? "collection" : "delivery"} reference`} />
+                <Input 
+                  {...field} 
+                  placeholder={`Enter ${prefix === "collection" ? "collection" : "delivery"} reference`}
+                  className="border-[#1EAEDB]/20 focus:border-[#1EAEDB]"
+                />
               </FormControl>
             </FormItem>
           )}
@@ -74,7 +83,7 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
                   id={`${prefix}-date`}
                   variant={"outline"}
                   className={cn(
-                    "w-full justify-start text-left font-normal",
+                    "w-full justify-start text-left font-normal border-[#1EAEDB]/20",
                     !date && "text-muted-foreground"
                   )}
                 >
@@ -92,7 +101,7 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
               </PopoverContent>
             </Popover>
             <Select>
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-[140px] border-[#1EAEDB]/20">
                 <SelectValue placeholder="Time" />
               </SelectTrigger>
               <SelectContent>
@@ -124,7 +133,7 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
             <FormItem>
               <FormLabel>City</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter city" />
+                <Input {...field} placeholder="Enter city" className="border-[#1EAEDB]/20" />
               </FormControl>
             </FormItem>
           )}
@@ -137,8 +146,32 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
             <FormItem>
               <FormLabel>Post Code</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter post code" />
+                <Input {...field} placeholder="Enter post code" className="border-[#1EAEDB]/20" />
               </FormControl>
+            </FormItem>
+          )}
+        />
+        
+        {/* Additional Comments Field */}
+        <FormField
+          control={form.control}
+          name={`${prefix}.additionalComments`}
+          render={({ field }) => (
+            <FormItem className="col-span-2 mt-2">
+              <FormLabel className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4 text-[#1EAEDB]" /> 
+                Additional Comments
+              </FormLabel>
+              <FormControl>
+                <Textarea 
+                  {...field} 
+                  placeholder="Enter any special instructions or additional information"
+                  className="min-h-[100px] border-[#1EAEDB]/20 resize-none"
+                />
+              </FormControl>
+              <FormDescription>
+                Include access codes, contact preferences, or special handling instructions
+              </FormDescription>
             </FormItem>
           )}
         />

@@ -4,13 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { Briefcase } from "lucide-react";
+import { Briefcase, Zap } from "lucide-react";
 import { format } from "date-fns";
 import { BasicInfoStep } from "./step-forms/BasicInfoStep";
 import { AddressesStep } from "./step-forms/AddressesStep";
 import { SummaryStep } from "./step-forms/SummaryStep";
 import { StepIndicator } from "./StepIndicator";
 import { NavigationButtons } from "./NavigationButtons";
+import { motion } from "framer-motion";
 
 interface Address {
   companyName: string;
@@ -18,6 +19,8 @@ interface Address {
   addressLine1: string;
   city: string;
   postCode: string;
+  reference: string;
+  additionalComments?: string;
 }
 
 interface JobCreationProps {
@@ -48,7 +51,8 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
         addressLine1: "",
         city: "",
         postCode: "",
-        reference: ""
+        reference: "",
+        additionalComments: ""
       },
       delivery: {
         companyName: "",
@@ -56,7 +60,8 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
         addressLine1: "",
         city: "",
         postCode: "",
-        reference: ""
+        reference: "",
+        additionalComments: ""
       }
     }
   });
@@ -81,7 +86,8 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
       contactName: "",
       addressLine1: "",
       city: "",
-      postCode: ""
+      postCode: "",
+      reference: ""
     }]);
   };
 
@@ -150,17 +156,25 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
   };
 
   return (
-    <Card className="border shadow-md rounded-xl overflow-hidden">
+    <Card className="border shadow-md rounded-xl overflow-hidden border-[#1EAEDB]/20 bg-gradient-to-br from-[#1A1F2C]/5 to-[#111827]/10">
       <CardHeader className="bg-gradient-to-r from-blue-600/90 to-indigo-600 text-white">
         <CardTitle className="text-xl flex items-center">
           <Briefcase className="h-5 w-5 mr-2" />
           Create New Job
+          <Zap className="h-4 w-4 ml-2 text-yellow-300" />
         </CardTitle>
         <StepIndicator currentStep={currentStep} totalSteps={totalSteps} />
       </CardHeader>
       <CardContent className="p-6">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <motion.form 
+            onSubmit={form.handleSubmit(handleSubmit)} 
+            className="space-y-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            key={currentStep}
+          >
             {renderCurrentStep()}
             
             <NavigationButtons 
@@ -171,7 +185,7 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
               nextStep={nextStep}
               onCancel={onComplete}
             />
-          </form>
+          </motion.form>
         </Form>
       </CardContent>
     </Card>

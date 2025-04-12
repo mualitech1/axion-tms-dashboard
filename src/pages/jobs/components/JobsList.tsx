@@ -5,6 +5,7 @@ import { mockJobs } from "./jobs-list/mockJobData";
 import { JobsTable } from "./jobs-list/JobsTable";
 import { EmptyJobsState } from "./jobs-list/EmptyJobsState";
 import { JobsFilter } from "./jobs-list/JobsFilter";
+import { motion } from "framer-motion";
 
 interface JobsListProps {
   selectedDate: Date;
@@ -36,10 +37,10 @@ export default function JobsList({ selectedDate, openJobCreation }: JobsListProp
   console.log("Current filtered jobs:", filteredJobs.length); // Debug log
 
   return (
-    <Card className="shadow-sm border-border/40">
-      <CardHeader className="pb-3 border-b">
+    <Card className="shadow-sm border-[#1EAEDB]/20 bg-gradient-to-br from-white to-blue-50/30">
+      <CardHeader className="pb-3 border-b border-[#1EAEDB]/10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
-          <CardTitle>Jobs List</CardTitle>
+          <CardTitle className="text-[#1A1F2C]">Jobs List</CardTitle>
           <JobsFilter 
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}

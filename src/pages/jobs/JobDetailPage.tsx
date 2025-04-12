@@ -1,212 +1,139 @@
 
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { mockJobs, getTimeFromDate } from "./components/jobs-list/mockJobData";
+import { mockJobs } from "./components/jobs-list/mockJobData";
 import { JobDetailHeader } from "./components/job-detail/JobDetailHeader";
-import { JobStatusCard } from "./components/job-detail/JobStatusCard";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { JobDetailsTab } from "./components/job-detail/JobDetailsTab";
 import { JobBackofficeTab } from "./components/job-detail/JobBackofficeTab";
 import { JobDocumentsTab } from "./components/job-detail/JobDocumentsTab";
 import { JobAssignmentInfo } from "./components/job-detail/JobAssignmentInfo";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileCheck } from "lucide-react";
-
-// Define job status as a union type for proper type checking
-type JobStatus = "in-progress" | "scheduled" | "completed" | "ready-for-invoicing";
+import { JobStatusCard } from "./components/job-detail/JobStatusCard";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { motion } from "framer-motion";
+import { MessageSquare } from "lucide-react";
 
 export default function JobDetailPage() {
-  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const jobId = parseInt(id || "0");
+  const [job, setJob] = useState<any | null>(null);
   
-  console.log("JobDetailPage rendered with ID:", id);
+  useEffect(() => {
+    if (id) {
+      const jobId = parseInt(id, 10);
+      const foundJob = mockJobs.find(j => j.id === jobId);
+      if (foundJob) {
+        setJob(foundJob);
+      }
+    }
+  }, [id]);
   
-  // Find the job from mock data - in a real app, this would be an API call
-  const job = mockJobs.find(j => j.id === jobId);
-  
-  // If job not found, show error and provide navigation option
   if (!job) {
-    console.log("Job not found for ID:", jobId);
     return (
-      <MainLayout title="Job Not Found">
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <h1 className="text-2xl font-semibold mb-2">Job Not Found</h1>
-          <p className="text-muted-foreground mb-4">
-            The job with ID {jobId} could not be found.
-          </p>
-          <Button onClick={() => navigate("/jobs")}>
-            Return to Jobs Dashboard
-          </Button>
+      <MainLayout title="Job Details">
+        <div className="p-8 text-center">
+          <h2 className="text-xl font-semibold mb-2">Job not found</h2>
+          <p className="text-muted-foreground">The requested job could not be found.</p>
         </div>
       </MainLayout>
     );
   }
   
-  // Get formatted time from the date string
-  const jobTime = getTimeFromDate(job.date);
-  
-  // State for tabs
-  const [activeTab, setActiveTab] = useState("details");
-  
-  // State for job status
-  const [jobStatus, setJobStatus] = useState<JobStatus>(job.status as JobStatus);
-  
-  // State to track document upload status
-  const [documentsUploaded, setDocumentsUploaded] = useState(false);
-  const [rateConfirmed, setRateConfirmed] = useState(false);
-  
-  // Check document upload status when tab changes or when uploads happen
-  useEffect(() => {
-    // This would be an API call in a real application
-    // For now we'll simulate checking if documents exist
-    const hasDocuments = localStorage.getItem(`job-${jobId}-documents`) === 'true';
-    setDocumentsUploaded(hasDocuments);
-  }, [jobId, activeTab]);
-  
-  // Update rate confirmation status
-  useEffect(() => {
-    // Create a helper function to safely check the status
-    const checkIfCompleted = (status: JobStatus): boolean => {
-      return status === "completed" || status === "ready-for-invoicing";
-    };
-    setRateConfirmed(checkIfCompleted(jobStatus));
-  }, [jobStatus]);
-  
-  const handleStatusChange = (newStatus: JobStatus) => {
-    setJobStatus(newStatus);
-    toast({
-      title: "Status Updated",
-      description: `Job status has been updated to ${newStatus}`,
-    });
-  };
-
-  const handleMarkReadyForInvoicing = () => {
-    setJobStatus("ready-for-invoicing");
-    toast({
-      title: "Ready for Invoicing",
-      description: "This job has been marked as ready for invoicing",
-    });
-  };
-
-  // Helper function to safely check if job is completed or ready for invoicing
-  const isJobCompleted = (status: JobStatus): boolean => {
-    return status === "completed" || status === "ready-for-invoicing";
-  };
-
-  const canMarkReadyForInvoicing = jobStatus === "completed" && documentsUploaded && rateConfirmed;
-  
-  // Use the helper function to create our boolean flag
-  const isCompleted = isJobCompleted(jobStatus);
-  
   return (
-    <MainLayout title="Job Details">
-      <JobDetailHeader jobId={jobId} title={job.title} client={job.client} />
-      
-      <div className="grid gap-6 md:grid-cols-3">
-        {/* Job status card */}
-        <JobStatusCard 
-          status={jobStatus}
-          priority={job.priority}
-          time={jobTime}
-          jobId={jobId}
-        />
+    <MainLayout title={`Job #${job.id}`}>
+      <div className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <JobDetailHeader jobId={job.id} title={job.title} client={job.client} />
+        </motion.div>
         
-        {/* Main content area */}
-        <div className="md:col-span-2">
-          <Card className="p-5 bg-white h-full">
-            {/* Status change controls for completed jobs */}
-            {isJobCompleted(jobStatus) && (
-              <div className="mb-4 p-3 border rounded-md bg-blue-50">
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <FileCheck className="h-5 w-5 text-blue-600" />
-                    <div>
-                      <h3 className="text-sm font-medium">Job Completed</h3>
-                      <p className="text-xs text-muted-foreground">
-                        This job is completed. You can now prepare it for invoicing.
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline" 
-                      size="sm"
-                      disabled={!canMarkReadyForInvoicing}
-                      onClick={handleMarkReadyForInvoicing}
-                      className={canMarkReadyForInvoicing ? "border-green-300 hover:bg-green-50" : ""}
-                    >
-                      Mark Ready for Invoicing
-                    </Button>
-                    
-                    <Select value={jobStatus} onValueChange={(value: JobStatus) => handleStatusChange(value)}>
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Change Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="in-progress">In Progress</SelectItem>
-                        <SelectItem value="scheduled">Scheduled</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                        <SelectItem value="ready-for-invoicing">Ready for Invoicing</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          <motion.div 
+            className="md:col-span-2 space-y-6"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
+            <Card className="overflow-hidden bg-gradient-to-br from-white to-blue-50/30 border-[#1EAEDB]/20">
+              <Tabs defaultValue="details" className="w-full">
+                <TabsList className="grid grid-cols-3 bg-muted/40 rounded-none border-b">
+                  <TabsTrigger value="details">Details</TabsTrigger>
+                  <TabsTrigger value="documents">Documents</TabsTrigger>
+                  <TabsTrigger value="backoffice">Back Office</TabsTrigger>
+                </TabsList>
+                <div className="p-4">
+                  <TabsContent value="details" className="mt-0 space-y-4">
+                    <JobDetailsTab />
+                  </TabsContent>
+                  <TabsContent value="documents" className="mt-0">
+                    <JobDocumentsTab />
+                  </TabsContent>
+                  <TabsContent value="backoffice" className="mt-0">
+                    <JobBackofficeTab />
+                  </TabsContent>
+                </div>
+              </Tabs>
+            </Card>
+            
+            {/* Collection Reference Box for Additional Comments */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+            >
+              <Card className="p-4 border-[#1EAEDB]/20 bg-gradient-to-br from-white to-blue-50/30">
+                <div className="flex items-center gap-2 mb-3">
+                  <MessageSquare className="h-5 w-5 text-[#1EAEDB]" />
+                  <h3 className="font-medium">Collection Reference Notes</h3>
                 </div>
                 
-                <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2 pt-2 border-t">
-                  <div className="flex items-center gap-1">
-                    <div className={`w-2 h-2 rounded-full ${documentsUploaded ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                    <span className="text-xs">Required Documents Uploaded</span>
+                <Separator className="mb-4" />
+                
+                <div className="space-y-3">
+                  <div className="bg-white/60 p-3 rounded-md border border-[#1EAEDB]/10 shadow-sm">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      <span className="font-medium text-gray-700">Collection Reference:</span> ABC-9876-COL
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Customer requested notification 30 minutes before arrival. Security code for gate: 4872.
+                    </p>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <div className={`w-2 h-2 rounded-full ${rateConfirmed ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                    <span className="text-xs">Rate Confirmed</span>
+                  
+                  <div className="bg-white/60 p-3 rounded-md border border-[#1EAEDB]/10 shadow-sm">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      <span className="font-medium text-gray-700">Delivery Reference:</span> XYZ-1234-DEL
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Delivery location has height restriction (4.2m). Unloading bay #3 is reserved.
+                    </p>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <div className={`w-2 h-2 rounded-full ${jobStatus === "ready-for-invoicing" ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                    <span className="text-xs">Ready for Invoicing</span>
+                  
+                  <div className="bg-white/60 p-3 rounded-md border border-[#1EAEDB]/10 shadow-sm">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      <span className="font-medium text-gray-700">Additional Instructions:</span>
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Fragile items on pallet #2 - handle with care. Contact Sarah Johnson (07892 123456) with any issues during collection or delivery.
+                    </p>
                   </div>
                 </div>
-              </div>
-            )}
-            
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-3 mb-4">
-                <TabsTrigger value="details">Details</TabsTrigger>
-                <TabsTrigger value="backoffice">Backoffice</TabsTrigger>
-                <TabsTrigger value="documents">Documents</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="details" className="space-y-4">
-                <JobDetailsTab />
-              </TabsContent>
-              
-              <TabsContent value="backoffice">
-                <JobBackofficeTab />
-              </TabsContent>
-              
-              <TabsContent value="documents">
-                <JobDocumentsTab 
-                  jobId={jobId}
-                  onDocumentsUploaded={() => {
-                    setDocumentsUploaded(true);
-                    localStorage.setItem(`job-${jobId}-documents`, 'true');
-                  }}
-                  isCompleted={isCompleted}
-                />
-              </TabsContent>
-            </Tabs>
-          </Card>
-        </div>
-        
-        {/* Sidebar */}
-        <div className="md:col-span-1">
-          <JobAssignmentInfo />
+              </Card>
+            </motion.div>
+          </motion.div>
+          
+          <motion.div 
+            className="space-y-6"
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
+            <JobStatusCard status={job.status} date={job.date} />
+            <JobAssignmentInfo />
+          </motion.div>
         </div>
       </div>
     </MainLayout>
