@@ -3,8 +3,11 @@ import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AutomationSettings from './components/settings/AutomationSettings';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function PipelineSettings() {
+  const isMobile = useIsMobile();
+  
   return (
     <MainLayout title="Pipeline Settings">
       <div className="mb-6">
@@ -15,13 +18,15 @@ export default function PipelineSettings() {
       </div>
       
       <Tabs defaultValue="automations" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="automations">Automations</TabsTrigger>
-          <TabsTrigger value="integrations">Integrations</TabsTrigger>
-          <TabsTrigger value="templates">Email Templates</TabsTrigger>
-          <TabsTrigger value="fields">Custom Fields</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto scrollbar-none">
+          <TabsList className={`${isMobile ? 'w-max min-w-full' : ''}`}>
+            <TabsTrigger value="general">General</TabsTrigger>
+            <TabsTrigger value="automations">Automations</TabsTrigger>
+            <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="templates">Email Templates</TabsTrigger>
+            <TabsTrigger value="fields">Custom Fields</TabsTrigger>
+          </TabsList>
+        </div>
         
         <TabsContent value="general" className="space-y-4">
           <div className="text-center py-8 text-muted">

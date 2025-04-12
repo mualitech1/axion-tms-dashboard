@@ -4,10 +4,12 @@ import { motion } from 'framer-motion';
 import { Save, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function SettingsHeader() {
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
+  const isMobile = useIsMobile();
   
   const handleSave = async () => {
     setSaving(true);
@@ -28,13 +30,13 @@ export default function SettingsHeader() {
       {/* Glow effect behind header */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1EAEDB]/0 via-[#1EAEDB] to-[#1EAEDB]/0" />
       
-      <div className="flex justify-between items-center px-8 py-6">
+      <div className={`flex ${isMobile ? 'flex-col' : 'justify-between'} items-start md:items-center px-4 md:px-8 py-4 md:py-6 gap-4`}>
         <div>
           <motion.h1 
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="text-3xl font-light text-white flex items-center gap-2"
+            className="text-2xl md:text-3xl font-light text-white flex items-center gap-2"
           >
             <span className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-[#1EAEDB] to-[#8B5CF6]">
               AXIMO
@@ -45,16 +47,16 @@ export default function SettingsHeader() {
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="text-gray-400 mt-1"
+            className="text-sm md:text-base text-gray-400 mt-1"
           >
             Configure your AI logistics assistant and personalize your experience
           </motion.p>
         </div>
         
-        <div className="flex gap-3">
+        <div className="flex gap-3 w-full md:w-auto">
           <Button 
             variant="outline"
-            className="border-[#1EAEDB]/30 hover:border-[#1EAEDB]/80 text-gray-300 hover:text-white hover:bg-[#1A1F2C]"
+            className="border-[#1EAEDB]/30 hover:border-[#1EAEDB]/80 text-gray-300 hover:text-white hover:bg-[#1A1F2C] flex-1 md:flex-none"
           >
             <RotateCcw className="h-4 w-4 mr-2" />
             Reset
@@ -63,7 +65,7 @@ export default function SettingsHeader() {
           <Button 
             onClick={handleSave}
             disabled={saving}
-            className="bg-gradient-to-r from-[#1EAEDB] to-[#8B5CF6] hover:from-[#1EAEDB]/90 hover:to-[#8B5CF6]/90 text-white shadow-lg shadow-[#1EAEDB]/20 hover:shadow-[#1EAEDB]/30 transition-all"
+            className="bg-gradient-to-r from-[#1EAEDB] to-[#8B5CF6] hover:from-[#1EAEDB]/90 hover:to-[#8B5CF6]/90 text-white shadow-lg shadow-[#1EAEDB]/20 hover:shadow-[#1EAEDB]/30 transition-all flex-1 md:flex-none"
           >
             {saving ? (
               <div className="flex items-center">

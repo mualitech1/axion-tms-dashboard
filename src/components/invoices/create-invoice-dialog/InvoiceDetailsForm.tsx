@@ -1,3 +1,4 @@
+
 import { Building2, Calendar, PoundSterling } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -5,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
 import { InvoiceFormValues } from "./hooks/useInvoiceForm";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface InvoiceDetailsFormProps {
   form: UseFormReturn<InvoiceFormValues>;
@@ -15,6 +17,8 @@ export function InvoiceDetailsForm({
   form,
   handlePaymentTermsChange
 }: InvoiceDetailsFormProps) {
+  const isMobile = useIsMobile();
+  
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4">
@@ -50,7 +54,7 @@ export function InvoiceDetailsForm({
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className={`grid grid-cols-1 ${isMobile ? '' : 'sm:grid-cols-2'} gap-4`}>
         <FormField
           control={form.control}
           name="issueDate"
@@ -105,7 +109,7 @@ export function InvoiceDetailsForm({
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className={`grid grid-cols-1 ${isMobile ? '' : 'sm:grid-cols-2'} gap-4`}>
         <FormField
           control={form.control}
           name="dueDate"

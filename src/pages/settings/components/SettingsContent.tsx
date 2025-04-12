@@ -7,6 +7,7 @@ import SecuritySettings from './SecuritySettings';
 import NotificationSettings from './NotificationSettings';
 import IntegrationSettings from './IntegrationSettings';
 import AISettings from './AISettings';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   Settings2, 
   Shield, 
@@ -18,6 +19,7 @@ import {
 export default function SettingsContent() {
   const [activeTab, setActiveTab] = useState('general');
   const [mounted, setMounted] = useState(false);
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     setMounted(true);
@@ -47,10 +49,10 @@ export default function SettingsContent() {
   };
   
   return (
-    <div className="px-8 pb-8">
+    <div className={`px-4 md:px-8 pb-8 ${isMobile ? 'pt-4' : ''}`}>
       <Tabs defaultValue="general" onValueChange={setActiveTab} className="w-full">
-        <div className="mb-8 border-b border-[#1EAEDB]/20">
-          <TabsList className="h-auto p-0 bg-transparent w-full justify-start overflow-x-auto scrollbar-none">
+        <div className="mb-6 md:mb-8 border-b border-[#1EAEDB]/20">
+          <TabsList className={`h-auto p-0 bg-transparent w-full ${isMobile ? 'grid grid-cols-2 gap-2' : 'justify-start'} overflow-x-auto scrollbar-none`}>
             {tabs.map((tab, index) => (
               <motion.div 
                 key={tab.id}
@@ -58,18 +60,19 @@ export default function SettingsContent() {
                 initial="hidden"
                 animate="visible"
                 variants={tabVariants}
+                className={isMobile ? 'mb-2' : ''}
               >
                 <TabsTrigger
                   value={tab.id}
                   className={`
-                    flex items-center gap-2 px-5 py-4 rounded-none border-b-2 
+                    flex items-center gap-2 ${isMobile ? 'justify-center py-3 px-2 w-full' : 'px-5 py-4 rounded-none'} 
                     transition-all duration-300 bg-transparent text-gray-400
-                    data-[state=active]:text-[#1EAEDB] data-[state=active]:border-[#1EAEDB]
+                    data-[state=active]:text-[#1EAEDB] ${!isMobile ? 'data-[state=active]:border-b-2 data-[state=active]:border-[#1EAEDB]' : 'data-[state=active]:bg-[#1EAEDB]/10'}
                     data-[state=inactive]:border-transparent hover:text-gray-200
                   `}
                 >
                   <tab.icon className="h-4 w-4" />
-                  {tab.label}
+                  <span className={isMobile ? 'text-sm' : ''}>{tab.label}</span>
                 </TabsTrigger>
               </motion.div>
             ))}
