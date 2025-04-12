@@ -14,10 +14,12 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { motion } from "framer-motion";
 import { MessageSquare } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 export default function JobDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [job, setJob] = useState<any | null>(null);
+  const [documentsUploaded, setDocumentsUploaded] = useState(false);
   
   useEffect(() => {
     if (id) {
@@ -28,6 +30,17 @@ export default function JobDetailPage() {
       }
     }
   }, [id]);
+  
+  const handleDocumentsUploaded = () => {
+    setDocumentsUploaded(true);
+    toast({
+      title: "Documents uploaded",
+      description: "All documents have been successfully uploaded.",
+    });
+  };
+  
+  // Determine if the job is completed based on status
+  const isJobCompleted = job?.status === "completed" || job?.status === "ready-for-invoicing";
   
   if (!job) {
     return (
@@ -70,7 +83,11 @@ export default function JobDetailPage() {
                     <JobDetailsTab />
                   </TabsContent>
                   <TabsContent value="documents" className="mt-0">
-                    <JobDocumentsTab />
+                    <JobDocumentsTab 
+                      jobId={job.id}
+                      onDocumentsUploaded={handleDocumentsUploaded}
+                      isCompleted={isJobCompleted}
+                    />
                   </TabsContent>
                   <TabsContent value="backoffice" className="mt-0">
                     <JobBackofficeTab />
@@ -131,7 +148,12 @@ export default function JobDetailPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
           >
-            <JobStatusCard status={job.status} date={job.date} />
+            <JobStatusCard 
+              status={job.status} 
+              priority={job.priority || "medium"} 
+              time={job.date} 
+              jobId={job.id}
+            />
             <JobAssignmentInfo />
           </motion.div>
         </div>
