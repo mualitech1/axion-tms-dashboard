@@ -12,6 +12,7 @@ interface Address {
   city: string;
   postCode: string;
   reference?: string;
+  time?: string;
 }
 
 interface AdditionalStopProps {

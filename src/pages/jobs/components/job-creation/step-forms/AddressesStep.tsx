@@ -13,6 +13,8 @@ interface Address {
   addressLine1: string;
   city: string;
   postCode: string;
+  reference?: string;
+  time?: string;
 }
 
 interface AddressesStepProps {
