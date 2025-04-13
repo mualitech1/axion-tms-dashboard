@@ -20,6 +20,7 @@ interface Address {
   city: string;
   postCode: string;
   reference: string;
+  time?: string;
   additionalComments?: string;
 }
 
@@ -32,6 +33,7 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
   const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
   const [additionalStops, setAdditionalStops] = useState<Address[]>([]);
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const [uploadedDocuments, setUploadedDocuments] = useState<File[]>([]);
   const { toast } = useToast();
   
   const form = useForm({
@@ -52,6 +54,7 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
         city: "",
         postCode: "",
         reference: "",
+        time: "09:00",
         additionalComments: ""
       },
       delivery: {
@@ -61,6 +64,7 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
         city: "",
         postCode: "",
         reference: "",
+        time: "14:00",
         additionalComments: ""
       }
     }
@@ -87,7 +91,8 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
       addressLine1: "",
       city: "",
       postCode: "",
-      reference: ""
+      reference: "",
+      time: "12:00"
     }]);
   };
 
@@ -102,13 +107,18 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
     newStops[index] = { ...newStops[index], [field]: value };
     setAdditionalStops(newStops);
   };
+  
+  const handleDocumentsChange = (files: File[]) => {
+    setUploadedDocuments(files);
+  };
 
   const handleSubmit = (data: any) => {
     // In a real app, we would save this to a database
     const fullJobData = {
       ...data,
       date,
-      additionalStops
+      additionalStops,
+      documents: uploadedDocuments.map(file => file.name)
     };
     
     console.log("Saving job:", fullJobData);

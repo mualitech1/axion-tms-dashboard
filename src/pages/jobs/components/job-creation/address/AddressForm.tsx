@@ -6,9 +6,8 @@ import { FormField, FormItem, FormLabel, FormControl, FormDescription } from "@/
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, Building, User, MapPin, MessageSquare } from "lucide-react";
+import { CalendarIcon, Building, User, MapPin, MessageSquare, Clock } from "lucide-react";
 import { useState } from "react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -100,16 +99,22 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
                 />
               </PopoverContent>
             </Popover>
-            <Select>
-              <SelectTrigger className="w-[140px] border-[#1EAEDB]/20">
-                <SelectValue placeholder="Time" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="morning">Morning</SelectItem>
-                <SelectItem value="afternoon">Afternoon</SelectItem>
-                <SelectItem value="specific">Specific Time</SelectItem>
-              </SelectContent>
-            </Select>
+            <FormField
+              control={form.control}
+              name={`${prefix}.time`}
+              render={({ field }) => (
+                <FormControl>
+                  <div className="relative">
+                    <Input
+                      type="time"
+                      className="w-full border-[#1EAEDB]/20 pl-9"
+                      {...field}
+                    />
+                    <Clock className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                  </div>
+                </FormControl>
+              )}
+            />
           </div>
         </div>
         

@@ -1,16 +1,16 @@
 
-import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { InputWithIcon } from "@/components/ui/input-with-icon";
-import { CalendarIcon, Briefcase, User, Truck, PoundSterling } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CalendarIcon } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
+import { DocumentUploader } from "@/components/job-creation/DocumentUploader";
 
 interface BasicInfoStepProps {
   form: UseFormReturn<any>;
@@ -20,73 +20,21 @@ interface BasicInfoStepProps {
 
 export function BasicInfoStep({ form, date, setDate }: BasicInfoStepProps) {
   return (
-    <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2">
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-4">
         <FormField
           control={form.control}
           name="jobTitle"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="col-span-2">
               <FormLabel>Job Title</FormLabel>
               <FormControl>
-                <InputWithIcon icon={Briefcase} placeholder="Enter job title" {...field} required />
+                <Input placeholder="Enter job title" {...field} />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
-        
-        <FormField
-          control={form.control}
-          name="customer"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Customer</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="px-10">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <SelectValue placeholder="Select customer" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="acme">Acme Corp</SelectItem>
-                  <SelectItem value="globex">Globex Corporation</SelectItem>
-                  <SelectItem value="stark">Stark Industries</SelectItem>
-                  <SelectItem value="wayne">Wayne Enterprises</SelectItem>
-                </SelectContent>
-              </Select>
-            </FormItem>
-          )}
-        />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="date">Job Date</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={"outline"}
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? format(date, "PPP") : <span>Pick a date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                initialFocus
-                className={cn("p-3 pointer-events-auto")}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
         
         <FormField
           control={form.control}
@@ -96,24 +44,52 @@ export function BasicInfoStep({ form, date, setDate }: BasicInfoStepProps) {
               <FormLabel>Vehicle Type</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger className="px-10">
-                    <Truck className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <SelectTrigger>
                     <SelectValue placeholder="Select vehicle type" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="van">Van</SelectItem>
-                  <SelectItem value="truck">Truck</SelectItem>
-                  <SelectItem value="flatbed">Flatbed</SelectItem>
-                  <SelectItem value="refrigerated">Refrigerated</SelectItem>
+                  <SelectItem value="7.5t">7.5 Tonne</SelectItem>
+                  <SelectItem value="18t">18 Tonne</SelectItem>
+                  <SelectItem value="artic">Articulated</SelectItem>
                 </SelectContent>
               </Select>
+              <FormMessage />
             </FormItem>
           )}
         />
+        
+        <div className="space-y-2">
+          <FormLabel>Collection Date</FormLabel>
+          <Popover>
+            <PopoverTrigger asChild>
+              <FormControl>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "w-full pl-3 text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                </Button>
+              </FormControl>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
       
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-2 gap-4">
         <FormField
           control={form.control}
           name="priority"
@@ -133,10 +109,36 @@ export function BasicInfoStep({ form, date, setDate }: BasicInfoStepProps) {
                   <SelectItem value="urgent">Urgent</SelectItem>
                 </SelectContent>
               </Select>
+              <FormMessage />
             </FormItem>
           )}
         />
         
+        <FormField
+          control={form.control}
+          name="customer"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Customer</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select customer" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="customer1">ABC Ltd</SelectItem>
+                  <SelectItem value="customer2">XYZ Corporation</SelectItem>
+                  <SelectItem value="customer3">123 Industries</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
         <FormField
           control={form.control}
           name="rate"
@@ -144,14 +146,22 @@ export function BasicInfoStep({ form, date, setDate }: BasicInfoStepProps) {
             <FormItem>
               <FormLabel>Rate (£)</FormLabel>
               <FormControl>
-                <InputWithIcon icon={PoundSterling} type="number" placeholder="Enter rate" {...field} />
+                <Input type="number" {...field} />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
       </div>
       
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4">
+        <FormItem>
+          <FormLabel>Order Confirmation Documents</FormLabel>
+          <DocumentUploader />
+        </FormItem>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           control={form.control}
           name="productType"
@@ -159,8 +169,9 @@ export function BasicInfoStep({ form, date, setDate }: BasicInfoStepProps) {
             <FormItem>
               <FormLabel>Product Type</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter product type" />
+                <Input placeholder="Enter product type" {...field} />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -170,14 +181,33 @@ export function BasicInfoStep({ form, date, setDate }: BasicInfoStepProps) {
           name="totalWeight"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Total Weight (KG)</FormLabel>
+              <FormLabel>Total Weight (kg)</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter total weight" type="number" />
+                <Input type="number" {...field} />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
       </div>
+      
+      <FormField
+        control={form.control}
+        name="additionalInformation"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Additional Information</FormLabel>
+            <FormControl>
+              <Textarea 
+                placeholder="Enter any additional information about this job" 
+                className="min-h-[80px]"
+                {...field} 
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 }
