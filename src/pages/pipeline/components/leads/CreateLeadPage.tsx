@@ -1,15 +1,23 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import CreateLeadForm from './CreateLeadForm';
 import { pipelineStages } from '../../data/pipelineData';
-import { useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
+/**
+ * CreateLeadPage component for creating new leads in the sales pipeline
+ * It provides the main container and layout for the lead creation process
+ */
 export default function CreateLeadPage() {
   const navigate = useNavigate();
   
+  /**
+   * Handles successful lead creation
+   * Navigates back to the pipeline board
+   */
   const handleLeadCreated = () => {
-    // Navigate back to the pipeline board after successful creation
     navigate('/sales-pipeline/board');
   };
   
