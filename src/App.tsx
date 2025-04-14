@@ -21,6 +21,8 @@ import NotFound from "./pages/NotFound";
 import CarrierSelfInvoices from "./pages/finance/CarrierSelfInvoices";
 import DisputeManagement from "./pages/finance/DisputeManagement";
 import PaymentRuns from "./pages/finance/PaymentRuns";
+import Drivers from "./pages/Drivers";
+import Fleet from "./pages/Fleet";
 
 // Customer specific pages
 import CustomersList from "./pages/customers/CustomersList";
@@ -67,6 +69,11 @@ function App() {
             <Route path="/finance/disputes" element={<DisputeManagement />} />
             <Route path="/finance/payment-runs" element={<PaymentRuns />} />
             <Route path="/settings" element={<Settings />} />
+            
+            {/* New Driver and Fleet Management Routes */}
+            <Route path="/drivers/*" element={<Drivers />} />
+            <Route path="/fleet/*" element={<Fleet />} />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

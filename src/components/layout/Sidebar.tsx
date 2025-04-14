@@ -1,11 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { 
   Home, Users, Truck, UserCircle, Settings, 
   BarChart2, CreditCard, FileText, Menu, X,
   Kanban, LayoutDashboard, ListTodo,
-  DollarSign,
-  Clipboard
+  DollarSign, Clipboard, User, Car
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -152,6 +152,8 @@ export default function Sidebar() {
             <NavItem to="/jobs" icon={Truck} label="Jobs" isCollapsed={isCollapsed} />
             <NavItem to="/customers" icon={Users} label="Customers" isCollapsed={isCollapsed} />
             <NavItem to="/carriers" icon={Truck} label="Carriers" isCollapsed={isCollapsed} />
+            <NavItem to="/drivers" icon={User} label="Drivers" isCollapsed={isCollapsed} />
+            <NavItem to="/fleet" icon={Car} label="Fleet" isCollapsed={isCollapsed} />
             
             {/* Sales Pipeline with submenu structure */}
             <NavItem 
