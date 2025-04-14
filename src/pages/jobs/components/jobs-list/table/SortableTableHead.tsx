@@ -8,6 +8,7 @@ interface SortableTableHeadProps {
   sortDirection: "asc" | "desc";
   onSort: (column: string) => void;
   children: React.ReactNode;
+  filter?: React.ReactNode;
 }
 
 export function SortableTableHead({
@@ -15,7 +16,8 @@ export function SortableTableHead({
   currentSortColumn,
   sortDirection,
   onSort,
-  children
+  children,
+  filter
 }: SortableTableHeadProps) {
   const renderSortIcon = () => {
     if (currentSortColumn !== column) return null;
@@ -26,11 +28,18 @@ export function SortableTableHead({
 
   return (
     <TableHead 
-      className="cursor-pointer hover:bg-muted/30 transition-colors"
+      className="cursor-pointer hover:bg-muted/30 transition-colors whitespace-nowrap"
       onClick={() => onSort(column)}
     >
-      <div className="flex items-center">
-        {children} {renderSortIcon()}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          {children} {renderSortIcon()}
+        </div>
+        {filter && (
+          <div onClick={(e) => e.stopPropagation()}>
+            {filter}
+          </div>
+        )}
       </div>
     </TableHead>
   );
