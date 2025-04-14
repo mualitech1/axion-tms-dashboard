@@ -6,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { JobStatus } from "../../../types/jobTypes";
 
 interface StatusFilterProps {
   value: string | null;
@@ -25,10 +26,14 @@ export function StatusFilter({ value, onChange }: StatusFilterProps) {
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any status</SelectItem>
-          <SelectItem value="scheduled">Scheduled</SelectItem>
+          <SelectItem value="booked">Booked</SelectItem>
+          <SelectItem value="allocated">Allocated</SelectItem>
           <SelectItem value="in-progress">In Progress</SelectItem>
+          <SelectItem value="finished">Finished</SelectItem>
+          <SelectItem value="invoiced">Invoiced</SelectItem>
+          <SelectItem value="cleared">Cleared</SelectItem>
           <SelectItem value="completed">Completed</SelectItem>
-          <SelectItem value="cancelled">Cancelled</SelectItem>
+          <SelectItem value="archived">Archived</SelectItem>
         </SelectContent>
       </Select>
     </div>

@@ -5,9 +5,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
-
-// Use the same JobStatus type as in JobDetailPage
-type JobStatus = "in-progress" | "scheduled" | "completed" | "ready-for-invoicing";
+import { JobStatus } from "../../types/jobTypes";
+import { JobStatusUpdate } from "./JobStatusUpdate";
+import { getStatusColor } from "../../utils/jobStatusUtils";
 
 interface JobStatusCardProps {
   status: JobStatus;
@@ -19,14 +19,25 @@ interface JobStatusCardProps {
 export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardProps) {
   // Helper function to safely check if status is completed or ready for invoicing
   const isJobCompleted = (status: JobStatus): boolean => {
-    return status === "completed" || status === "ready-for-invoicing";
+    return status === "completed" || status === "archived";
   };
   
-  const [rateConfirmed, setRateConfirmed] = useState(isJobCompleted(status));
+  const [currentStatus, setCurrentStatus] = useState<JobStatus>(status);
+  const [rateConfirmed, setRateConfirmed] = useState(isJobCompleted(currentStatus));
   
   useEffect(() => {
-    setRateConfirmed(isJobCompleted(status));
-  }, [status]);
+    setRateConfirmed(isJobCompleted(currentStatus));
+  }, [currentStatus]);
+  
+  const handleStatusChange = (newStatus: JobStatus) => {
+    setCurrentStatus(newStatus);
+    
+    // If status is now invoiced, we could trigger additional actions
+    if (newStatus === "invoiced") {
+      // In a real app, this would generate an invoice
+      console.log("Should generate invoice for job:", jobId);
+    }
+  };
   
   const handleConfirmRate = () => {
     setRateConfirmed(true);
@@ -36,7 +47,7 @@ export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardPr
     });
   };
   
-  const isCompleted = isJobCompleted(status);
+  const isCompleted = isJobCompleted(currentStatus);
   
   return (
     <Card className="p-5 md:col-span-3 bg-white">
@@ -49,14 +60,10 @@ export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardPr
             <p className="text-sm text-muted-foreground">Status</p>
             <div className="flex items-center gap-2">
               <Badge 
-                variant={
-                  status === "in-progress" ? "default" :
-                  status === "scheduled" ? "secondary" :
-                  status === "ready-for-invoicing" ? "outline" : "outline"
-                }
-                className={`capitalize text-sm ${status === "ready-for-invoicing" ? "bg-green-100 text-green-800 border-green-200" : ""}`}
+                variant="outline"
+                className={`capitalize text-sm ${getStatusColor(currentStatus)}`}
               >
-                {status}
+                {currentStatus.replace('-', ' ')}
               </Badge>
               <Badge 
                 variant="outline" 
@@ -90,6 +97,15 @@ export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardPr
         </div>
       </div>
       
+      {/* Status Update Section */}
+      <div className="mt-4 pt-3 border-t">
+        <JobStatusUpdate 
+          jobId={jobId}
+          status={currentStatus}
+          onStatusChange={handleStatusChange}
+        />
+      </div>
+      
       {/* Rate confirmation section */}
       <div className="mt-4 pt-3 border-t">
         <div className="flex items-center justify-between">
@@ -110,7 +126,7 @@ export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardPr
               <Button 
                 size="sm"
                 variant="outline" 
-                disabled={!isCompleted}
+                disabled={!isCompleted && currentStatus !== "invoiced"}
                 onClick={handleConfirmRate}
               >
                 Confirm Final Rate

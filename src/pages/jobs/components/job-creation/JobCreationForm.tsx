@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
@@ -12,6 +11,7 @@ import { SummaryStep } from "./step-forms/SummaryStep";
 import { StepIndicator } from "./StepIndicator";
 import { NavigationButtons } from "./NavigationButtons";
 import { motion } from "framer-motion";
+import { JobStatus } from "../../types/jobTypes";
 
 interface Address {
   companyName: string;
@@ -113,17 +113,17 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
   };
 
   const handleSubmit = (data: any) => {
-    // In a real app, we would save this to a database
     const fullJobData = {
       ...data,
       date,
       additionalStops,
-      documents: uploadedDocuments.map(file => file.name)
+      documents: uploadedDocuments.map(file => file.name),
+      status: "booked" as JobStatus,
+      createdAt: new Date().toISOString(),
     };
     
     console.log("Saving job:", fullJobData);
     
-    // Save addresses for future use
     const newAddresses = [];
     if (!savedAddresses.some(addr => addr.addressLine1 === data.collection.addressLine1)) {
       newAddresses.push(data.collection);
@@ -138,7 +138,7 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
     
     toast({
       title: "Job Created",
-      description: `${data.jobTitle} has been scheduled for ${date ? format(date, "PPP") : "unspecified date"}`,
+      description: `${data.jobTitle} has been scheduled for ${date ? format(date, "PPP") : "unspecified date"} with status "Booked"`,
     });
     
     onComplete();
