@@ -1,7 +1,7 @@
 
 import { Card } from '@/components/ui/card';
 import { vehicles } from '../data/fleetData';
-import { AlertTriangle, Calendar, Gauge, Tool } from 'lucide-react';
+import { AlertTriangle, Calendar, Gauge, Wrench } from 'lucide-react';
 
 export default function MaintenanceAlerts() {
   // Get current date for comparisons
@@ -58,7 +58,7 @@ export default function MaintenanceAlerts() {
                 <li key={`service-${vehicle.id}`} className="text-sm p-2 bg-amber-50 rounded flex justify-between">
                   <span>{vehicle.registration}</span>
                   <div className="flex items-center gap-1">
-                    <Tool className="h-3 w-3" />
+                    <Wrench className="h-3 w-3" />
                     <span className="font-medium">{formatDate(vehicle.nextServiceDate)}</span>
                   </div>
                 </li>

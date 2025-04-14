@@ -2,7 +2,7 @@
 import { Vehicle } from '../types/fleetTypes';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, AlertTriangle, Tool } from 'lucide-react';
+import { Calendar, AlertTriangle, Wrench } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -79,7 +79,7 @@ export default function VehiclesTable({ vehicles }: VehiclesTableProps) {
                 <TableCell>
                   {new Date(vehicle.nextServiceDate) <= new Date() ? (
                     <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 flex items-center gap-1">
-                      <Tool className="h-3 w-3" /> Overdue
+                      <Wrench className="h-3 w-3" /> Overdue
                     </Badge>
                   ) : (
                     getExpiryBadge(vehicle.nextServiceDate)
