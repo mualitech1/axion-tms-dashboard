@@ -1,10 +1,11 @@
 
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { JobStatus } from "../../types/jobTypes";
 
 interface FilterButtonsProps {
-  filter: "all" | "booked" | "in-progress" | "issues";
-  setFilter: (filter: "all" | "booked" | "in-progress" | "issues") => void;
+  filter: "all" | JobStatus;
+  setFilter: (filter: "all" | JobStatus) => void;
 }
 
 export function FilterButtons({ filter, setFilter }: FilterButtonsProps) {

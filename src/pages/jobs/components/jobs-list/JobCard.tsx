@@ -3,8 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpRight, Calendar, User2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Job, getTimeFromDate } from "./mockJobData";
-import { JobStatus } from "../../types/jobTypes";
+import { getTimeFromDate } from "./mockJobData";
+import { Job, JobStatus } from "../../types/jobTypes";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface JobCardProps {

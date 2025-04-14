@@ -5,8 +5,8 @@ import { mockJobs } from "./jobs-list/mockJobData";
 import { JobsTable } from "./jobs-list/JobsTable";
 import { EmptyJobsState } from "./jobs-list/EmptyJobsState";
 import { JobsFilter } from "./jobs-list/JobsFilter";
-import { motion } from "framer-motion";
 import { FilterButtons } from "./jobs-list/FilterButtons";
+import { Job, JobStatus } from "../types/jobTypes";
 
 interface JobsListProps {
   selectedDate: Date;
@@ -15,7 +15,7 @@ interface JobsListProps {
 
 export default function JobsList({ selectedDate, openJobCreation }: JobsListProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "booked" | "in-progress" | "issues">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | JobStatus>("all");
   
   const filteredJobs = mockJobs
     .filter(job => {
