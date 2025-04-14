@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockJobs } from "./jobs-list/mockJobData";
+import { mockJobs } from "../data/mockJobData";
 import { JobsTable } from "./jobs-list/JobsTable";
 import { EmptyJobsState } from "./jobs-list/EmptyJobsState";
 import { JobsFilter } from "./jobs-list/JobsFilter";
