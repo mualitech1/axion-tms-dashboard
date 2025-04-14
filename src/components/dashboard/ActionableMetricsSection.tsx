@@ -31,9 +31,9 @@ export default function ActionableMetricsSection({ jobsData, financialData }: Ac
   return (
     <div className="grid gap-4 md:grid-cols-3 mb-6">
       {/* Jobs Status Cards */}
-      <Link to="/jobs?status=in-transit" className="transition-transform hover:scale-[1.02]">
+      <Link to="/jobs?status=in-progress" className="transition-transform hover:scale-[1.02]">
         <MetricsCard
-          title="Jobs In Transit"
+          title="Jobs In Progress"
           value={jobsData.inTransit}
           description="Currently being transported"
           icon={<TruckIcon className="h-4 w-4" />}
@@ -52,7 +52,7 @@ export default function ActionableMetricsSection({ jobsData, financialData }: Ac
         />
       </Link>
       
-      <Link to="/jobs?status=ready-for-invoicing" className="transition-transform hover:scale-[1.02]">
+      <Link to="/jobs?status=finished" className="transition-transform hover:scale-[1.02]">
         <MetricsCard
           title="Ready for Invoicing"
           value={jobsData.readyForInvoicing}

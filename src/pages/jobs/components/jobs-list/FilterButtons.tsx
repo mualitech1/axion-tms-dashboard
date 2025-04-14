@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FilterButtonsProps {
-  filter: "all" | "scheduled" | "in-progress" | "pending";
-  setFilter: (filter: "all" | "scheduled" | "in-progress" | "pending") => void;
+  filter: "all" | "booked" | "in-progress" | "issues";
+  setFilter: (filter: "all" | "booked" | "in-progress" | "issues") => void;
 }
 
 export function FilterButtons({ filter, setFilter }: FilterButtonsProps) {
@@ -21,12 +21,12 @@ export function FilterButtons({ filter, setFilter }: FilterButtonsProps) {
         All
       </Button>
       <Button 
-        variant={filter === "scheduled" ? "default" : "ghost"} 
+        variant={filter === "booked" ? "default" : "ghost"} 
         size={isMobile ? "sm" : "sm"}
-        onClick={() => setFilter("scheduled")}
+        onClick={() => setFilter("booked")}
         className="rounded-full whitespace-nowrap"
       >
-        Scheduled
+        Booked
       </Button>
       <Button 
         variant={filter === "in-progress" ? "default" : "ghost"} 
@@ -37,12 +37,12 @@ export function FilterButtons({ filter, setFilter }: FilterButtonsProps) {
         In Progress
       </Button>
       <Button 
-        variant={filter === "pending" ? "default" : "ghost"} 
+        variant={filter === "issues" ? "default" : "ghost"} 
         size={isMobile ? "sm" : "sm"}
-        onClick={() => setFilter("pending")}
+        onClick={() => setFilter("issues")}
         className="rounded-full whitespace-nowrap"
       >
-        Pending
+        Issues
       </Button>
     </div>
   );

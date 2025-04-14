@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import { Job } from "./mockJobData";
+import { Job, JobStatus } from "../../types/jobTypes";
 
 interface JobsTableProps {
   jobs: Job[];
@@ -148,7 +148,7 @@ export function JobsTable({ jobs }: JobsTableProps) {
               <TableCell>{job.origin}</TableCell>
               <TableCell>{job.destination}</TableCell>
               <TableCell>{format(new Date(job.date), "MMM d, HH:mm")}</TableCell>
-              <TableCell>{job.assignedTo || "Unassigned"}</TableCell>
+              <TableCell>{job.hauler?.name || "Unassigned"}</TableCell>
               <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                 <div className="flex justify-end gap-2">
                   <Button 
@@ -179,16 +179,26 @@ export function JobsTable({ jobs }: JobsTableProps) {
 }
 
 // Helper functions for badges
-function getStatusBadge(status: string) {
-  switch (status.toLowerCase()) {
-    case "scheduled":
-      return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Scheduled</Badge>;
-    case "in transit":
-      return <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">In Transit</Badge>;
+function getStatusBadge(status: JobStatus) {
+  switch (status) {
+    case "booked":
+      return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Booked</Badge>;
+    case "allocated":
+      return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">Allocated</Badge>;
+    case "in-progress":
+      return <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">In Progress</Badge>;
+    case "finished":
+      return <Badge variant="outline" className="bg-emerald-50 text-emerald-800 border-emerald-200">Finished</Badge>;
+    case "invoiced":
+      return <Badge variant="outline" className="bg-indigo-50 text-indigo-800 border-indigo-200">Invoiced</Badge>;
+    case "cleared":
+      return <Badge variant="outline" className="bg-green-50 text-green-800 border-green-200">Cleared</Badge>;
     case "completed":
-      return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Completed</Badge>;
-    case "delayed":
-      return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Delayed</Badge>;
+      return <Badge variant="outline" className="bg-teal-50 text-teal-800 border-teal-200">Completed</Badge>;
+    case "archived":
+      return <Badge variant="outline" className="bg-gray-50 text-gray-800 border-gray-200">Archived</Badge>;
+    case "issues":
+      return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Issues</Badge>;
     default:
       return <Badge variant="outline">{status}</Badge>;
   }

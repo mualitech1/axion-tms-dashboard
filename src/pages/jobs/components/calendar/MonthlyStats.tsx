@@ -16,11 +16,11 @@ export function MonthlyStats() {
           <span className="font-bold text-lg">42</span>
         </div>
         <div className="flex flex-col">
-          <span className="text-muted-foreground">Scheduled</span>
+          <span className="text-muted-foreground">Booked</span>
           <span className="font-bold text-lg">36</span>
         </div>
         <div className="flex flex-col">
-          <span className="text-muted-foreground">Unscheduled</span>
+          <span className="text-muted-foreground">Unassigned</span>
           <span className="font-bold text-lg">6</span>
         </div>
       </div>

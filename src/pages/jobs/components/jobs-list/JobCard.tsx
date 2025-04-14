@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowUpRight, Calendar, User2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Job, getTimeFromDate } from "./mockJobData";
+import { JobStatus } from "../../types/jobTypes";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface JobCardProps {
@@ -40,12 +41,12 @@ export function JobCard({ job }: JobCardProps) {
             <div className="flex flex-wrap items-center gap-1 md:gap-2 mt-2">
               <Badge 
                 variant={
-                  job.status.toLowerCase() === "in transit" ? "default" :
-                  job.status.toLowerCase() === "scheduled" ? "secondary" : "outline"
+                  job.status === "in-progress" ? "default" :
+                  job.status === "booked" ? "secondary" : "outline"
                 }
                 className="capitalize text-xs md:text-sm py-0 md:py-0.5 px-1.5 md:px-2"
               >
-                {job.status}
+                {job.status.replace("-", " ")}
               </Badge>
               <Badge 
                 variant="outline" 

@@ -45,10 +45,10 @@ export function JobsPanel({ date, selectedJobs }: JobsPanelProps) {
             <CalendarIconOutline className="h-8 w-8 md:h-10 md:w-10 text-muted-foreground/70" />
           </div>
           <p className="text-muted-foreground font-medium text-sm md:text-base">
-            {date ? "No jobs scheduled for this date." : "Please select a date to view scheduled jobs."}
+            {date ? "No jobs booked for this date." : "Please select a date to view scheduled jobs."}
           </p>
           <p className="text-xs md:text-sm text-muted-foreground mt-2">
-            {date && "Click 'Create New Job' to schedule something for this day."}
+            {date && "Click 'Create New Job' to book something for this day."}
           </p>
         </div>
       )}

@@ -6,6 +6,7 @@ import { JobsTable } from "./jobs-list/JobsTable";
 import { EmptyJobsState } from "./jobs-list/EmptyJobsState";
 import { JobsFilter } from "./jobs-list/JobsFilter";
 import { motion } from "framer-motion";
+import { FilterButtons } from "./jobs-list/FilterButtons";
 
 interface JobsListProps {
   selectedDate: Date;
@@ -14,6 +15,7 @@ interface JobsListProps {
 
 export default function JobsList({ selectedDate, openJobCreation }: JobsListProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "booked" | "in-progress" | "issues">("all");
   
   const filteredJobs = mockJobs
     .filter(job => {
@@ -31,7 +33,11 @@ export default function JobsList({ selectedDate, openJobCreation }: JobsListProp
         job.destination.toLowerCase().includes(searchTerm) ||
         job.id.toString().includes(searchTerm);
         
-      return sameDate && matchesSearch;
+      const matchesStatus = 
+        statusFilter === "all" || 
+        job.status === statusFilter;
+      
+      return sameDate && matchesSearch && matchesStatus;
     });
 
   console.log("Current filtered jobs:", filteredJobs.length); // Debug log
@@ -46,6 +52,10 @@ export default function JobsList({ selectedDate, openJobCreation }: JobsListProp
             setSearchTerm={setSearchTerm}
           />
         </div>
+        <FilterButtons 
+          filter={statusFilter}
+          setFilter={setStatusFilter}
+        />
       </CardHeader>
       <CardContent className="p-0">
         {filteredJobs.length > 0 ? (
