@@ -7,7 +7,8 @@ export type JobStatus =
   | "invoiced"
   | "cleared"
   | "completed"
-  | "archived";
+  | "archived"
+  | "issues";
 
 export interface Job {
   id: number;
@@ -34,6 +35,7 @@ export interface Job {
   estimatedDuration?: number;
   podUploaded?: boolean; // Track if POD has been uploaded
   podDocumentId?: string; // Reference to the uploaded POD document
+  issueDetails?: string; // Details about any issues that occur
 }
 
 export interface StatusTransition {
@@ -41,5 +43,5 @@ export interface StatusTransition {
   to: JobStatus;
   label: string;
   requiresAction?: boolean;
-  actionType?: 'assign-hauler' | 'confirm-completion' | 'upload-pod' | 'generate-invoice' | 'confirm-payment' | 'archive';
+  actionType?: 'assign-hauler' | 'confirm-completion' | 'upload-pod' | 'generate-invoice' | 'confirm-payment' | 'archive' | 'report-issue' | 'resolve-issue';
 }

@@ -34,6 +34,7 @@ export function StatusFilter({ value, onChange }: StatusFilterProps) {
           <SelectItem value="cleared">Cleared</SelectItem>
           <SelectItem value="completed">Completed</SelectItem>
           <SelectItem value="archived">Archived</SelectItem>
+          <SelectItem value="issues">Issues</SelectItem>
         </SelectContent>
       </Select>
     </div>

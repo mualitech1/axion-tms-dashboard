@@ -9,6 +9,7 @@ import { JobStatus } from "../../types/jobTypes";
 import { JobStatusUpdate } from "./JobStatusUpdate";
 import { getStatusColor } from "../../utils/jobStatusUtils";
 import { PodUploadDialog } from "./PodUploadDialog";
+import { JobLifecycleViewer } from "./JobLifecycleViewer";
 
 interface JobStatusCardProps {
   status: JobStatus;
@@ -59,6 +60,7 @@ export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardPr
   };
   
   const isCompleted = isJobCompleted(currentStatus);
+  const hasIssues = currentStatus === "issues";
   
   return (
     <Card className="p-5 md:col-span-3 bg-white">
@@ -108,6 +110,21 @@ export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardPr
         </div>
       </div>
       
+      {/* Issues Alert */}
+      {hasIssues && (
+        <div className="mt-4 p-3 bg-red-50 rounded-md border border-red-200">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-red-500" />
+            <p className="text-sm font-medium text-red-800">
+              This job has issues that need attention
+            </p>
+          </div>
+          <p className="mt-1 text-xs text-red-700">
+            Please review and resolve the issues to continue with the job.
+          </p>
+        </div>
+      )}
+      
       {/* POD Status for Finished Jobs */}
       {currentStatus === "finished" && (
         <div className="mt-4 pt-3 border-t">
@@ -140,6 +157,17 @@ export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardPr
           </div>
         </div>
       )}
+      
+      {/* Job Lifecycle Viewer */}
+      <div className="mt-4 pt-3 border-t">
+        <div className="flex justify-between items-center">
+          <p className="text-sm font-medium">Job Lifecycle</p>
+          <JobLifecycleViewer 
+            jobId={jobId} 
+            currentStatus={currentStatus} 
+          />
+        </div>
+      </div>
       
       {/* Status Update Section */}
       <div className="mt-4 pt-3 border-t">

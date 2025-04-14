@@ -11,6 +11,13 @@ export const statusTransitions: StatusTransition[] = [
   { from: "invoiced", to: "cleared", label: "Mark as Paid", requiresAction: true, actionType: "confirm-payment" },
   { from: "cleared", to: "completed", label: "Complete Job", requiresAction: false },
   { from: "completed", to: "archived", label: "Archive", requiresAction: false },
+  // Add transitions for issues status
+  { from: "booked", to: "issues", label: "Report Issue", requiresAction: true, actionType: "report-issue" },
+  { from: "allocated", to: "issues", label: "Report Issue", requiresAction: true, actionType: "report-issue" },
+  { from: "in-progress", to: "issues", label: "Report Issue", requiresAction: true, actionType: "report-issue" },
+  { from: "issues", to: "booked", label: "Resolve & Reset", requiresAction: true, actionType: "resolve-issue" },
+  { from: "issues", to: "allocated", label: "Resolve & Allocate", requiresAction: true, actionType: "resolve-issue" },
+  { from: "issues", to: "in-progress", label: "Resolve & Continue", requiresAction: true, actionType: "resolve-issue" },
 ];
 
 // Helper function to get the next possible statuses
@@ -111,6 +118,8 @@ export const getStatusColor = (status: JobStatus): string => {
       return "bg-teal-100 text-teal-800 border-teal-200";
     case "archived":
       return "bg-gray-100 text-gray-800 border-gray-200";
+    case "issues":
+      return "bg-red-100 text-red-800 border-red-200";
     default:
       return "bg-gray-100 text-gray-800 border-gray-200";
   }
