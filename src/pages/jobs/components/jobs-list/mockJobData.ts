@@ -26,6 +26,7 @@ export const mockJobs: Job[] = [
     status: "booked" as JobStatus,
     priority: "high",
     date: getTimeToday(10), // 10:00 AM today
+    time: "10:00 AM", // Added time property
     origin: "London, UK",
     destination: "Manchester, UK",
     vehicle: "Truck #201",
@@ -46,6 +47,7 @@ export const mockJobs: Job[] = [
     status: "in-progress" as JobStatus,
     priority: "medium",
     date: getTimeToday(13), // 1:00 PM today
+    time: "1:00 PM", // Added time property
     origin: "Bristol, UK",
     destination: "Bath, UK",
     vehicle: "Truck #205",
@@ -67,6 +69,7 @@ export const mockJobs: Job[] = [
     status: "booked" as JobStatus,
     priority: "low",
     date: getTimeToday(15), // 3:00 PM today
+    time: "3:00 PM", // Added time property
     origin: "Birmingham, UK",
     destination: "Liverpool, UK",
     vehicle: "Truck #210",
@@ -89,6 +92,7 @@ export const mockJobs: Job[] = [
     status: "booked" as JobStatus,
     priority: "high",
     date: "2025-04-10T10:00:00",
+    time: "10:00 AM", // Added time property
     origin: "Austin, TX",
     destination: "Dallas, TX",
     vehicle: "Truck #105",
@@ -110,6 +114,7 @@ export const mockJobs: Job[] = [
     status: "in-progress" as JobStatus,
     priority: "medium",
     date: "2025-04-09T14:30:00",
+    time: "2:30 PM", // Added time property
     origin: "Houston, TX",
     destination: "San Antonio, TX",
     vehicle: "Truck #108",
@@ -131,6 +136,7 @@ export const mockJobs: Job[] = [
     status: "completed" as JobStatus,
     priority: "low",
     date: "2025-04-09T09:00:00",
+    time: "9:00 AM", // Added time property
     origin: "Dallas, TX",
     destination: "Fort Worth, TX",
     vehicle: "Truck #102",
@@ -153,6 +159,7 @@ export const mockJobs: Job[] = [
     status: "issues" as JobStatus,
     priority: "high",
     date: "2025-04-09T08:15:00",
+    time: "8:15 AM", // Added time property
     origin: "Austin, TX",
     destination: "Houston, TX",
     vehicle: "Truck #110",
@@ -175,6 +182,7 @@ export const mockJobs: Job[] = [
     status: "booked" as JobStatus,
     priority: "medium",
     date: "2025-04-10T07:00:00",
+    time: "7:00 AM", // Added time property
     origin: "San Antonio, TX",
     destination: "Austin, TX",
     vehicle: "Truck #107",
@@ -196,6 +204,7 @@ export const mockJobs: Job[] = [
     status: "booked" as JobStatus,
     priority: "low",
     date: "2025-04-11T11:00:00",
+    time: "11:00 AM", // Added time property
     origin: "Fort Worth, TX",
     destination: "Dallas, TX",
     vehicle: "Truck #103",
@@ -217,6 +226,7 @@ export const mockJobs: Job[] = [
     status: "in-progress" as JobStatus,
     priority: "high",
     date: "2025-04-09T13:45:00",
+    time: "1:45 PM", // Added time property
     origin: "Dallas, TX",
     destination: "Houston, TX",
     vehicle: "Truck #112",
@@ -238,6 +248,7 @@ export const mockJobs: Job[] = [
     status: "booked" as JobStatus,
     priority: "medium",
     date: "2025-04-11T09:30:00",
+    time: "9:30 AM", // Added time property
     origin: "Houston, TX",
     destination: "Austin, TX",
     vehicle: "Truck #114",
