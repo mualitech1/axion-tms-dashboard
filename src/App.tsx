@@ -57,10 +57,11 @@ function App() {
             
             <Route path="/customer-portal/*" element={<CustomerPortal />} />
             <Route path="/carriers/*" element={<Carriers />} />
+            
+            {/* Fixed pipeline routing */}
             <Route path="/pipeline/*" element={<Pipeline />} />
-            <Route path="/pipeline/reports" element={<PipelineReports />} />
-            <Route path="/pipeline/settings" element={<PipelineSettings />} />
-            <Route path="/sales-pipeline/*" element={<Pipeline />} />
+            
+            {/* Remove duplicate routes that might cause conflicts */}
             <Route path="/users/*" element={<Users />} />
             <Route path="/analytics/*" element={<Analytics />} />
             <Route path="/finance" element={<Finance />} />
