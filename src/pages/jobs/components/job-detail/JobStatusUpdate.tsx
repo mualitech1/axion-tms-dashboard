@@ -11,7 +11,8 @@ import {
   Truck,
   UserCheck,
   CheckCircle,
-  Archive
+  Archive,
+  Upload
 } from "lucide-react";
 import {
   Tooltip,
@@ -27,8 +28,10 @@ import {
   getStatusLabel, 
   getStatusColor, 
   getPossibleTransitions,
-  transitionJobStatus
+  transitionJobStatus,
+  isPodRequired
 } from "../../utils/jobStatusUtils";
+import { PodUploadDialog } from "./PodUploadDialog";
 
 interface JobStatusUpdateProps {
   jobId: number;
@@ -38,6 +41,8 @@ interface JobStatusUpdateProps {
 
 export function JobStatusUpdate({ jobId, status, onStatusChange }: JobStatusUpdateProps) {
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showPodUpload, setShowPodUpload] = useState(false);
+  const [podUploaded, setPodUploaded] = useState(false);
   const possibleTransitions = getPossibleTransitions(status);
 
   const getStatusIcon = (status: JobStatus) => {
@@ -55,17 +60,42 @@ export function JobStatusUpdate({ jobId, status, onStatusChange }: JobStatusUpda
   };
   
   const handleStatusUpdate = (transition: StatusTransition) => {
+    if (transition.actionType === "upload-pod") {
+      // Open POD upload dialog instead of transitioning directly
+      setShowPodUpload(true);
+      return;
+    }
+    
     setIsUpdating(true);
     
     // In a real app, this would be an API call
     setTimeout(() => {
-      const success = transitionJobStatus(status, transition.to, onStatusChange);
+      const success = transitionJobStatus(
+        status, 
+        transition.to, 
+        onStatusChange, 
+        transition.from === "finished" ? podUploaded : undefined
+      );
+      
       setIsUpdating(false);
       
       if (!success) {
         console.error("Failed to update job status");
       }
     }, 500);
+  };
+
+  const handlePodUploaded = () => {
+    setPodUploaded(true);
+    setShowPodUpload(false);
+    
+    // Now we can transition to the next status
+    const transition = possibleTransitions.find(t => t.actionType === "upload-pod");
+    if (transition) {
+      setTimeout(() => {
+        transitionJobStatus(status, transition.to, onStatusChange, true);
+      }, 500);
+    }
   };
   
   return (
@@ -97,6 +127,21 @@ export function JobStatusUpdate({ jobId, status, onStatusChange }: JobStatusUpda
         </div>
       </div>
       
+      {/* POD requirement indicator for finished status */}
+      {status === "finished" && !podUploaded && (
+        <div className="bg-amber-50 border border-amber-200 rounded-md p-2 text-sm text-amber-800 flex items-center gap-2">
+          <AlertTriangle className="h-4 w-4 text-amber-500" />
+          <span>Proof of Delivery (POD) document required before invoicing</span>
+        </div>
+      )}
+      
+      {status === "finished" && podUploaded && (
+        <div className="bg-green-50 border border-green-200 rounded-md p-2 text-sm text-green-800 flex items-center gap-2">
+          <CheckCircle className="h-4 w-4 text-green-500" />
+          <span>POD uploaded successfully. Ready for invoicing.</span>
+        </div>
+      )}
+      
       {possibleTransitions.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-2">
           <span className="text-sm font-medium text-gray-500 w-full">Next actions:</span>
@@ -111,7 +156,10 @@ export function JobStatusUpdate({ jobId, status, onStatusChange }: JobStatusUpda
                     className="flex items-center gap-1 border-blue-200 hover:border-blue-300 hover:bg-blue-50"
                     onClick={() => handleStatusUpdate(transition)}
                   >
-                    {getStatusIcon(transition.to)}
+                    {transition.actionType === "upload-pod" ? 
+                      <Upload className="h-4 w-4" /> : 
+                      getStatusIcon(transition.to)
+                    }
                     <span>{transition.label}</span>
                   </Button>
                 </TooltipTrigger>
@@ -122,6 +170,16 @@ export function JobStatusUpdate({ jobId, status, onStatusChange }: JobStatusUpda
             ))}
           </TooltipProvider>
         </div>
+      )}
+      
+      {/* POD Upload Dialog */}
+      {showPodUpload && (
+        <PodUploadDialog 
+          jobId={jobId} 
+          open={showPodUpload} 
+          onClose={() => setShowPodUpload(false)}
+          onUploadComplete={handlePodUploaded}
+        />
       )}
     </div>
   );

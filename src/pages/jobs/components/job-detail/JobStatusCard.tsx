@@ -1,5 +1,5 @@
 
-import { Truck, Calendar, FileText, DollarSign } from "lucide-react";
+import { Truck, Calendar, FileText, DollarSign, AlertTriangle, CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { JobStatus } from "../../types/jobTypes";
 import { JobStatusUpdate } from "./JobStatusUpdate";
 import { getStatusColor } from "../../utils/jobStatusUtils";
+import { PodUploadDialog } from "./PodUploadDialog";
 
 interface JobStatusCardProps {
   status: JobStatus;
@@ -24,6 +25,8 @@ export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardPr
   
   const [currentStatus, setCurrentStatus] = useState<JobStatus>(status);
   const [rateConfirmed, setRateConfirmed] = useState(isJobCompleted(currentStatus));
+  const [podUploaded, setPodUploaded] = useState(false);
+  const [showPodUpload, setShowPodUpload] = useState(false);
   
   useEffect(() => {
     setRateConfirmed(isJobCompleted(currentStatus));
@@ -44,6 +47,14 @@ export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardPr
     toast({
       title: "Rate confirmed",
       description: "The final rate has been confirmed for this job."
+    });
+  };
+
+  const handlePodUploaded = () => {
+    setPodUploaded(true);
+    toast({
+      title: "POD uploaded",
+      description: "Proof of Delivery document has been uploaded successfully."
     });
   };
   
@@ -96,6 +107,39 @@ export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardPr
           </div>
         </div>
       </div>
+      
+      {/* POD Status for Finished Jobs */}
+      {currentStatus === "finished" && (
+        <div className="mt-4 pt-3 border-t">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-amber-500" />
+              <div>
+                <p className="text-sm font-medium">Proof of Delivery</p>
+                <p className="text-xs text-muted-foreground">Upload POD to proceed with invoicing</p>
+              </div>
+            </div>
+            
+            <div>
+              {podUploaded ? (
+                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1">
+                  <CheckCircle className="h-3 w-3" />
+                  <span>POD Uploaded</span>
+                </Badge>
+              ) : (
+                <Button 
+                  size="sm"
+                  variant="outline" 
+                  className="flex items-center gap-1"
+                  onClick={() => setShowPodUpload(true)}
+                >
+                  Upload POD
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Status Update Section */}
       <div className="mt-4 pt-3 border-t">
@@ -152,6 +196,16 @@ export function JobStatusCard({ status, priority, time, jobId }: JobStatusCardPr
           </div>
         )}
       </div>
+
+      {/* POD Upload Dialog */}
+      {showPodUpload && (
+        <PodUploadDialog 
+          jobId={jobId}
+          open={showPodUpload}
+          onClose={() => setShowPodUpload(false)}
+          onUploadComplete={handlePodUploaded}
+        />
+      )}
     </Card>
   );
 }

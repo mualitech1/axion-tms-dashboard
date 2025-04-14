@@ -7,7 +7,7 @@ export const statusTransitions: StatusTransition[] = [
   { from: "booked", to: "allocated", label: "Assign Hauler", requiresAction: true, actionType: "assign-hauler" },
   { from: "allocated", to: "in-progress", label: "Start Job", requiresAction: false },
   { from: "in-progress", to: "finished", label: "Mark as Finished", requiresAction: true, actionType: "confirm-completion" },
-  { from: "finished", to: "invoiced", label: "Generate Invoice", requiresAction: true, actionType: "generate-invoice" },
+  { from: "finished", to: "invoiced", label: "Generate Invoice", requiresAction: true, actionType: "upload-pod" },
   { from: "invoiced", to: "cleared", label: "Mark as Paid", requiresAction: true, actionType: "confirm-payment" },
   { from: "cleared", to: "completed", label: "Complete Job", requiresAction: false },
   { from: "completed", to: "archived", label: "Archive", requiresAction: false },
@@ -29,16 +29,32 @@ export const isValidTransition = (from: JobStatus, to: JobStatus): boolean => {
   return statusTransitions.some(t => t.from === from && t.to === to);
 };
 
+// Helper function to check if POD is required for the current status
+export const isPodRequired = (currentStatus: JobStatus): boolean => {
+  return currentStatus === "finished";
+};
+
 // Helper function to transition job status with proper validation
 export const transitionJobStatus = (
   currentStatus: JobStatus,
   newStatus: JobStatus,
-  onSuccess?: (status: JobStatus) => void
+  onSuccess?: (status: JobStatus) => void,
+  hasPodUploaded: boolean = false
 ): boolean => {
   if (!isValidTransition(currentStatus, newStatus)) {
     toast({
       title: "Invalid status transition",
       description: `Cannot transition from ${currentStatus} to ${newStatus}`,
+      variant: "destructive"
+    });
+    return false;
+  }
+  
+  // Check if POD is required for this transition
+  if (currentStatus === "finished" && newStatus === "invoiced" && !hasPodUploaded) {
+    toast({
+      title: "POD Required",
+      description: "You must upload a Proof of Delivery (POD) document before generating an invoice.",
       variant: "destructive"
     });
     return false;

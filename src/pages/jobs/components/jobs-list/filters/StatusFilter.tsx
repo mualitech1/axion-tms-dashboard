@@ -29,7 +29,7 @@ export function StatusFilter({ value, onChange }: StatusFilterProps) {
           <SelectItem value="booked">Booked</SelectItem>
           <SelectItem value="allocated">Allocated</SelectItem>
           <SelectItem value="in-progress">In Progress</SelectItem>
-          <SelectItem value="finished">Finished</SelectItem>
+          <SelectItem value="finished">Finished (Needs POD)</SelectItem>
           <SelectItem value="invoiced">Invoiced</SelectItem>
           <SelectItem value="cleared">Cleared</SelectItem>
           <SelectItem value="completed">Completed</SelectItem>

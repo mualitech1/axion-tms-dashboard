@@ -32,6 +32,8 @@ export interface Job {
   createdAt: string;
   lastUpdatedAt?: string;
   estimatedDuration?: number;
+  podUploaded?: boolean; // Track if POD has been uploaded
+  podDocumentId?: string; // Reference to the uploaded POD document
 }
 
 export interface StatusTransition {
@@ -39,5 +41,5 @@ export interface StatusTransition {
   to: JobStatus;
   label: string;
   requiresAction?: boolean;
-  actionType?: 'assign-hauler' | 'confirm-completion' | 'generate-invoice' | 'confirm-payment' | 'archive';
+  actionType?: 'assign-hauler' | 'confirm-completion' | 'upload-pod' | 'generate-invoice' | 'confirm-payment' | 'archive';
 }
