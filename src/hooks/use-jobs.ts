@@ -1,12 +1,23 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Job } from '@/types/database';
+import { Job, JobLocation } from '@/types/database';
 import { useToast } from '@/hooks/use-toast';
 
 export function useJobs() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  // Helper function to convert JobLocation to JSON for Supabase
+  const locationToJson = (location: JobLocation | Record<string, any>) => {
+    return location as Record<string, any>;
+  }
+
+  // Helper function to convert from JSON to JobLocation
+  const jsonToLocation = (json: any): JobLocation => {
+    if (!json) return { address: '', city: '', postcode: '', country: '' };
+    return json as JobLocation;
+  }
 
   // Fetch all jobs
   const { data: jobs, isLoading, error } = useQuery({
@@ -24,21 +35,28 @@ export function useJobs() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as Job[];
     }
   });
 
   // Create job
   const createJob = useMutation({
     mutationFn: async (newJob: Omit<Job, 'id' | 'created_at' | 'updated_at'>) => {
+      // Convert location objects to JSON for Supabase
+      const supabaseJob = {
+        ...newJob,
+        pickup_location: locationToJson(newJob.pickup_location),
+        delivery_location: locationToJson(newJob.delivery_location)
+      };
+
       const { data, error } = await supabase
         .from('jobs')
-        .insert(newJob)
+        .insert(supabaseJob)
         .select()
         .single();
 
       if (error) throw error;
-      return data;
+      return data as Job;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
@@ -59,15 +77,26 @@ export function useJobs() {
   // Update job
   const updateJob = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Job> & { id: string }) => {
+      // Convert location objects to JSON if they exist in the updates
+      const supabaseUpdates = { ...updates };
+      
+      if (updates.pickup_location) {
+        supabaseUpdates.pickup_location = locationToJson(updates.pickup_location);
+      }
+      
+      if (updates.delivery_location) {
+        supabaseUpdates.delivery_location = locationToJson(updates.delivery_location);
+      }
+
       const { data, error } = await supabase
         .from('jobs')
-        .update(updates)
+        .update(supabaseUpdates)
         .eq('id', id)
         .select()
         .single();
 
       if (error) throw error;
-      return data;
+      return data as Job;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['jobs'] });

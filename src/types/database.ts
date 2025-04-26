@@ -58,8 +58,8 @@ export interface Job {
   status: string;
   priority: string;
   pickup_date: string;
-  pickup_location: JobLocation;
-  delivery_location: JobLocation;
+  pickup_location: JobLocation | Record<string, any>;
+  delivery_location: JobLocation | Record<string, any>;
   estimated_duration: number | null;
   value: number | null;
   notes: string | null;
@@ -69,4 +69,9 @@ export interface Job {
   pod_uploaded: boolean;
   pod_document_id: string | null;
   issue_details: string | null;
+  // Add joined relationships
+  customer?: Company;
+  carrier?: Company;
+  vehicle?: Vehicle;
+  driver?: any;
 }

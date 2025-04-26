@@ -35,8 +35,7 @@ export default function JobsPage() {
       
       {showCreateModal && (
         <JobCreation
-          open={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
+          onComplete={() => setShowCreateModal(false)}
         />
       )}
     </MainLayout>
