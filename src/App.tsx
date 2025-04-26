@@ -1,10 +1,15 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import AuthPage from "@/pages/auth/AuthPage";
+import { useEffect } from "react";
+import { networkStateService } from "@/services/cache-service";
+import { queryClient } from "@/services/api-service";
+import { useToast } from "@/hooks/use-toast";
 
 // Pages
 import Index from "./pages/Index";
@@ -35,7 +40,53 @@ import CustomerPortalAccess from "./pages/customers/CustomerPortalAccess";
 import PipelineReports from "./pages/pipeline/PipelineReports";
 import PipelineSettings from "./pages/pipeline/PipelineSettings";
 
-const queryClient = new QueryClient();
+// Network status monitor component
+function NetworkMonitor() {
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    // Initial check
+    if (!navigator.onLine) {
+      toast({
+        title: "You are offline",
+        description: "Some features may be limited until connection is restored",
+        variant: "destructive",
+      });
+    }
+    
+    // Monitor online/offline status
+    const handleOffline = () => {
+      toast({
+        title: "You are offline",
+        description: "Some features may be limited until connection is restored",
+        variant: "destructive",
+      });
+    };
+    
+    const handleOnline = () => {
+      toast({
+        title: "You are back online",
+        description: "Syncing pending changes...",
+      });
+      // Process any pending operations
+      networkStateService.processPendingOperations();
+    };
+    
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
+    
+    // Set up network listener for pending operations
+    const cleanup = networkStateService.setupNetworkListener();
+    
+    return () => {
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
+      cleanup();
+    };
+  }, [toast]);
+  
+  return null;
+}
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { session, loading } = useAuth();
@@ -57,6 +108,7 @@ function App() {
       <BrowserRouter>
         <AuthProvider>
           <TooltipProvider>
+            <NetworkMonitor />
             <Toaster />
             <Sonner />
             <Routes>
