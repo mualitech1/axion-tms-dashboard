@@ -1,4 +1,5 @@
 
+
 import { supabase } from '@/integrations/supabase/client';
 import { getErrorMessage } from '@/utils/error-handler';
 import type { TableName } from '@/types/database-types';
@@ -26,7 +27,7 @@ export const apiClient = {
       const { data, error } = await supabase
         .from(tableName)
         .select(query.select || '*')
-        .eq('id', id)
+        .eq('id' as any, id)
         .single();
       
       if (error) throw error;
@@ -65,7 +66,7 @@ export const apiClient = {
       const { data: result, error } = await supabase
         .from(tableName)
         .update(data as any)
-        .eq('id', id)
+        .eq('id' as any, id)
         .select()
         .single();
       
@@ -82,7 +83,7 @@ export const apiClient = {
       const { error } = await supabase
         .from(tableName)
         .delete()
-        .eq('id', id);
+        .eq('id' as any, id);
       
       if (error) throw error;
     } catch (error) {
@@ -99,3 +100,4 @@ export { networkService } from '@/services/network-service';
 // Helper types to access the Insert and Update types from the generated Supabase types
 type TablesInsert<T extends TableName> = Tables<T> extends object ? { [P in keyof Tables<T>]?: Tables<T>[P] } : never;
 type TablesUpdate<T extends TableName> = Tables<T> extends object ? { [P in keyof Tables<T>]?: Tables<T>[P] } : never;
+
