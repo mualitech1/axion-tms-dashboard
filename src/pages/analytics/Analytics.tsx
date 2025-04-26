@@ -9,17 +9,25 @@ import { mockInvoices } from './data/mockInvoices';
 
 export default function Analytics() {
   const [dateRange, setDateRange] = useState('30days');
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Simulate loading for demo purposes
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   return (
     <MainLayout title="Analytics">
       <div className="animate-fade-in space-y-6">
-        {/* Header with date range selector */}
         <AnalyticsHeader dateRange={dateRange} setDateRange={setDateRange} />
         
-        {/* Main analytics tabs */}
         <Tabs defaultValue="overview" className="space-y-4">
           <AnalyticsTabs defaultValue="overview" />
-          <AnalyticsTabContent invoices={mockInvoices} />
+          <AnalyticsTabContent invoices={mockInvoices} isLoading={isLoading} />
         </Tabs>
       </div>
     </MainLayout>
