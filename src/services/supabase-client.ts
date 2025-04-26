@@ -39,12 +39,12 @@ export const apiClient = {
   
   async create<T extends TableName>(
     tableName: T, 
-    data: Partial<Tables<T>>
+    data: Partial<TablesInsert<T>>
   ): Promise<Tables<T>> {
     try {
       const { data: result, error } = await supabase
         .from(tableName)
-        .insert(data)
+        .insert(data as any)
         .select()
         .single();
       
@@ -59,12 +59,12 @@ export const apiClient = {
   async update<T extends TableName>(
     tableName: T, 
     id: string, 
-    data: Partial<Tables<T>>
+    data: Partial<TablesUpdate<T>>
   ): Promise<Tables<T>> {
     try {
       const { data: result, error } = await supabase
         .from(tableName)
-        .update(data)
+        .update(data as any)
         .eq('id', id)
         .select()
         .single();
@@ -95,3 +95,7 @@ export const apiClient = {
 // Re-export for convenience
 export { queryClient } from '@/config/query-client';
 export { networkService } from '@/services/network-service';
+
+// Helper types to access the Insert and Update types from the generated Supabase types
+type TablesInsert<T extends TableName> = Tables<T> extends object ? { [P in keyof Tables<T>]?: Tables<T>[P] } : never;
+type TablesUpdate<T extends TableName> = Tables<T> extends object ? { [P in keyof Tables<T>]?: Tables<T>[P] } : never;
