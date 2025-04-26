@@ -3,7 +3,8 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Job, JobLocation } from '@/types/database';
 import { useToast } from '@/hooks/use-toast';
-import { apiClient, queryClient, getErrorMessage } from '@/services/api-service';
+import { apiClient, queryClient } from '@/services/supabase-client';
+import { getErrorMessage } from '@/utils/error-handler';
 import { z } from 'zod';
 
 // Schema for job validation

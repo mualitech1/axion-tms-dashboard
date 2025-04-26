@@ -8,7 +8,7 @@ import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import AuthPage from "@/pages/auth/AuthPage";
 import { useEffect } from "react";
 import { networkStateService } from "@/services/cache-service";
-import { queryClient } from "@/services/api-service";
+import { queryClient } from "@/config/query-client";
 import { useToast } from "@/hooks/use-toast";
 
 // Pages

@@ -1,5 +1,5 @@
 
-import { queryClient } from './api-service';
+import { queryClient } from './supabase-client';
 
 // Predefined entity types for type safety
 export type EntityType = 'jobs' | 'companies' | 'vehicles' | 'drivers' | 'documents';

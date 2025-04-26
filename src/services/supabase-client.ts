@@ -39,7 +39,7 @@ export const apiClient = {
   
   async create<T extends TableName>(
     tableName: T, 
-    data: Partial<Tables<T>['Row']>
+    data: Partial<Tables<T>>
   ): Promise<Tables<T>> {
     try {
       const { data: result, error } = await supabase
@@ -59,7 +59,7 @@ export const apiClient = {
   async update<T extends TableName>(
     tableName: T, 
     id: string, 
-    data: Partial<Tables<T>['Row']>
+    data: Partial<Tables<T>>
   ): Promise<Tables<T>> {
     try {
       const { data: result, error } = await supabase

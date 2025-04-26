@@ -3,7 +3,8 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Company } from '@/types/database';
 import { useToast } from '@/hooks/use-toast';
-import { queryClient, getErrorMessage } from '@/services/api-service';
+import { queryClient } from '@/config/query-client';
+import { getErrorMessage } from '@/utils/error-handler';
 import { validateData, companySchema } from '@/services/validation-service';
 
 export function useCompanies() {
