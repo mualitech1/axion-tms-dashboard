@@ -9,7 +9,66 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      claude_tasks: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          error_message: string | null
+          id: string
+          input_data: Json
+          max_tokens: number | null
+          metadata: Json | null
+          model: string
+          output_data: Json | null
+          priority: string
+          status: string
+          temperature: number | null
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          error_message?: string | null
+          id?: string
+          input_data?: Json
+          max_tokens?: number | null
+          metadata?: Json | null
+          model: string
+          output_data?: Json | null
+          priority?: string
+          status?: string
+          temperature?: number | null
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          error_message?: string | null
+          id?: string
+          input_data?: Json
+          max_tokens?: number | null
+          metadata?: Json | null
+          model?: string
+          output_data?: Json | null
+          priority?: string
+          status?: string
+          temperature?: number | null
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
