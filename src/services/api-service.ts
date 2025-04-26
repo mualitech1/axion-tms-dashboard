@@ -7,6 +7,18 @@ import { Tables } from '@/integrations/supabase/types';
 // Define a union type of all valid table names for type safety
 type TableName = 'companies' | 'jobs' | 'vehicles' | 'drivers' | 'documents' | 'profiles' | 'user_roles' | 'claude_tasks';
 
+// Map table names to their respective types from the generated Tables type
+type TableTypes = {
+  companies: Tables<'companies'>;
+  jobs: Tables<'jobs'>;
+  vehicles: Tables<'vehicles'>;
+  drivers: Tables<'drivers'>;
+  documents: Tables<'documents'>;
+  profiles: Tables<'profiles'>;
+  user_roles: Tables<'user_roles'>;
+  claude_tasks: Tables<'claude_tasks'>;
+}
+
 // Global query client for advanced cache control
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -119,7 +131,7 @@ export const networkService = {
 
 // Type-safe approach to handle table names with generics
 export const apiClient = {
-  async get<T>(tableName: TableName, query: any = {}): Promise<T[]> {
+  async get<T extends keyof TableTypes>(tableName: T, query: any = {}): Promise<TableTypes[T][]> {
     try {
       const { data, error } = await supabase
         .from(tableName)
@@ -128,14 +140,14 @@ export const apiClient = {
         .range(query.start || 0, query.end || 9);
       
       if (error) throw error;
-      return data as T[];
+      return data as TableTypes[T][];
     } catch (error) {
       console.error(`Error fetching data from ${tableName}:`, error);
       throw new Error(getErrorMessage(error));
     }
   },
   
-  async getById<T>(tableName: TableName, id: string, query: any = {}): Promise<T> {
+  async getById<T extends keyof TableTypes>(tableName: T, id: string, query: any = {}): Promise<TableTypes[T]> {
     try {
       const { data, error } = await supabase
         .from(tableName)
@@ -144,40 +156,47 @@ export const apiClient = {
         .single();
       
       if (error) throw error;
-      return data as T;
+      return data as TableTypes[T];
     } catch (error) {
       console.error(`Error fetching ${tableName} by ID:`, error);
       throw new Error(getErrorMessage(error));
     }
   },
   
-  async create<T extends Record<string, any>>(tableName: TableName, data: T): Promise<T> {
+  async create<T extends keyof TableTypes>(
+    tableName: T, 
+    data: Partial<TableTypes[T]>
+  ): Promise<TableTypes[T]> {
     try {
       const { data: result, error } = await supabase
         .from(tableName)
-        .insert(data)
+        .insert(data as any)
         .select()
         .single();
       
       if (error) throw error;
-      return result as T;
+      return result as TableTypes[T];
     } catch (error) {
       console.error(`Error creating record in ${tableName}:`, error);
       throw new Error(getErrorMessage(error));
     }
   },
   
-  async update<T extends Record<string, any>>(tableName: TableName, id: string, data: T): Promise<T> {
+  async update<T extends keyof TableTypes>(
+    tableName: T, 
+    id: string, 
+    data: Partial<TableTypes[T]>
+  ): Promise<TableTypes[T]> {
     try {
       const { data: result, error } = await supabase
         .from(tableName)
-        .update(data)
+        .update(data as any)
         .eq('id', id)
         .select()
         .single();
       
       if (error) throw error;
-      return result as T;
+      return result as TableTypes[T];
     } catch (error) {
       console.error(`Error updating record in ${tableName}:`, error);
       throw new Error(getErrorMessage(error));
