@@ -79,6 +79,7 @@ export const apiClient = {
   
   async delete(tableName: TableName, id: string): Promise<void> {
     try {
+      // Remove type parameters to simplify the operation
       const { error } = await supabase
         .from(tableName)
         .delete()
