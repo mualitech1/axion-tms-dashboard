@@ -10,7 +10,8 @@ export function useJobs() {
 
   // Helper function to convert JobLocation to JSON for Supabase
   const locationToJson = (location: JobLocation | Record<string, any>) => {
-    return location as Record<string, any>;
+    // Since we've added an index signature to JobLocation, it's already compatible with JSON
+    return location;
   }
 
   // Helper function to convert from JSON to JobLocation

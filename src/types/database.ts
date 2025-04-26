@@ -39,12 +39,14 @@ export interface Vehicle {
   assigned_driver_id: string | null;
 }
 
+// Modified to be a Record type which satisfies Json requirements
 export interface JobLocation {
   address: string;
   city: string;
   postcode: string;
   country: string;
   notes?: string;
+  [key: string]: string | undefined; // Add index signature to make it compatible with Json type
 }
 
 export interface Job {
