@@ -2,13 +2,17 @@
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { QueryClient } from '@tanstack/react-query';
+import { Tables } from '@/integrations/supabase/types';
+
+// Define a union type of all valid table names for type safety
+type TableName = 'companies' | 'jobs' | 'vehicles' | 'drivers' | 'documents' | 'profiles' | 'user_roles' | 'claude_tasks';
 
 // Global query client for advanced cache control
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // Data considered fresh for 5 minutes
-      cacheTime: 1000 * 60 * 30, // Cache persists for 30 minutes
+      gcTime: 1000 * 60 * 30, // Cache persists for 30 minutes (renamed from cacheTime)
       retry: (failureCount, error) => {
         // Don't retry on 4xx errors
         if (
@@ -113,12 +117,12 @@ export const networkService = {
   }
 };
 
-// Enhanced Supabase client with error handling
+// Type-safe approach to handle table names with generics
 export const apiClient = {
-  async get<T>(table: string, query: any = {}): Promise<T[]> {
+  async get<T>(tableName: TableName, query: any = {}): Promise<T[]> {
     try {
       const { data, error } = await supabase
-        .from(table)
+        .from(tableName)
         .select(query.select || '*')
         .order(query.orderBy || 'created_at', { ascending: query.ascending ?? false })
         .range(query.start || 0, query.end || 9);
@@ -126,15 +130,15 @@ export const apiClient = {
       if (error) throw error;
       return data as T[];
     } catch (error) {
-      console.error(`Error fetching data from ${table}:`, error);
+      console.error(`Error fetching data from ${tableName}:`, error);
       throw new Error(getErrorMessage(error));
     }
   },
   
-  async getById<T>(table: string, id: string, query: any = {}): Promise<T> {
+  async getById<T>(tableName: TableName, id: string, query: any = {}): Promise<T> {
     try {
       const { data, error } = await supabase
-        .from(table)
+        .from(tableName)
         .select(query.select || '*')
         .eq('id', id)
         .single();
@@ -142,15 +146,15 @@ export const apiClient = {
       if (error) throw error;
       return data as T;
     } catch (error) {
-      console.error(`Error fetching ${table} by ID:`, error);
+      console.error(`Error fetching ${tableName} by ID:`, error);
       throw new Error(getErrorMessage(error));
     }
   },
   
-  async create<T>(table: string, data: Partial<T>): Promise<T> {
+  async create<T extends Record<string, any>>(tableName: TableName, data: T): Promise<T> {
     try {
       const { data: result, error } = await supabase
-        .from(table)
+        .from(tableName)
         .insert(data)
         .select()
         .single();
@@ -158,15 +162,15 @@ export const apiClient = {
       if (error) throw error;
       return result as T;
     } catch (error) {
-      console.error(`Error creating record in ${table}:`, error);
+      console.error(`Error creating record in ${tableName}:`, error);
       throw new Error(getErrorMessage(error));
     }
   },
   
-  async update<T>(table: string, id: string, data: Partial<T>): Promise<T> {
+  async update<T extends Record<string, any>>(tableName: TableName, id: string, data: T): Promise<T> {
     try {
       const { data: result, error } = await supabase
-        .from(table)
+        .from(tableName)
         .update(data)
         .eq('id', id)
         .select()
@@ -175,21 +179,21 @@ export const apiClient = {
       if (error) throw error;
       return result as T;
     } catch (error) {
-      console.error(`Error updating record in ${table}:`, error);
+      console.error(`Error updating record in ${tableName}:`, error);
       throw new Error(getErrorMessage(error));
     }
   },
   
-  async delete(table: string, id: string): Promise<void> {
+  async delete(tableName: TableName, id: string): Promise<void> {
     try {
       const { error } = await supabase
-        .from(table)
+        .from(tableName)
         .delete()
         .eq('id', id);
       
       if (error) throw error;
     } catch (error) {
-      console.error(`Error deleting record from ${table}:`, error);
+      console.error(`Error deleting record from ${tableName}:`, error);
       throw new Error(getErrorMessage(error));
     }
   }
