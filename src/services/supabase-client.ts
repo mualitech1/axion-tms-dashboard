@@ -77,13 +77,13 @@ export const apiClient = {
     }
   },
   
+  // Simplify the delete function by removing generic type parameters entirely
   async delete(tableName: TableName, id: string): Promise<void> {
     try {
-      // Remove type parameters to simplify the operation
       const { error } = await supabase
         .from(tableName)
         .delete()
-        .eq('id' as any, id);
+        .eq('id', id); // Remove the type assertion 'as any'
       
       if (error) throw error;
     } catch (error) {
@@ -96,5 +96,3 @@ export const apiClient = {
 // Re-export for convenience
 export { queryClient } from '@/config/query-client';
 export { networkService } from '@/services/network-service';
-
-// Avoid complex type references that cause excessive type instantiation depth
