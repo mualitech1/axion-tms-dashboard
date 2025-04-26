@@ -1,5 +1,4 @@
 
-
 import { supabase } from '@/integrations/supabase/client';
 import { getErrorMessage } from '@/utils/error-handler';
 import type { TableName } from '@/types/database-types';
@@ -40,12 +39,12 @@ export const apiClient = {
   
   async create<T extends TableName>(
     tableName: T, 
-    data: Partial<TablesInsert<T>>
+    data: Partial<any>
   ): Promise<Tables<T>> {
     try {
       const { data: result, error } = await supabase
         .from(tableName)
-        .insert(data as any)
+        .insert(data)
         .select()
         .single();
       
@@ -60,12 +59,12 @@ export const apiClient = {
   async update<T extends TableName>(
     tableName: T, 
     id: string, 
-    data: Partial<TablesUpdate<T>>
+    data: Partial<any>
   ): Promise<Tables<T>> {
     try {
       const { data: result, error } = await supabase
         .from(tableName)
-        .update(data as any)
+        .update(data)
         .eq('id' as any, id)
         .select()
         .single();
@@ -97,7 +96,6 @@ export const apiClient = {
 export { queryClient } from '@/config/query-client';
 export { networkService } from '@/services/network-service';
 
-// Helper types to access the Insert and Update types from the generated Supabase types
-type TablesInsert<T extends TableName> = Tables<T> extends object ? { [P in keyof Tables<T>]?: Tables<T>[P] } : never;
-type TablesUpdate<T extends TableName> = Tables<T> extends object ? { [P in keyof Tables<T>]?: Tables<T>[P] } : never;
-
+// Simplified helper types to avoid excessive type instantiation depth
+// This avoids recursive type references that can cause the TS2589 error
+type SimpleObject = Record<string, any>;
