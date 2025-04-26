@@ -131,7 +131,7 @@ export const networkService = {
 
 // Type-safe approach to handle table names with generics
 export const apiClient = {
-  async get<T extends keyof TableTypes>(tableName: T, query: any = {}): Promise<TableTypes[T][]> {
+  async get<T extends TableName>(tableName: T, query: any = {}): Promise<Tables<T>[]> {
     try {
       const { data, error } = await supabase
         .from(tableName)
@@ -140,14 +140,14 @@ export const apiClient = {
         .range(query.start || 0, query.end || 9);
       
       if (error) throw error;
-      return data as TableTypes[T][];
+      return data as Tables<T>[];
     } catch (error) {
       console.error(`Error fetching data from ${tableName}:`, error);
       throw new Error(getErrorMessage(error));
     }
   },
   
-  async getById<T extends keyof TableTypes>(tableName: T, id: string, query: any = {}): Promise<TableTypes[T]> {
+  async getById<T extends TableName>(tableName: T, id: string, query: any = {}): Promise<Tables<T>> {
     try {
       const { data, error } = await supabase
         .from(tableName)
@@ -156,47 +156,47 @@ export const apiClient = {
         .single();
       
       if (error) throw error;
-      return data as TableTypes[T];
+      return data as Tables<T>;
     } catch (error) {
       console.error(`Error fetching ${tableName} by ID:`, error);
       throw new Error(getErrorMessage(error));
     }
   },
   
-  async create<T extends keyof TableTypes>(
+  async create<T extends TableName>(
     tableName: T, 
-    data: Partial<TableTypes[T]>
-  ): Promise<TableTypes[T]> {
+    data: Partial<Tables<T>>
+  ): Promise<Tables<T>> {
     try {
       const { data: result, error } = await supabase
         .from(tableName)
-        .insert(data as any)
+        .insert(data)
         .select()
         .single();
       
       if (error) throw error;
-      return result as TableTypes[T];
+      return result as Tables<T>;
     } catch (error) {
       console.error(`Error creating record in ${tableName}:`, error);
       throw new Error(getErrorMessage(error));
     }
   },
   
-  async update<T extends keyof TableTypes>(
+  async update<T extends TableName>(
     tableName: T, 
     id: string, 
-    data: Partial<TableTypes[T]>
-  ): Promise<TableTypes[T]> {
+    data: Partial<Tables<T>>
+  ): Promise<Tables<T>> {
     try {
       const { data: result, error } = await supabase
         .from(tableName)
-        .update(data as any)
+        .update(data)
         .eq('id', id)
         .select()
         .single();
       
       if (error) throw error;
-      return result as TableTypes[T];
+      return result as Tables<T>;
     } catch (error) {
       console.error(`Error updating record in ${tableName}:`, error);
       throw new Error(getErrorMessage(error));
