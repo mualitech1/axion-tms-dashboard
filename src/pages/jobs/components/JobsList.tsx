@@ -1,72 +1,65 @@
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockJobs } from "../data/mockJobData";
-import { JobsTable } from "./jobs-list/table/JobsTable";
-import { EmptyJobsState } from "./jobs-list/EmptyJobsState";
-import { JobsFilter } from "./jobs-list/JobsFilter";
-import { FilterButtons } from "./jobs-list/FilterButtons";
-import { Job, JobStatus } from "../types/jobTypes";
+import { Job } from '@/types/database';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { format } from 'date-fns';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useNavigate } from 'react-router-dom';
 
 interface JobsListProps {
-  selectedDate: Date;
-  openJobCreation: () => void;
+  jobs: Job[];
+  isLoading: boolean;
 }
 
-export default function JobsList({ selectedDate, openJobCreation }: JobsListProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | JobStatus>("all");
-  
-  const filteredJobs = mockJobs
-    .filter(job => {
-      const jobDate = new Date(job.date);
-      const sameDate = 
-        jobDate.getDate() === selectedDate.getDate() &&
-        jobDate.getMonth() === selectedDate.getMonth() &&
-        jobDate.getFullYear() === selectedDate.getFullYear();
-        
-      const matchesSearch = 
-        searchTerm === "" ||
-        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.origin.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.destination.toLowerCase().includes(searchTerm) ||
-        job.id.toString().includes(searchTerm);
-        
-      const matchesStatus = 
-        statusFilter === "all" || 
-        job.status === statusFilter;
-      
-      return sameDate && matchesSearch && matchesStatus;
-    });
+export default function JobsList({ jobs, isLoading }: JobsListProps) {
+  const navigate = useNavigate();
 
-  console.log("Current filtered jobs:", filteredJobs.length); // Debug log
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
+      </div>
+    );
+  }
 
   return (
-    <Card className="shadow-sm border-[#1EAEDB]/20 bg-gradient-to-br from-white to-blue-50/30">
-      <CardHeader className="pb-3 border-b border-[#1EAEDB]/10">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
-          <CardTitle className="text-[#1A1F2C]">Jobs List</CardTitle>
-          <JobsFilter 
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-          />
-        </div>
-        <FilterButtons 
-          filter={statusFilter}
-          setFilter={setStatusFilter}
-        />
-      </CardHeader>
-      <CardContent className="p-0">
-        {filteredJobs.length > 0 ? (
-          <JobsTable jobs={filteredJobs} />
-        ) : (
-          <EmptyJobsState 
-            selectedDate={selectedDate}
-            openJobCreation={openJobCreation}
-          />
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Reference</TableHead>
+          <TableHead>Title</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Priority</TableHead>
+          <TableHead>Pickup Date</TableHead>
+          <TableHead>Customer</TableHead>
+          <TableHead>Carrier</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {jobs.map((job) => (
+          <TableRow 
+            key={job.id}
+            className="cursor-pointer hover:bg-muted"
+            onClick={() => navigate(`/jobs/${job.id}`)}
+          >
+            <TableCell>{job.reference}</TableCell>
+            <TableCell>{job.title}</TableCell>
+            <TableCell>{job.status}</TableCell>
+            <TableCell>{job.priority}</TableCell>
+            <TableCell>{format(new Date(job.pickup_date), 'PPP')}</TableCell>
+            <TableCell>{job.customer?.name || 'Unassigned'}</TableCell>
+            <TableCell>{job.carrier?.name || 'Unassigned'}</TableCell>
+          </TableRow>
+        ))}
+        {jobs.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={7} className="text-center py-8">
+              No jobs found
+            </TableCell>
+          </TableRow>
         )}
-      </CardContent>
-    </Card>
+      </TableBody>
+    </Table>
   );
 }
