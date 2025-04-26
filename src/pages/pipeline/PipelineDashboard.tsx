@@ -4,6 +4,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Plus, ListTodo } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Breadcrumb } from '@/components/navigation/Breadcrumb';
 import MetricsCards from './components/dashboard/MetricsCards';
 import PipelineOverview from './components/dashboard/PipelineOverview';
 import LeadsByStage from './components/dashboard/LeadsByStage';
@@ -12,10 +13,16 @@ import UpcomingTasksPanel from './components/dashboard/UpcomingTasksPanel';
 import ReminderOverviewCard from './components/dashboard/ReminderOverviewCard';
 
 export default function PipelineDashboard() {
+  const breadcrumbItems = [
+    { label: 'Sales', path: '/sales-pipeline' },
+    { label: 'Pipeline Dashboard', path: '/sales-pipeline/dashboard' }
+  ];
+  
   return (
     <MainLayout title="Pipeline Dashboard">
       <div className="mb-6">
-        <div className="flex justify-between items-center mb-2">
+        <Breadcrumb items={breadcrumbItems} />
+        <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold">Sales Pipeline</h1>
             <p className="text-muted-foreground">
