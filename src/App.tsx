@@ -1,9 +1,10 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import AuthPage from "@/pages/auth/AuthPage";
 
 // Pages
 import Index from "./pages/Index";
@@ -36,49 +37,51 @@ import PipelineSettings from "./pages/pipeline/PipelineSettings";
 
 const queryClient = new QueryClient();
 
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { session, loading } = useAuth();
+  
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  
+  if (!session) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  return <>{children}</>;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/jobs/*" element={<Jobs />} />
-            
-            {/* Improved Customers routing structure */}
-            <Route path="/customers" element={<Customers />}>
-              <Route index element={<CustomersList />} />
-              <Route path=":customerId" element={<CustomerDetails />} />
-              <Route path=":customerId/documents" element={<CustomerDocumentsPage />} />
-              <Route path=":customerId/portal" element={<CustomerPortalAccess />} />
-            </Route>
-            
-            <Route path="/customer-portal/*" element={<CustomerPortal />} />
-            <Route path="/carriers/*" element={<Carriers />} />
-            
-            {/* Fixed pipeline routing */}
-            <Route path="/pipeline/*" element={<Pipeline />} />
-            
-            {/* Remove duplicate routes that might cause conflicts */}
-            <Route path="/users/*" element={<Users />} />
-            <Route path="/analytics/*" element={<Analytics />} />
-            <Route path="/finance" element={<Finance />} />
-            <Route path="/invoices" element={<Invoices />} />
-            <Route path="/finance/carrier-self-invoices" element={<CarrierSelfInvoices />} />
-            <Route path="/finance/disputes" element={<DisputeManagement />} />
-            <Route path="/finance/payment-runs" element={<PaymentRuns />} />
-            <Route path="/settings" element={<Settings />} />
-            
-            {/* New Driver and Fleet Management Routes */}
-            <Route path="/drivers/*" element={<Drivers />} />
-            <Route path="/fleet/*" element={<Fleet />} />
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <Routes>
+              <Route path="/auth" element={<AuthPage />} />
+              
+              {/* Protected routes */}
+              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/jobs/*" element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
+              <Route path="/customers/*" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
+              <Route path="/customer-portal/*" element={<ProtectedRoute><CustomerPortal /></ProtectedRoute>} />
+              <Route path="/carriers/*" element={<ProtectedRoute><Carriers /></ProtectedRoute>} />
+              <Route path="/pipeline/*" element={<ProtectedRoute><Pipeline /></ProtectedRoute>} />
+              <Route path="/users/*" element={<ProtectedRoute><Users /></ProtectedRoute>} />
+              <Route path="/analytics/*" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+              <Route path="/finance/*" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
+              <Route path="/invoices/*" element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
+              <Route path="/settings/*" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+              <Route path="/drivers/*" element={<ProtectedRoute><Drivers /></ProtectedRoute>} />
+              <Route path="/fleet/*" element={<ProtectedRoute><Fleet /></ProtectedRoute>} />
+              
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </TooltipProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 }
