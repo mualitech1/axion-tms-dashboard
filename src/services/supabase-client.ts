@@ -39,12 +39,12 @@ export const apiClient = {
   
   async create<T extends TableName>(
     tableName: T, 
-    data: Partial<any>
+    data: Record<string, any>
   ): Promise<Tables<T>> {
     try {
       const { data: result, error } = await supabase
         .from(tableName)
-        .insert(data)
+        .insert([data] as any) // Wrap in array to satisfy the API
         .select()
         .single();
       
@@ -59,12 +59,12 @@ export const apiClient = {
   async update<T extends TableName>(
     tableName: T, 
     id: string, 
-    data: Partial<any>
+    data: Record<string, any>
   ): Promise<Tables<T>> {
     try {
       const { data: result, error } = await supabase
         .from(tableName)
-        .update(data)
+        .update(data as any)
         .eq('id' as any, id)
         .select()
         .single();
@@ -96,6 +96,4 @@ export const apiClient = {
 export { queryClient } from '@/config/query-client';
 export { networkService } from '@/services/network-service';
 
-// Simplified helper types to avoid excessive type instantiation depth
-// This avoids recursive type references that can cause the TS2589 error
-type SimpleObject = Record<string, any>;
+// Avoid complex type references that cause excessive type instantiation depth
