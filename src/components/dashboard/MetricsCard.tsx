@@ -41,8 +41,8 @@ export default function MetricsCard({
 
   return (
     <div className={cn(
-      "relative rounded-lg border backdrop-blur-sm transition-all duration-300",
-      "p-4 hover:shadow-aximo",
+      "relative rounded-lg border backdrop-blur-sm transition-all duration-300 flex flex-col justify-between",
+      "p-4 hover:shadow-aximo h-full",
       getBgColor(),
       className
     )}>
@@ -55,26 +55,28 @@ export default function MetricsCard({
         )}
       </div>
       
-      <div className="text-2xl font-bold text-aximo-text">
-        {value}
-      </div>
-      
-      {change && (
-        <div className="flex items-center mt-2 text-xs">
-          <span className={cn("flex items-center", getChangeColor(change.direction))}>
-            {change.direction === "up" ? 
-              <ArrowUpIcon className="w-3 h-3 mr-1" /> : 
-              <ArrowDownIcon className="w-3 h-3 mr-1" />
-            }
-            {change.value}%
-          </span>
-          {change.text && (
-            <span className="ml-1 text-aximo-text-secondary">
-              {change.text}
-            </span>
-          )}
+      <div className="flex-grow flex flex-col justify-center">
+        <div className="text-2xl font-bold text-aximo-text">
+          {value}
         </div>
-      )}
+        
+        {change && (
+          <div className="flex items-center mt-2 text-xs">
+            <span className={cn("flex items-center", getChangeColor(change.direction))}>
+              {change.direction === "up" ? 
+                <ArrowUpIcon className="w-3 h-3 mr-1" /> : 
+                <ArrowDownIcon className="w-3 h-3 mr-1" />
+              }
+              {change.value}%
+            </span>
+            {change.text && (
+              <span className="ml-1 text-aximo-text-secondary">
+                {change.text}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
       
       <div className="absolute inset-0 rounded-lg aximo-glow opacity-50 pointer-events-none" />
     </div>
