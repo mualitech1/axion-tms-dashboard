@@ -44,7 +44,7 @@ const resetSchema = z.object({
 });
 
 export default function AuthPage() {
-  const { signIn, signUp, resetPassword } = useAuth();
+  const { signIn, signUp, resetPassword, session } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -58,6 +58,21 @@ export default function AuthPage() {
       setAuthError("Please check your email for a password reset link");
     }
   }, [searchParams]);
+
+  // Display helpful message if we detect URL configuration issues
+  useEffect(() => {
+    const currentUrl = window.location.origin;
+    console.log('Current app URL:', currentUrl);
+    
+    // Check if we're on localhost without port 8082 (which is configured in Supabase)
+    if (currentUrl.includes('localhost') && !currentUrl.includes(':8082')) {
+      toast({
+        title: "URL Configuration Notice",
+        description: `You're accessing the app at ${currentUrl}, but Supabase is configured for localhost:8082. This may cause authentication issues.`,
+        variant: "destructive"
+      });
+    }
+  }, []);
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -89,6 +104,7 @@ export default function AuthPage() {
     setAuthError(null);
     
     try {
+      console.log('Login form submitted with:', values.email);
       await signIn(values.email, values.password);
       loginForm.reset();
     } catch (error: any) {
@@ -103,6 +119,7 @@ export default function AuthPage() {
     setAuthError(null);
     
     try {
+      console.log('Register form submitted with:', values.email);
       await signUp(values.email, values.password, values.firstName, values.lastName);
       registerForm.reset();
       setActiveTab('login');
@@ -122,9 +139,14 @@ export default function AuthPage() {
     setAuthError(null);
     
     try {
+      console.log('Password reset requested for:', values.email);
       await resetPassword(values.email);
       resetForm.reset();
       setShowResetForm(false);
+      toast({
+        title: "Password reset email sent",
+        description: "If this email exists in our system, you'll receive password reset instructions."
+      });
     } catch (error: any) {
       setAuthError(error.message);
     } finally {
@@ -360,6 +382,11 @@ export default function AuthPage() {
             </Tabs>
           )}
         </CardContent>
+        <CardFooter className="flex justify-center text-sm text-muted-foreground pt-0">
+          <div>
+            Running on {window.location.origin}
+          </div>
+        </CardFooter>
       </Card>
     </div>
   );

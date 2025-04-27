@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string, password: string) => {
     try {
       console.log('Attempting sign in for:', email);
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error, data } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
         console.error('Sign in error:', error.message);
@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
       
-      console.log('Sign in successful for:', email);
+      console.log('Sign in successful for:', email, data);
     } catch (error: any) {
       console.error('Sign in error:', error.message);
       toast({
@@ -93,6 +93,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
     try {
       console.log('Attempting sign up for:', email);
+      // Use the current origin for redirectTo
+      const redirectUrl = window.location.origin + '/auth';
+      console.log('Using redirect URL:', redirectUrl);
+      
       const { error, data } = await supabase.auth.signUp({
         email,
         password,
@@ -100,7 +104,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           data: {
             first_name: firstName,
             last_name: lastName
-          }
+          },
+          emailRedirectTo: redirectUrl
         }
       });
       
