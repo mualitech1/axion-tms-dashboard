@@ -55,13 +55,13 @@ export function EnhancedChart({
       <div className="flex justify-center mt-4 space-x-6">
         {dataKeys[0] && (
           <div className="flex items-center">
-            <div className={`w-3 h-3 rounded-sm mr-2`} style={{ backgroundColor: colors.primary }} />
+            <div className="w-3 h-3 rounded-sm mr-2" style={{ backgroundColor: colors.primary }} />
             <span className="text-xs text-aximo-text">{labels[0]}</span>
           </div>
         )}
         {dataKeys[1] && colors.secondary && (
           <div className="flex items-center">
-            <div className={`w-3 h-3 rounded-sm mr-2`} style={{ backgroundColor: colors.secondary }} />
+            <div className="w-3 h-3 rounded-sm mr-2" style={{ backgroundColor: colors.secondary }} />
             <span className="text-xs text-aximo-text">{labels[1]}</span>
           </div>
         )}

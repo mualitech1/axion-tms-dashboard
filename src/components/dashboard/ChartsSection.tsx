@@ -6,9 +6,15 @@ interface ChartData {
   value: number;
 }
 
+interface DeliveryPerformanceData {
+  name: string;
+  onTime: number;
+  delayed: number;
+}
+
 interface ChartsSectionProps {
   revenueData: ChartData[];
-  consignmentsData: ChartData[];
+  consignmentsData: DeliveryPerformanceData[];
 }
 
 export default function ChartsSection({ revenueData, consignmentsData }: ChartsSectionProps) {

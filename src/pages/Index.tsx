@@ -2,7 +2,7 @@
 import MainLayout from '@/components/layout/MainLayout';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import ActionableMetricsSection from '@/components/dashboard/ActionableMetricsSection';
-import EnhancedChartsSection from '@/components/dashboard/EnhancedChartsSection';
+import ChartsSection from '@/components/dashboard/ChartsSection';
 import ComplianceAndAlertSection from '@/components/dashboard/ComplianceAndAlertSection';
 import { Link } from 'react-router-dom';
 import { ArrowRightIcon, BrainIcon, Database, FileText, Truck, Users } from 'lucide-react';
@@ -87,9 +87,9 @@ export default function Index() {
         
         <ActionableMetricsSection jobsData={mockJobsData} financialData={mockFinancialData} />
         
-        <EnhancedChartsSection 
+        <ChartsSection 
           revenueData={revenueData} 
-          deliveryPerformance={mockDeliveryPerformance}
+          consignmentsData={mockDeliveryPerformance}
         />
         
         <ComplianceAndAlertSection />
