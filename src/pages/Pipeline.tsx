@@ -16,7 +16,7 @@ export default function Pipeline() {
     <ReminderProvider>
       <AutoReminder />
       <Routes>
-        <Route index element={<PipelineDashboard />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<PipelineDashboard />} />
         <Route path="board" element={<PipelineBoard />} />
         <Route path="lead/new" element={<CreateLeadPage />} />
@@ -27,7 +27,7 @@ export default function Pipeline() {
         <Route path="tasks" element={<PipelineTasks />} />
         <Route path="tasks/calendar" element={<PipelineTasks defaultTab="calendar" />} />
         <Route path="tasks/tags" element={<PipelineTasks defaultTab="tags" />} />
-        <Route path="*" element={<Navigate to="/pipeline" replace />} />
+        <Route path="*" element={<Navigate to="dashboard" replace />} />
       </Routes>
     </ReminderProvider>
   );

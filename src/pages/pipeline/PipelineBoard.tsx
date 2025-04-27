@@ -100,7 +100,7 @@ export default function PipelineBoard() {
             <SortAsc className="mr-2 h-4 w-4" />
             Sort
           </Button>
-          <Link to="/sales-pipeline/lead/new">
+          <Link to="/pipeline/lead/new">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
               Add New Lead

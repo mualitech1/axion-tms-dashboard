@@ -25,11 +25,11 @@ export const navigationItems = [
       { 
         title: "Sales Pipeline", 
         icon: Kanban, 
-        to: "/sales-pipeline/dashboard",
+        to: "/pipeline/dashboard",
         subItems: [
-          { title: "Dashboard", icon: LayoutDashboard, to: "/sales-pipeline/dashboard" },
-          { title: "Pipeline Board", icon: Kanban, to: "/sales-pipeline/board" },
-          { title: "Task Management", icon: ListTodo, to: "/sales-pipeline/tasks" }
+          { title: "Dashboard", icon: LayoutDashboard, to: "/pipeline/dashboard" },
+          { title: "Pipeline Board", icon: Kanban, to: "/pipeline/board" },
+          { title: "Task Management", icon: ListTodo, to: "/pipeline/tasks" }
         ]
       },
       { title: "Invoices", icon: FileText, to: "/invoices" },

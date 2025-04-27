@@ -14,8 +14,8 @@ import ReminderOverviewCard from './components/dashboard/ReminderOverviewCard';
 
 export default function PipelineDashboard() {
   const breadcrumbItems = [
-    { label: 'Sales', path: '/sales-pipeline' },
-    { label: 'Pipeline Dashboard', path: '/sales-pipeline/dashboard' }
+    { label: 'Sales', path: '/pipeline' },
+    { label: 'Pipeline Dashboard', path: '/pipeline/dashboard' }
   ];
   
   return (
@@ -30,16 +30,16 @@ export default function PipelineDashboard() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Link to="/sales-pipeline/board">
+            <Link to="/pipeline/board">
               <Button variant="outline">Board View</Button>
             </Link>
-            <Link to="/sales-pipeline/tasks">
+            <Link to="/pipeline/tasks">
               <Button variant="outline">
                 <ListTodo className="h-4 w-4 mr-2" />
                 Tasks
               </Button>
             </Link>
-            <Link to="/sales-pipeline/lead/new">
+            <Link to="/pipeline/lead/new">
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
                 Add New Lead

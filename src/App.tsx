@@ -120,7 +120,8 @@ function App() {
               <Route path="/customers/*" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
               <Route path="/customer-portal/*" element={<ProtectedRoute><CustomerPortal /></ProtectedRoute>} />
               <Route path="/carriers/*" element={<ProtectedRoute><Carriers /></ProtectedRoute>} />
-              <Route path="/pipeline/*" element={<ProtectedRoute><Pipeline /></ProtectedRoute>} />
+              {/* Update this line to support both URL paths */}
+              <Route path={["/pipeline/*", "/sales-pipeline/*"]} element={<ProtectedRoute><Pipeline /></ProtectedRoute>} />
               <Route path="/users/*" element={<ProtectedRoute><Users /></ProtectedRoute>} />
               <Route path="/analytics/*" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
               <Route path="/finance/*" element={<ProtectedRoute><Finance /></ProtectedRoute>} />

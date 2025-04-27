@@ -39,13 +39,13 @@ export default function PipelineSidebar() {
       </h3>
       
       <PipelineSidebarItem 
-        to="/sales-pipeline/dashboard" 
+        to="/pipeline/dashboard" 
         icon={LayoutDashboard} 
         label="Dashboard"
       />
       
       <PipelineSidebarItem 
-        to="/sales-pipeline/board" 
+        to="/pipeline/board" 
         icon={Kanban} 
         label="Pipeline Board" 
       />
@@ -55,19 +55,19 @@ export default function PipelineSidebar() {
       </div>
       
       <PipelineSidebarItem 
-        to="/sales-pipeline/tasks" 
+        to="/pipeline/tasks" 
         icon={ListTodo} 
         label="Task Board"
       />
       
       <PipelineSidebarItem 
-        to="/sales-pipeline/tasks/calendar" 
+        to="/pipeline/tasks/calendar" 
         icon={Calendar} 
         label="Task Calendar"
       />
       
       <PipelineSidebarItem 
-        to="/sales-pipeline/tasks/tags" 
+        to="/pipeline/tasks/tags" 
         icon={Tag} 
         label="Task Tags"
       />
