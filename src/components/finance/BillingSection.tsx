@@ -4,9 +4,12 @@ import { Button } from "@/components/ui/button";
 import { useInvoices } from "@/hooks/use-invoices";
 import { Loader2, Plus } from "lucide-react";
 import { formatCurrency } from "@/utils/format";
+import { useState } from "react";
+import { CreateInvoiceDialog } from "@/components/invoices/create-invoice-dialog/CreateInvoiceDialog";
 
 export function BillingSection() {
   const { invoices, isLoading } = useInvoices();
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -17,14 +20,19 @@ export function BillingSection() {
   }
 
   const totalOutstanding = invoices
-    ?.filter(inv => inv.status === 'pending' || inv.status === 'overdue')
+    ?.filter(inv => ['draft', 'sent', 'overdue'].includes(inv.status))
     .reduce((sum, inv) => sum + inv.total_amount, 0) || 0;
+
+  const handleInvoiceCreated = (invoice: any) => {
+    // The useInvoices hook will automatically refresh the data
+    setCreateDialogOpen(false);
+  };
 
   return (
     <Card className="mb-6">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Billing Overview</CardTitle>
-        <Button>
+        <Button onClick={() => setCreateDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Create Invoice
         </Button>
@@ -42,7 +50,7 @@ export function BillingSection() {
                 {formatCurrency(totalOutstanding)}
               </div>
               <p className="text-xs text-muted-foreground">
-                From {invoices?.filter(inv => ['pending', 'overdue'].includes(inv.status)).length || 0} invoices
+                From {invoices?.filter(inv => ['draft', 'sent', 'overdue'].includes(inv.status)).length || 0} invoices
               </p>
             </CardContent>
           </Card>
@@ -85,6 +93,12 @@ export function BillingSection() {
           </Card>
         </div>
       </CardContent>
+
+      <CreateInvoiceDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onInvoiceCreated={handleInvoiceCreated}
+      />
     </Card>
   );
 }
