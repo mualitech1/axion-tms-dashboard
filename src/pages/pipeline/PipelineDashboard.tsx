@@ -19,28 +19,32 @@ export default function PipelineDashboard() {
   ];
   
   return (
-    <MainLayout title="Pipeline Dashboard">
+    <MainLayout title="AI Logistics Pipeline">
       <div className="mb-6">
         <Breadcrumb items={breadcrumbItems} />
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold">Sales Pipeline</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl font-bold text-aximo-text bg-gradient-to-r from-aximo-primary to-aximo-light bg-clip-text text-transparent">
+              Logistics Pipeline
+            </h1>
+            <p className="text-aximo-text-secondary">
               Track leads, opportunities and manage your sales process.
             </p>
           </div>
           <div className="flex items-center gap-2">
             <Link to="/pipeline/board">
-              <Button variant="outline">Board View</Button>
+              <Button variant="outline" className="border-aximo-border bg-aximo-card text-aximo-text hover:bg-aximo-border">
+                Board View
+              </Button>
             </Link>
             <Link to="/pipeline/tasks">
-              <Button variant="outline">
+              <Button variant="outline" className="border-aximo-border bg-aximo-card text-aximo-text hover:bg-aximo-border">
                 <ListTodo className="h-4 w-4 mr-2" />
                 Tasks
               </Button>
             </Link>
             <Link to="/pipeline/lead/new">
-              <Button>
+              <Button className="bg-aximo-primary hover:bg-aximo-highlight text-white">
                 <Plus className="h-4 w-4 mr-2" />
                 Add New Lead
               </Button>
@@ -53,7 +57,7 @@ export default function PipelineDashboard() {
       <MetricsCards />
       
       {/* Pipeline Overview and Leads by Stage */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-3 gap-6 mt-6">
         <div className="md:col-span-2">
           <PipelineOverview />
         </div>
@@ -63,7 +67,7 @@ export default function PipelineDashboard() {
       </div>
       
       {/* Recent Activity, Upcoming Tasks and Reminders */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-3 gap-6 mt-6">
         <div className="md:col-span-1">
           <RecentActivityPanel />
         </div>

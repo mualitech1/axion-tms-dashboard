@@ -80,6 +80,19 @@ export default {
 					'red-light': '#FFECEB',
 					'yellow': '#FFC107',
 					'yellow-light': '#FFF8E0',
+				},
+				// Aximo color palette
+				aximo: {
+					'primary': '#0090FF', // Bright blue from logo and buttons
+					'dark': '#0A101F',    // Dark background
+					'darker': '#060C17',  // Darker sections
+					'light': '#33C3F0',   // Light blue accents
+					'highlight': '#1EAEDB', // Highlighted elements
+					'card': '#111827',    // Card background
+					'text': '#F9FAFB',    // Primary text
+					'text-secondary': '#9CA3AF', // Secondary text
+					'border': '#1F2937',  // Border color
+					'glow': 'rgba(0, 144, 255, 0.5)', // Glow effect color
 				}
 			},
 			borderRadius: {
@@ -153,6 +166,16 @@ export default {
 					'50%': {
 						transform: 'translateY(-5px)'
 					}
+				},
+				'pulse-glow': {
+					'0%, 100%': {
+						opacity: 0.6,
+						boxShadow: '0 0 5px rgba(0, 144, 255, 0.5)'
+					},
+					'50%': {
+						opacity: 1,
+						boxShadow: '0 0 15px rgba(0, 144, 255, 0.8)'
+					}
 				}
 			},
 			animation: {
@@ -163,15 +186,22 @@ export default {
 				'slide-in-right': 'slide-in-right 0.3s ease-out',
 				'slide-out-right': 'slide-out-right 0.3s ease-out',
 				'scale-in': 'scale-in 0.2s ease-out',
-				'float': 'float 3s ease-in-out infinite'
+				'float': 'float 3s ease-in-out infinite',
+				'pulse-glow': 'pulse-glow 2s infinite'
 			},
 			boxShadow: {
 				'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
 				'card': '0 0 20px rgba(0, 0, 0, 0.05)',
-				'elevated': '0 10px 30px rgba(0, 0, 0, 0.08)'
+				'elevated': '0 10px 30px rgba(0, 0, 0, 0.08)',
+				'aximo': '0 0 15px rgba(0, 144, 255, 0.3)',
+				'aximo-strong': '0 0 25px rgba(0, 144, 255, 0.5)'
 			},
 			backdropBlur: {
 				'xs': '2px'
+			},
+			backgroundImage: {
+				'aximo-gradient': 'linear-gradient(to right, rgba(0, 144, 255, 0.8), rgba(51, 195, 240, 0.8))',
+				'dark-gradient': 'linear-gradient(to bottom, #0A101F, #060C17)'
 			}
 		}
 	},

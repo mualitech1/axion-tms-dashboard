@@ -21,18 +21,18 @@ export default function DashboardCard({
   
   return (
     <div className={cn(
-      "dashboard-card overflow-hidden animate-scale-in",
+      "bg-aximo-card border border-aximo-border rounded-lg shadow-aximo overflow-hidden animate-scale-in p-4 md:p-5",
       isMobile ? "p-3" : "",
       className
     )}>
       <div className="flex items-center justify-between mb-3 md:mb-4">
-        <h3 className="text-xs md:text-sm font-medium text-tms-gray-600">{title}</h3>
+        <h3 className="text-xs md:text-sm font-medium text-aximo-text-secondary">{title}</h3>
       </div>
       
       {isLoading ? (
         <div className="flex flex-col space-y-2 md:space-y-3">
-          <div className="h-8 md:h-10 bg-tms-gray-200 rounded-md animate-pulse" />
-          <div className="h-16 md:h-24 bg-tms-gray-200 rounded-md animate-pulse" />
+          <div className="h-8 md:h-10 bg-aximo-border rounded-md animate-pulse" />
+          <div className="h-16 md:h-24 bg-aximo-border rounded-md animate-pulse" />
         </div>
       ) : (
         <div className={isMobile ? "text-sm" : ""}>
@@ -41,7 +41,7 @@ export default function DashboardCard({
       )}
       
       {footer && (
-        <div className="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-tms-gray-200">
+        <div className="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-aximo-border">
           {footer}
         </div>
       )}

@@ -16,7 +16,7 @@ export default function MainLayout({ children, title }: MainLayoutProps) {
   const isMobile = useIsMobile();
   const location = useLocation();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const isPipelinePath = location.pathname.startsWith('/sales-pipeline');
+  const isPipelinePath = location.pathname.startsWith('/pipeline');
 
   useEffect(() => {
     if (isMobile) {
@@ -25,7 +25,7 @@ export default function MainLayout({ children, title }: MainLayoutProps) {
   }, [isMobile]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex w-full overflow-x-hidden">
+    <div className="min-h-screen bg-aximo-dark flex w-full overflow-x-hidden">
       <Sidebar />
       
       <div className={cn(
@@ -39,7 +39,7 @@ export default function MainLayout({ children, title }: MainLayoutProps) {
           
           <main className={cn(
             "p-2 sm:p-4 md:p-6 lg:p-8 flex-1 overflow-x-hidden",
-            isPipelinePath && !isMobile && "border-l"
+            isPipelinePath && !isMobile && "border-l border-aximo-border"
           )}>
             {children}
           </main>

@@ -8,6 +8,7 @@ import { navigationItems } from './sidebar/navigation-config';
 import { NavSection, NavItem } from './sidebar/NavSection';
 import { SubMenu } from './sidebar/SubMenu';
 import { MobileMenu } from './sidebar/MobileMenu';
+import { AximoLogo } from '@/components/aximo/AximoLogo';
 
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -35,21 +36,21 @@ export default function Sidebar() {
 
       <aside 
         className={cn(
-          "fixed left-0 top-0 z-50 h-full bg-white border-r border-tms-gray-200 flex flex-col transition-all duration-300 ease-in-out",
+          "fixed left-0 top-0 z-50 h-full bg-aximo-darker border-r border-aximo-border flex flex-col transition-all duration-300 ease-in-out",
           isCollapsed ? "w-16" : "w-64",
           isMobile && (isMobileOpen ? "translate-x-0" : "-translate-x-full")
         )}
       >
         <div className={cn(
-          "h-16 border-b border-tms-gray-200 flex items-center px-4 sticky top-0 bg-white/90 backdrop-blur-sm",
+          "h-16 border-b border-aximo-border flex items-center px-4 sticky top-0 bg-aximo-dark/90 backdrop-blur-sm",
           isCollapsed ? "justify-center" : "justify-between"
         )}>
           {!isCollapsed ? (
             <>
-              <div className="font-semibold text-lg text-tms-gray-800">IKB Transport</div>
+              <AximoLogo />
               <button 
                 onClick={toggleSidebar} 
-                className="p-1 rounded-md hover:bg-tms-gray-100 text-tms-gray-500"
+                className="p-1 rounded-md hover:bg-aximo-border text-aximo-text-secondary"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -57,7 +58,7 @@ export default function Sidebar() {
           ) : (
             <button 
               onClick={toggleSidebar} 
-              className="p-1 rounded-md hover:bg-tms-gray-100 text-tms-gray-500"
+              className="p-1 rounded-md hover:bg-aximo-border text-aximo-text-secondary"
             >
               <Menu className="h-5 w-5" />
             </button>

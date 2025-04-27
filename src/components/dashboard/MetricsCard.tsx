@@ -28,9 +28,9 @@ export default function MetricsCard({
   const isMobile = useIsMobile();
 
   const getChangeColor = (direction: "up" | "down" | "neutral") => {
-    if (direction === "up") return "text-tms-green";
-    if (direction === "down") return "text-tms-red";
-    return "text-tms-gray-500";
+    if (direction === "up") return "text-green-400";
+    if (direction === "down") return "text-red-400";
+    return "text-aximo-text-secondary";
   };
 
   const getChangeIcon = (direction: "up" | "down" | "neutral") => {
@@ -42,12 +42,12 @@ export default function MetricsCard({
   return (
     <DashboardCard 
       title={title}
-      className={cn("hover-lift", className)}
+      className={cn("hover:border-aximo-primary/50 transition-all duration-300", className)}
       isLoading={isLoading}
     >
       <div className="flex items-start justify-between">
         <div>
-          <div className={`${isMobile ? 'text-lg md:text-xl' : 'text-2xl'} font-semibold text-tms-gray-800`}>
+          <div className={`${isMobile ? 'text-lg md:text-xl' : 'text-2xl'} font-semibold text-aximo-text`}>
             {value}
           </div>
           
@@ -63,7 +63,7 @@ export default function MetricsCard({
                 <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} ml-0.5 md:ml-1`}>{change.value}%</span>
               </div>
               {change.text && (
-                <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-tms-gray-500 ml-0.5 md:ml-1`}>
+                <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-aximo-text-secondary ml-0.5 md:ml-1`}>
                   {change.text}
                 </span>
               )}
@@ -72,7 +72,7 @@ export default function MetricsCard({
         </div>
         
         {icon && (
-          <div className={`bg-tms-blue-light p-1.5 md:p-2 rounded-full ${isMobile ? 'scale-75' : ''}`}>
+          <div className={`bg-aximo-primary/10 text-aximo-primary p-1.5 md:p-2 rounded-full ${isMobile ? 'scale-75' : ''}`}>
             {icon}
           </div>
         )}
