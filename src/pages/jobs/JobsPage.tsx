@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { useJobs } from '@/hooks/use-jobs';
@@ -90,7 +91,7 @@ export default function JobsPage() {
             
             <Button 
               variant="outline" 
-              onClick={() => refetch()} 
+              onClick={handleRefresh} 
               size="icon" 
               className="border-aximo-border"
             >

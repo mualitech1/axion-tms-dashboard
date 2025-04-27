@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
@@ -166,16 +166,16 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
   };
 
   return (
-    <Card className="border shadow-md rounded-xl overflow-hidden border-[#1EAEDB]/20 bg-gradient-to-br from-[#1A1F2C]/5 to-[#111827]/10">
-      <CardHeader className="bg-gradient-to-r from-blue-600/90 to-indigo-600 text-white">
+    <>
+      <CardHeader className="bg-gradient-to-r from-blue-600/90 to-indigo-600 text-white px-6 py-4">
         <CardTitle className="text-xl flex items-center">
           <Briefcase className="h-5 w-5 mr-2" />
           Create New Job
           <Zap className="h-4 w-4 ml-2 text-yellow-300" />
         </CardTitle>
-        <StepIndicator currentStep={currentStep} totalSteps={totalSteps} />
+        <StepIndicator currentStep={currentStep} totalSteps={3} />
       </CardHeader>
-      <CardContent className="p-6">
+      <CardContent className="p-6 bg-aximo-dark">
         <Form {...form}>
           <motion.form 
             onSubmit={form.handleSubmit(handleSubmit)} 
@@ -189,7 +189,7 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
             
             <NavigationButtons 
               currentStep={currentStep}
-              totalSteps={totalSteps}
+              totalSteps={3}
               isSubmitting={form.formState.isSubmitting}
               prevStep={prevStep}
               nextStep={nextStep}
@@ -198,6 +198,6 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
           </motion.form>
         </Form>
       </CardContent>
-    </Card>
+    </>
   );
 }
