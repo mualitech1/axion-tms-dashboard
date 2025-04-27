@@ -1,6 +1,7 @@
 
 import { cn } from '@/lib/utils';
 import { ArrowDownIcon, ArrowUpIcon, MinusIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface BadgeDeltaProps {
   value: number;
@@ -9,6 +10,7 @@ interface BadgeDeltaProps {
   showArrow?: boolean;
   prefix?: string;
   suffix?: string;
+  animated?: boolean;
 }
 
 export function BadgeDelta({
@@ -18,6 +20,7 @@ export function BadgeDelta({
   showArrow = true,
   prefix = '',
   suffix = '%',
+  animated = true,
 }: BadgeDeltaProps) {
   // Determine the variant if auto
   const actualVariant = 
@@ -34,21 +37,29 @@ export function BadgeDelta({
   
   // Get the color classes based on variant
   const variantClasses = {
-    success: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
-    danger: 'bg-red-500/10 text-red-500 border-red-500/20',
-    neutral: 'bg-gray-500/10 text-gray-500 border-gray-500/20',
+    success: 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30',
+    danger: 'bg-red-500/15 text-red-500 border-red-500/30',
+    neutral: 'bg-gray-500/15 text-gray-500 border-gray-500/30',
   };
   
+  const Badge = animated ? motion.div : 'div';
+  const animationProps = animated ? {
+    initial: { scale: 0.9, opacity: 0 },
+    animate: { scale: 1, opacity: 1 },
+    transition: { type: "spring", stiffness: 500, damping: 25 }
+  } : {};
+  
   return (
-    <div
+    <Badge
       className={cn(
-        'inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium',
+        'inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium shadow-sm',
         variantClasses[actualVariant],
         className
       )}
+      {...animationProps}
     >
       {showArrow && <Icon className="mr-1 h-3 w-3" />}
       <span>{prefix}{absValue}{suffix}</span>
-    </div>
+    </Badge>
   );
 }
