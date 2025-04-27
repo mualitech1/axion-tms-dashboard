@@ -4,14 +4,14 @@ import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { Briefcase, Zap } from "lucide-react";
+import { Briefcase, Zap, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
 import { BasicInfoStep } from "./step-forms/BasicInfoStep";
 import { AddressesStep } from "./step-forms/AddressesStep";
 import { SummaryStep } from "./step-forms/SummaryStep";
 import { StepIndicator } from "./StepIndicator";
 import { NavigationButtons } from "./NavigationButtons";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { JobStatus } from "../../types/jobTypes";
 
 interface Address {
@@ -174,35 +174,43 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
 
   return (
     <>
-      <CardHeader className="bg-gradient-to-r from-blue-600/90 to-indigo-600 text-white px-6 py-4">
-        <CardTitle className="text-xl flex items-center">
-          <Briefcase className="h-5 w-5 mr-2" />
-          Create New Job
-          <Zap className="h-4 w-4 ml-2 text-yellow-300" />
-        </CardTitle>
+      <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-t-lg">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Briefcase className="h-5 w-5" />
+            <CardTitle className="text-xl font-semibold">Create New Job</CardTitle>
+            <Zap className="h-4 w-4 text-yellow-300 ml-2" />
+          </div>
+        </div>
         <StepIndicator currentStep={currentStep} totalSteps={3} />
       </CardHeader>
-      <CardContent className="p-6 bg-aximo-dark">
+      
+      <CardContent className="p-6 bg-aximo-dark space-y-6">
         <Form {...form}>
-          <motion.form 
-            onSubmit={form.handleSubmit(handleSubmit)} 
-            className="space-y-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            key={currentStep}
-          >
-            {renderCurrentStep()}
-            
-            <NavigationButtons 
-              currentStep={currentStep}
-              totalSteps={3}
-              isSubmitting={form.formState.isSubmitting}
-              prevStep={prevStep}
-              nextStep={nextStep}
-              onCancel={onComplete}
-            />
-          </motion.form>
+          <AnimatePresence mode="wait">
+            <motion.form 
+              onSubmit={form.handleSubmit(handleSubmit)} 
+              className="space-y-6"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              key={currentStep}
+            >
+              <div className="bg-aximo-card rounded-lg p-6 shadow-lg border border-aximo-border">
+                {renderCurrentStep()}
+              </div>
+              
+              <NavigationButtons 
+                currentStep={currentStep}
+                totalSteps={3}
+                isSubmitting={form.formState.isSubmitting}
+                prevStep={prevStep}
+                nextStep={nextStep}
+                onCancel={onComplete}
+              />
+            </motion.form>
+          </AnimatePresence>
         </Form>
       </CardContent>
     </>
