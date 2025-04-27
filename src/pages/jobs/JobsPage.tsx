@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { useJobs } from '@/hooks/use-jobs';
@@ -13,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import JobsGrid from './components/jobs-list/JobsGrid';
 import { Card, CardContent } from '@/components/ui/card';
+import { Calendar } from "@/components/ui/calendar";
 
 export default function JobsPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);

@@ -38,7 +38,7 @@ export default function JobsGrid({ jobs, isLoading }: JobsGridProps) {
               time: new Date(job.pickup_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
               origin: job.pickup_location.city,
               destination: job.delivery_location.city,
-              vehicle: job.vehicle?.name || 'Unassigned',
+              vehicle: job.vehicle?.name || job.vehicle?.type || 'Unassigned',
               status: job.status as any,
               priority: (job.priority || 'medium') as any,
               createdAt: job.created_at || new Date().toISOString()
