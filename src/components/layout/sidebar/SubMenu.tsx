@@ -15,7 +15,7 @@ export const SubMenu = ({ isCollapsed }: SubMenuProps) => {
   return (
     <div className="ml-7 space-y-1 border-l pl-2 border-tms-gray-200 mt-1">
       <NavLink 
-        to="/sales-pipeline/dashboard"
+        to="/pipeline/dashboard"
         className={({ isActive }) =>
           cn(
             "flex items-center py-1 px-2 text-sm rounded-md transition-colors",
@@ -28,7 +28,7 @@ export const SubMenu = ({ isCollapsed }: SubMenuProps) => {
       </NavLink>
       
       <NavLink 
-        to="/sales-pipeline/board"
+        to="/pipeline/board"
         className={({ isActive }) =>
           cn(
             "flex items-center py-1 px-2 text-sm rounded-md transition-colors",
@@ -41,13 +41,13 @@ export const SubMenu = ({ isCollapsed }: SubMenuProps) => {
       </NavLink>
       
       <NavLink 
-        to="/sales-pipeline/tasks"
+        to="/pipeline/tasks"
         className={({ isActive }) =>
           cn(
             "flex items-center py-1 px-2 text-sm rounded-md transition-colors",
             isActive || 
-            location.pathname === '/sales-pipeline/tasks/calendar' || 
-            location.pathname === '/sales-pipeline/tasks/tags'
+            location.pathname === '/pipeline/tasks/calendar' || 
+            location.pathname === '/pipeline/tasks/tags'
               ? "text-tms-blue font-medium" 
               : "text-tms-gray-600 hover:text-tms-blue"
           )
