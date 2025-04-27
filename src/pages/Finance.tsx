@@ -4,6 +4,7 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { FinanceMetrics } from "@/components/finance/FinanceMetrics";
 import { FinanceNavigationCards } from "@/components/finance/FinanceNavigationCards";
 import { FinanceTabContent } from "@/components/finance/FinanceTabContent";
+import { BillingSection } from "@/components/finance/BillingSection";
 
 export default function Finance() {
   return (
@@ -15,6 +16,7 @@ export default function Finance() {
 
       <FinanceMetrics />
       <FinanceNavigationCards />
+      <BillingSection />
       <FinanceTabContent />
     </MainLayout>
   );
