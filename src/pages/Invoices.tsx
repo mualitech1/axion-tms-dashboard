@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,141 +9,44 @@ import { InvoiceFilters } from "@/components/invoices/InvoiceFilters";
 import { InvoiceTable } from "@/components/invoices/InvoiceTable";
 import { InvoiceAnalytics } from "@/components/invoices/InvoiceAnalytics";
 import { CreateJobDialog } from "@/components/invoices/CreateJobDialog";
-import { CreateInvoiceDialog, InvoiceData } from "@/components/invoices/create-invoice-dialog/CreateInvoiceDialog";
+import { CreateInvoiceDialog } from "@/components/invoices/create-invoice-dialog/CreateInvoiceDialog";
+import { InvoiceData } from "@/components/invoices/create-invoice-dialog/types";
 import { invoices as mockInvoices } from "@/components/invoices/mockData";
-import { useToast } from "@/hooks/use-toast";
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetHeader, 
-  SheetTitle, 
-  SheetTrigger 
-} from "@/components/ui/sheet";
+import { useInvoiceList } from "@/hooks/use-invoice-list";
+import { useInvoiceActions } from "@/hooks/use-invoice-actions";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { BarChart3 } from "lucide-react";
 
 export default function Invoices() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [createJobOpen, setCreateJobOpen] = useState(false);
-  const [createInvoiceOpen, setCreateInvoiceOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("all");
   const [invoicesList, setInvoicesList] = useState<InvoiceData[]>(mockInvoices);
-  const [editingInvoice, setEditingInvoice] = useState<InvoiceData | null>(null);
-  const [sortColumn, setSortColumn] = useState<string>("date");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [showAnalytics, setShowAnalytics] = useState(false);
-  const { toast } = useToast();
-  
-  // Handle sorting
-  const handleSort = (column: string) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortColumn(column);
-      setSortDirection("asc");
-    }
-  };
-  
-  // Apply sorting and filtering
-  const sortAndFilterInvoices = () => {
-    let result = [...invoicesList];
-    
-    // Filter by search query
-    if (searchQuery) {
-      result = result.filter(invoice => 
-        invoice.customer.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        invoice.id.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    
-    // Filter by tab
-    if (activeTab !== "all") {
-      result = result.filter(invoice => invoice.status === activeTab);
-    }
-    
-    // Sort
-    result.sort((a, b) => {
-      let valueA: any = a[sortColumn as keyof InvoiceData];
-      let valueB: any = b[sortColumn as keyof InvoiceData];
-      
-      // Handle numeric sorts
-      if (sortColumn === "amount") {
-        valueA = Number(valueA);
-        valueB = Number(valueB);
-      }
-      
-      // String comparison
-      if (typeof valueA === "string" && typeof valueB === "string") {
-        return sortDirection === "asc" 
-          ? valueA.localeCompare(valueB) 
-          : valueB.localeCompare(valueA);
-      }
-      
-      // Number comparison
-      return sortDirection === "asc" ? valueA - valueB : valueB - valueA;
-    });
-    
-    return result;
-  };
-  
-  const filteredInvoices = sortAndFilterInvoices();
 
-  const handleInvoiceCreated = (newInvoice: InvoiceData) => {
-    // Add the new invoice to the list
-    setInvoicesList(current => [newInvoice, ...current]);
-    
-    toast({
-      title: "Invoice created",
-      description: `Invoice ${newInvoice.id} has been created successfully.`,
-    });
-  };
-  
-  const handleInvoiceUpdated = (updatedInvoice: InvoiceData) => {
-    // Update the invoice in the list
-    setInvoicesList(current => 
-      current.map(invoice => 
-        invoice.id === updatedInvoice.id ? updatedInvoice : invoice
-      )
-    );
-    
-    toast({
-      title: "Invoice updated",
-      description: `Invoice ${updatedInvoice.id} has been updated successfully.`,
-    });
-  };
-  
-  const handleInvoiceDeleted = (id: string) => {
-    // Confirm deletion
-    if (window.confirm("Are you sure you want to delete this invoice?")) {
-      setInvoicesList(current => current.filter(invoice => invoice.id !== id));
-      
-      toast({
-        title: "Invoice deleted",
-        description: `Invoice ${id} has been deleted successfully.`,
-      });
-    }
-  };
-  
-  const handleStatusChange = (id: string, newStatus: "pending" | "paid") => {
-    setInvoicesList(current => 
-      current.map(invoice => {
-        if (invoice.id === id) {
-          return { ...invoice, status: newStatus };
-        }
-        return invoice;
-      })
-    );
-    
-    toast({
-      title: `Invoice marked as ${newStatus}`,
-      description: `Invoice ${id} has been updated to ${newStatus}.`,
-    });
-  };
-  
-  const handleEditInvoice = (invoice: InvoiceData) => {
-    setEditingInvoice(invoice);
-    setCreateInvoiceOpen(true);
-  };
+  const {
+    searchQuery,
+    setSearchQuery,
+    activeTab,
+    setActiveTab,
+    sortColumn,
+    sortDirection,
+    handleSort,
+    sortAndFilterInvoices
+  } = useInvoiceList(invoicesList);
+
+  const {
+    editingInvoice,
+    createDialogOpen,
+    createJobOpen,
+    setCreateDialogOpen,
+    setCreateJobOpen,
+    handleInvoiceCreated,
+    handleInvoiceUpdated,
+    handleInvoiceDeleted,
+    handleStatusChange,
+    handleEditInvoice,
+  } = useInvoiceActions(setInvoicesList);
+
+  const filteredInvoices = sortAndFilterInvoices();
 
   // Calculate summary statistics
   const totalAmount = invoicesList.reduce((sum, inv) => sum + inv.amount, 0);
@@ -206,7 +109,7 @@ export default function Invoices() {
             onCreateJob={() => setCreateJobOpen(true)}
             onCreateInvoice={() => {
               setEditingInvoice(null);
-              setCreateInvoiceOpen(true);
+              setCreateDialogOpen(true);
             }}
           />
           
@@ -228,9 +131,9 @@ export default function Invoices() {
       />
 
       <CreateInvoiceDialog 
-        open={createInvoiceOpen}
+        open={createDialogOpen}
         onOpenChange={(isOpen) => {
-          setCreateInvoiceOpen(isOpen);
+          setCreateDialogOpen(isOpen);
           if (!isOpen) {
             setEditingInvoice(null);
           }
