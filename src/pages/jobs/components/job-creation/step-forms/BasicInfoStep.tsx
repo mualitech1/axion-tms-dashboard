@@ -16,9 +16,10 @@ interface BasicInfoStepProps {
   form: UseFormReturn<any>;
   date: Date | undefined;
   setDate: (date: Date | undefined) => void;
+  onDocumentsChange: (files: File[]) => void;
 }
 
-export function BasicInfoStep({ form, date, setDate }: BasicInfoStepProps) {
+export function BasicInfoStep({ form, date, setDate, onDocumentsChange }: BasicInfoStepProps) {
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-4">
@@ -157,7 +158,7 @@ export function BasicInfoStep({ form, date, setDate }: BasicInfoStepProps) {
       <div className="grid grid-cols-1 gap-4">
         <FormItem>
           <FormLabel>Order Confirmation Documents</FormLabel>
-          <DocumentUploader />
+          <DocumentUploader onDocumentsChange={onDocumentsChange} />
         </FormItem>
       </div>
       

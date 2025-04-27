@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
@@ -109,6 +110,7 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
   };
   
   const handleDocumentsChange = (files: File[]) => {
+    console.log("Documents changed:", files);
     setUploadedDocuments(files);
   };
 
@@ -147,7 +149,12 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
-        return <BasicInfoStep form={form} date={date} setDate={setDate} />;
+        return <BasicInfoStep 
+                form={form} 
+                date={date} 
+                setDate={setDate}
+                onDocumentsChange={handleDocumentsChange} 
+              />;
       case 2:
         return (
           <AddressesStep 

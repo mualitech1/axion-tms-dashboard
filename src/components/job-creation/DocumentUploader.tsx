@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Button } from "@/components/ui/button";
 import { FileText, Upload, X, FileCheck } from 'lucide-react';
@@ -12,6 +12,13 @@ interface DocumentUploaderProps {
 export function DocumentUploader({ onDocumentsChange }: DocumentUploaderProps) {
   const [files, setFiles] = useState<File[]>([]);
   const { toast } = useToast();
+  
+  // Effect to notify parent component when files change
+  useEffect(() => {
+    if (onDocumentsChange) {
+      onDocumentsChange(files);
+    }
+  }, [files, onDocumentsChange]);
   
   const onDrop = useCallback((acceptedFiles: File[]) => {
     // Filter for PDF and Word documents
@@ -35,25 +42,17 @@ export function DocumentUploader({ onDocumentsChange }: DocumentUploaderProps) {
       const newFiles = [...files, ...validFiles];
       setFiles(newFiles);
       
-      if (onDocumentsChange) {
-        onDocumentsChange(newFiles);
-      }
-      
       toast({
         title: "Files uploaded",
         description: `${validFiles.length} document${validFiles.length === 1 ? "" : "s"} added successfully`,
       });
     }
-  }, [files, onDocumentsChange, toast]);
+  }, [files, toast]);
   
   const removeFile = (index: number) => {
     const newFiles = [...files];
     newFiles.splice(index, 1);
     setFiles(newFiles);
-    
-    if (onDocumentsChange) {
-      onDocumentsChange(newFiles);
-    }
   };
   
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ 
@@ -70,7 +69,7 @@ export function DocumentUploader({ onDocumentsChange }: DocumentUploaderProps) {
       <div 
         {...getRootProps()} 
         className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-          isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
+          isDragActive ? 'border-blue-500 bg-blue-50/10' : 'border-gray-600 hover:border-blue-400'
         }`}
       >
         <input {...getInputProps()} />
