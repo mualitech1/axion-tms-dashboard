@@ -79,7 +79,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       
       console.log('Sign in successful for:', email);
-      return data;
     } catch (error: any) {
       console.error('Sign in error:', error.message);
       toast({
@@ -123,7 +122,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
       }
       
-      return data;
     } catch (error: any) {
       console.error('Sign up error:', error.message);
       
