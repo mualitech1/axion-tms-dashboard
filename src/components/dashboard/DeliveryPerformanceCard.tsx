@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 
 export default function DeliveryPerformanceCard() {
   return (
-    <Card className="bg-aximo-card/50 backdrop-blur-sm border-aximo-border transition-all duration-300 hover:shadow-aximo">
+    <Card className="bg-aximo-card/50 backdrop-blur-sm border-aximo-border transition-all duration-300 hover:shadow-aximo h-full">
       <CardHeader>
         <CardTitle className="text-lg font-semibold bg-gradient-to-r from-aximo-primary to-aximo-light bg-clip-text text-transparent">
           Delivery Performance

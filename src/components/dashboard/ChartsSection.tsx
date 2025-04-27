@@ -33,6 +33,9 @@ export default function ChartsSection({ revenueData, consignmentsData }: ChartsS
           secondary: '#FF4842',
           grid: 'rgba(255, 255, 255, 0.1)'
         }}
+        showLegend={true}
+        dataKeys={['onTime', 'delayed']}
+        dataLabels={['On-Time', 'Delayed']}
       />
     </div>
   );

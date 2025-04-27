@@ -11,6 +11,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from 'recharts';
 import { cn } from '@/lib/utils';
 
@@ -25,6 +26,9 @@ interface EnhancedChartProps {
     secondary?: string;
     grid?: string;
   };
+  showLegend?: boolean;
+  dataKeys?: string[];
+  dataLabels?: string[];
 }
 
 export function EnhancedChart({
@@ -35,10 +39,36 @@ export function EnhancedChart({
   height = 300,
   colors = {
     primary: '#0090FF',
-    secondary: '#33C3F0',
+    secondary: '#FF4842',
     grid: 'rgba(255, 255, 255, 0.1)',
   },
+  showLegend = false,
+  dataKeys = ['value'],
+  dataLabels,
 }: EnhancedChartProps) {
+  const renderLegend = () => {
+    if (!showLegend) return null;
+    
+    const labels = dataLabels || dataKeys;
+    
+    return (
+      <div className="flex justify-center mt-4 space-x-6">
+        {dataKeys[0] && (
+          <div className="flex items-center">
+            <div className={`w-3 h-3 rounded-sm mr-2`} style={{ backgroundColor: colors.primary }} />
+            <span className="text-xs text-aximo-text">{labels[0]}</span>
+          </div>
+        )}
+        {dataKeys[1] && colors.secondary && (
+          <div className="flex items-center">
+            <div className={`w-3 h-3 rounded-sm mr-2`} style={{ backgroundColor: colors.secondary }} />
+            <span className="text-xs text-aximo-text">{labels[1]}</span>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <Card className={cn(
       "bg-aximo-card/50 backdrop-blur-sm border-aximo-border",
@@ -80,12 +110,14 @@ export function EnhancedChart({
                 />
                 <Line
                   type="monotone"
-                  dataKey="value"
+                  dataKey={dataKeys[0]}
                   stroke={colors.primary}
                   strokeWidth={2}
                   dot={{ fill: colors.primary, strokeWidth: 2 }}
                   activeDot={{ r: 6, stroke: colors.primary }}
+                  name={dataLabels ? dataLabels[0] : dataKeys[0]}
                 />
+                {showLegend && <Legend content={() => null} />} {/* Hidden native legend */}
               </LineChart>
             ) : (
               <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -113,23 +145,25 @@ export function EnhancedChart({
                   labelStyle={{ color: '#fff' }}
                 />
                 <Bar
-                  dataKey="onTime"
+                  dataKey={dataKeys[0]}
                   fill={colors.primary}
                   radius={[4, 4, 0, 0]}
-                  name="On Time"
+                  name={dataLabels ? dataLabels[0] : dataKeys[0]}
                 />
-                {colors.secondary && (
+                {dataKeys[1] && colors.secondary && (
                   <Bar
-                    dataKey="delayed"
+                    dataKey={dataKeys[1]}
                     fill={colors.secondary}
                     radius={[4, 4, 0, 0]}
-                    name="Delayed"
+                    name={dataLabels ? dataLabels[1] : dataKeys[1]}
                   />
                 )}
+                {showLegend && <Legend content={() => null} />} {/* Hidden native legend */}
               </BarChart>
             )}
           </ResponsiveContainer>
         </div>
+        {showLegend && renderLegend()}
       </CardContent>
     </Card>
   );
