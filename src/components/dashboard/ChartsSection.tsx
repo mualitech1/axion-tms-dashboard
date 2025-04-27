@@ -1,5 +1,5 @@
 
-import Chart from '@/components/dashboard/Chart';
+import { EnhancedChart } from './EnhancedChart';
 
 interface ChartData {
   name: string;
@@ -14,16 +14,25 @@ interface ChartsSectionProps {
 export default function ChartsSection({ revenueData, consignmentsData }: ChartsSectionProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      <Chart 
+      <EnhancedChart 
         title="Revenue Trend" 
         data={revenueData} 
-        type="line" 
+        type="line"
+        colors={{
+          primary: '#0090FF',
+          grid: 'rgba(255, 255, 255, 0.1)'
+        }}
       />
       
-      <Chart 
-        title="Weekly Consignments" 
-        data={consignmentsData} 
-        type="bar" 
+      <EnhancedChart 
+        title="Delivery Performance" 
+        data={consignmentsData}
+        type="bar"
+        colors={{
+          primary: '#33C3F0',
+          secondary: '#FF4842',
+          grid: 'rgba(255, 255, 255, 0.1)'
+        }}
       />
     </div>
   );
