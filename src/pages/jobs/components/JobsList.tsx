@@ -79,16 +79,16 @@ export default function JobsList({ jobs, isLoading }: JobsListProps) {
   return (
     <div className="rounded-md border border-aximo-border overflow-hidden">
       <Table>
-        <TableHeader className="bg-aximo-dark">
+        <TableHeader className="bg-aximo-darker">
           <TableRow className="hover:bg-transparent border-aximo-border">
-            <TableHead>Reference</TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Priority</TableHead>
-            <TableHead>Pickup Date</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Carrier</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="text-aximo-text-secondary">Reference</TableHead>
+            <TableHead className="text-aximo-text-secondary">Title</TableHead>
+            <TableHead className="text-aximo-text-secondary">Status</TableHead>
+            <TableHead className="text-aximo-text-secondary">Priority</TableHead>
+            <TableHead className="text-aximo-text-secondary">Pickup Date</TableHead>
+            <TableHead className="text-aximo-text-secondary">Customer</TableHead>
+            <TableHead className="text-aximo-text-secondary">Carrier</TableHead>
+            <TableHead className="text-right text-aximo-text-secondary">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -98,16 +98,16 @@ export default function JobsList({ jobs, isLoading }: JobsListProps) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.03 }}
-              className="cursor-pointer hover:bg-aximo-primary/5 border-aximo-border"
+              className="cursor-pointer hover:bg-aximo-primary/5 border-aximo-border bg-aximo-dark"
               onClick={() => navigate(`/jobs/${job.id}`)}
             >
-              <TableCell className="font-medium">{job.reference}</TableCell>
-              <TableCell>{job.title}</TableCell>
+              <TableCell className="font-medium text-aximo-text">{job.reference}</TableCell>
+              <TableCell className="text-aximo-text">{job.title}</TableCell>
               <TableCell>{getStatusBadge(job.status)}</TableCell>
               <TableCell>{getPriorityBadge(job.priority)}</TableCell>
-              <TableCell>{format(new Date(job.pickup_date), 'PPP')}</TableCell>
-              <TableCell>{job.customer?.name || 'Unassigned'}</TableCell>
-              <TableCell>{job.carrier?.name || 'Unassigned'}</TableCell>
+              <TableCell className="text-aximo-text">{format(new Date(job.pickup_date), 'PP')}</TableCell>
+              <TableCell className="text-aximo-text">{job.customer?.name || 'Unassigned'}</TableCell>
+              <TableCell className="text-aximo-text">{job.carrier?.name || 'Unassigned'}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
                   <Button 
@@ -117,17 +117,18 @@ export default function JobsList({ jobs, isLoading }: JobsListProps) {
                       e.stopPropagation();
                       navigate(`/jobs/${job.id}`);
                     }}
+                    className="text-aximo-text-secondary hover:text-aximo-primary"
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" className="text-aximo-text-secondary hover:text-aximo-primary">
                         <MoreHorizontal className="h-4 w-4" />
                         <span className="sr-only">Open menu</span>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-aximo-dark border-aximo-border">
+                    <DropdownMenuContent align="end" className="bg-aximo-darker border-aximo-border">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuSeparator className="bg-aximo-border" />
                       <DropdownMenuItem>Edit</DropdownMenuItem>
@@ -142,7 +143,7 @@ export default function JobsList({ jobs, isLoading }: JobsListProps) {
             </motion.tr>
           ))}
           {jobs.length === 0 && (
-            <TableRow>
+            <TableRow className="border-aximo-border bg-aximo-dark">
               <TableCell colSpan={8} className="text-center py-10">
                 <div className="flex flex-col items-center justify-center">
                   <div className="bg-aximo-primary/10 p-4 rounded-full mb-3">

@@ -1,10 +1,11 @@
+
 import { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { useJobs } from '@/hooks/use-jobs';
 import JobsList from './components/JobsList';
 import JobCreation from './components/JobCreation';
 import { Button } from '@/components/ui/button';
-import { Plus, Filter, Calendar as CalendarIcon, Grid, RefreshCcw } from 'lucide-react';
+import { Plus, Filter, RefreshCcw, CalendarIcon, Grid, List } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
@@ -63,10 +64,11 @@ export default function JobsPage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
+        className="h-full"
       >
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-aximo-primary to-aximo-light mb-1">Jobs Dashboard</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-aximo-primary mb-1">Jobs Dashboard</h1>
             <p className="text-aximo-text-secondary">
               Manage and track all your transportation jobs in one place
               {jobs && <span className="ml-2">• <span className="font-semibold">{jobs.length}</span> total jobs</span>}
@@ -76,7 +78,7 @@ export default function JobsPage() {
           <div className="flex flex-col md:flex-row gap-2 w-full lg:w-auto">
             <Button 
               onClick={() => setShowCreateModal(true)}
-              className="bg-gradient-to-r from-aximo-primary to-aximo-light hover:from-aximo-primary/90 hover:to-aximo-light/90 text-white transition-all duration-300"
+              className="bg-aximo-primary hover:bg-aximo-primary/90 text-white transition-all duration-300"
               size="lg"
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -101,7 +103,7 @@ export default function JobsPage() {
             transition={{ duration: 0.3, delay: 0.1 }}
             className="col-span-1"
           >
-            <Card className="bg-gradient-to-br from-aximo-dark to-aximo-darker border border-aximo-border shadow-aximo">
+            <Card className="bg-aximo-dark border border-aximo-border shadow-sm">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-aximo-text-secondary">Total Jobs</p>
@@ -119,7 +121,7 @@ export default function JobsPage() {
             transition={{ duration: 0.3, delay: 0.2 }}
             className="col-span-1"
           >
-            <Card className="bg-gradient-to-br from-aximo-dark to-aximo-darker border border-aximo-border shadow-aximo">
+            <Card className="bg-aximo-dark border border-aximo-border shadow-sm">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-aximo-text-secondary">In Progress</p>
@@ -137,7 +139,7 @@ export default function JobsPage() {
             transition={{ duration: 0.3, delay: 0.3 }}
             className="col-span-1"
           >
-            <Card className="bg-gradient-to-br from-aximo-dark to-aximo-darker border border-aximo-border shadow-aximo">
+            <Card className="bg-aximo-dark border border-aximo-border shadow-sm">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-aximo-text-secondary">Completed</p>
@@ -155,7 +157,7 @@ export default function JobsPage() {
             transition={{ duration: 0.3, delay: 0.4 }}
             className="col-span-1"
           >
-            <Card className="bg-gradient-to-br from-aximo-dark to-aximo-darker border border-aximo-border shadow-aximo">
+            <Card className="bg-aximo-dark border border-aximo-border shadow-sm">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-aximo-text-secondary">Issues</p>
@@ -168,18 +170,18 @@ export default function JobsPage() {
           </motion.div>
         </div>
 
-        <div className="bg-gradient-to-br from-aximo-dark to-aximo-darker border border-aximo-border rounded-lg p-4 mb-6 shadow-aximo">
+        <div className="bg-aximo-dark border border-aximo-border rounded-lg p-4 mb-6 shadow-sm">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
             <div className="flex items-center gap-2 mb-3 sm:mb-0">
               <Select 
                 defaultValue={filterStatus} 
                 onValueChange={setFilterStatus}
               >
-                <SelectTrigger className="w-[180px] bg-aximo-dark border-aximo-border">
+                <SelectTrigger className="w-[180px] bg-aximo-darker border-aximo-border">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-aximo-darker border-aximo-border">
                   <SelectItem value="all">All Jobs</SelectItem>
                   <SelectItem value="booked">Booked</SelectItem>
                   <SelectItem value="allocated">Allocated</SelectItem>
@@ -198,12 +200,12 @@ export default function JobsPage() {
                 value={viewMode} 
                 onValueChange={(val) => setViewMode(val as 'list' | 'grid')}
               >
-                <TabsList className="bg-aximo-dark/50 border border-aximo-border">
-                  <TabsTrigger value="list" className="data-[state=active]:bg-aximo-primary/20">
-                    <Calendar className="h-4 w-4 mr-2" />
+                <TabsList className="bg-aximo-darker border border-aximo-border">
+                  <TabsTrigger value="list" className="data-[state=active]:bg-aximo-primary data-[state=active]:text-white">
+                    <List className="h-4 w-4 mr-2" />
                     List
                   </TabsTrigger>
-                  <TabsTrigger value="grid" className="data-[state=active]:bg-aximo-primary/20">
+                  <TabsTrigger value="grid" className="data-[state=active]:bg-aximo-primary data-[state=active]:text-white">
                     <Grid className="h-4 w-4 mr-2" />
                     Grid
                   </TabsTrigger>

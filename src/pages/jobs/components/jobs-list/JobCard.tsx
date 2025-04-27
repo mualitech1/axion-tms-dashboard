@@ -43,13 +43,13 @@ export function JobCard({ job }: JobCardProps) {
   };
   
   return (
-    <Link to={`/jobs/${job.id}`}>
+    <Link to={`/jobs/${job.id}`} className="group">
       <motion.div
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         transition={{ type: "spring", stiffness: 400, damping: 17 }}
       >
-        <Card className="overflow-hidden border border-aximo-border bg-gradient-to-br from-aximo-dark to-aximo-darker shadow-aximo hover:shadow-aximo-strong transition-all duration-300">
+        <Card className="overflow-hidden border border-aximo-border bg-aximo-dark shadow-sm hover:shadow-md transition-all duration-300">
           <div className="p-4">
             <div className="flex items-start justify-between">
               <div className="flex-grow">
