@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
@@ -175,12 +174,11 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
     }
   };
 
-  // Calculate the appropriate max height for the scroll area
-  const scrollMaxHeight = isMobile ? "60vh" : "70vh";
+  const scrollMaxHeight = isMobile ? "calc(70vh - 200px)" : "calc(80vh - 200px)";
 
   return (
     <>
-      <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-t-lg">
+      <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-t-lg sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Briefcase className="h-5 w-5" />
@@ -191,7 +189,7 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
         <StepIndicator currentStep={currentStep} totalSteps={3} />
       </CardHeader>
       
-      <CardContent className="p-6 bg-aximo-dark">
+      <CardContent className="p-4 sm:p-6 bg-aximo-dark">
         <Form {...form}>
           <AnimatePresence mode="wait">
             <motion.form 
@@ -204,7 +202,7 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
               key={currentStep}
             >
               <div className="bg-aximo-card rounded-lg shadow-lg border border-aximo-border">
-                <ScrollArea className="p-6" style={{ maxHeight: scrollMaxHeight }}>
+                <ScrollArea className="p-4 sm:p-6" style={{ maxHeight: scrollMaxHeight }}>
                   {renderCurrentStep()}
                 </ScrollArea>
               </div>
