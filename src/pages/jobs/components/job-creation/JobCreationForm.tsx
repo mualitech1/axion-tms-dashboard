@@ -4,7 +4,7 @@ import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { Briefcase, Zap, ArrowRight } from "lucide-react";
+import { Briefcase, Zap } from "lucide-react";
 import { format } from "date-fns";
 import { BasicInfoStep } from "./step-forms/BasicInfoStep";
 import { AddressesStep } from "./step-forms/AddressesStep";
@@ -13,6 +13,8 @@ import { StepIndicator } from "./StepIndicator";
 import { NavigationButtons } from "./NavigationButtons";
 import { motion, AnimatePresence } from "framer-motion";
 import { JobStatus } from "../../types/jobTypes";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Address {
   companyName: string;
@@ -36,6 +38,7 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [uploadedDocuments, setUploadedDocuments] = useState<File[]>([]);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   const form = useForm({
     defaultValues: {
@@ -172,6 +175,9 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
     }
   };
 
+  // Calculate the appropriate max height for the scroll area
+  const scrollMaxHeight = isMobile ? "60vh" : "70vh";
+
   return (
     <>
       <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-t-lg">
@@ -185,7 +191,7 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
         <StepIndicator currentStep={currentStep} totalSteps={3} />
       </CardHeader>
       
-      <CardContent className="p-6 bg-aximo-dark space-y-6">
+      <CardContent className="p-6 bg-aximo-dark">
         <Form {...form}>
           <AnimatePresence mode="wait">
             <motion.form 
@@ -197,8 +203,10 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
               transition={{ duration: 0.3 }}
               key={currentStep}
             >
-              <div className="bg-aximo-card rounded-lg p-6 shadow-lg border border-aximo-border">
-                {renderCurrentStep()}
+              <div className="bg-aximo-card rounded-lg shadow-lg border border-aximo-border">
+                <ScrollArea className="p-6" style={{ maxHeight: scrollMaxHeight }}>
+                  {renderCurrentStep()}
+                </ScrollArea>
               </div>
               
               <NavigationButtons 

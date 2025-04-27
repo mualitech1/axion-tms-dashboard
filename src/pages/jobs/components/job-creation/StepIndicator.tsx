@@ -1,17 +1,21 @@
 
+import { useIsMobile } from "@/hooks/use-mobile";
+
 interface StepIndicatorProps {
   currentStep: number;
   totalSteps: number;
 }
 
 export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
+  const isMobile = useIsMobile();
+  
   return (
     <div className="mt-4">
-      <div className="flex items-center justify-between max-w-[400px]">
+      <div className={`flex items-center ${isMobile ? 'justify-around' : 'justify-between max-w-[400px]'}`}>
         {Array.from({ length: totalSteps }).map((_, index) => (
-          <div key={index} className="flex items-center">
+          <div key={index} className="flex items-center flex-1">
             <div className={`
-              flex items-center justify-center w-8 h-8 rounded-full
+              flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0
               ${index + 1 <= currentStep
                 ? 'bg-white text-blue-600'
                 : 'bg-blue-800/30 text-blue-100'
@@ -21,7 +25,7 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
             </div>
             {index < totalSteps - 1 && (
               <div className={`
-                h-0.5 w-full min-w-[2rem] mx-2
+                h-0.5 w-full min-w-[1rem] mx-1 md:mx-2
                 ${index + 1 < currentStep ? 'bg-white' : 'bg-blue-800/30'}
                 transition-colors duration-200
               `} />
