@@ -6,6 +6,7 @@ import { AnalyticsHeader } from './components/AnalyticsHeader';
 import { AnalyticsTabs } from './components/AnalyticsTabs';
 import { AnalyticsTabContent } from './components/AnalyticsTabContent';
 import { mockInvoices } from './data/mockInvoices';
+import { motion } from 'framer-motion';
 
 export default function Analytics() {
   const [dateRange, setDateRange] = useState('30days');
@@ -22,14 +23,19 @@ export default function Analytics() {
   
   return (
     <MainLayout title="Analytics">
-      <div className="animate-fade-in space-y-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="space-y-6"
+      >
         <AnalyticsHeader dateRange={dateRange} setDateRange={setDateRange} />
         
-        <Tabs defaultValue="overview" className="space-y-4">
+        <Tabs defaultValue="overview" className="space-y-6">
           <AnalyticsTabs defaultValue="overview" />
           <AnalyticsTabContent invoices={mockInvoices} isLoading={isLoading} />
         </Tabs>
-      </div>
+      </motion.div>
     </MainLayout>
   );
 }

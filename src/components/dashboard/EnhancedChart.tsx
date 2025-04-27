@@ -1,6 +1,5 @@
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useEffect, useState } from 'react';
 import {
   LineChart,
   Line,
@@ -16,7 +15,7 @@ import {
 import { cn } from '@/lib/utils';
 
 interface EnhancedChartProps {
-  title: string;
+  title?: string;
   data: any[];
   type: 'line' | 'bar';
   className?: string;
@@ -46,6 +45,17 @@ export function EnhancedChart({
   dataKeys = ['value'],
   dataLabels,
 }: EnhancedChartProps) {
+  const [chartData, setChartData] = useState<any[]>([]);
+
+  // Animate chart data
+  useEffect(() => {
+    setChartData([]);
+    const timer = setTimeout(() => {
+      setChartData(data);
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [data]);
+
   const renderLegend = () => {
     if (!showLegend) return null;
     
@@ -69,102 +79,110 @@ export function EnhancedChart({
     );
   };
 
-  return (
-    <Card className={cn(
-      "bg-aximo-card/50 backdrop-blur-sm border-aximo-border",
-      "transition-all duration-300 hover:shadow-aximo",
-      className
-    )}>
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold bg-gradient-to-r from-aximo-primary to-aximo-light bg-clip-text text-transparent">
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div style={{ height: `${height}px`, width: '100%' }}>
-          <ResponsiveContainer>
-            {type === 'line' ? (
-              <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
-                <XAxis
-                  dataKey="name"
-                  stroke="currentColor"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={{ stroke: colors.grid }}
-                />
-                <YAxis
-                  stroke="currentColor"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={{ stroke: colors.grid }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(17, 25, 40, 0.8)',
-                    borderColor: colors.primary,
-                    borderRadius: '8px',
-                    backdropFilter: 'blur(4px)',
-                  }}
-                  labelStyle={{ color: '#fff' }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey={dataKeys[0]}
-                  stroke={colors.primary}
-                  strokeWidth={2}
-                  dot={{ fill: colors.primary, strokeWidth: 2 }}
-                  activeDot={{ r: 6, stroke: colors.primary }}
-                  name={dataLabels ? dataLabels[0] : dataKeys[0]}
-                />
-                {showLegend && <Legend content={() => null} />} {/* Hidden native legend */}
-              </LineChart>
-            ) : (
-              <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
-                <XAxis
-                  dataKey="name"
-                  stroke="currentColor"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={{ stroke: colors.grid }}
-                />
-                <YAxis
-                  stroke="currentColor"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={{ stroke: colors.grid }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(17, 25, 40, 0.8)',
-                    borderColor: colors.primary,
-                    borderRadius: '8px',
-                    backdropFilter: 'blur(4px)',
-                  }}
-                  labelStyle={{ color: '#fff' }}
-                />
-                <Bar
-                  dataKey={dataKeys[0]}
-                  fill={colors.primary}
-                  radius={[4, 4, 0, 0]}
-                  name={dataLabels ? dataLabels[0] : dataKeys[0]}
-                />
-                {dataKeys[1] && colors.secondary && (
-                  <Bar
-                    dataKey={dataKeys[1]}
-                    fill={colors.secondary}
-                    radius={[4, 4, 0, 0]}
-                    name={dataLabels ? dataLabels[1] : dataKeys[1]}
-                  />
-                )}
-                {showLegend && <Legend content={() => null} />} {/* Hidden native legend */}
-              </BarChart>
-            )}
-          </ResponsiveContainer>
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-aximo-darker/95 backdrop-blur-md border border-aximo-border p-3 rounded-md shadow-aximo text-sm">
+          <p className="text-aximo-text-secondary mb-1">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <div key={`tooltip-${index}`} className="flex items-center gap-2">
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: entry.color }}
+              />
+              <span className="text-aximo-text">
+                {`${dataLabels?.[index] || entry.dataKey}: ${entry.value}`}
+              </span>
+            </div>
+          ))}
         </div>
-        {showLegend && renderLegend()}
-      </CardContent>
-    </Card>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className="w-full" style={{ height: `${height}px` }}>
+      <ResponsiveContainer>
+        {type === 'line' ? (
+          <LineChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
+            <defs>
+              <linearGradient id="primaryGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={colors.primary} stopOpacity={0.3} />
+                <stop offset="95%" stopColor={colors.primary} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+            <XAxis
+              dataKey="name"
+              stroke="currentColor"
+              fontSize={12}
+              tickLine={false}
+              axisLine={{ stroke: colors.grid }}
+              tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 11 }}
+            />
+            <YAxis
+              stroke="currentColor"
+              fontSize={12}
+              tickLine={false}
+              axisLine={{ stroke: colors.grid }}
+              tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 11 }}
+              width={35}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Line
+              type="monotone"
+              dataKey={dataKeys[0]}
+              stroke={colors.primary}
+              strokeWidth={2}
+              dot={{ fill: colors.primary, strokeWidth: 2, r: 4, strokeOpacity: 0.8 }}
+              activeDot={{ r: 6, stroke: colors.primary }}
+              name={dataLabels ? dataLabels[0] : dataKeys[0]}
+              fill="url(#primaryGradient)"
+            />
+            {showLegend && <Legend content={() => null} />} {/* Hidden native legend */}
+          </LineChart>
+        ) : (
+          <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+            <XAxis
+              dataKey="name"
+              stroke="currentColor"
+              fontSize={12}
+              tickLine={false}
+              axisLine={{ stroke: colors.grid }}
+              tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 11 }}
+            />
+            <YAxis
+              stroke="currentColor"
+              fontSize={12}
+              tickLine={false}
+              axisLine={{ stroke: colors.grid }}
+              tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 11 }}
+              width={35}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Bar
+              dataKey={dataKeys[0]}
+              fill={colors.primary}
+              radius={[4, 4, 0, 0]}
+              name={dataLabels ? dataLabels[0] : dataKeys[0]}
+              animationDuration={1000}
+            />
+            {dataKeys[1] && colors.secondary && (
+              <Bar
+                dataKey={dataKeys[1]}
+                fill={colors.secondary}
+                radius={[4, 4, 0, 0]}
+                name={dataLabels ? dataLabels[1] : dataKeys[1]}
+                animationDuration={1000}
+              />
+            )}
+            {showLegend && <Legend content={() => null} />} {/* Hidden native legend */}
+          </BarChart>
+        )}
+      </ResponsiveContainer>
+      {showLegend && renderLegend()}
+    </div>
   );
 }
