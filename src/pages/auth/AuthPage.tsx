@@ -22,6 +22,9 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AlertCircle, Eye, EyeOff, Mail, User } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { InputWithIcon } from '@/components/ui/input-with-icon';
 
 const authSchema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -33,6 +36,8 @@ const authSchema = z.object({
 export default function AuthPage() {
   const { signIn, signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<z.infer<typeof authSchema>>({
     resolver: zodResolver(authSchema),
@@ -46,11 +51,22 @@ export default function AuthPage() {
 
   const onSubmit = async (values: z.infer<typeof authSchema>, mode: 'login' | 'register') => {
     setIsLoading(true);
+    setAuthError(null);
+    
     try {
       if (mode === 'login') {
         await signIn(values.email, values.password);
       } else {
         await signUp(values.email, values.password, values.firstName || '', values.lastName || '');
+      }
+    } catch (error: any) {
+      // Handle specific error cases
+      if (error.message.includes('credentials')) {
+        setAuthError('Invalid email or password');
+      } else if (error.message.includes('already registered')) {
+        setAuthError('This email is already registered. Please try logging in instead.');
+      } else {
+        setAuthError(error.message);
       }
     } finally {
       setIsLoading(false);
@@ -58,17 +74,24 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle>Welcome to TMS</CardTitle>
-          <CardDescription>
+    <div className="min-h-screen flex items-center justify-center bg-aximo-darker px-4">
+      <Card className="w-full max-w-md border-aximo-border bg-aximo-dark">
+        <CardHeader className="text-center space-y-2">
+          <CardTitle className="text-2xl font-bold text-aximo-text">Welcome to TMS</CardTitle>
+          <CardDescription className="text-aximo-text-secondary">
             Sign in to your account or create a new one
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {authError && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{authError}</AlertDescription>
+            </Alert>
+          )}
+          
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="register">Register</TabsTrigger>
             </TabsList>
@@ -83,7 +106,7 @@ export default function AuthPage() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your email" {...field} />
+                          <InputWithIcon icon={Mail} placeholder="Enter your email" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -96,7 +119,25 @@ export default function AuthPage() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="Enter your password" {...field} />
+                          <div className="relative">
+                            <Input 
+                              type={showPassword ? "text" : "password"} 
+                              placeholder="Enter your password" 
+                              {...field} 
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              {showPassword ? 
+                                <EyeOff className="h-4 w-4 text-muted-foreground" /> : 
+                                <Eye className="h-4 w-4 text-muted-foreground" />
+                              }
+                            </Button>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -119,7 +160,7 @@ export default function AuthPage() {
                       <FormItem>
                         <FormLabel>First Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your first name" {...field} />
+                          <InputWithIcon icon={User} placeholder="Enter your first name" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -132,7 +173,7 @@ export default function AuthPage() {
                       <FormItem>
                         <FormLabel>Last Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your last name" {...field} />
+                          <InputWithIcon icon={User} placeholder="Enter your last name" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -145,7 +186,7 @@ export default function AuthPage() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your email" {...field} />
+                          <InputWithIcon icon={Mail} placeholder="Enter your email" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -158,7 +199,25 @@ export default function AuthPage() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="Enter your password" {...field} />
+                          <div className="relative">
+                            <Input 
+                              type={showPassword ? "text" : "password"} 
+                              placeholder="Enter your password" 
+                              {...field} 
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              {showPassword ? 
+                                <EyeOff className="h-4 w-4 text-muted-foreground" /> : 
+                                <Eye className="h-4 w-4 text-muted-foreground" />
+                              }
+                            </Button>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
