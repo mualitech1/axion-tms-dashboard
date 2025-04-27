@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { useJobs } from '@/hooks/use-jobs';
@@ -28,6 +27,10 @@ export default function JobsPage() {
       title: "Refreshing jobs",
       description: "The jobs list is being refreshed."
     });
+  };
+
+  const handleCreateJobClick = () => {
+    setShowCreateModal(true);
   };
 
   const filteredJobs = jobs && filterStatus !== 'all' 
@@ -77,7 +80,7 @@ export default function JobsPage() {
           
           <div className="flex flex-col md:flex-row gap-2 w-full lg:w-auto">
             <Button 
-              onClick={() => setShowCreateModal(true)}
+              onClick={handleCreateJobClick}
               className="bg-aximo-primary hover:bg-aximo-primary/90 text-white transition-all duration-300"
               size="lg"
             >
