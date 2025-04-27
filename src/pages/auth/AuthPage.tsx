@@ -27,6 +27,7 @@ import { AlertCircle, Eye, EyeOff, Mail, User, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { InputWithIcon } from '@/components/ui/input-with-icon';
 import { useSearchParams } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -105,6 +106,10 @@ export default function AuthPage() {
       await signUp(values.email, values.password, values.firstName, values.lastName);
       registerForm.reset();
       setActiveTab('login');
+      toast({
+        title: "Registration successful",
+        description: "Please check your email to confirm your account before logging in.",
+      });
     } catch (error: any) {
       setAuthError(error.message);
     } finally {
