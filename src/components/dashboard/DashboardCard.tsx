@@ -8,6 +8,8 @@ interface DashboardCardProps {
   className?: string;
   footer?: React.ReactNode;
   isLoading?: boolean;
+  icon?: React.ReactNode;
+  accentColor?: 'blue' | 'green' | 'amber' | 'red';
 }
 
 export default function DashboardCard({ 
@@ -15,18 +17,40 @@ export default function DashboardCard({
   children, 
   className,
   footer,
-  isLoading = false
+  isLoading = false,
+  icon,
+  accentColor
 }: DashboardCardProps) {
   const isMobile = useIsMobile();
   
+  const getBorderClass = () => {
+    if (!accentColor) return "border-aximo-border";
+    
+    switch (accentColor) {
+      case 'blue': return "border-aximo-primary/40";
+      case 'green': return "border-green-500/40";
+      case 'amber': return "border-amber-500/40";
+      case 'red': return "border-red-500/40";
+      default: return "border-aximo-border";
+    }
+  };
+  
   return (
     <div className={cn(
-      "bg-aximo-card border border-aximo-border rounded-lg shadow-aximo overflow-hidden animate-scale-in p-4 md:p-5",
+      "bg-aximo-card border rounded-lg shadow-aximo overflow-hidden animate-scale-in p-4 md:p-5",
+      getBorderClass(),
       isMobile ? "p-3" : "",
       className
     )}>
       <div className="flex items-center justify-between mb-3 md:mb-4">
-        <h3 className="text-xs md:text-sm font-medium text-aximo-text-secondary">{title}</h3>
+        <div className="flex items-center">
+          {icon && (
+            <div className="mr-3 text-aximo-primary">
+              {icon}
+            </div>
+          )}
+          <h3 className="text-xs md:text-sm font-medium text-aximo-text-secondary">{title}</h3>
+        </div>
       </div>
       
       {isLoading ? (

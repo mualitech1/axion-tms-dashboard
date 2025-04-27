@@ -29,7 +29,7 @@ export default function MainLayout({ children, title }: MainLayoutProps) {
       <Sidebar />
       
       <div className={cn(
-        "flex-1 transition-all duration-300 ease-in-out",
+        "flex-1 transition-all duration-300 ease-in-out bg-aximo-darker",
         isMobile ? "ml-0" : (isSidebarCollapsed ? "ml-16" : "ml-64")
       )}>
         <Header title={title} />

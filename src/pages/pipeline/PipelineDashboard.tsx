@@ -2,7 +2,7 @@
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
-import { Plus, ListTodo } from 'lucide-react';
+import { Plus, ListTodo, ArrowRightIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Breadcrumb } from '@/components/navigation/Breadcrumb';
 import MetricsCards from './components/dashboard/MetricsCards';
@@ -77,6 +77,16 @@ export default function PipelineDashboard() {
         <div className="md:col-span-1">
           <ReminderOverviewCard />
         </div>
+      </div>
+      
+      {/* View All Jobs Button */}
+      <div className="mt-6 flex justify-end">
+        <Button variant="ghost" size="sm" asChild className="text-aximo-primary hover:text-aximo-light">
+          <Link to="/jobs" className="flex items-center text-sm">
+            View all jobs
+            <ArrowRightIcon className="ml-1 h-4 w-4" />
+          </Link>
+        </Button>
       </div>
     </MainLayout>
   );

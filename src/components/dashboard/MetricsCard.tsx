@@ -15,6 +15,7 @@ interface MetricsCardProps {
   icon?: React.ReactNode;
   className?: string;
   isLoading?: boolean;
+  accentColor?: 'blue' | 'green' | 'amber' | 'red';
 }
 
 export default function MetricsCard({
@@ -24,6 +25,7 @@ export default function MetricsCard({
   icon,
   className,
   isLoading = false,
+  accentColor,
 }: MetricsCardProps) {
   const isMobile = useIsMobile();
 
@@ -44,6 +46,8 @@ export default function MetricsCard({
       title={title}
       className={cn("hover:border-aximo-primary/50 transition-all duration-300", className)}
       isLoading={isLoading}
+      icon={icon}
+      accentColor={accentColor}
     >
       <div className="flex items-start justify-between">
         <div>

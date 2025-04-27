@@ -14,19 +14,19 @@ export default function Header({ title }: HeaderProps) {
   const { signOut, user } = useAuth();
 
   return (
-    <div className="flex h-16 items-center justify-between border-b border-aximo-border bg-aximo-dark px-6">
+    <div className="flex h-16 items-center justify-between border-b border-aximo-border bg-aximo-darker px-4 md:px-6">
       {title && <h1 className="text-xl font-semibold text-aximo-text">{title}</h1>}
       <div className="flex-1 mx-8">
         <div className="relative max-w-md">
           <input
             type="text"
             placeholder="Search..."
-            className="w-full bg-aximo-darker border border-aximo-border text-aximo-text rounded-full px-4 py-1.5 pl-10 focus:outline-none focus:ring-1 focus:ring-aximo-primary"
+            className="w-full bg-aximo-card border border-aximo-border text-aximo-text rounded-full px-4 py-1.5 pl-10 focus:outline-none focus:ring-1 focus:ring-aximo-primary"
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-aximo-text-secondary h-4 w-4" />
         </div>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 md:gap-4">
         <Button 
           variant="ghost" 
           size="icon"
@@ -41,7 +41,7 @@ export default function Header({ title }: HeaderProps) {
         >
           <ClockIcon className="h-5 w-5" />
         </Button>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           <div className="hidden md:block">
             <span className="text-sm text-aximo-text-secondary">{user?.email || 'admin@aximo.ai'}</span>
           </div>
