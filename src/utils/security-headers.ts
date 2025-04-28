@@ -86,8 +86,8 @@ export function addCSRFTokenToForm(formElement: HTMLFormElement): void {
   
   if (!input) {
     input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = '_csrf';
+    (input as HTMLInputElement).type = 'hidden';
+    (input as HTMLInputElement).name = '_csrf';
     formElement.appendChild(input);
   }
   
