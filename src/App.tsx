@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AuthProvider } from '@/hooks/use-auth';
@@ -96,17 +95,12 @@ const router = createBrowserRouter([
   },
 ]);
 
-// Custom RouterProvider wrapper component to fix the router context issue
-const AppWithProviders = () => {
-  return (
-    <RouterProvider router={router} />
-  );
-};
-
 function App() {
   return (
     <React.StrictMode>
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </React.StrictMode>
   );
 }

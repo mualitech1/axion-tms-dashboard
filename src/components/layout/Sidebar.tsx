@@ -73,7 +73,7 @@ export default function Sidebar() {
               return (
                 <div key={item.title}>
                   <NavItem
-                    to={item.href || '#'}
+                    to={item.href || '#'} // Use default '#' if href doesn't exist
                     icon={item.icon ? Icons[item.icon] : null}
                     label={item.title}
                     isCollapsed={isCollapsed}
