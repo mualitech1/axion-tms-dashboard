@@ -96,12 +96,17 @@ const router = createBrowserRouter([
   },
 ]);
 
+// Custom RouterProvider wrapper component to fix the router context issue
+const AppWithProviders = () => {
+  return (
+    <RouterProvider router={router} />
+  );
+};
+
 function App() {
   return (
     <React.StrictMode>
-      <AuthProvider>
-        <RouterProvider router={router} />
-      </AuthProvider>
+      <RouterProvider router={router} />
     </React.StrictMode>
   );
 }

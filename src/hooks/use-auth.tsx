@@ -1,6 +1,5 @@
 
 import { useEffect, useState, createContext, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -22,7 +21,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -37,9 +35,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             title: "Successfully signed in",
             description: `Welcome, ${session?.user?.email}`,
           });
-          navigate('/');
+          // Instead of using navigate here, we can use window.location
+          window.location.href = '/';
         } else if (event === 'SIGNED_OUT') {
-          navigate('/auth');
+          window.location.href = '/auth';
         }
       }
     );
@@ -53,12 +52,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // If user is already logged in and on auth page, redirect to home
       if (session && window.location.pathname === '/auth') {
-        navigate('/');
+        window.location.href = '/';
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
