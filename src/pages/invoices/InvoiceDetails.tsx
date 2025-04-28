@@ -33,7 +33,7 @@ export default function InvoiceDetails() {
 
   if (isLoading) {
     return (
-      <MainLayout>
+      <MainLayout title="Invoice Details">
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-1/4 bg-gray-200 rounded"></div>
           <div className="h-[400px] bg-gray-100 rounded-lg"></div>
@@ -44,7 +44,7 @@ export default function InvoiceDetails() {
 
   if (!invoice) {
     return (
-      <MainLayout>
+      <MainLayout title="Invoice Not Found">
         <div className="text-center py-12">
           <h2 className="text-2xl font-semibold text-gray-900">Invoice not found</h2>
           <p className="mt-2 text-gray-600">The invoice you're looking for doesn't exist or you don't have permission to view it.</p>
@@ -58,7 +58,7 @@ export default function InvoiceDetails() {
   }
 
   return (
-    <MainLayout>
+    <MainLayout title={`Invoice #${invoice.invoice_number}`}>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <Button variant="outline" onClick={() => navigate('/invoices')}>

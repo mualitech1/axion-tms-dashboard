@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,6 +23,7 @@ import Settings from "./pages/Settings";
 import Analytics from "./pages/Analytics";
 import Finance from "./pages/Finance";
 import Invoices from "./pages/Invoices";
+import InvoiceDetails from "./pages/invoices/InvoiceDetails";
 import NotFound from "./pages/NotFound";
 import CarrierSelfInvoices from "./pages/finance/CarrierSelfInvoices";
 import DisputeManagement from "./pages/finance/DisputeManagement";
