@@ -1,5 +1,5 @@
 
-import { Job } from '@/types/database';
+import { Job } from '../types/jobTypes';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -105,9 +105,9 @@ export default function JobsList({ jobs, isLoading }: JobsListProps) {
               <TableCell className="text-aximo-text">{job.title}</TableCell>
               <TableCell>{getStatusBadge(job.status)}</TableCell>
               <TableCell>{getPriorityBadge(job.priority)}</TableCell>
-              <TableCell className="text-aximo-text">{format(new Date(job.pickup_date), 'PP')}</TableCell>
-              <TableCell className="text-aximo-text">{job.customer?.name || 'Unassigned'}</TableCell>
-              <TableCell className="text-aximo-text">{job.carrier?.name || 'Unassigned'}</TableCell>
+              <TableCell className="text-aximo-text">{format(new Date(job.date), 'PP')}</TableCell>
+              <TableCell className="text-aximo-text">{job.client}</TableCell>
+              <TableCell className="text-aximo-text">{job.hauler?.name || 'Unassigned'}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
                   <Button 
