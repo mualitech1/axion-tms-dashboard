@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/card';
 import { JobsHeader } from './components/jobs-header/JobsHeader';
 import { JobsStatistics } from './components/stats/JobsStatistics';
 import { JobsFilters } from './components/filters/JobsFilters';
+import { adaptDatabaseJobsToJobTypes } from './adapters/jobAdapter';
 
 export default function JobsPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -21,14 +22,17 @@ export default function JobsPage() {
     setShowCreateModal(true);
   };
 
-  const filteredJobs = jobs && filterStatus !== 'all' 
-    ? jobs.filter(job => job.status === filterStatus) 
-    : jobs;
+  // Convert database jobs to the type expected by our components
+  const adaptedJobs = adaptDatabaseJobsToJobTypes(jobs);
+  
+  const filteredJobs = filterStatus !== 'all' 
+    ? adaptedJobs.filter(job => job.status === filterStatus) 
+    : adaptedJobs;
 
-  const jobStatusCounts = jobs ? jobs.reduce((acc, job) => {
+  const jobStatusCounts = adaptedJobs.reduce((acc, job) => {
     acc[job.status] = (acc[job.status] || 0) + 1;
     return acc;
-  }, {} as Record<string, number>) : {};
+  }, {} as Record<string, number>);
 
   if (error) {
     return (
@@ -55,7 +59,7 @@ export default function JobsPage() {
         className="h-full"
       >
         <JobsHeader onCreateJob={handleCreateJobClick} onRefresh={refetch} />
-        <JobsStatistics jobs={jobs} jobStatusCounts={jobStatusCounts} />
+        <JobsStatistics jobs={adaptedJobs} jobStatusCounts={jobStatusCounts} />
         
         <div className="bg-gradient-to-br from-aximo-dark to-aximo-darker border border-aximo-border rounded-lg p-6 shadow-lg backdrop-blur-sm">
           <JobsFilters
@@ -72,9 +76,9 @@ export default function JobsPage() {
             transition={{ duration: 0.3 }}
           >
             {viewMode === 'list' ? (
-              <JobsList jobs={filteredJobs || []} isLoading={isLoading} />
+              <JobsList jobs={filteredJobs} isLoading={isLoading} />
             ) : (
-              <JobsGrid jobs={filteredJobs || []} isLoading={isLoading} />
+              <JobsGrid jobs={filteredJobs} isLoading={isLoading} />
             )}
           </motion.div>
         </div>
