@@ -1,8 +1,8 @@
 
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import JobCreationForm from "./job-creation/JobCreationForm";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 interface JobCreationProps {
   onComplete: () => void;
@@ -11,14 +11,22 @@ interface JobCreationProps {
 export default function JobCreation({ onComplete }: JobCreationProps) {
   const isMobile = useIsMobile();
   
-  return (
+  return isMobile ? (
+    // For mobile, use a sheet that slides up from bottom
+    <Sheet open={true} onOpenChange={onComplete}>
+      <SheetContent 
+        side="bottom" 
+        className="h-[95vh] p-0 bg-[#030619] border-t border-[#1a3246] rounded-t-xl overflow-hidden"
+      >
+        <JobCreationForm onComplete={onComplete} />
+      </SheetContent>
+    </Sheet>
+  ) : (
+    // For desktop, use a centered dialog
     <Dialog open={true} onOpenChange={onComplete}>
       <DialogContent 
-        className={`w-full ${isMobile ? 'max-w-[95%]' : 'max-w-3xl'} p-0 bg-aximo-dark border-aximo-border max-h-[95vh] overflow-hidden rounded-lg`}
+        className="w-full max-w-4xl p-0 bg-[#030619] border-[#1a3246] max-h-[90vh] overflow-hidden rounded-xl"
       >
-        <VisuallyHidden>
-          <DialogTitle>Create New Job</DialogTitle>
-        </VisuallyHidden>
         <JobCreationForm onComplete={onComplete} />
       </DialogContent>
     </Dialog>

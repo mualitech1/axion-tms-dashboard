@@ -1,21 +1,21 @@
 
 import { useState } from "react";
 
-interface Address {
+interface AdditionalStop {
   companyName: string;
   contactName: string;
   addressLine1: string;
   city: string;
   postCode: string;
   reference: string;
-  time?: string;
+  time: string;
 }
 
 export function useAdditionalStops() {
-  const [additionalStops, setAdditionalStops] = useState<Address[]>([]);
+  const [additionalStops, setAdditionalStops] = useState<AdditionalStop[]>([]);
 
   const addStop = () => {
-    setAdditionalStops([...additionalStops, {
+    const newStop: AdditionalStop = {
       companyName: "",
       contactName: "",
       addressLine1: "",
@@ -23,7 +23,8 @@ export function useAdditionalStops() {
       postCode: "",
       reference: "",
       time: "12:00"
-    }]);
+    };
+    setAdditionalStops([...additionalStops, newStop]);
   };
 
   const removeStop = (index: number) => {
@@ -32,9 +33,12 @@ export function useAdditionalStops() {
     setAdditionalStops(newStops);
   };
 
-  const updateAdditionalStop = (index: number, field: keyof Address, value: string) => {
+  const updateAdditionalStop = (index: number, field: keyof AdditionalStop, value: string) => {
     const newStops = [...additionalStops];
-    newStops[index] = { ...newStops[index], [field]: value };
+    newStops[index] = {
+      ...newStops[index],
+      [field]: value
+    };
     setAdditionalStops(newStops);
   };
 

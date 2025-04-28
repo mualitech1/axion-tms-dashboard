@@ -26,6 +26,21 @@ interface FormContentProps {
   onSubmit: (data: any) => void;
 }
 
+const variants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? 20 : -20,
+    opacity: 0
+  }),
+  center: {
+    x: 0,
+    opacity: 1
+  },
+  exit: (direction: number) => ({
+    x: direction < 0 ? 20 : -20,
+    opacity: 0
+  })
+};
+
 export function FormContent({
   form,
   currentStep,
@@ -43,7 +58,29 @@ export function FormContent({
   onSubmit
 }: FormContentProps) {
   const isMobile = useIsMobile();
-  const scrollMaxHeight = isMobile ? "calc(70vh - 200px)" : "calc(80vh - 200px)";
+  const scrollMaxHeight = isMobile ? "calc(75vh - 170px)" : "calc(80vh - 170px)";
+  const [direction, setDirection] = React.useState(0);
+
+  // Set direction based on step change
+  React.useEffect(() => {
+    const handleStepChange = (newStep: number) => {
+      setDirection(newStep > currentStep ? 1 : -1);
+    };
+    
+    return () => {
+      handleStepChange(currentStep);
+    };
+  }, [currentStep]);
+
+  const handleNext = () => {
+    setDirection(1);
+    nextStep();
+  };
+
+  const handlePrev = () => {
+    setDirection(-1);
+    prevStep();
+  };
 
   const renderCurrentStep = () => {
     switch (currentStep) {
@@ -75,32 +112,41 @@ export function FormContent({
 
   return (
     <Form {...form}>
-      <AnimatePresence mode="wait">
-        <motion.form 
-          onSubmit={form.handleSubmit(onSubmit)} 
-          className="space-y-6"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }}
-          key={currentStep}
-        >
-          <div className="bg-aximo-darker rounded-lg shadow-lg border border-aximo-border">
-            <ScrollArea className="p-4 sm:p-6" style={{ maxHeight: scrollMaxHeight }}>
-              {renderCurrentStep()}
-            </ScrollArea>
-          </div>
-          
-          <NavigationButtons 
-            currentStep={currentStep}
-            totalSteps={totalSteps}
-            isSubmitting={form.formState.isSubmitting}
-            prevStep={prevStep}
-            nextStep={nextStep}
-            onCancel={onCancel}
-          />
-        </motion.form>
-      </AnimatePresence>
+      <form 
+        onSubmit={form.handleSubmit(onSubmit)} 
+        className="space-y-4 sm:space-y-6"
+      >
+        <div className="bg-[#05101b] rounded-lg shadow-lg border border-[#1a3246] overflow-hidden">
+          <ScrollArea 
+            className="p-4 sm:p-6" 
+            style={{ maxHeight: scrollMaxHeight }}
+            scrollHideDelay={100}
+          >
+            <AnimatePresence custom={direction} mode="wait">
+              <motion.div
+                key={currentStep}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+              >
+                {renderCurrentStep()}
+              </motion.div>
+            </AnimatePresence>
+          </ScrollArea>
+        </div>
+        
+        <NavigationButtons 
+          currentStep={currentStep}
+          totalSteps={totalSteps}
+          isSubmitting={form.formState.isSubmitting}
+          prevStep={handlePrev}
+          nextStep={handleNext}
+          onCancel={onCancel}
+        />
+      </form>
     </Form>
   );
 }

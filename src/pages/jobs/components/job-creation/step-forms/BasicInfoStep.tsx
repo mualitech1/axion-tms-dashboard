@@ -5,12 +5,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { CalendarIcon, Briefcase, PackageOpen, CalendarDays } from "lucide-react";
+import { Package2, Truck, CalendarDays, User, Scales, DollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UseFormReturn } from "react-hook-form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { FileUploader } from "../file-upload/FileUploader";
+import { motion } from "framer-motion";
 
 interface BasicInfoStepProps {
   form: UseFormReturn<any>;
@@ -19,197 +20,287 @@ interface BasicInfoStepProps {
   onDocumentsChange: (files: File[]) => void;
 }
 
+const inputContainer = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (custom: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { 
+      delay: custom * 0.1,
+      duration: 0.5,
+      ease: "easeOut"
+    }
+  })
+};
+
 export function BasicInfoStep({ form, date, setDate, onDocumentsChange }: BasicInfoStepProps) {
   return (
-    <div className="space-y-6 text-aximo-text">
-      <div className="space-y-4">
-        <FormField
-          control={form.control}
-          name="jobTitle"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-aximo-text">Job Title <span className="text-red-500">*</span></FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <Input 
-                    placeholder="Enter job title" 
-                    {...field} 
-                    className="pl-9 bg-aximo-dark border-aximo-border text-aximo-text" 
-                  />
-                  <Briefcase className="absolute left-3 top-3 h-4 w-4 text-aximo-primary" />
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-6 text-white">
+      <motion.div 
+        className="space-y-5"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          visible: {
+            transition: { staggerChildren: 0.1 }
+          }
+        }}
+      >
+        <motion.div variants={inputContainer} custom={0}>
           <FormField
             control={form.control}
-            name="customer"
+            name="jobTitle"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-aximo-text">Customer <span className="text-red-500">*</span></FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="Select or enter customer" 
-                    {...field} 
-                    className="bg-aximo-dark border-aximo-border text-aximo-text" 
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="vehicleType"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-aximo-text">Vehicle Type <span className="text-red-500">*</span></FormLabel>
+                <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider flex items-center">
+                  Job Title <span className="text-red-400 ml-1">*</span>
+                </FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input 
-                      placeholder="Select vehicle type" 
+                      placeholder="Enter job title" 
                       {...field} 
-                      className="pl-9 bg-aximo-dark border-aximo-border text-aximo-text" 
+                      className="pl-10 bg-[#05101b] border-[#1a3246] focus:border-[#0a9bdb] focus:ring-[#0a9bdb]/20 h-11 text-white placeholder:text-[#6b82a6]" 
                     />
-                    <PackageOpen className="absolute left-3 top-3 h-4 w-4 text-aximo-primary" />
+                    <Package2 className="absolute left-3 top-3 h-5 w-5 text-[#0a9bdb]" />
                   </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-400" />
               </FormItem>
             )}
           />
-        </div>
+        </motion.div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="productType"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-aximo-text">Product Type</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="Enter product type" 
-                    {...field} 
-                    className="bg-aximo-dark border-aximo-border text-aximo-text" 
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <motion.div variants={inputContainer} custom={1}>
+            <FormField
+              control={form.control}
+              name="customer"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider flex items-center">
+                    Customer <span className="text-red-400 ml-1">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input 
+                        placeholder="Select or enter customer" 
+                        {...field} 
+                        className="pl-10 bg-[#05101b] border-[#1a3246] focus:border-[#0a9bdb] focus:ring-[#0a9bdb]/20 h-11 text-white placeholder:text-[#6b82a6]" 
+                      />
+                      <User className="absolute left-3 top-3 h-5 w-5 text-[#0a9bdb]" />
+                    </div>
+                  </FormControl>
+                  <FormMessage className="text-red-400" />
+                </FormItem>
+              )}
+            />
+          </motion.div>
           
-          <FormField
-            control={form.control}
-            name="totalWeight"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-aximo-text">Total Weight (kg)</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    min="0"
-                    placeholder="Enter total weight" 
-                    {...field} 
-                    className="bg-aximo-dark border-aximo-border text-aximo-text" 
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+          <motion.div variants={inputContainer} custom={2}>
+            <FormField
+              control={form.control}
+              name="vehicleType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider flex items-center">
+                    Vehicle Type <span className="text-red-400 ml-1">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input 
+                        placeholder="Select vehicle type" 
+                        {...field} 
+                        className="pl-10 bg-[#05101b] border-[#1a3246] focus:border-[#0a9bdb] focus:ring-[#0a9bdb]/20 h-11 text-white placeholder:text-[#6b82a6]" 
+                      />
+                      <Truck className="absolute left-3 top-3 h-5 w-5 text-[#0a9bdb]" />
+                    </div>
+                  </FormControl>
+                  <FormMessage className="text-red-400" />
+                </FormItem>
+              )}
+            />
+          </motion.div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormItem>
-            <FormLabel className="text-aximo-text">Pickup Date <span className="text-red-500">*</span></FormLabel>
-            <Popover>
-              <PopoverTrigger asChild>
-                <FormControl>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full pl-9 relative text-left font-normal bg-aximo-dark border-aximo-border text-aximo-text hover:bg-aximo-darker",
-                      !date && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarDays className="absolute left-3 top-2 h-4 w-4 text-aximo-primary" />
-                    {date ? format(date, "PPP") : <span>Pick a date</span>}
-                  </Button>
-                </FormControl>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-aximo-darker border-aximo-border" align="start">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  initialFocus
-                  className="bg-aximo-darker text-aximo-text"
-                />
-              </PopoverContent>
-            </Popover>
-            <FormMessage />
-          </FormItem>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <motion.div variants={inputContainer} custom={3}>
+            <FormField
+              control={form.control}
+              name="productType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider">Product Type</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input 
+                        placeholder="Enter product type" 
+                        {...field} 
+                        className="pl-10 bg-[#05101b] border-[#1a3246] focus:border-[#0a9bdb] focus:ring-[#0a9bdb]/20 h-11 text-white placeholder:text-[#6b82a6]" 
+                      />
+                      <Package2 className="absolute left-3 top-3 h-5 w-5 text-[#0a9bdb]" />
+                    </div>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </motion.div>
           
-          <FormField
-            control={form.control}
-            name="rate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-aximo-text">Rate (£)</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    min="0"
-                    step="0.01"
-                    placeholder="Enter rate" 
-                    {...field} 
-                    className="bg-aximo-dark border-aximo-border text-aximo-text" 
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+          <motion.div variants={inputContainer} custom={4}>
+            <FormField
+              control={form.control}
+              name="totalWeight"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider">Total Weight (kg)</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input 
+                        type="number" 
+                        min="0"
+                        placeholder="Enter total weight" 
+                        {...field} 
+                        className="pl-10 bg-[#05101b] border-[#1a3246] focus:border-[#0a9bdb] focus:ring-[#0a9bdb]/20 h-11 text-white placeholder:text-[#6b82a6]" 
+                      />
+                      <Scales className="absolute left-3 top-3 h-5 w-5 text-[#0a9bdb]" />
+                    </div>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </motion.div>
         </div>
         
-        <FormField
-          control={form.control}
-          name="priority"
-          render={({ field }) => (
-            <FormItem className="space-y-1">
-              <FormLabel className="text-aximo-text">Priority</FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="flex flex-wrap gap-2 sm:gap-3"
-                >
-                  <div className="flex items-center space-x-2 bg-aximo-darker rounded-md px-4 py-2 border border-aximo-border">
-                    <RadioGroupItem value="low" id="low" className="text-blue-500" />
-                    <Label htmlFor="low" className="text-aximo-text">Low</Label>
-                  </div>
-                  <div className="flex items-center space-x-2 bg-aximo-darker rounded-md px-4 py-2 border border-aximo-border">
-                    <RadioGroupItem value="medium" id="medium" className="text-amber-500" />
-                    <Label htmlFor="medium" className="text-aximo-text">Medium</Label>
-                  </div>
-                  <div className="flex items-center space-x-2 bg-aximo-darker rounded-md px-4 py-2 border border-aximo-border">
-                    <RadioGroupItem value="high" id="high" className="text-red-500" />
-                    <Label htmlFor="high" className="text-aximo-text">High</Label>
-                  </div>
-                </RadioGroup>
-              </FormControl>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <motion.div variants={inputContainer} custom={5}>
+            <FormItem>
+              <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider flex items-center">
+                Pickup Date <span className="text-red-400 ml-1">*</span>
+              </FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full pl-10 relative text-left font-normal h-11 border-[#1a3246] bg-[#05101b] hover:bg-[#162233]",
+                        !date && "text-[#6b82a6]"
+                      )}
+                    >
+                      <CalendarDays className="absolute left-3 top-3 h-5 w-5 text-[#0a9bdb]" />
+                      {date ? format(date, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-[#05101b] border-[#1a3246]" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    initialFocus
+                    className="bg-[#05101b] text-white pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+              <FormMessage className="text-red-400" />
             </FormItem>
-          )}
-        />
-      </div>
+          </motion.div>
+          
+          <motion.div variants={inputContainer} custom={6}>
+            <FormField
+              control={form.control}
+              name="rate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider">Rate (£)</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input 
+                        type="number" 
+                        min="0"
+                        step="0.01"
+                        placeholder="Enter rate" 
+                        {...field} 
+                        className="pl-10 bg-[#05101b] border-[#1a3246] focus:border-[#0a9bdb] focus:ring-[#0a9bdb]/20 h-11 text-white placeholder:text-[#6b82a6]" 
+                      />
+                      <DollarSign className="absolute left-3 top-3 h-5 w-5 text-[#0a9bdb]" />
+                    </div>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </motion.div>
+        </div>
+        
+        <motion.div variants={inputContainer} custom={7}>
+          <FormField
+            control={form.control}
+            name="priority"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider">Priority</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-wrap gap-3"
+                  >
+                    <div className="flex items-center space-x-2 bg-[#081427] hover:bg-[#0c1e3a] rounded-md px-4 py-2 border border-[#1a3246] transition-colors group cursor-pointer">
+                      <RadioGroupItem 
+                        value="low" 
+                        id="low" 
+                        className="text-blue-400 border-[#1a3246]" 
+                      />
+                      <Label 
+                        htmlFor="low" 
+                        className="text-[#6b82a6] group-hover:text-blue-400 cursor-pointer transition-colors"
+                      >
+                        Low
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 bg-[#081427] hover:bg-[#0c1e3a] rounded-md px-4 py-2 border border-[#1a3246] transition-colors group cursor-pointer">
+                      <RadioGroupItem 
+                        value="medium" 
+                        id="medium" 
+                        className="text-amber-400 border-[#1a3246]" 
+                      />
+                      <Label 
+                        htmlFor="medium" 
+                        className="text-[#6b82a6] group-hover:text-amber-400 cursor-pointer transition-colors"
+                      >
+                        Medium
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 bg-[#081427] hover:bg-[#0c1e3a] rounded-md px-4 py-2 border border-[#1a3246] transition-colors group cursor-pointer">
+                      <RadioGroupItem 
+                        value="high" 
+                        id="high" 
+                        className="text-red-400 border-[#1a3246]" 
+                      />
+                      <Label 
+                        htmlFor="high" 
+                        className="text-[#6b82a6] group-hover:text-red-400 cursor-pointer transition-colors"
+                      >
+                        High
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </motion.div>
+      </motion.div>
       
-      <div className="space-y-2">
-        <FormLabel className="text-aximo-text">Documents</FormLabel>
+      <motion.div
+        className="pt-2"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+      >
+        <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider mb-3 block">Documents</FormLabel>
         <FileUploader onFilesChange={onDocumentsChange} />
-      </div>
+      </motion.div>
     </div>
   );
 }
