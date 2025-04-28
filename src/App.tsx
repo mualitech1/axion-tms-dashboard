@@ -23,6 +23,7 @@ import NotFound from '@/pages/NotFound';
 import CarrierReports from '@/pages/carriers/CarrierReports';
 import AnalyticsAdvanced from '@/pages/analytics/AnalyticsAdvanced';
 
+// Define all routes at the top level
 const router = createBrowserRouter([
   {
     path: "/",
@@ -41,7 +42,7 @@ const router = createBrowserRouter([
     element: <Invoices />,
   },
   {
-    path: "/jobs",
+    path: "/jobs/*",  // Use wildcard to allow for nested routes
     element: <Jobs />,
   },
   {
