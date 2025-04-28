@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -58,11 +59,12 @@ export default function Invoices() {
   return (
     <MainLayout title="Invoices">
       <div className="space-y-6 animate-fade-in">
-        <DashboardHeader
-          title="Invoices Management"
-          subtitle="Track, manage, and create customer invoices"
-          className="bg-gradient-to-r from-aximo-primary/10 to-transparent p-6 rounded-lg border border-aximo-border"
-        />
+        <div className="bg-gradient-to-r from-aximo-primary/10 to-transparent p-6 rounded-lg border border-aximo-border">
+          <DashboardHeader
+            title="Invoices Management"
+            subtitle="Track, manage, and create customer invoices"
+          />
+        </div>
 
         <InvoiceSummaryCards
           invoices={invoicesList}
