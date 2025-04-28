@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpRight, Calendar, User2, MapPin, Truck } from "lucide-react";
@@ -15,7 +14,6 @@ interface JobCardProps {
 export function JobCard({ job }: JobCardProps) {
   const isMobile = useIsMobile();
   
-  // Format time from date
   const time = job.time || getTimeFromDate(job.date);
   
   const getStatusColor = (status: JobStatus) => {
@@ -42,19 +40,28 @@ export function JobCard({ job }: JobCardProps) {
     }
   };
   
+  const getStatusIcon = (status: JobStatus) => {
+    switch (status) {
+      case "issues": return <Badge variant="outline" className="text-xs md:text-sm py-0.5 px-2 bg-red-500/10 text-red-500 border-red-500/20 backdrop-blur-sm transition-all duration-300 group-hover:shadow-sm">Issues</Badge>;
+      case "in-progress": return <Badge variant="outline" className="text-xs md:text-sm py-0.5 px-2 bg-amber-500/10 text-amber-500 border-amber-500/20 backdrop-blur-sm transition-all duration-300 group-hover:shadow-sm">In Progress</Badge>;
+      case "completed": return <Badge variant="outline" className="text-xs md:text-sm py-0.5 px-2 bg-green-500/10 text-green-500 border-green-500/20 backdrop-blur-sm transition-all duration-300 group-hover:shadow-sm">Completed</Badge>;
+      default: return null;
+    }
+  };
+  
   return (
     <Link to={`/jobs/${job.id}`} className="group">
       <motion.div
-        whileHover={{ scale: 1.02 }}
+        whileHover={{ scale: 1.02, y: -4 }}
         whileTap={{ scale: 0.98 }}
         transition={{ type: "spring", stiffness: 400, damping: 17 }}
       >
-        <Card className="overflow-hidden border border-aximo-border bg-aximo-dark shadow-sm hover:shadow-md transition-all duration-300">
+        <Card className="overflow-hidden border border-aximo-border bg-gradient-to-br from-aximo-card to-aximo-darker backdrop-blur-sm transition-all duration-300 group-hover:shadow-lg group-hover:shadow-aximo-primary/10 group-hover:border-aximo-primary/50">
           <div className="p-4">
             <div className="flex items-start justify-between">
               <div className="flex-grow">
                 <div className="flex items-center gap-2 mb-2">
-                  <h4 className="font-medium text-aximo-text group-hover:text-aximo-primary transition-colors truncate text-sm md:text-base">
+                  <h4 className="font-medium text-aximo-text group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-aximo-primary group-hover:to-blue-400 transition-all duration-300 truncate text-sm md:text-base">
                     {job.title}
                   </h4>
                   <ArrowUpRight className="h-3.5 w-3.5 text-aximo-primary opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -90,13 +97,14 @@ export function JobCard({ job }: JobCardProps) {
                 <div className="flex flex-wrap items-center gap-2 mt-auto">
                   <Badge 
                     variant="outline" 
-                    className={`capitalize text-xs md:text-sm py-0.5 px-2 ${getStatusColor(job.status)}`}
+                    className={`capitalize text-xs md:text-sm py-0.5 px-2 ${getStatusColor(job.status)} backdrop-blur-sm transition-all duration-300 group-hover:shadow-sm`}
                   >
+                    {getStatusIcon(job.status)}
                     {job.status.replace("-", " ")}
                   </Badge>
                   <Badge 
                     variant="outline" 
-                    className={`text-xs md:text-sm py-0.5 px-2 ${getPriorityColor(job.priority)}`}
+                    className={`text-xs md:text-sm py-0.5 px-2 ${getPriorityColor(job.priority)} backdrop-blur-sm transition-all duration-300 group-hover:shadow-sm`}
                   >
                     {job.priority} priority
                   </Badge>
@@ -105,7 +113,15 @@ export function JobCard({ job }: JobCardProps) {
             </div>
           </div>
           
-          <div className={`h-1 w-full ${job.status === 'issues' ? 'bg-red-500' : job.status === 'in-progress' ? 'bg-amber-500' : job.status === 'completed' ? 'bg-green-500' : 'bg-aximo-primary'}`}></div>
+          <div className={`h-1 w-full bg-gradient-to-r ${
+            job.status === 'issues' 
+              ? 'from-red-500 to-red-400' 
+              : job.status === 'in-progress' 
+              ? 'from-amber-500 to-amber-400' 
+              : job.status === 'completed' 
+              ? 'from-green-500 to-green-400' 
+              : 'from-aximo-primary to-blue-400'
+          } transition-all duration-300`}></div>
         </Card>
       </motion.div>
     </Link>
