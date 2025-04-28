@@ -8,6 +8,7 @@ import { SummaryStep } from "./step-forms/SummaryStep";
 import { NavigationButtons } from "./NavigationButtons";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { UseFormReturn } from "react-hook-form";
+import * as React from "react";
 
 interface FormContentProps {
   form: UseFormReturn<any>;

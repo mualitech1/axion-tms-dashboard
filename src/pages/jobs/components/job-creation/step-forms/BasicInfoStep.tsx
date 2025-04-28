@@ -5,7 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { Package2, Truck, CalendarDays, User, Scales, DollarSign } from "lucide-react";
+import { Package2, Truck, CalendarDays, User, Scale, DollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UseFormReturn } from "react-hook-form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -162,7 +162,7 @@ export function BasicInfoStep({ form, date, setDate, onDocumentsChange }: BasicI
                         {...field} 
                         className="pl-10 bg-[#05101b] border-[#1a3246] focus:border-[#0a9bdb] focus:ring-[#0a9bdb]/20 h-11 text-white placeholder:text-[#6b82a6]" 
                       />
-                      <Scales className="absolute left-3 top-3 h-5 w-5 text-[#0a9bdb]" />
+                      <Scale className="absolute left-3 top-3 h-5 w-5 text-[#0a9bdb]" />
                     </div>
                   </FormControl>
                 </FormItem>

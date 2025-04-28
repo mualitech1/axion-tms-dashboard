@@ -2,7 +2,7 @@
 import * as React from "react"
 import { 
   Home, Package, FileText, Truck, Users, Car, CreditCard, 
-  User, BarChart2, TrendingUp, Settings, Info, Bell, HelpCircle, Loader2
+  User, BarChart2, TrendingUp, Settings, Info, Bell, HelpCircle, Loader2, Scale
 } from "lucide-react"
 
 export type IconProps = React.HTMLAttributes<SVGElement> & {
@@ -24,6 +24,7 @@ export const Icons = {
   "trending-up": TrendingUp,
   settings: Settings,
   shipping: Truck, // Using Truck as a substitute for Shipping since it's not exported from lucide-react
+  scale: Scale, // Added Scale icon
   
   // Utility icons
   info: Info,
