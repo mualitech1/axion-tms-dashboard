@@ -1,7 +1,7 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Shield, CheckCircle2, Copy } from 'lucide-react';
+import { Shield, CheckCircle2, Copy, QrCode } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   InputOTP,
@@ -9,6 +9,8 @@ import {
   InputOTPSlot,
   InputOTPSeparator
 } from '@/components/ui/input-otp';
+import { prepareTOTPSetup, verifyAndEnableTOTP, disableTOTP, isTOTPEnabled } from '@/utils/auth-security';
+import { useAuth } from '@/hooks/use-auth';
 
 interface TwoFactorSetupProps {
   onComplete?: (enabled: boolean) => void;
@@ -16,28 +18,54 @@ interface TwoFactorSetupProps {
 }
 
 export default function TwoFactorSetup({ onComplete, initialState = false }: TwoFactorSetupProps) {
-  const [step, setStep] = useState<'initial' | 'setup' | 'verify' | 'complete'>(
-    initialState ? 'complete' : 'initial'
-  );
+  const [step, setStep] = useState<'initial' | 'setup' | 'verify' | 'complete'>('initial');
   const [secretKey, setSecretKey] = useState<string>('');
+  const [otpAuthUrl, setOtpAuthUrl] = useState<string>('');
   const [verificationCode, setVerificationCode] = useState('');
   const [isEnabled, setIsEnabled] = useState(initialState);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
-  // In a real application, this would be generated on the server
-  const generateSecretKey = () => {
-    // Mock implementation - in real app this would be from the backend
-    const randomKey = Array.from({ length: 16 }, () => 
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".charAt(Math.floor(Math.random() * 32))
-    ).join('');
+  useEffect(() => {
+    // Check if 2FA is already enabled on component mount
+    async function checkTOTPStatus() {
+      if (user) {
+        const enabled = await isTOTPEnabled();
+        setIsEnabled(enabled);
+        setStep(enabled ? 'complete' : 'initial');
+      }
+    }
     
-    setSecretKey(randomKey);
-    return randomKey;
-  };
+    checkTOTPStatus();
+  }, [user]);
 
-  const handleSetup = () => {
-    generateSecretKey();
-    setStep('setup');
+  const handleSetup = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "You need to be logged in to set up two-factor authentication.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      const { secret, otpAuthUrl } = await prepareTOTPSetup(user.id);
+      setSecretKey(secret);
+      setOtpAuthUrl(otpAuthUrl);
+      setStep('setup');
+    } catch (error: any) {
+      toast({
+        title: "Setup Failed",
+        description: error.message || "Failed to start two-factor authentication setup.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCopyKey = () => {
@@ -48,10 +76,21 @@ export default function TwoFactorSetup({ onComplete, initialState = false }: Two
     });
   };
 
-  const handleVerify = () => {
-    // In a real application, this would verify with the backend
-    if (verificationCode.length === 6) {
-      // Mock verification - in a real app, this would check against the actual TOTP
+  const handleVerify = async () => {
+    if (verificationCode.length !== 6) {
+      toast({
+        title: "Verification Failed",
+        description: "Please enter a valid 6-digit verification code.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      await verifyAndEnableTOTP(verificationCode);
+      
       setStep('complete');
       setIsEnabled(true);
       if (onComplete) onComplete(true);
@@ -60,25 +99,41 @@ export default function TwoFactorSetup({ onComplete, initialState = false }: Two
         title: "2FA Enabled",
         description: "Two-factor authentication has been successfully enabled for your account.",
       });
-    } else {
+    } catch (error: any) {
       toast({
         title: "Verification Failed",
-        description: "Please enter a valid verification code.",
+        description: error.message || "Failed to verify the code. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleDisable = () => {
-    setStep('initial');
-    setIsEnabled(false);
-    setVerificationCode('');
-    if (onComplete) onComplete(false);
+  const handleDisable = async () => {
+    setIsLoading(true);
     
-    toast({
-      title: "2FA Disabled",
-      description: "Two-factor authentication has been disabled for your account.",
-    });
+    try {
+      await disableTOTP();
+      
+      setStep('initial');
+      setIsEnabled(false);
+      setVerificationCode('');
+      if (onComplete) onComplete(false);
+      
+      toast({
+        title: "2FA Disabled",
+        description: "Two-factor authentication has been disabled for your account.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to disable two-factor authentication.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -97,8 +152,20 @@ export default function TwoFactorSetup({ onComplete, initialState = false }: Two
             Each time you sign in, you'll need to provide a one-time code from your authenticator app.
           </p>
           
-          <Button onClick={handleSetup} className="mt-2">
-            <Shield className="mr-2 h-4 w-4" /> Setup 2FA
+          <Button onClick={handleSetup} className="mt-2" disabled={isLoading}>
+            {isLoading ? (
+              <span className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Setting Up...
+              </span>
+            ) : (
+              <>
+                <Shield className="mr-2 h-4 w-4" /> Setup 2FA
+              </>
+            )}
           </Button>
         </div>
       )}
@@ -123,9 +190,9 @@ export default function TwoFactorSetup({ onComplete, initialState = false }: Two
               </p>
               <div className="flex items-center space-x-3 p-3 bg-tms-gray-100 rounded-md">
                 <div className="bg-white p-2 border border-tms-gray-200 rounded-md">
-                  {/* Placeholder for QR code - in real app, use a QR code library */}
+                  {/* In a real app, generate a QR code using a library */}
                   <div className="h-32 w-32 bg-gray-200 flex items-center justify-center">
-                    <span className="text-xs text-gray-500">QR Code</span>
+                    <QrCode className="h-16 w-16 text-gray-500" />
                   </div>
                 </div>
                 
@@ -168,11 +235,21 @@ export default function TwoFactorSetup({ onComplete, initialState = false }: Two
                 </InputOTP>
                 
                 <div className="flex space-x-3">
-                  <Button variant="outline" onClick={() => setStep('initial')}>
+                  <Button variant="outline" onClick={() => setStep('initial')} disabled={isLoading}>
                     Cancel
                   </Button>
-                  <Button onClick={handleVerify}>
-                    Verify and Activate
+                  <Button onClick={handleVerify} disabled={isLoading}>
+                    {isLoading ? (
+                      <span className="flex items-center">
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Verifying...
+                      </span>
+                    ) : (
+                      "Verify and Activate"
+                    )}
                   </Button>
                 </div>
               </div>
@@ -202,8 +279,23 @@ export default function TwoFactorSetup({ onComplete, initialState = false }: Two
             </p>
           </div>
           
-          <Button variant="outline" onClick={handleDisable} className="text-tms-red border-tms-red hover:bg-tms-red-light/20">
-            Disable 2FA
+          <Button 
+            variant="outline" 
+            onClick={handleDisable} 
+            className="text-tms-red border-tms-red hover:bg-tms-red-light/20"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Disabling...
+              </span>
+            ) : (
+              "Disable 2FA"
+            )}
           </Button>
         </div>
       )}
