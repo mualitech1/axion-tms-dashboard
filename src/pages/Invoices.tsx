@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { InvoiceSummaryCards } from "@/components/invoices/InvoiceSummaryCards";
 import { InvoiceStatusTabs } from "@/components/invoices/InvoiceStatusTabs";
 import { InvoiceFilters } from "@/components/invoices/InvoiceFilters";
@@ -48,7 +47,6 @@ export default function Invoices() {
 
   const filteredInvoices = sortAndFilterInvoices();
 
-  // Calculate summary statistics
   const totalAmount = invoicesList.reduce((sum, inv) => sum + inv.amount, 0);
   const pendingAmount = invoicesList
     .filter(inv => inv.status === "pending")
@@ -59,71 +57,74 @@ export default function Invoices() {
 
   return (
     <MainLayout title="Invoices">
-      <DashboardHeader
-        title="Invoices Management"
-        subtitle="Track, manage, and create customer invoices"
-      />
+      <div className="space-y-6 animate-fade-in">
+        <DashboardHeader
+          title="Invoices Management"
+          subtitle="Track, manage, and create customer invoices"
+          className="bg-gradient-to-r from-aximo-primary/10 to-transparent p-6 rounded-lg border border-aximo-border"
+        />
 
-      <InvoiceSummaryCards
-        invoices={invoicesList}
-        totalAmount={totalAmount}
-        pendingAmount={pendingAmount}
-        paidAmount={paidAmount}
-      />
-      
-      <Sheet>
-        <div className="mb-6 flex justify-end">
-          <SheetTrigger asChild>
-            <Button
-              variant="outline"
-              className="gap-2"
-              onClick={() => setShowAnalytics(true)}
-            >
-              <BarChart3 className="h-4 w-4" />
-              <span>View Analytics</span>
-            </Button>
-          </SheetTrigger>
-        </div>
+        <InvoiceSummaryCards
+          invoices={invoicesList}
+          totalAmount={totalAmount}
+          pendingAmount={pendingAmount}
+          paidAmount={paidAmount}
+        />
         
-        <SheetContent className="w-[90%] sm:max-w-[800px] overflow-y-auto">
-          <SheetHeader className="mb-6">
-            <SheetTitle className="text-2xl">Invoice Analytics</SheetTitle>
-          </SheetHeader>
-          <InvoiceAnalytics invoices={invoicesList} />
-        </SheetContent>
-      </Sheet>
-      
-      <Card className="bg-white shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Invoice Management</CardTitle>
-          <InvoiceStatusTabs 
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-          />
-        </CardHeader>
-
-        <CardContent>
-          <InvoiceFilters 
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            onCreateJob={() => setCreateJobOpen(true)}
-            onCreateInvoice={() => {
-              handleEditInvoice(null);
-              setCreateDialogOpen(true);
-            }}
-          />
+        <Sheet>
+          <div className="mb-6 flex justify-end">
+            <SheetTrigger asChild>
+              <Button
+                variant="outline"
+                className="gap-2 hover:bg-aximo-primary/10 transition-all"
+                onClick={() => setShowAnalytics(true)}
+              >
+                <BarChart3 className="h-4 w-4" />
+                <span>View Analytics</span>
+              </Button>
+            </SheetTrigger>
+          </div>
           
-          <InvoiceTable 
-            invoices={filteredInvoices}
-            onEditInvoice={handleEditInvoice}
-            onDeleteInvoice={handleInvoiceDeleted}
-            onStatusChange={handleStatusChange}
-            sortColumn={sortColumn}
-            sortDirection={sortDirection}
-            onSort={handleSort}
-          />
-        </CardContent>
-      </Card>
+          <SheetContent className="w-[90%] sm:max-w-[800px] overflow-y-auto bg-aximo-darker border-l border-aximo-border">
+            <SheetHeader className="mb-6">
+              <SheetTitle className="text-2xl text-aximo-text">Invoice Analytics</SheetTitle>
+            </SheetHeader>
+            <InvoiceAnalytics invoices={invoicesList} />
+          </SheetContent>
+        </Sheet>
+        
+        <Card className="bg-aximo-card border-aximo-border shadow-aximo">
+          <div className="p-6 space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-aximo-text">Invoice Management</h2>
+              <InvoiceStatusTabs 
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+              />
+            </div>
+
+            <InvoiceFilters 
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              onCreateJob={() => setCreateJobOpen(true)}
+              onCreateInvoice={() => {
+                handleEditInvoice(null);
+                setCreateDialogOpen(true);
+              }}
+            />
+            
+            <InvoiceTable 
+              invoices={filteredInvoices}
+              onEditInvoice={handleEditInvoice}
+              onDeleteInvoice={handleInvoiceDeleted}
+              onStatusChange={handleStatusChange}
+              sortColumn={sortColumn}
+              sortDirection={sortDirection}
+              onSort={handleSort}
+            />
+          </div>
+        </Card>
+      </div>
 
       <CreateJobDialog 
         open={createJobOpen}

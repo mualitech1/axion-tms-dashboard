@@ -1,69 +1,56 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { formatCurrency } from "@/lib/utils";
+import { InvoiceData } from "./create-invoice-dialog/types";
 
 interface InvoiceSummaryCardsProps {
-  invoices: any[];
+  invoices: InvoiceData[];
   totalAmount: number;
   pendingAmount: number;
   paidAmount: number;
 }
 
-export function InvoiceSummaryCards({ 
-  invoices, 
-  totalAmount, 
-  pendingAmount, 
-  paidAmount 
+export function InvoiceSummaryCards({
+  invoices,
+  totalAmount,
+  pendingAmount,
+  paidAmount,
 }: InvoiceSummaryCardsProps) {
   return (
-    <div className="grid gap-6 md:grid-cols-3 mb-6">
-      <Card className="bg-white hover:shadow-md transition-shadow">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Total Invoices</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-500" />
-              <span className="text-2xl font-bold">{invoices.length}</span>
-            </div>
-            <span className="text-lg font-semibold">${totalAmount.toLocaleString()}</span>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <Card className="bg-gradient-to-br from-aximo-card to-aximo-darker border-aximo-border p-6 hover:shadow-aximo transition-all duration-300">
+        <div className="space-y-2">
+          <p className="text-sm text-aximo-text-secondary">Total Invoices</p>
+          <div className="flex items-end justify-between">
+            <h3 className="text-2xl font-bold text-aximo-text">{formatCurrency(totalAmount)}</h3>
+            <span className="text-sm text-aximo-text-secondary">{invoices.length} invoices</span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">Last 12 months</p>
-        </CardContent>
+        </div>
       </Card>
-      
-      <Card className="bg-white hover:shadow-md transition-shadow">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Pending Invoices</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-amber-500" />
-              <span className="text-2xl font-bold">{invoices.filter(inv => inv.status === "pending").length}</span>
-            </div>
-            <span className="text-lg font-semibold text-amber-500">${pendingAmount.toLocaleString()}</span>
+
+      <Card className="bg-gradient-to-br from-aximo-card to-aximo-darker border-aximo-border p-6 hover:shadow-aximo transition-all duration-300">
+        <div className="space-y-2">
+          <p className="text-sm text-amber-400">Pending Invoices</p>
+          <div className="flex items-end justify-between">
+            <h3 className="text-2xl font-bold text-amber-400">{formatCurrency(pendingAmount)}</h3>
+            <span className="text-sm text-aximo-text-secondary">
+              {invoices.filter(i => i.status === "pending").length} pending
+            </span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">Outstanding amount</p>
-        </CardContent>
+        </div>
       </Card>
-      
-      <Card className="bg-white hover:shadow-md transition-shadow">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Paid Invoices</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-green-500" />
-              <span className="text-2xl font-bold">{invoices.filter(inv => inv.status === "paid").length}</span>
-            </div>
-            <span className="text-lg font-semibold text-green-500">${paidAmount.toLocaleString()}</span>
+
+      <Card className="bg-gradient-to-br from-aximo-card to-aximo-darker border-aximo-border p-6 hover:shadow-aximo transition-all duration-300">
+        <div className="space-y-2">
+          <p className="text-sm text-green-400">Paid Invoices</p>
+          <div className="flex items-end justify-between">
+            <h3 className="text-2xl font-bold text-green-400">{formatCurrency(paidAmount)}</h3>
+            <span className="text-sm text-aximo-text-secondary">
+              {invoices.filter(i => i.status === "paid").length} paid
+            </span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">Collected amount</p>
-        </CardContent>
+        </div>
       </Card>
     </div>
   );
