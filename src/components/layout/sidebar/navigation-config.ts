@@ -1,46 +1,97 @@
+import { Icons } from "@/components/ui/icons"
 
-import { 
-  Home, Users, Truck, UserCircle, Settings, 
-  BarChart2, CreditCard, FileText,
-  Kanban, LayoutDashboard, ListTodo,
-  DollarSign, User, Car
-} from 'lucide-react';
+export type SidebarNavItem = {
+  title: string
+  disabled?: boolean
+  external?: boolean
+  icon?: keyof typeof Icons
+} & (
+  | {
+      href: string
+      items?: never
+    }
+  | {
+      href?: string
+      items: SidebarNavItem[]
+    }
+)
 
-export const navigationItems = [
+export const sidebarItems = [
   {
-    section: "Dashboard",
-    items: [
-      { title: "Overview", icon: Home, to: "/" },
-      { title: "Analytics", icon: BarChart2, to: "/analytics" }
-    ]
+    title: "Dashboard",
+    href: "/",
+    icon: "home",
   },
   {
-    section: "Management",
+    title: "Jobs",
+    href: "/jobs",
+    icon: "package",
+  },
+  {
+    title: "Invoices",
+    href: "/invoices",
+    icon: "file-text",
+  },
+  {
+    title: "Drivers",
+    href: "/drivers",
+    icon: "truck",
+  },
+  {
+    title: "Carriers",
+    href: "/carriers",
+    icon: "shipping",
+  },
+  {
+    title: "Customers",
+    href: "/customers",
+    icon: "users",
+  },
+  {
+    title: "Fleet",
+    href: "/fleet",
+    icon: "car",
+  },
+  {
+    title: "Finance",
+    href: "/finance",
+    icon: "credit-card",
+  },
+  {
+    title: "Users",
+    href: "/users",
+    icon: "user",
+  },
+  {
+    title: "Analytics",
+    icon: "bar-chart-2",
     items: [
-      { title: "Jobs", icon: Truck, to: "/jobs" },
-      { title: "Customers", icon: Users, to: "/customers" },
-      { title: "Carriers", icon: Truck, to: "/carriers" },
-      { title: "Drivers", icon: User, to: "/drivers" },
-      { title: "Fleet", icon: Car, to: "/fleet" },
-      { 
-        title: "Sales Pipeline", 
-        icon: Kanban, 
-        to: "/pipeline/dashboard",
-        subItems: [
-          { title: "Dashboard", icon: LayoutDashboard, to: "/pipeline/dashboard" },
-          { title: "Pipeline Board", icon: Kanban, to: "/pipeline/board" },
-          { title: "Task Management", icon: ListTodo, to: "/pipeline/tasks" }
-        ]
+      {
+        title: "Overview",
+        href: "/analytics",
       },
-      { title: "Invoices", icon: FileText, to: "/invoices" },
-      { title: "Finance", icon: CreditCard, to: "/finance" }
-    ]
+      {
+        title: "Advanced Analytics",
+        href: "/analytics/advanced",
+      },
+      {
+        title: "Pipeline Reports",
+        href: "/pipeline/reports",
+      },
+      {
+        title: "Carrier Reports",
+        href: "/carriers/reports",
+      },
+    ],
   },
   {
-    section: "System",
-    items: [
-      { title: "Users", icon: UserCircle, to: "/users" },
-      { title: "Settings", icon: Settings, to: "/settings" }
-    ]
-  }
-];
+    title: "Pipeline",
+    href: "/pipeline",
+    icon: "trending-up",
+  },
+  {
+    title: "Settings",
+    href: "/settings",
+    icon: "settings",
+  },
+] as const;
