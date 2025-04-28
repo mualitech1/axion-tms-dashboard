@@ -68,21 +68,22 @@ export default function Sidebar() {
         
         <div className="flex-1 py-6 px-3 space-y-6 overflow-y-auto scrollbar-thin">
           {sidebarItems.map((item) => {
-            // Handle items with or without submenu differently
+            // Handle items with submenu
             if ('items' in item) {
               return (
                 <div key={item.title}>
                   <NavItem
-                    to={item.href || '#'} // Use default '#' if href doesn't exist
+                    to="#" // For parent items with subitems, always use "#" as fallback
                     icon={item.icon ? Icons[item.icon] : null}
                     label={item.title}
                     isCollapsed={isCollapsed}
-                    hasSubmenu={Boolean(item.items)}
+                    hasSubmenu={true}
                   />
                   {item.items && <SubMenu isCollapsed={isCollapsed} />}
                 </div>
               );
             } else {
+              // Handle regular items
               return (
                 <div key={item.title}>
                   <NavItem
