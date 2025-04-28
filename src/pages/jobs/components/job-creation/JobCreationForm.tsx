@@ -39,7 +39,7 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
 
   return (
     <>
-      <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-t-lg sticky top-0 z-10">
+      <CardHeader className="bg-gradient-to-r from-aximo-primary to-aximo-highlight text-white px-6 py-4 rounded-t-lg sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Briefcase className="h-5 w-5" />

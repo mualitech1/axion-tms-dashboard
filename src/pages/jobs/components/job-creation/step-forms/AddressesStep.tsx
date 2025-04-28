@@ -27,28 +27,28 @@ interface AddressesStepProps {
 
 export function AddressesStep({ form, additionalStops, addStop, removeStop, updateAdditionalStop }: AddressesStepProps) {
   return (
-    <div>
+    <div className="text-aximo-text">
       <div className="mb-6">
         <Tabs defaultValue="collection" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="collection">Collection Details</TabsTrigger>
-            <TabsTrigger value="delivery">Delivery Details</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 mb-6 bg-aximo-dark">
+            <TabsTrigger value="collection" className="data-[state=active]:bg-aximo-primary data-[state=active]:text-white">Collection Details</TabsTrigger>
+            <TabsTrigger value="delivery" className="data-[state=active]:bg-aximo-primary data-[state=active]:text-white">Delivery Details</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="collection" className="bg-white p-6 rounded-lg border shadow-sm">
+          <TabsContent value="collection" className="bg-aximo-card p-4 sm:p-6 rounded-lg border border-aximo-border shadow-sm">
             <AddressForm prefix="collection" label="Collection Details" form={form} />
           </TabsContent>
           
-          <TabsContent value="delivery" className="bg-white p-6 rounded-lg border shadow-sm">
+          <TabsContent value="delivery" className="bg-aximo-card p-4 sm:p-6 rounded-lg border border-aximo-border shadow-sm">
             <AddressForm prefix="delivery" label="Delivery Details" form={form} />
           </TabsContent>
         </Tabs>
       </div>
       
       {additionalStops.length > 0 && (
-        <div className="border-t pt-6 mt-6">
+        <div className="border-t border-aximo-border pt-6 mt-6">
           <h3 className="text-lg font-medium mb-4 flex items-center">
-            <MapPin className="h-5 w-5 mr-2 text-blue-500" />
+            <MapPin className="h-5 w-5 mr-2 text-aximo-primary" />
             Additional Stops
           </h3>
           {additionalStops.map((stop, index) => (
@@ -67,9 +67,9 @@ export function AddressesStep({ form, additionalStops, addStop, removeStop, upda
         type="button"
         variant="outline"
         onClick={addStop}
-        className="w-full mt-4 py-6 border-dashed border-2 hover:bg-blue-50 hover:border-blue-300 transition-colors"
+        className="w-full mt-4 py-6 border-dashed border-2 border-aximo-border hover:bg-aximo-primary/5 hover:border-aximo-primary/50 text-aximo-text transition-colors"
       >
-        <Plus className="mr-2 h-4 w-4" /> Add Additional Stop
+        <Plus className="mr-2 h-4 w-4 text-aximo-primary" /> Add Additional Stop
       </Button>
     </div>
   );

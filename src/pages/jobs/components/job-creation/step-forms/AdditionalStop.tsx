@@ -24,103 +24,106 @@ interface AdditionalStopProps {
 
 export function AdditionalStop({ stop, index, updateStop, removeStop }: AdditionalStopProps) {
   return (
-    <Card className="p-4 mb-4 relative">
+    <Card className="p-4 mb-4 relative bg-aximo-card border-aximo-border">
       <Button
         type="button"
         variant="ghost"
         size="sm"
         onClick={() => removeStop(index)}
-        className="absolute right-2 top-2 h-8 w-8 p-0"
+        className="absolute right-2 top-2 h-8 w-8 p-0 text-aximo-text-secondary hover:text-red-500 hover:bg-red-500/10"
       >
         <X className="h-4 w-4" />
       </Button>
       
-      <h4 className="text-sm font-medium mb-3">Additional Stop #{index + 1}</h4>
+      <h4 className="text-sm font-medium mb-3 text-aximo-text">Additional Stop #{index + 1}</h4>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
-          <Label htmlFor={`stop-${index}-company`}>Company Name</Label>
+          <Label htmlFor={`stop-${index}-company`} className="text-aximo-text">Company Name</Label>
           <div className="relative">
             <Input
               id={`stop-${index}-company`}
               value={stop.companyName}
               onChange={(e) => updateStop(index, "companyName", e.target.value)}
-              className="pl-9"
+              className="pl-9 bg-aximo-dark border-aximo-border text-aximo-text"
               placeholder="Enter company name"
             />
-            <Building className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+            <Building className="absolute left-3 top-3 h-4 w-4 text-aximo-primary" />
           </div>
         </div>
         
         <div>
-          <Label htmlFor={`stop-${index}-contact`}>Contact Name</Label>
+          <Label htmlFor={`stop-${index}-contact`} className="text-aximo-text">Contact Name</Label>
           <div className="relative">
             <Input
               id={`stop-${index}-contact`}
               value={stop.contactName}
               onChange={(e) => updateStop(index, "contactName", e.target.value)}
-              className="pl-9"
+              className="pl-9 bg-aximo-dark border-aximo-border text-aximo-text"
               placeholder="Enter contact name"
             />
-            <User className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+            <User className="absolute left-3 top-3 h-4 w-4 text-aximo-primary" />
           </div>
         </div>
         
         <div className="md:col-span-2">
-          <Label htmlFor={`stop-${index}-address`}>Address</Label>
+          <Label htmlFor={`stop-${index}-address`} className="text-aximo-text">Address</Label>
           <div className="relative">
             <Input
               id={`stop-${index}-address`}
               value={stop.addressLine1}
               onChange={(e) => updateStop(index, "addressLine1", e.target.value)}
-              className="pl-9"
+              className="pl-9 bg-aximo-dark border-aximo-border text-aximo-text"
               placeholder="Enter address"
             />
-            <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+            <MapPin className="absolute left-3 top-3 h-4 w-4 text-aximo-primary" />
           </div>
         </div>
         
         <div>
-          <Label htmlFor={`stop-${index}-city`}>City</Label>
+          <Label htmlFor={`stop-${index}-city`} className="text-aximo-text">City</Label>
           <Input
             id={`stop-${index}-city`}
             value={stop.city}
             onChange={(e) => updateStop(index, "city", e.target.value)}
             placeholder="Enter city"
+            className="bg-aximo-dark border-aximo-border text-aximo-text"
           />
         </div>
         
         <div>
-          <Label htmlFor={`stop-${index}-postcode`}>Post Code</Label>
+          <Label htmlFor={`stop-${index}-postcode`} className="text-aximo-text">Post Code</Label>
           <Input
             id={`stop-${index}-postcode`}
             value={stop.postCode}
             onChange={(e) => updateStop(index, "postCode", e.target.value)}
             placeholder="Enter post code"
+            className="bg-aximo-dark border-aximo-border text-aximo-text"
           />
         </div>
         
         <div>
-          <Label htmlFor={`stop-${index}-reference`}>Reference</Label>
+          <Label htmlFor={`stop-${index}-reference`} className="text-aximo-text">Reference</Label>
           <Input
             id={`stop-${index}-reference`}
             value={stop.reference || ""}
             onChange={(e) => updateStop(index, "reference", e.target.value)}
             placeholder="Enter reference"
+            className="bg-aximo-dark border-aximo-border text-aximo-text"
           />
         </div>
         
         <div>
-          <Label htmlFor={`stop-${index}-time`}>Time</Label>
+          <Label htmlFor={`stop-${index}-time`} className="text-aximo-text">Time</Label>
           <div className="relative">
             <Input
               id={`stop-${index}-time`}
               type="time"
               value={stop.time || ""}
               onChange={(e) => updateStop(index, "time", e.target.value)}
-              className="pl-9"
+              className="pl-9 bg-aximo-dark border-aximo-border text-aximo-text"
             />
-            <Clock className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+            <Clock className="absolute left-3 top-3 h-4 w-4 text-aximo-primary" />
           </div>
         </div>
       </div>

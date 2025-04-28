@@ -14,7 +14,7 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
   return (
     <Dialog open={true} onOpenChange={onComplete}>
       <DialogContent 
-        className={`w-full ${isMobile ? 'max-w-[95%]' : 'max-w-3xl'} p-0 bg-aximo-dark border-aximo-border max-h-[95vh] overflow-hidden`}
+        className={`w-full ${isMobile ? 'max-w-[95%]' : 'max-w-3xl'} p-0 bg-aximo-dark border-aximo-border max-h-[95vh] overflow-hidden rounded-lg`}
       >
         <VisuallyHidden>
           <DialogTitle>Create New Job</DialogTitle>

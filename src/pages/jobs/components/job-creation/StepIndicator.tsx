@@ -17,8 +17,8 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
             <div className={`
               flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full flex-shrink-0 text-xs sm:text-sm
               ${index + 1 <= currentStep
-                ? 'bg-white text-blue-600'
-                : 'bg-blue-800/30 text-blue-100'
+                ? 'bg-white text-aximo-primary'
+                : 'bg-aximo-primary/30 text-white'
               } transition-colors duration-200
             `}>
               {index + 1}
@@ -26,14 +26,14 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
             {index < totalSteps - 1 && (
               <div className={`
                 h-0.5 w-full min-w-[0.5rem] mx-1 md:mx-2
-                ${index + 1 < currentStep ? 'bg-white' : 'bg-blue-800/30'}
+                ${index + 1 < currentStep ? 'bg-white' : 'bg-aximo-primary/30'}
                 transition-colors duration-200
               `} />
             )}
           </div>
         ))}
       </div>
-      <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-blue-100">
+      <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-white/80">
         Step {currentStep} of {totalSteps}
       </div>
     </div>

@@ -1,16 +1,16 @@
 
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Briefcase, PackageOpen, CalendarDays } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { UseFormReturn } from "react-hook-form";
-import { DocumentUploader } from "@/components/job-creation/DocumentUploader";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { FileUploader } from "../file-upload/FileUploader";
 
 interface BasicInfoStepProps {
   form: UseFormReturn<any>;
@@ -21,194 +21,195 @@ interface BasicInfoStepProps {
 
 export function BasicInfoStep({ form, date, setDate, onDocumentsChange }: BasicInfoStepProps) {
   return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-4">
+    <div className="space-y-6 text-aximo-text">
+      <div className="space-y-4">
         <FormField
           control={form.control}
           name="jobTitle"
           render={({ field }) => (
-            <FormItem className="col-span-2">
-              <FormLabel>Job Title</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter job title" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="vehicleType"
-          render={({ field }) => (
             <FormItem>
-              <FormLabel>Vehicle Type</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select vehicle type" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="van">Van</SelectItem>
-                  <SelectItem value="7.5t">7.5 Tonne</SelectItem>
-                  <SelectItem value="18t">18 Tonne</SelectItem>
-                  <SelectItem value="artic">Articulated</SelectItem>
-                </SelectContent>
-              </Select>
+              <FormLabel className="text-aximo-text">Job Title <span className="text-red-500">*</span></FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Input 
+                    placeholder="Enter job title" 
+                    {...field} 
+                    className="pl-9 bg-aximo-dark border-aximo-border text-aximo-text" 
+                  />
+                  <Briefcase className="absolute left-3 top-3 h-4 w-4 text-aximo-primary" />
+                </div>
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         
-        <div className="space-y-2">
-          <FormLabel>Collection Date</FormLabel>
-          <Popover>
-            <PopoverTrigger asChild>
-              <FormControl>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-full pl-3 text-left font-normal",
-                    !date && "text-muted-foreground"
-                  )}
-                >
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
-                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                </Button>
-              </FormControl>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="customer"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-aximo-text">Customer <span className="text-red-500">*</span></FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Select or enter customer" 
+                    {...field} 
+                    className="bg-aximo-dark border-aximo-border text-aximo-text" 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="vehicleType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-aximo-text">Vehicle Type <span className="text-red-500">*</span></FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Input 
+                      placeholder="Select vehicle type" 
+                      {...field} 
+                      className="pl-9 bg-aximo-dark border-aximo-border text-aximo-text" 
+                    />
+                    <PackageOpen className="absolute left-3 top-3 h-4 w-4 text-aximo-primary" />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-4">
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="productType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-aximo-text">Product Type</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Enter product type" 
+                    {...field} 
+                    className="bg-aximo-dark border-aximo-border text-aximo-text" 
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="totalWeight"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-aximo-text">Total Weight (kg)</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    min="0"
+                    placeholder="Enter total weight" 
+                    {...field} 
+                    className="bg-aximo-dark border-aximo-border text-aximo-text" 
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormItem>
+            <FormLabel className="text-aximo-text">Pickup Date <span className="text-red-500">*</span></FormLabel>
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full pl-9 relative text-left font-normal bg-aximo-dark border-aximo-border text-aximo-text hover:bg-aximo-darker",
+                      !date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarDays className="absolute left-3 top-2 h-4 w-4 text-aximo-primary" />
+                    {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 bg-aximo-darker border-aximo-border" align="start">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  initialFocus
+                  className="bg-aximo-darker text-aximo-text"
+                />
+              </PopoverContent>
+            </Popover>
+            <FormMessage />
+          </FormItem>
+          
+          <FormField
+            control={form.control}
+            name="rate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-aximo-text">Rate (£)</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    min="0"
+                    step="0.01"
+                    placeholder="Enter rate" 
+                    {...field} 
+                    className="bg-aximo-dark border-aximo-border text-aximo-text" 
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+        
         <FormField
           control={form.control}
           name="priority"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Priority</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select priority" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="urgent">Urgent</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="customer"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Customer</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select customer" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="customer1">ABC Ltd</SelectItem>
-                  <SelectItem value="customer2">XYZ Corporation</SelectItem>
-                  <SelectItem value="customer3">123 Industries</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-      
-      <div className="grid grid-cols-2 gap-4">
-        <FormField
-          control={form.control}
-          name="rate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Rate (£)</FormLabel>
+            <FormItem className="space-y-1">
+              <FormLabel className="text-aximo-text">Priority</FormLabel>
               <FormControl>
-                <Input type="number" {...field} />
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  className="flex flex-wrap gap-2 sm:gap-3"
+                >
+                  <div className="flex items-center space-x-2 bg-aximo-darker rounded-md px-4 py-2 border border-aximo-border">
+                    <RadioGroupItem value="low" id="low" className="text-blue-500" />
+                    <Label htmlFor="low" className="text-aximo-text">Low</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 bg-aximo-darker rounded-md px-4 py-2 border border-aximo-border">
+                    <RadioGroupItem value="medium" id="medium" className="text-amber-500" />
+                    <Label htmlFor="medium" className="text-aximo-text">Medium</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 bg-aximo-darker rounded-md px-4 py-2 border border-aximo-border">
+                    <RadioGroupItem value="high" id="high" className="text-red-500" />
+                    <Label htmlFor="high" className="text-aximo-text">High</Label>
+                  </div>
+                </RadioGroup>
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
       </div>
       
-      <div className="grid grid-cols-1 gap-4">
-        <FormItem>
-          <FormLabel>Order Confirmation Documents</FormLabel>
-          <DocumentUploader onDocumentsChange={onDocumentsChange} />
-        </FormItem>
+      <div className="space-y-2">
+        <FormLabel className="text-aximo-text">Documents</FormLabel>
+        <FileUploader onFilesChange={onDocumentsChange} />
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField
-          control={form.control}
-          name="productType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Product Type</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter product type" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="totalWeight"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Total Weight (kg)</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-      
-      <FormField
-        control={form.control}
-        name="additionalInformation"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Additional Information</FormLabel>
-            <FormControl>
-              <Textarea 
-                placeholder="Enter any additional information about this job" 
-                className="min-h-[80px]"
-                {...field} 
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
     </div>
   );
 }

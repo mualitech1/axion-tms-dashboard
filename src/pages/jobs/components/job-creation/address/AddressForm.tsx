@@ -1,5 +1,4 @@
 
-import { InputWithIcon } from "@/components/ui/input-with-icon";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FormField, FormItem, FormLabel, FormControl, FormDescription } from "@/components/ui/form";
@@ -23,19 +22,26 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
   
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-aximo-text">
       <h3 className="text-md font-medium flex items-center gap-2">
-        <span className="text-[#1EAEDB]">{label}</span>
+        <span className="text-aximo-primary">{label}</span>
       </h3>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <FormField
           control={form.control}
           name={`${prefix}.companyName`}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Company Name</FormLabel>
+              <FormLabel className="text-aximo-text">Company Name</FormLabel>
               <FormControl>
-                <InputWithIcon icon={Building} placeholder="Enter company name" {...field} />
+                <div className="relative">
+                  <Input 
+                    placeholder="Enter company name" 
+                    {...field}
+                    className="pl-9 bg-aximo-dark border-aximo-border text-aximo-text"
+                  />
+                  <Building className="absolute left-3 top-3 h-4 w-4 text-aximo-primary" />
+                </div>
               </FormControl>
             </FormItem>
           )}
@@ -46,9 +52,16 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
           name={`${prefix}.contactName`}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Contact Name</FormLabel>
+              <FormLabel className="text-aximo-text">Contact Name</FormLabel>
               <FormControl>
-                <InputWithIcon icon={User} placeholder="Enter contact name" {...field} />
+                <div className="relative">
+                  <Input 
+                    placeholder="Enter contact name" 
+                    {...field}
+                    className="pl-9 bg-aximo-dark border-aximo-border text-aximo-text"
+                  />
+                  <User className="absolute left-3 top-3 h-4 w-4 text-aximo-primary" />
+                </div>
               </FormControl>
             </FormItem>
           )}
@@ -59,14 +72,14 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
           name={`${prefix}.reference`}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
+              <FormLabel className="text-aximo-text">
                 {prefix === "collection" ? "Collection Reference" : "Delivery Reference"}
               </FormLabel>
               <FormControl>
                 <Input 
                   {...field} 
                   placeholder={`Enter ${prefix === "collection" ? "collection" : "delivery"} reference`}
-                  className="border-[#1EAEDB]/20 focus:border-[#1EAEDB]"
+                  className="bg-aximo-dark border-aximo-border text-aximo-text"
                 />
               </FormControl>
             </FormItem>
@@ -74,7 +87,7 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
         />
         
         <div className="space-y-2">
-          <Label htmlFor={`${prefix}-date`}>Date & Time Window</Label>
+          <Label htmlFor={`${prefix}-date`} className="text-aximo-text">Date & Time Window</Label>
           <div className="flex gap-2">
             <Popover>
               <PopoverTrigger asChild>
@@ -82,20 +95,21 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
                   id={`${prefix}-date`}
                   variant={"outline"}
                   className={cn(
-                    "w-full justify-start text-left font-normal border-[#1EAEDB]/20",
-                    !date && "text-muted-foreground"
+                    "w-full justify-start text-left font-normal bg-aximo-dark border-aximo-border text-aximo-text",
+                    !date && "text-aximo-text-secondary"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <CalendarIcon className="mr-2 h-4 w-4 text-aximo-primary" />
                   {date ? format(date, "PP") : <span>Pick a date</span>}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 bg-aximo-darker border-aximo-border" align="start">
                 <Calendar
                   mode="single"
                   selected={date}
                   onSelect={setDate}
                   initialFocus
+                  className="bg-aximo-darker"
                 />
               </PopoverContent>
             </Popover>
@@ -107,10 +121,10 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
                   <div className="relative">
                     <Input
                       type="time"
-                      className="w-full border-[#1EAEDB]/20 pl-9"
+                      className="w-full bg-aximo-dark border-aximo-border text-aximo-text pl-9"
                       {...field}
                     />
-                    <Clock className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                    <Clock className="absolute left-3 top-3 h-4 w-4 text-aximo-primary" />
                   </div>
                 </FormControl>
               )}
@@ -122,10 +136,17 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
           control={form.control}
           name={`${prefix}.addressLine1`}
           render={({ field }) => (
-            <FormItem className="col-span-2">
-              <FormLabel>Address Line 1</FormLabel>
+            <FormItem className="col-span-full">
+              <FormLabel className="text-aximo-text">Address Line 1</FormLabel>
               <FormControl>
-                <InputWithIcon icon={MapPin} placeholder="Enter address" {...field} />
+                <div className="relative">
+                  <Input 
+                    placeholder="Enter address" 
+                    {...field}
+                    className="pl-9 bg-aximo-dark border-aximo-border text-aximo-text"
+                  />
+                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-aximo-primary" />
+                </div>
               </FormControl>
             </FormItem>
           )}
@@ -136,9 +157,13 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
           name={`${prefix}.city`}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>City</FormLabel>
+              <FormLabel className="text-aximo-text">City</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter city" className="border-[#1EAEDB]/20" />
+                <Input 
+                  {...field} 
+                  placeholder="Enter city"
+                  className="bg-aximo-dark border-aximo-border text-aximo-text"
+                />
               </FormControl>
             </FormItem>
           )}
@@ -149,9 +174,13 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
           name={`${prefix}.postCode`}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Post Code</FormLabel>
+              <FormLabel className="text-aximo-text">Post Code</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter post code" className="border-[#1EAEDB]/20" />
+                <Input 
+                  {...field} 
+                  placeholder="Enter post code"
+                  className="bg-aximo-dark border-aximo-border text-aximo-text"
+                />
               </FormControl>
             </FormItem>
           )}
@@ -162,19 +191,19 @@ export function AddressForm({ prefix, label, form }: AddressFormProps) {
           control={form.control}
           name={`${prefix}.additionalComments`}
           render={({ field }) => (
-            <FormItem className="col-span-2 mt-2">
-              <FormLabel className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4 text-[#1EAEDB]" /> 
+            <FormItem className="col-span-full mt-2">
+              <FormLabel className="flex items-center gap-2 text-aximo-text">
+                <MessageSquare className="h-4 w-4 text-aximo-primary" /> 
                 Additional Comments
               </FormLabel>
               <FormControl>
                 <Textarea 
                   {...field} 
                   placeholder="Enter any special instructions or additional information"
-                  className="min-h-[100px] border-[#1EAEDB]/20 resize-none"
+                  className="min-h-[100px] bg-aximo-dark border-aximo-border text-aximo-text resize-none"
                 />
               </FormControl>
-              <FormDescription>
+              <FormDescription className="text-aximo-text-secondary">
                 Include access codes, contact preferences, or special handling instructions
               </FormDescription>
             </FormItem>

@@ -85,7 +85,7 @@ export function FormContent({
           transition={{ duration: 0.3 }}
           key={currentStep}
         >
-          <div className="bg-aximo-card rounded-lg shadow-lg border border-aximo-border">
+          <div className="bg-aximo-darker rounded-lg shadow-lg border border-aximo-border">
             <ScrollArea className="p-4 sm:p-6" style={{ maxHeight: scrollMaxHeight }}>
               {renderCurrentStep()}
             </ScrollArea>
