@@ -108,7 +108,7 @@ export default function Invoices() {
             setSearchQuery={setSearchQuery}
             onCreateJob={() => setCreateJobOpen(true)}
             onCreateInvoice={() => {
-              setEditingInvoice(null);
+              handleEditInvoice(null);
               setCreateDialogOpen(true);
             }}
           />
@@ -135,7 +135,7 @@ export default function Invoices() {
         onOpenChange={(isOpen) => {
           setCreateDialogOpen(isOpen);
           if (!isOpen) {
-            setEditingInvoice(null);
+            handleEditInvoice(null);
           }
         }}
         onInvoiceCreated={handleInvoiceCreated}
