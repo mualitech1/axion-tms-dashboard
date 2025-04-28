@@ -28,7 +28,7 @@ export function JobTitleField({ form }: JobTitleFieldProps) {
                 <Input 
                   placeholder="Enter job title" 
                   {...field} 
-                  className="pl-10 bg-[#05101b] border-[#1a3246] focus:border-[#0a9bdb] focus:ring-[#0a9bdb]/20 h-11 text-white placeholder:text-[#6b82a6]" 
+                  className="pl-10 bg-[#05101b] border-[#1a3246] focus-visible:ring-1 focus-visible:ring-[#0a9bdb]/30 focus-visible:border-[#0a9bdb] h-11 text-white placeholder:text-[#6b82a6]" 
                 />
                 <Package2 className="absolute left-3 top-3 h-5 w-5 text-[#0a9bdb]" />
               </div>
