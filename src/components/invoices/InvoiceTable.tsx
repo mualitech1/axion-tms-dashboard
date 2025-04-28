@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { ArrowUpDown, Calendar, Download, Eye, Edit, Trash2, CreditCard } from "
 import { InvoiceData } from "./create-invoice-dialog/types";
 import { Switch } from "@/components/ui/switch";
 import { InvoicePaymentModal } from "./InvoicePaymentModal";
+import { useNavigate } from "react-router-dom";
 
 interface InvoiceTableProps {
   invoices: InvoiceData[];
@@ -27,6 +27,7 @@ export function InvoiceTable({
   sortDirection,
   onSort
 }: InvoiceTableProps) {
+  const navigate = useNavigate();
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceData | null>(null);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
@@ -145,6 +146,14 @@ export function InvoiceTable({
                           <CreditCard className="h-3.5 w-3.5" />
                         </Button>
                       )}
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => navigate(`/invoices/${invoice.id}`)}
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                      </Button>
                       <Button 
                         variant="outline" 
                         size="icon" 

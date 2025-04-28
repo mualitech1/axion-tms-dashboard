@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -126,7 +125,8 @@ function App() {
               <Route path="/users/*" element={<ProtectedRoute><Users /></ProtectedRoute>} />
               <Route path="/analytics/*" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
               <Route path="/finance/*" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
-              <Route path="/invoices/*" element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
+              <Route path="/invoices" element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
+              <Route path="/invoices/:id" element={<ProtectedRoute><InvoiceDetails /></ProtectedRoute>} />
               <Route path="/settings/*" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="/drivers/*" element={<ProtectedRoute><Drivers /></ProtectedRoute>} />
               <Route path="/fleet/*" element={<ProtectedRoute><Fleet /></ProtectedRoute>} />
