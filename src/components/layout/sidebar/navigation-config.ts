@@ -1,3 +1,4 @@
+
 import { Icons } from "@/components/ui/icons"
 
 export type SidebarNavItem = {
@@ -95,3 +96,6 @@ export const sidebarItems = [
     icon: "settings",
   },
 ] as const;
+
+// Export navigationItems alias for backward compatibility
+export const navigationItems = sidebarItems;

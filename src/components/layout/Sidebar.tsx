@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { X, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { navigationItems } from './sidebar/navigation-config';
+import { sidebarItems } from './sidebar/navigation-config';
 import { NavSection, NavItem } from './sidebar/NavSection';
 import { SubMenu } from './sidebar/SubMenu';
 import { MobileMenu } from './sidebar/MobileMenu';
@@ -66,28 +65,36 @@ export default function Sidebar() {
         </div>
         
         <div className="flex-1 py-6 px-3 space-y-6 overflow-y-auto scrollbar-thin">
-          {navigationItems.map((section) => (
-            <NavSection 
-              key={section.section} 
-              title={section.section} 
-              isCollapsed={isCollapsed}
-            >
-              {section.items.map((item) => (
-                <div key={item.title}>
-                  <NavItem
-                    to={item.to}
-                    icon={item.icon}
-                    label={item.title}
-                    isCollapsed={isCollapsed}
-                    hasSubmenu={Boolean(item.subItems)}
-                  />
-                  {item.subItems && <SubMenu isCollapsed={isCollapsed} />}
-                </div>
-              ))}
-            </NavSection>
+          {sidebarItems.map((item) => (
+            <div key={item.title}>
+              <NavItem
+                to={item.href || '#'}
+                icon={item.icon ? Icons[item.icon] : null}
+                label={item.title}
+                isCollapsed={isCollapsed}
+                hasSubmenu={Boolean(item.items)}
+              />
+              {item.items && <SubMenu isCollapsed={isCollapsed} />}
+            </div>
           ))}
         </div>
       </aside>
     </>
   );
+}
+
+// Helper component to use icons from the config
+const Icons = {
+  home: () => <span>🏠</span>,
+  package: () => <span>📦</span>,
+  "file-text": () => <span>📄</span>,
+  truck: () => <span>🚚</span>,
+  users: () => <span>👥</span>,
+  shipping: () => <span>🚢</span>,
+  car: () => <span>🚗</span>,
+  "credit-card": () => <span>💳</span>,
+  user: () => <span>👤</span>,
+  "bar-chart-2": () => <span>📊</span>,
+  "trending-up": () => <span>📈</span>,
+  settings: () => <span>⚙️</span>,
 }

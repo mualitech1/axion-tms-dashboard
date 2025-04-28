@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Index from '@/pages/Index';
-import AuthPage from '@/pages/AuthPage';
+import AuthPage from '@/pages/auth/AuthPage';
 import Drivers from '@/pages/Drivers';
 import Invoices from '@/pages/Invoices';
 import Jobs from '@/pages/Jobs';
