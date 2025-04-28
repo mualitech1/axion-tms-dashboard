@@ -62,7 +62,10 @@ export function useJobMutations() {
         if (updates.title || updates.reference || updates.pickup_date || 
             updates.pickup_location || updates.delivery_location) {
           
-          const currentJob = await queryClient.getQueryData(['jobs'])?.find((job: Job) => job.id === id);
+          // Fix: Type the query data properly
+          const jobs = queryClient.getQueryData<Job[]>(['jobs']);
+          const currentJob = jobs?.find((job) => job.id === id);
+          
           if (!currentJob) {
             throw new Error("Job not found");
           }
