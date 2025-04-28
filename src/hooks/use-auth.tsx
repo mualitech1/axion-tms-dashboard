@@ -1,10 +1,11 @@
-
 import { useEffect, useState, createContext, useContext } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { getErrorMessage } from '@/utils/error-handler';
 import { SecurityEventType, logSecurityEvent, checkSuspiciousActivity } from '../services/security-audit';
+import { getCSRFToken, storeCSRFToken } from '@/utils/security-headers';
+import { registerDevice } from '@/services/device-management';
 
 interface AuthContextType {
   session: Session | null;
@@ -71,6 +72,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     fetchClientIP();
     
+    // Generate CSRF token on app initialization
+    storeCSRFToken();
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -81,6 +85,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (event === 'SIGNED_IN') {
           // Log successful login
           if (session?.user) {
+            // Register the current device
+            await registerDevice(session.user.id);
+            
+            // Log the login event
             await logSecurityEvent(
               SecurityEventType.LOGIN_SUCCESS,
               session.user.id,
@@ -178,7 +186,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       
-      const { error, data } = await supabase.auth.signInWithPassword({ email, password });
+      // Add CSRF token to the auth request options
+      const csrfToken = getCSRFToken();
+      
+      const { error, data } = await supabase.auth.signInWithPassword({ 
+        email, 
+        password,
+        options: {
+          // Pass the CSRF token in the session data
+          data: {
+            csrf_token: csrfToken
+          }
+        }
+      });
       
       if (error) {
         console.error('Sign in error:', error.message);

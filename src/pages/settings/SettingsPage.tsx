@@ -5,6 +5,7 @@ import ProfileSettings from '@/pages/settings/components/GeneralSettings';
 import NotificationsSettings from '@/pages/settings/components/NotificationSettings';
 import SecuritySettings from '@/pages/settings/components/SecuritySettings';
 import SecurityLogs from '@/pages/settings/components/SecurityLogs';
+import DeviceManagement from '@/pages/settings/components/DeviceManagement';
 import { SubscriptionSettings } from "@/components/settings/SubscriptionSettings";
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect } from 'react';
@@ -46,6 +47,7 @@ export default function SettingsPage() {
           <SubscriptionSettings />
           <ProfileSettings />
           <SecuritySettings />
+          <DeviceManagement />
           <SecurityLogs />
           <NotificationsSettings />
         </div>

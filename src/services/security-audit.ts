@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export enum SecurityEventType {
@@ -9,7 +8,11 @@ export enum SecurityEventType {
   TOTP_ENABLED = 'totp_enabled',
   TOTP_DISABLED = 'totp_disabled',
   ACCOUNT_LOCKED = 'account_locked',
-  UNUSUAL_ACTIVITY = 'unusual_activity'
+  UNUSUAL_ACTIVITY = 'unusual_activity',
+  DEVICE_ADDED = 'device_added',
+  DEVICE_REMOVED = 'device_removed',
+  SUSPICIOUS_LOCATION = 'suspicious_location',
+  CSRF_VIOLATION = 'csrf_violation'
 }
 
 interface SecurityEvent {
