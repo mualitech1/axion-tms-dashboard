@@ -2,6 +2,8 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AuthProvider } from '@/hooks/use-auth';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from '@/config/query-client';
 import Index from '@/pages/Index';
 import AuthPage from '@/pages/auth/AuthPage';
 import Drivers from '@/pages/Drivers';
@@ -99,9 +101,11 @@ const router = createBrowserRouter([
 function App() {
   return (
     <React.StrictMode>
-      <AuthProvider>
-        <RouterProvider router={router} />
-      </AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
+      </QueryClientProvider>
     </React.StrictMode>
   );
 }
