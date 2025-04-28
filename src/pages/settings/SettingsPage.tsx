@@ -1,8 +1,9 @@
+
 import MainLayout from '@/components/layout/MainLayout';
-import SettingsHeader from '@/components/settings/SettingsHeader';
-import ProfileSettings from '@/components/settings/ProfileSettings';
-import NotificationsSettings from '@/components/settings/NotificationsSettings';
-import SecuritySettings from '@/components/settings/SecuritySettings';
+import SettingsHeader from '@/pages/settings/components/SettingsHeader';
+import ProfileSettings from '@/pages/settings/components/GeneralSettings';
+import NotificationsSettings from '@/pages/settings/components/NotificationSettings';
+import SecuritySettings from '@/pages/settings/components/SecuritySettings';
 import { SubscriptionSettings } from "@/components/settings/SubscriptionSettings";
 
 export default function SettingsPage() {
