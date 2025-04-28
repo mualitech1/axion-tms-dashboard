@@ -25,7 +25,8 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
     // For desktop, use a centered dialog
     <Dialog open={true} onOpenChange={onComplete}>
       <DialogContent 
-        className="w-full max-w-4xl p-0 bg-[#030619] border-[#1a3246] max-h-[90vh] overflow-hidden rounded-xl"
+        className="w-full max-w-4xl p-0 bg-[#030619] border-[#1a3246] h-auto max-h-[90vh] overflow-hidden rounded-xl"
+        onInteractOutside={(e) => e.preventDefault()}
       >
         <JobCreationForm onComplete={onComplete} />
       </DialogContent>

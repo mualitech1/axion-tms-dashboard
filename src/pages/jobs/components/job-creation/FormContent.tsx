@@ -59,7 +59,8 @@ export function FormContent({
   onSubmit
 }: FormContentProps) {
   const isMobile = useIsMobile();
-  const scrollMaxHeight = isMobile ? "calc(75vh - 170px)" : "calc(80vh - 170px)";
+  // Adjusting the max height to ensure the form is always scrollable
+  const scrollMaxHeight = isMobile ? "calc(65vh)" : "calc(70vh)";
   const [direction, setDirection] = React.useState(0);
 
   // Set direction based on step change
@@ -120,7 +121,10 @@ export function FormContent({
         <div className="bg-[#05101b] rounded-lg shadow-lg border border-[#1a3246] overflow-hidden">
           <ScrollArea 
             className="p-4 sm:p-6" 
-            style={{ maxHeight: scrollMaxHeight }}
+            style={{ 
+              height: scrollMaxHeight,
+              overflowY: "auto"
+            }}
             scrollHideDelay={100}
           >
             <AnimatePresence custom={direction} mode="wait">

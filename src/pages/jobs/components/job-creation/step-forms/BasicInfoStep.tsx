@@ -12,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { FileUploader } from "../file-upload/FileUploader";
 import { motion } from "framer-motion";
+import { InputWithIcon } from "@/components/ui/input-with-icon";
 
 interface BasicInfoStepProps {
   form: UseFormReturn<any>;
@@ -35,7 +36,7 @@ const inputContainer = {
 
 export function BasicInfoStep({ form, date, setDate, onDocumentsChange }: BasicInfoStepProps) {
   return (
-    <div className="space-y-6 text-white">
+    <div className="space-y-6 text-white pb-8">
       <motion.div 
         className="space-y-5"
         initial="hidden"
@@ -192,7 +193,7 @@ export function BasicInfoStep({ form, date, setDate, onDocumentsChange }: BasicI
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-[#05101b] border-[#1a3246]" align="start">
+                <PopoverContent className="w-auto p-0 bg-[#05101b] border-[#1a3246] z-50" align="start">
                   <Calendar
                     mode="single"
                     selected={date}
