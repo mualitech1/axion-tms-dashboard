@@ -92,9 +92,9 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
 
     try {
       // Create the complete customer object with contacts
-      const newCustomer = {
+      const newCustomer: Omit<Customer, 'id'> & { id: string } = {
         ...values,
-        id: Date.now(), // temporary ID for demo
+        id: Date.now().toString(), // Generate string ID from timestamp
         contacts: [
           { ...primaryContact, isPrimary: true, role: 'Primary' },
           ...(invoiceContact ? [{ ...invoiceContact, role: 'Invoice' }] : []),
@@ -118,7 +118,7 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
       
       // Now call the onAddCustomer prop if it exists
       if (onAddCustomer) {
-        onAddCustomer(newCustomer as Customer);
+        onAddCustomer(newCustomer);
       }
       
       toast({

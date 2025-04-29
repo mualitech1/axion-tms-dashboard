@@ -33,7 +33,7 @@ const OriginalDate = Date;
 
 // Mock data for the customer portal
 export const customerPortalData: Customer = {
-  id: 1001,
+  id: "1001", // Changed from number to string
   name: "Acme Logistics Ltd",
   contact: "Jane Smith",
   email: "jane@acmelogistics.com",

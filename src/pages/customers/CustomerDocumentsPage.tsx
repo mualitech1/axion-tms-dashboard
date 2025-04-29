@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -36,10 +35,8 @@ export default function CustomerDocumentsPage() {
   const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => {
-    // In a real app, this would be an API call
-    // Convert the string ID from URL params to a number for comparison
-    const numericId = customerId ? parseInt(customerId, 10) : -1;
-    const foundCustomer = customerData.find(c => c.id === numericId);
+    // Find customer by string ID
+    const foundCustomer = customerData.find(c => c.id === customerId);
     setCustomer(foundCustomer || null);
   }, [customerId]);
   

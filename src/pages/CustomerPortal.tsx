@@ -11,7 +11,7 @@ import { Customer } from "@/types/customer";
 
 // Mock customer data for demonstration
 const mockCustomer: Customer = {
-  id: 1001,
+  id: "1001", // Changed from number to string
   name: "Acme Logistics",
   contact: "John Doe",
   email: "john@acmelogistics.com",

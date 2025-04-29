@@ -1,4 +1,3 @@
-
 import { useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -18,10 +17,9 @@ import { ContactPerson } from '@/types/customer';
 export default function CustomerDetails() {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState('overview');
-  const customerId = id ? parseInt(id) : 0;
   
-  // Find the customer from the mock data
-  const customer = customerData.find(c => c.id === customerId);
+  // Find the customer from the mock data - directly compare string IDs
+  const customer = customerData.find(c => c.id === id);
 
   if (!customer) {
     return (

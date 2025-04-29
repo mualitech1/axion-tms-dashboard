@@ -17,7 +17,7 @@ type Segment = {
   id: string;
   name: string;
   color: string;
-  customers: number[];
+  customers: string[]; // Changed from number[] to string[]
 };
 
 const CustomerSegmentation: React.FC<CustomerSegmentationProps> = ({ customers }) => {
@@ -26,19 +26,19 @@ const CustomerSegmentation: React.FC<CustomerSegmentationProps> = ({ customers }
       id: 'key-accounts', 
       name: 'Key Accounts', 
       color: 'bg-blue-500', 
-      customers: [1, 3] 
+      customers: ["1", "3"] // Changed from [1, 3] to ["1", "3"]
     },
     { 
       id: 'new-customers', 
       name: 'New Customers', 
       color: 'bg-green-500', 
-      customers: [2, 4] 
+      customers: ["2", "4"] // Changed from [2, 4] to ["2", "4"]
     },
     { 
       id: 'at-risk', 
       name: 'At Risk', 
       color: 'bg-red-500', 
-      customers: [5] 
+      customers: ["5"] // Changed from [5] to ["5"]
     },
   ]);
   
