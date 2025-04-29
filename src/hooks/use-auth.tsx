@@ -189,16 +189,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Add CSRF token to the auth request options
       const csrfToken = getCSRFToken();
       
-      // Fixed: The data property should be at the same level as options, not inside it
+      // Fixed: The data property should be inside the options object
       const { error, data } = await supabase.auth.signInWithPassword({ 
         email, 
         password,
         options: {
-          captchaToken: undefined  // Optional captcha token if needed
-        },
-        // Set CSRF token in the user metadata  
-        data: {
-          csrf_token: csrfToken
+          captchaToken: undefined,  // Optional captcha token if needed
+          // Set CSRF token in the user metadata  
+          data: {
+            csrf_token: csrfToken
+          }
         }
       });
       
