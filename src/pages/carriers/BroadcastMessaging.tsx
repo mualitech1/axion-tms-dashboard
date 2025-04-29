@@ -29,7 +29,9 @@ const initialGroups: CarrierMessageGroup[] = [
     createdAt: '2025-03-20T14:30:00',
     filters: {
       fleetType: 'Small',
-      complianceStatus: 'Compliant'
+      complianceStatus: 'Compliant',
+      capabilities: [], // Adding the required capabilities array
+      regions: [] // Adding the required regions array
     }
   },
   {
@@ -39,7 +41,8 @@ const initialGroups: CarrierMessageGroup[] = [
     createdAt: '2025-04-05T09:15:00',
     filters: {
       fleetType: 'Large',
-      capabilities: ['heavy', 'oversized']
+      capabilities: ['heavy', 'oversized'],
+      regions: [] // Adding the required regions array
     }
   }
 ];
