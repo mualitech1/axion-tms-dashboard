@@ -34,6 +34,15 @@ export default function Customers() {
     }, 500);
   };
 
+  // Define metrics values for CustomerMetrics
+  const metricsData = {
+    totalCalls: 68,
+    totalEmails: 173,
+    newCustomers: 24,
+    scheduledMeetings: 12,
+    activityTimestamp: 'Today, 10:30 AM'
+  };
+
   return (
     <MainLayout title="Customers">
       <div className="animate-fade-in">
@@ -51,7 +60,7 @@ export default function Customers() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
-              <CustomerMetrics />
+              <CustomerMetrics {...metricsData} />
             </motion.div>
           </motion.div>
         )}

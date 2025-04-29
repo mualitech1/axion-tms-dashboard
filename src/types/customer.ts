@@ -39,7 +39,7 @@ export interface JobRecord {
 }
 
 export interface Customer {
-  id: number;
+  id: string; // Changed from number to string
   name: string;
   contact: string;
   email: string;

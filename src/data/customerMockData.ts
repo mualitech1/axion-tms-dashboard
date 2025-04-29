@@ -4,7 +4,7 @@ import { Customer } from '@/types/customer';
 // Enhanced mock data for customers
 export const customerData: Customer[] = [
   {
-    id: 1,
+    id: "1", // Changed from number to string
     name: 'Acme Corporation',
     contact: 'John Smith',
     email: 'john@acmecorp.com',
@@ -96,7 +96,7 @@ export const customerData: Customer[] = [
     notes: 'Key account with regular shipments to Manchester.'
   },
   {
-    id: 2,
+    id: "2", // Changed from number to string
     name: 'Globex Industries',
     contact: 'Jane Cooper',
     email: 'jane@globex.com',
@@ -127,7 +127,7 @@ export const customerData: Customer[] = [
     ]
   },
   {
-    id: 3,
+    id: "3", // Changed from number to string
     name: 'Wayne Enterprises',
     contact: 'Bruce Wayne',
     email: 'bruce@wayne.com',
@@ -137,7 +137,7 @@ export const customerData: Customer[] = [
     lastOrder: '2023-05-28',
   },
   {
-    id: 4,
+    id: "4", // Changed from number to string
     name: 'Stark Industries',
     contact: 'Tony Stark',
     email: 'tony@stark.com',
@@ -147,7 +147,7 @@ export const customerData: Customer[] = [
     lastOrder: '2023-05-20',
   },
   {
-    id: 5,
+    id: "5", // Changed from number to string
     name: 'Daily Planet',
     contact: 'Clark Kent',
     email: 'clark@dailyplanet.com',
