@@ -166,7 +166,7 @@ export default function DriversPage() {
                     <div key={`expiry-${driver.id}`} className="flex items-center justify-between p-3 bg-aximo-darker rounded-lg border border-aximo-border/50">
                       <div>
                         <p className="font-medium text-aximo-text">{driver.name}</p>
-                        <p className="text-xs text-aximo-text-secondary">{driver.license.type}</p>
+                        <p className="text-xs text-aximo-text-secondary">License #{driver.license.number.substring(0, 8)}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <Shield className="h-4 w-4 text-amber-500" />
