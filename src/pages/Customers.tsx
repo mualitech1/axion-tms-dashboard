@@ -6,6 +6,8 @@ import { Customer } from '@/types/customer';
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import CustomerMetrics from '@/components/customers/CustomerMetrics';
+import { motion } from 'framer-motion';
 
 export default function Customers() {
   const { toast } = useToast();
@@ -36,9 +38,22 @@ export default function Customers() {
     <MainLayout title="Customers">
       <div className="animate-fade-in">
         {isRootPath && (
-          <div className="mb-8">
+          <motion.div 
+            className="mb-8"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <CustomerHeader onAddCustomer={handleAddCustomer} />
-          </div>
+            <motion.div 
+              className="mt-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              <CustomerMetrics />
+            </motion.div>
+          </motion.div>
         )}
         
         {/* Outlet for nested routes */}
