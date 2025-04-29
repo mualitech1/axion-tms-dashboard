@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AuthProvider } from '@/hooks/use-auth';
@@ -29,6 +30,10 @@ import CarrierMatching from '@/pages/carriers/CarrierMatching';
 import CarrierPortal from '@/pages/carriers/CarrierPortal';
 import CarrierPayments from '@/pages/carriers/CarrierPayments';
 import AnalyticsAdvanced from '@/pages/analytics/AnalyticsAdvanced';
+import CustomersList from '@/pages/customers/CustomersList';
+import CustomerDetails from '@/pages/customers/CustomerDetails';
+import CustomerDocumentsPage from '@/pages/customers/CustomerDocumentsPage';
+import CustomerPortalAccess from '@/pages/customers/CustomerPortalAccess';
 
 // Define all routes at the top level
 const router = createBrowserRouter([
@@ -99,6 +104,24 @@ const router = createBrowserRouter([
   {
     path: "/customers",
     element: <Customers />,
+    children: [
+      {
+        path: "", // Root path for customers
+        element: <CustomersList />
+      },
+      {
+        path: ":id", // Customer details page
+        element: <CustomerDetails />
+      },
+      {
+        path: ":id/documents", // Customer documents page
+        element: <CustomerDocumentsPage />
+      },
+      {
+        path: ":id/portal", // Customer portal access page
+        element: <CustomerPortalAccess />
+      }
+    ]
   },
   {
     path: "/fleet",

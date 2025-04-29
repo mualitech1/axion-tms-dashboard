@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Customer } from '@/types/customer';
 import { customerData } from '@/data/customerMockData';
 import CustomerTable from '@/components/customers/CustomerTable';
@@ -50,6 +51,33 @@ export default function CustomersList() {
   
   return (
     <div className="space-y-6 animate-fade-in max-w-[1600px] mx-auto">
+      {/* Enhanced Header with Gradient */}
+      <motion.div 
+        initial={{ y: -20, opacity: 0 }} 
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-lg p-6 text-white shadow-lg mb-6"
+      >
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Customer Management</h1>
+            <p className="text-blue-100">Manage and track all your customer accounts</p>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              variant="secondary" 
+              className="bg-white/10 hover:bg-white/20"
+            >
+              <Filter className="h-4 w-4 mr-2" />
+              Advanced Filters
+            </Button>
+            <Button className="bg-white text-blue-700 hover:bg-blue-50">
+              Export Data
+            </Button>
+          </div>
+        </div>
+      </motion.div>
+
       <div className="grid grid-cols-1 gap-6">
         {/* Customer Alerts Enhanced Dashboard */}
         <CustomerAlertsDashboard customers={customers} />
