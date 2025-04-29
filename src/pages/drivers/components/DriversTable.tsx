@@ -3,9 +3,10 @@ import { Driver } from '../types/driverTypes';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { BellRing, Calendar, AlertTriangle, Eye, PhoneCall, Mail } from 'lucide-react';
+import { BellRing, Calendar, AlertTriangle, Eye, PhoneCall, Mail, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
+import { motion } from 'framer-motion';
 
 interface DriversTableProps {
   drivers: Driver[];
@@ -40,7 +41,22 @@ export default function DriversTable({ drivers }: DriversTableProps) {
       return <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20 flex items-center gap-1"><Calendar className="h-3 w-3" /> {daysLeft} days left</Badge>;
     }
     
-    return <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 flex items-center gap-1"><Calendar className="h-3 w-3" />{formatDistanceToNow(new Date(expiryDate))}</Badge>;
+    return <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 flex items-center gap-1"><Calendar className="h-3 w-3" />{formatDistanceToNow(new Date(expiryDate), { addSuffix: true })}</Badge>;
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+  
+  const rowVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 }
   };
 
   return (
@@ -57,15 +73,27 @@ export default function DriversTable({ drivers }: DriversTableProps) {
             <TableHead className="text-aximo-text font-semibold text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <motion.tbody
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           {drivers.length > 0 ? (
-            drivers.map((driver) => (
-              <TableRow 
-                key={driver.id} 
-                className="cursor-pointer hover:bg-aximo-darker/50 border-aximo-border"
+            drivers.map((driver, index) => (
+              <motion.tr 
+                key={driver.id}
+                variants={rowVariants}
+                className="group cursor-pointer hover:bg-aximo-darker/70 border-aximo-border"
                 onClick={() => navigate(`/drivers/${driver.id}`)}
               >
-                <TableCell className="font-medium text-aximo-text">{driver.name}</TableCell>
+                <TableCell className="font-medium p-3">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-aximo-primary/20 text-aximo-primary p-1.5 rounded-full">
+                      <User className="w-4 h-4" />
+                    </div>
+                    <span className="text-aximo-text">{driver.name}</span>
+                  </div>
+                </TableCell>
                 <TableCell>
                   <Badge variant="outline" className={`${getStatusColor(driver.status)}`}>
                     {driver.status}
@@ -90,29 +118,31 @@ export default function DriversTable({ drivers }: DriversTableProps) {
                   </div>
                 </TableCell>
                 <TableCell className="text-right space-x-1">
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-aximo-text" onClick={(e) => {
-                    e.stopPropagation();
-                    // Action to view driver details
-                  }}>
-                    <Eye className="h-4 w-4" />
-                    <span className="sr-only">View</span>
-                  </Button>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-aximo-text" onClick={(e) => {
-                    e.stopPropagation();
-                    // Action to call driver
-                  }}>
-                    <PhoneCall className="h-4 w-4" />
-                    <span className="sr-only">Call</span>
-                  </Button>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-aximo-text" onClick={(e) => {
-                    e.stopPropagation();
-                    // Action to email driver
-                  }}>
-                    <Mail className="h-4 w-4" />
-                    <span className="sr-only">Email</span>
-                  </Button>
+                  <div className="flex justify-end space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-aximo-text hover:bg-aximo-primary/10 hover:text-aximo-primary" onClick={(e) => {
+                      e.stopPropagation();
+                      // Action to view driver details
+                    }}>
+                      <Eye className="h-4 w-4" />
+                      <span className="sr-only">View</span>
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-aximo-text hover:bg-aximo-primary/10 hover:text-aximo-primary" onClick={(e) => {
+                      e.stopPropagation();
+                      // Action to call driver
+                    }}>
+                      <PhoneCall className="h-4 w-4" />
+                      <span className="sr-only">Call</span>
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-aximo-text hover:bg-aximo-primary/10 hover:text-aximo-primary" onClick={(e) => {
+                      e.stopPropagation();
+                      // Action to email driver
+                    }}>
+                      <Mail className="h-4 w-4" />
+                      <span className="sr-only">Email</span>
+                    </Button>
+                  </div>
                 </TableCell>
-              </TableRow>
+              </motion.tr>
             ))
           ) : (
             <TableRow className="border-aximo-border">
@@ -121,7 +151,7 @@ export default function DriversTable({ drivers }: DriversTableProps) {
               </TableCell>
             </TableRow>
           )}
-        </TableBody>
+        </motion.tbody>
       </Table>
     </div>
   );
