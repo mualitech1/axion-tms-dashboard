@@ -1,5 +1,7 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import MainLayout from '@/components/layout/MainLayout';
 import CarrierTable from './components/CarrierTable';
 import { CarrierFilters } from './components/filters/CarrierFilters';
@@ -13,12 +15,18 @@ import {
   UserCircle2,
   LineChart,
   Scale,
-  Radio
+  Radio,
+  Filter,
+  Download,
+  Search
 } from 'lucide-react';
+import CarrierOverview from './components/CarrierOverview';
+import FleetDistribution from './components/FleetDistribution';
+import UpcomingExpirations from './components/UpcomingExpirations';
 
 export default function CarriersPage() {
   const [filteredCarriers, setFilteredCarriers] = useState<Carrier[]>(carriers);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
   
   const handleFiltersChange = (filtered: Carrier[]) => {
@@ -39,9 +47,9 @@ export default function CarriersPage() {
     
     let filtered = [...carriers];
     
-    if (searchTerm) {
+    if (searchQuery) {
       filtered = filtered.filter(carrier => 
-        carrier.name.toLowerCase().includes(searchTerm.toLowerCase())
+        carrier.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
     
@@ -81,61 +89,93 @@ export default function CarriersPage() {
   };
 
   const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
+    setSearchQuery(value);
     handleFilterChange({});
   };
 
   return (
     <MainLayout title="Carrier Management">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Carriers</h1>
-        <div className="flex space-x-2">
-          <Link to="/carriers/portal">
-            <Button variant="outline" size="sm">
-              <UserCircle2 className="mr-2 h-4 w-4" />
-              Carrier Portal
-            </Button>
-          </Link>
-          <Link to="/carriers/reports">
-            <Button variant="outline" size="sm">
-              <LineChart className="mr-2 h-4 w-4" />
-              Reports
-            </Button>
-          </Link>
-          <Link to="/carriers/compliance">
-            <Button variant="outline" size="sm">
-              <Scale className="mr-2 h-4 w-4" />
-              Compliance
-            </Button>
-          </Link>
-          <Link to="/carriers/messaging">
-            <Button variant="outline" size="sm">
-              <MessageSquare className="mr-2 h-4 w-4" />
-              Messaging
-            </Button>
-          </Link>
-          <Link to="/carriers/broadcast">
-            <Button variant="outline" size="sm">
-              <Radio className="mr-2 h-4 w-4" />
-              Broadcast
-            </Button>
-          </Link>
-          <Link to="/carriers/register">
-            <Button size="sm">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Add Carrier
-            </Button>
-          </Link>
+      <motion.div 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        transition={{ duration: 0.5 }}
+        className="p-4 md:p-6 space-y-6"
+      >
+        {/* Enhanced Header Section */}
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg p-6 text-white shadow-lg">
+          <h1 className="text-3xl font-bold mb-2">Carrier Management</h1>
+          <p className="opacity-90">Organize, track and manage all your transport carriers and their compliance</p>
         </div>
-      </div>
-      
-      <div className="space-y-4">
+        
+        {/* Search and Action Bar */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-aximo-card rounded-lg p-4 shadow-sm border border-aximo-border">
+          <div className="relative flex-1 max-w-md">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <Search className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search carriers by name, region or fleet type..."
+              className="pl-10 px-4 py-2 border rounded-md w-full bg-aximo-darker border-aximo-border text-aximo-text focus:ring-1 focus:ring-aximo-primary focus:border-aximo-primary"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          
+          <div className="flex gap-2 flex-wrap sm:flex-nowrap">
+            <Button variant="outline" size="sm" className="flex items-center gap-1 bg-aximo-dark border-aximo-border text-aximo-text">
+              <Filter className="h-4 w-4" />
+              <span>Filter</span>
+            </Button>
+            <Button variant="outline" size="sm" className="flex items-center gap-1 bg-aximo-dark border-aximo-border text-aximo-text">
+              <FileText className="h-4 w-4" />
+              <span>Reports</span>
+            </Button>
+            <Button variant="outline" size="sm" className="flex items-center gap-1 bg-aximo-dark border-aximo-border text-aximo-text">
+              <Download className="h-4 w-4" />
+              <span>Export</span>
+            </Button>
+            <Link to="/carriers/register">
+              <Button size="sm" className="flex items-center gap-1 bg-aximo-primary text-white">
+                <PlusCircle className="h-4 w-4" />
+                <span>Add Carrier</span>
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        {/* KPIs and Alerts Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <CarrierOverview />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <FleetDistribution />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <UpcomingExpirations />
+          </motion.div>
+        </div>
+        
+        {/* Filters */}
         <CarrierFilters 
-          searchTerm={searchTerm}
+          searchTerm={searchQuery}
           onSearchChange={handleSearchChange}
           activeFiltersCount={activeFiltersCount}
           onFilterChange={handleFilterChange}
-          className=""
+          className="bg-aximo-card rounded-lg p-4 shadow-sm border border-aximo-border"
           regionOptions={[
             { id: "london", label: "London" },
             { id: "manchester", label: "Manchester" },
@@ -149,8 +189,39 @@ export default function CarriersPage() {
             { id: "bristol", label: "Bristol" }
           ]}
         />
-        <CarrierTable carriers={filteredCarriers} />
-      </div>
+
+        {/* Enhanced Carriers Table Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="bg-aximo-card rounded-lg shadow-sm border border-aximo-border overflow-hidden"
+        >
+          <CarrierTable carriers={filteredCarriers} />
+        </motion.div>
+        
+        {/* Quick Action Links */}
+        <div className="flex flex-wrap gap-2 justify-center mt-6">
+          <Link to="/carriers/compliance">
+            <Button variant="outline" size="sm" className="flex items-center gap-1 bg-aximo-dark border-aximo-border text-aximo-text-secondary">
+              <Scale className="h-4 w-4" />
+              <span>Compliance Dashboard</span>
+            </Button>
+          </Link>
+          <Link to="/carriers/reports">
+            <Button variant="outline" size="sm" className="flex items-center gap-1 bg-aximo-dark border-aximo-border text-aximo-text-secondary">
+              <LineChart className="h-4 w-4" />
+              <span>Performance Reports</span>
+            </Button>
+          </Link>
+          <Link to="/carriers/messaging">
+            <Button variant="outline" size="sm" className="flex items-center gap-1 bg-aximo-dark border-aximo-border text-aximo-text-secondary">
+              <MessageSquare className="h-4 w-4" />
+              <span>Message Carriers</span>
+            </Button>
+          </Link>
+        </div>
+      </motion.div>
     </MainLayout>
   );
 }

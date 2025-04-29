@@ -21,6 +21,14 @@ import PipelineReports from '@/pages/pipeline/PipelineReports';
 import Analytics from '@/pages/Analytics';
 import NotFound from '@/pages/NotFound';
 import CarrierReports from '@/pages/carriers/CarrierReports';
+import CarrierMessaging from '@/pages/carriers/CarrierMessaging';
+import CarrierRegistration from '@/pages/carriers/CarrierRegistration';
+import CarrierDetails from '@/pages/carriers/CarrierDetails';
+import CarrierCompliance from '@/pages/carriers/CarrierCompliance';
+import CarrierMatching from '@/pages/carriers/CarrierMatching';
+import BroadcastMessaging from '@/pages/carriers/BroadcastMessaging';
+import CarrierPortal from '@/pages/carriers/CarrierPortal';
+import CarrierPayments from '@/pages/carriers/CarrierPayments';
 import AnalyticsAdvanced from '@/pages/analytics/AnalyticsAdvanced';
 
 // Define all routes at the top level
@@ -34,7 +42,7 @@ const router = createBrowserRouter([
     element: <AuthPage />,
   },
   {
-    path: "/drivers",
+    path: "/drivers/*",  // Use wildcard to allow for nested routes
     element: <Drivers />,
   },
   {
@@ -46,7 +54,7 @@ const router = createBrowserRouter([
     element: <Jobs />,
   },
   {
-    path: "/carriers",
+    path: "/carriers/*",  // Use wildcard to allow for nested routes
     element: <Carriers />,
   },
   {
@@ -56,6 +64,38 @@ const router = createBrowserRouter([
   {
     path: "/carriers/reports",
     element: <CarrierReports />,
+  },
+  {
+    path: "/carriers/messaging",
+    element: <CarrierMessaging />,
+  },
+  {
+    path: "/carriers/register",
+    element: <CarrierRegistration />,
+  },
+  {
+    path: "/carriers/details/:id",
+    element: <CarrierDetails />,
+  },
+  {
+    path: "/carriers/compliance",
+    element: <CarrierCompliance />,
+  },
+  {
+    path: "/carriers/matching",
+    element: <CarrierMatching />,
+  },
+  {
+    path: "/carriers/broadcast",
+    element: <BroadcastMessaging />,
+  },
+  {
+    path: "/carriers/portal",
+    element: <CarrierPortal />,
+  },
+  {
+    path: "/carriers/payments",
+    element: <CarrierPayments />,
   },
   {
     path: "/customers",
