@@ -1,18 +1,18 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Star, 
   AlertCircle, 
   CheckCircle, 
   Truck,
-  MoreHorizontal,
   Eye,
   PhoneCall,
-  Mail
+  Mail,
+  User
 } from 'lucide-react';
-import { Carrier, capabilityIcons, capabilityLabels } from '../data/carrierData';
+import { Carrier } from '../data/types/carrierTypes';
 import { 
   Table, 
   TableHeader, 
@@ -24,19 +24,13 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 interface CarrierTableProps {
   carriers: Carrier[];
 }
 
 export default function CarrierTable({ carriers }: CarrierTableProps) {
+  const navigate = useNavigate();
   const [favorites, setFavorites] = useState<number[]>([]);
   
   const toggleFavorite = (id: number) => {
@@ -69,14 +63,19 @@ export default function CarrierTable({ carriers }: CarrierTableProps) {
     }
   };
 
-  const tableRowVariants = {
+  const containerVariants = {
     hidden: { opacity: 0 },
-    visible: (i: number) => ({
+    visible: {
       opacity: 1,
       transition: {
-        delay: i * 0.05,
-      },
-    }),
+        staggerChildren: 0.1
+      }
+    }
+  };
+  
+  const rowVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 }
   };
 
   return (
@@ -94,17 +93,18 @@ export default function CarrierTable({ carriers }: CarrierTableProps) {
             <TableHead className="text-aximo-text font-semibold text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <motion.tbody
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           {carriers.length > 0 ? (
             carriers.map((carrier, i) => (
               <motion.tr
                 key={carrier.id}
-                className="cursor-pointer hover:bg-aximo-darker/50 border-aximo-border"
-                custom={i}
-                initial="hidden"
-                animate="visible"
-                variants={tableRowVariants}
-                onClick={() => window.location.href = `/carriers/details/${carrier.id}`}
+                variants={rowVariants}
+                className="group cursor-pointer hover:bg-aximo-darker/50 border-aximo-border"
+                onClick={() => navigate(`/carriers/details/${carrier.id}`)}
               >
                 <TableCell className="w-10">
                   <Button 
@@ -119,23 +119,28 @@ export default function CarrierTable({ carriers }: CarrierTableProps) {
                     <Star className={carrier.favorite ? "fill-yellow-400 text-yellow-400" : "text-aximo-text-secondary"} size={16} />
                   </Button>
                 </TableCell>
-                <TableCell className="font-medium text-aximo-text">
-                  {carrier.name}
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-indigo-600/20 text-indigo-600 p-1.5 rounded-full">
+                      <User className="w-4 h-4" />
+                    </div>
+                    <span className="text-aximo-text">{carrier.name}</span>
+                  </div>
                 </TableCell>
                 <TableCell className="text-aximo-text">{carrier.region}</TableCell>
                 <TableCell className="text-aximo-text">{carrier.fleet}</TableCell>
                 <TableCell>
                   <div className="flex gap-1 flex-wrap">
                     <TooltipProvider>
-                      {carrier.capabilities.slice(0, 3).map((capability) => (
-                        <Tooltip key={capability}>
+                      {carrier.capabilities.slice(0, 3).map((capability, idx) => (
+                        <Tooltip key={`${carrier.id}-${capability}-${idx}`}>
                           <TooltipTrigger asChild>
                             <div className="inline-flex items-center justify-center w-7 h-7 bg-aximo-darker rounded-md text-aximo-text">
-                              {capabilityIcons[capability] || <Truck size={16} />}
+                              <Truck size={16} />
                             </div>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>{capabilityLabels[capability] || capability}</p>
+                            <p>{capability}</p>
                           </TooltipContent>
                         </Tooltip>
                       ))}
@@ -149,10 +154,10 @@ export default function CarrierTable({ carriers }: CarrierTableProps) {
                           </TooltipTrigger>
                           <TooltipContent>
                             <div className="space-y-1">
-                              {carrier.capabilities.slice(3).map((capability) => (
-                                <p key={capability} className="flex items-center gap-2">
-                                  {capabilityIcons[capability] || <Truck size={16} />}
-                                  {capabilityLabels[capability] || capability}
+                              {carrier.capabilities.slice(3).map((capability, idx) => (
+                                <p key={`${carrier.id}-${capability}-extra-${idx}`} className="flex items-center gap-2">
+                                  <Truck size={16} />
+                                  {capability}
                                 </p>
                               ))}
                             </div>
@@ -183,27 +188,29 @@ export default function CarrierTable({ carriers }: CarrierTableProps) {
                   </div>
                 </TableCell>
                 <TableCell className="text-right space-x-1">
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-aximo-text" onClick={(e) => {
-                    e.stopPropagation();
-                    window.location.href = `/carriers/details/${carrier.id}`;
-                  }}>
-                    <Eye className="h-4 w-4" />
-                    <span className="sr-only">View</span>
-                  </Button>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-aximo-text" onClick={(e) => {
-                    e.stopPropagation();
-                    // Action to call carrier
-                  }}>
-                    <PhoneCall className="h-4 w-4" />
-                    <span className="sr-only">Call</span>
-                  </Button>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-aximo-text" onClick={(e) => {
-                    e.stopPropagation();
-                    // Action to email carrier
-                  }}>
-                    <Mail className="h-4 w-4" />
-                    <span className="sr-only">Email</span>
-                  </Button>
+                  <div className="flex justify-end space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-aximo-text hover:bg-indigo-600/10 hover:text-indigo-600" onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/carriers/details/${carrier.id}`);
+                    }}>
+                      <Eye className="h-4 w-4" />
+                      <span className="sr-only">View</span>
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-aximo-text hover:bg-indigo-600/10 hover:text-indigo-600" onClick={(e) => {
+                      e.stopPropagation();
+                      // Action to call carrier
+                    }}>
+                      <PhoneCall className="h-4 w-4" />
+                      <span className="sr-only">Call</span>
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-aximo-text hover:bg-indigo-600/10 hover:text-indigo-600" onClick={(e) => {
+                      e.stopPropagation();
+                      // Action to email carrier
+                    }}>
+                      <Mail className="h-4 w-4" />
+                      <span className="sr-only">Email</span>
+                    </Button>
+                  </div>
                 </TableCell>
               </motion.tr>
             ))
@@ -218,7 +225,7 @@ export default function CarrierTable({ carriers }: CarrierTableProps) {
               </TableCell>
             </TableRow>
           )}
-        </TableBody>
+        </motion.tbody>
       </Table>
     </div>
   );
