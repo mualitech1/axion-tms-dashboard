@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Customer } from '@/types/customer';
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Customers() {
   const { toast } = useToast();
