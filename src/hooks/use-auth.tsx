@@ -1,3 +1,4 @@
+
 import { useEffect, useState, createContext, useContext } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -193,7 +194,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email, 
         password,
         options: {
-          // Pass the CSRF token in the session data
+          captchaToken: undefined,  // Optional captcha token if needed
           data: {
             csrf_token: csrfToken
           }
