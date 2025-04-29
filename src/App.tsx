@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AuthProvider } from '@/hooks/use-auth';
@@ -22,11 +21,11 @@ import Analytics from '@/pages/Analytics';
 import NotFound from '@/pages/NotFound';
 import CarrierReports from '@/pages/carriers/CarrierReports';
 import CarrierMessaging from '@/pages/carriers/CarrierMessaging';
+import BroadcastMessaging from '@/pages/carriers/BroadcastMessaging';
 import CarrierRegistration from '@/pages/carriers/CarrierRegistration';
 import CarrierDetails from '@/pages/carriers/CarrierDetails';
 import CarrierCompliance from '@/pages/carriers/CarrierCompliance';
 import CarrierMatching from '@/pages/carriers/CarrierMatching';
-import BroadcastMessaging from '@/pages/carriers/BroadcastMessaging';
 import CarrierPortal from '@/pages/carriers/CarrierPortal';
 import CarrierPayments from '@/pages/carriers/CarrierPayments';
 import AnalyticsAdvanced from '@/pages/analytics/AnalyticsAdvanced';
