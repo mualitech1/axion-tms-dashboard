@@ -1,7 +1,8 @@
 
 import { Card } from '@/components/ui/card';
 import { drivers } from '../data/driverData';
-import { ArrowUpIcon, ArrowDownIcon, BriefcaseIcon, TruckIcon } from 'lucide-react';
+import { ArrowUpIcon, ArrowDownIcon, BriefcaseIcon, TruckIcon, Activity, Fuel, Shield, Star } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function DriverKPIOverview() {
   // Calculate average KPIs
@@ -20,75 +21,148 @@ export default function DriverKPIOverview() {
     (a.kpi.onTimeDeliveries + a.kpi.fuelEfficiency + a.kpi.safetyScore + a.kpi.customerSatisfaction)
   )[0];
 
+  const kpiItems = [
+    {
+      label: "On-time Delivery",
+      value: averageKPIs.onTimeDeliveries,
+      icon: Activity,
+      color: "text-blue-500",
+      bgColor: "bg-blue-500/10",
+      borderColor: "border-blue-500/20",
+      change: 2,
+      positive: true
+    },
+    {
+      label: "Fuel Efficiency",
+      value: averageKPIs.fuelEfficiency,
+      icon: Fuel,
+      color: "text-green-500",
+      bgColor: "bg-green-500/10",
+      borderColor: "border-green-500/20",
+      change: 1,
+      positive: true
+    },
+    {
+      label: "Safety Score",
+      value: averageKPIs.safetyScore,
+      icon: Shield,
+      color: "text-amber-500",
+      bgColor: "bg-amber-500/10",
+      borderColor: "border-amber-500/20",
+      change: 0.5,
+      positive: false
+    },
+    {
+      label: "Customer Rating",
+      value: averageKPIs.customerSatisfaction,
+      icon: Star,
+      color: "text-purple-500",
+      bgColor: "bg-purple-500/10",
+      borderColor: "border-purple-500/20",
+      change: 3,
+      positive: true
+    }
+  ];
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.1, duration: 0.5 }
+    })
+  };
+
   return (
-    <Card className="col-span-1 md:col-span-2 p-5">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">Driver Performance KPIs</h3>
-        <span className="text-xs text-muted-foreground">{activeDrivers.length} active drivers</span>
+    <Card className="col-span-1 md:col-span-2 bg-aximo-card border-aximo-border shadow-aximo p-5">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-full bg-aximo-primary/20 text-aximo-primary">
+            <Activity className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-aximo-text">Driver Performance</h3>
+            <p className="text-sm text-aximo-text-secondary">{activeDrivers.length} active drivers</p>
+          </div>
+        </div>
       </div>
       
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="p-4 bg-blue-50 rounded-lg">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-blue-600">On-time Delivery</span>
-            <span className="flex items-center text-xs text-green-600">
-              <ArrowUpIcon className="h-3 w-3 mr-1" />
-              2%
-            </span>
-          </div>
-          <p className="text-2xl font-semibold">{averageKPIs.onTimeDeliveries.toFixed(1)}%</p>
-        </div>
-        
-        <div className="p-4 bg-green-50 rounded-lg">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-green-600">Fuel Efficiency</span>
-            <span className="flex items-center text-xs text-green-600">
-              <ArrowUpIcon className="h-3 w-3 mr-1" />
-              1%
-            </span>
-          </div>
-          <p className="text-2xl font-semibold">{averageKPIs.fuelEfficiency.toFixed(1)}%</p>
-        </div>
-        
-        <div className="p-4 bg-amber-50 rounded-lg">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-amber-600">Safety Score</span>
-            <span className="flex items-center text-xs text-red-600">
-              <ArrowDownIcon className="h-3 w-3 mr-1" />
-              0.5%
-            </span>
-          </div>
-          <p className="text-2xl font-semibold">{averageKPIs.safetyScore.toFixed(1)}%</p>
-        </div>
-        
-        <div className="p-4 bg-purple-50 rounded-lg">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-purple-600">Customer Rating</span>
-            <span className="flex items-center text-xs text-green-600">
-              <ArrowUpIcon className="h-3 w-3 mr-1" />
-              3%
-            </span>
-          </div>
-          <p className="text-2xl font-semibold">{averageKPIs.customerSatisfaction.toFixed(1)}%</p>
-        </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        {kpiItems.map((item, index) => (
+          <motion.div
+            key={item.label}
+            custom={index}
+            initial="hidden"
+            animate="visible"
+            variants={cardVariants}
+            className={`p-4 rounded-lg border ${item.borderColor} ${item.bgColor}`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className={`text-xs font-medium ${item.color}`}>{item.label}</span>
+              <span className={`flex items-center text-xs ${item.positive ? 'text-green-500' : 'text-red-500'}`}>
+                {item.positive ? (
+                  <ArrowUpIcon className="h-3 w-3 mr-1" />
+                ) : (
+                  <ArrowDownIcon className="h-3 w-3 mr-1" />
+                )}
+                {item.change}%
+              </span>
+            </div>
+            <div className="flex items-baseline gap-1">
+              <p className="text-2xl font-bold text-aximo-text">{item.value.toFixed(1)}</p>
+              <span className="text-xs text-aximo-text-secondary">%</span>
+            </div>
+            <div className="mt-2 h-1.5 w-full bg-aximo-darker rounded-full overflow-hidden">
+              <div 
+                className={`h-full ${
+                  item.value > 90 ? 'bg-green-500' : 
+                  item.value > 80 ? 'bg-amber-500' : 
+                  'bg-red-500'
+                }`}
+                style={{ width: `${item.value}%` }}
+              ></div>
+            </div>
+          </motion.div>
+        ))}
       </div>
       
       {bestDriver && (
-        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-          <h4 className="text-sm font-medium mb-2">Top Performing Driver</h4>
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <BriefcaseIcon className="h-5 w-5 text-blue-600" />
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="bg-gradient-to-r from-aximo-primary/20 to-aximo-light/10 rounded-lg p-4 border border-aximo-primary/20 backdrop-blur-sm"
+        >
+          <h4 className="text-sm font-medium mb-3 text-aximo-text">Top Performing Driver</h4>
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-full bg-aximo-primary/30 flex items-center justify-center">
+              <BriefcaseIcon className="h-6 w-6 text-aximo-primary" />
             </div>
-            <div>
-              <p className="text-sm font-medium">{bestDriver.name}</p>
-              <p className="text-xs text-muted-foreground">
-                Avg Score: {((bestDriver.kpi.onTimeDeliveries + bestDriver.kpi.fuelEfficiency + 
-                bestDriver.kpi.safetyScore + bestDriver.kpi.customerSatisfaction) / 4).toFixed(1)}%
-              </p>
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <p className="text-base font-medium text-aximo-text">{bestDriver.name}</p>
+                <div className="px-2 py-0.5 rounded-full bg-aximo-primary/20 text-aximo-primary text-xs font-medium">
+                  Star Driver
+                </div>
+              </div>
+              <div className="mt-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-aximo-text-secondary">Performance Score</span>
+                  <span className="font-medium text-aximo-text">{((bestDriver.kpi.onTimeDeliveries + 
+                    bestDriver.kpi.fuelEfficiency + bestDriver.kpi.safetyScore + 
+                    bestDriver.kpi.customerSatisfaction) / 4).toFixed(1)}%</span>
+                </div>
+                <div className="mt-1.5 h-1.5 w-full bg-aximo-darker rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-aximo-primary"
+                    style={{ width: `${((bestDriver.kpi.onTimeDeliveries + bestDriver.kpi.fuelEfficiency + 
+                      bestDriver.kpi.safetyScore + bestDriver.kpi.customerSatisfaction) / 4)}%` }}
+                  ></div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
     </Card>
   );
