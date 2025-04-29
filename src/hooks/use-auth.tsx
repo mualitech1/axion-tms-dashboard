@@ -1,3 +1,4 @@
+
 import { useEffect, useState, createContext, useContext } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -189,18 +190,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Add CSRF token to the auth request options
       const csrfToken = getCSRFToken();
       
-      // Fixed: The data property should be inside the options object
+      // Fixed: Use the correct structure for signInWithPassword parameters
       const { error, data } = await supabase.auth.signInWithPassword({ 
         email, 
         password,
         options: {
           captchaToken: undefined,  // Optional captcha token if needed
-          // Set CSRF token in the user metadata  
+        }
+      });
+      
+      // If login is successful, update user metadata with CSRF token separately
+      if (!error && data?.user) {
+        await supabase.auth.updateUser({
           data: {
             csrf_token: csrfToken
           }
-        }
-      });
+        });
+      }
       
       if (error) {
         console.error('Sign in error:', error.message);
