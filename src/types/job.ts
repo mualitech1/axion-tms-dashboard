@@ -25,7 +25,7 @@ export interface JobLocation {
 
 // Hauler/carrier info 
 export interface JobHauler {
-  id: number | string;
+  id: string | number;
   name: string;
   contactPhone?: string;
   email?: string;
@@ -33,7 +33,7 @@ export interface JobHauler {
 
 // Consolidated Job interface
 export interface Job {
-  id: number | string;
+  id: string | number;
   title: string;
   client: string;
   date: string;

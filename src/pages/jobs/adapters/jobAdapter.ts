@@ -1,19 +1,23 @@
 
 import { Job as DatabaseJob } from '@/types/database';
-import { Job } from '@/types/job';
+import { Job, JobLocation } from '@/types/job';
 
 /**
  * Converts a database job object to the format expected by the Jobs UI components
  */
 export function adaptDatabaseJobToJobType(dbJob: DatabaseJob): Job {
+  // Ensure pickup_location and delivery_location are properly handled
+  const pickupLocation = dbJob.pickup_location || {};
+  const deliveryLocation = dbJob.delivery_location || {};
+  
   return {
     id: dbJob.id,
     title: dbJob.title,
     client: dbJob.customer?.name || 'Unassigned',
     date: dbJob.pickup_date,
     time: new Date(dbJob.pickup_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    origin: dbJob.pickup_location?.city || '',
-    destination: dbJob.delivery_location?.city || '',
+    origin: typeof pickupLocation === 'object' && pickupLocation.city ? pickupLocation.city : 'Unknown',
+    destination: typeof deliveryLocation === 'object' && deliveryLocation.city ? deliveryLocation.city : 'Unknown',
     vehicle: dbJob.vehicle ? `${dbJob.vehicle.make} ${dbJob.vehicle.model}` : 'Unassigned',
     status: dbJob.status as any,
     priority: (dbJob.priority || 'medium') as any,
@@ -46,7 +50,7 @@ export function adaptDatabaseJobsToJobTypes(dbJobs: DatabaseJob[] | undefined): 
  * Converts a UI job type back to database format for saving
  */
 export function adaptJobTypeToDatabase(job: Partial<Job>): Partial<DatabaseJob> {
-  // This is a simplified conversion, add more fields as needed
+  // Define minimum required fields for job creation
   const dbJob: Partial<DatabaseJob> = {
     title: job.title,
     status: job.status,
@@ -57,7 +61,11 @@ export function adaptJobTypeToDatabase(job: Partial<Job>): Partial<DatabaseJob> 
     estimated_duration: job.estimatedDuration,
     pod_uploaded: job.podUploaded,
     pod_document_id: job.podDocumentId,
-    issue_details: job.issueDetails
+    issue_details: job.issueDetails,
+    // Default values for required fields
+    pickup_date: new Date().toISOString(),
+    pickup_location: { address: '', city: '', postcode: '', country: '' },
+    delivery_location: { address: '', city: '', postcode: '', country: '' }
   };
   
   return dbJob;

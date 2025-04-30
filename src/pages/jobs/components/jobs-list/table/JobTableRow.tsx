@@ -8,7 +8,7 @@ import { Job } from "../../../types/jobTypes";
 
 interface JobTableRowProps {
   job: Job;
-  onRowClick: (id: number) => void;
+  onRowClick: (id: number | string) => void;
 }
 
 export function JobTableRow({ job, onRowClick }: JobTableRowProps) {

@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Job, JobLocation } from '@/types/job';
 import { useToast } from '@/hooks/use-toast';
 import { getErrorMessage } from '@/utils/error-handler';
-import { adaptDatabaseJobsToJobTypes } from '@/pages/jobs/adapters/jobAdapter';
+import { adaptDatabaseJobsToJobTypes, adaptJobTypeToDatabase } from '@/pages/jobs/adapters/jobAdapter';
 
 // Hook for fetching all jobs with filters
 export function useJobs(filters?: Record<string, any>) {
@@ -66,15 +66,8 @@ export function useJobs(filters?: Record<string, any>) {
   const createJob = useMutation({
     mutationFn: async (jobData: Omit<Job, 'id' | 'createdAt'>) => {
       try {
-        // Transform the job data for the database
-        const supabaseJob = {
-          title: jobData.title,
-          reference: jobData.reference || `JOB-${Date.now()}`,
-          status: jobData.status || 'booked',
-          priority: jobData.priority || 'medium',
-          // Map other fields as needed
-          // This is a simplified example
-        };
+        // Transform the job data for the database using our adapter
+        const supabaseJob = adaptJobTypeToDatabase(jobData);
 
         const { data, error } = await supabase
           .from('jobs')
@@ -107,12 +100,16 @@ export function useJobs(filters?: Record<string, any>) {
 
   // Job mutation for updating a job
   const updateJob = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Job> & { id: number | string }) => {
+    mutationFn: async ({ id, ...updates }: Partial<Job> & { id: string | number }) => {
       try {
+        // Convert id to string for Supabase
+        const jobId = id.toString();
+        const supabaseUpdates = adaptJobTypeToDatabase(updates);
+
         const { data, error } = await supabase
           .from('jobs')
-          .update(updates)
-          .eq('id', id)
+          .update(supabaseUpdates)
+          .eq('id', jobId)
           .select()
           .single();
 
@@ -141,12 +138,15 @@ export function useJobs(filters?: Record<string, any>) {
 
   // Job mutation for deleting a job
   const deleteJob = useMutation({
-    mutationFn: async (id: number | string) => {
+    mutationFn: async (id: string | number) => {
       try {
+        // Convert id to string for Supabase
+        const jobId = id.toString();
+        
         const { error } = await supabase
           .from('jobs')
           .delete()
-          .eq('id', id);
+          .eq('id', jobId);
 
         if (error) throw error;
       } catch (error) {
@@ -182,7 +182,7 @@ export function useJobs(filters?: Record<string, any>) {
 }
 
 // Hook for fetching a specific job by ID
-export function useJob(id?: number | string) {
+export function useJob(id?: string | number) {
   const { toast } = useToast();
   const enabled = id !== undefined;
   
@@ -196,6 +196,9 @@ export function useJob(id?: number | string) {
       if (!id) return null;
       
       try {
+        // Convert id to string for Supabase
+        const jobId = id.toString();
+        
         const { data, error } = await supabase
           .from('jobs')
           .select(`
@@ -205,13 +208,13 @@ export function useJob(id?: number | string) {
             vehicle:vehicles(*),
             driver:drivers(*)
           `)
-          .eq('id', id)
+          .eq('id', jobId)
           .single();
 
         if (error) throw error;
         
-        // Transform to our Job type
-        return adaptDatabaseJobsToJobTypes([data])[0];
+        // Transform to our Job type using the adapter
+        return data ? adaptDatabaseJobToJobType(data) : null;
       } catch (error) {
         console.error(`Error fetching job with ID ${id}:`, error);
         throw new Error(getErrorMessage(error));

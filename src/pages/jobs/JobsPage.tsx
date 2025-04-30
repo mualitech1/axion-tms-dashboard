@@ -31,8 +31,16 @@ export default function JobsPage() {
     refetch();
   };
   
+  // Convert our jobs to the format expected by JobsList
+  const jobsForList = jobs?.map(job => ({
+    ...job,
+    id: typeof job.id === 'string' ? parseInt(job.id, 10) || job.id : job.id
+  })) || [];
+  
   // Filter jobs based on tab selection (fallback for when we're not using API filtering)
-  const filteredJobs = currentTab === 'all' ? jobs : jobs?.filter(job => job.status === currentTab);
+  const filteredJobs = currentTab === 'all' 
+    ? jobsForList 
+    : jobsForList.filter(job => job.status === currentTab);
 
   return (
     <MainLayout title="Jobs Management">
@@ -90,12 +98,12 @@ export default function JobsPage() {
             </div>
             
             <TabsContent value="all" className="p-4">
-              <JobsList jobs={filteredJobs || []} isLoading={isLoading} />
+              <JobsList jobs={filteredJobs} isLoading={isLoading} />
             </TabsContent>
             
             {['booked', 'in-progress', 'completed', 'issues'].map((status) => (
               <TabsContent key={status} value={status} className="p-4">
-                <JobsList jobs={filteredJobs || []} isLoading={isLoading} />
+                <JobsList jobs={filteredJobs} isLoading={isLoading} />
               </TabsContent>
             ))}
           </Tabs>

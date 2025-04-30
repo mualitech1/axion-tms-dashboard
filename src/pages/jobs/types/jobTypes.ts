@@ -11,7 +11,7 @@ export type JobStatus =
   | "issues";
 
 export interface Job {
-  id: number;
+  id: string | number;
   title: string;
   client: string;
   date: string;
@@ -22,7 +22,7 @@ export interface Job {
   status: JobStatus;
   priority: "low" | "medium" | "high";
   hauler?: {
-    id: number;
+    id: string | number;
     name: string;
     contactPhone?: string;
     email?: string;
