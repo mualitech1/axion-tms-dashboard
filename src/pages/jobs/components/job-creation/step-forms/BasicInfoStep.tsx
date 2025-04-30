@@ -19,9 +19,9 @@ interface BasicInfoStepProps {
 
 export function BasicInfoStep({ form, date, setDate, onDocumentsChange }: BasicInfoStepProps) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <motion.div 
-        className="space-y-8"
+        className="space-y-6"
         initial="hidden"
         animate="visible"
         variants={{
@@ -46,19 +46,19 @@ export function BasicInfoStep({ form, date, setDate, onDocumentsChange }: BasicI
             Schedule & Priority
           </h3>
           <DateRateFields form={form} date={date} setDate={setDate} />
-          <div className="mt-6">
+          <div className="mt-5">
             <PrioritySelection form={form} />
           </div>
         </div>
       </motion.div>
       
       <motion.div
-        className="pt-5 border-t border-[#1a3246]"
+        className="pt-4 border-t border-[#1a3246]"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, duration: 0.5 }}
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3">
           <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider">
             Documents
           </FormLabel>
@@ -68,6 +68,8 @@ export function BasicInfoStep({ form, date, setDate, onDocumentsChange }: BasicI
           </div>
         </div>
         <FileUploader onFilesChange={onDocumentsChange} />
+        {/* Spacer div to ensure content doesn't get cut off when scrolling */}
+        <div className="h-2"></div>
       </motion.div>
     </div>
   );

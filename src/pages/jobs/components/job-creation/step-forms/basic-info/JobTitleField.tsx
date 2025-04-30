@@ -15,7 +15,7 @@ export function JobTitleField({ form }: JobTitleFieldProps) {
       hidden: { opacity: 0, y: 20 },
       visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
     }}
-    className="mb-6"
+    className="mb-5"
     >
       <FormField
         control={form.control}

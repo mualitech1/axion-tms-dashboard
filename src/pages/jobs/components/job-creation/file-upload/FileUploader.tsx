@@ -66,14 +66,14 @@ export function FileUploader({ onFilesChange }: FileUploaderProps) {
     <div className="space-y-4">
       <div 
         {...getRootProps()} 
-        className={`relative border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center min-h-[180px] transition-all duration-300 ${
+        className={`relative border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center min-h-[150px] transition-all duration-300 ${
           isDragActive ? 'border-[#0adeee] bg-[#0a9bdb]/10' : 'border-[#1a3246] hover:border-[#0a9bdb]/60'
         }`}
       >
         <input {...getInputProps()} />
         <div className="flex flex-col items-center justify-center gap-2 text-center">
-          <div className="w-14 h-14 rounded-full bg-[#0a9bdb]/10 flex items-center justify-center mb-2">
-            <Upload className="h-6 w-6 text-[#0adeee]" />
+          <div className="w-12 h-12 rounded-full bg-[#0a9bdb]/10 flex items-center justify-center mb-1">
+            <Upload className="h-5 w-5 text-[#0adeee]" />
           </div>
           <p className="text-sm font-medium text-white">
             {isDragActive ? 'Drop files here' : 'Drag & drop or click to upload'}
@@ -85,7 +85,7 @@ export function FileUploader({ onFilesChange }: FileUploaderProps) {
             type="button" 
             variant="outline" 
             size="sm" 
-            className="mt-2 border-[#1a3246] bg-[#081427] text-[#0adeee] hover:bg-[#0c1e3a] hover:text-white"
+            className="mt-1 border-[#1a3246] bg-[#081427] text-[#0adeee] hover:bg-[#0c1e3a] hover:text-white"
           >
             Browse Files
           </Button>
@@ -107,13 +107,13 @@ export function FileUploader({ onFilesChange }: FileUploaderProps) {
       <AnimatePresence>
         {files.length > 0 && (
           <motion.div 
-            className="space-y-2"
+            className="space-y-2 mb-4"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
           >
             <p className="text-sm font-medium text-[#0adeee]">Uploaded Documents</p>
-            <ul className="border rounded-md divide-y divide-[#1a3246] border-[#1a3246] bg-[#081427]">
+            <ul className="border rounded-md divide-y divide-[#1a3246] border-[#1a3246] bg-[#081427] max-h-[200px] overflow-y-auto">
               {files.map((file, index) => (
                 <motion.li 
                   key={`${file.name}-${index}`}

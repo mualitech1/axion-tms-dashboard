@@ -60,8 +60,8 @@ export function FormContent({
   onSubmit
 }: FormContentProps) {
   const isMobile = useIsMobile();
-  // Adjusting the max height to ensure the form is always scrollable
-  const scrollMaxHeight = isMobile ? "calc(65vh)" : "calc(70vh)";
+  // Adjusting the max height to ensure the form is always scrollable but not too large
+  const scrollMaxHeight = isMobile ? "calc(58vh)" : "calc(60vh)";
   const [direction, setDirection] = React.useState(0);
 
   // Set direction based on step change
@@ -117,9 +117,9 @@ export function FormContent({
     <Form {...form}>
       <form 
         onSubmit={form.handleSubmit(onSubmit)} 
-        className="space-y-4 sm:space-y-6"
+        className="space-y-4 sm:space-y-6 flex flex-col h-full"
       >
-        <div className="bg-[#05101b] rounded-lg shadow-lg border border-[#1a3246] overflow-hidden">
+        <div className="bg-[#05101b] rounded-lg shadow-lg border border-[#1a3246] flex-grow overflow-hidden">
           <ScrollArea 
             className="p-4 sm:p-6" 
             style={{ 
@@ -160,14 +160,17 @@ export function FormContent({
           </ScrollArea>
         </div>
         
-        <NavigationButtons 
-          currentStep={currentStep}
-          totalSteps={totalSteps}
-          isSubmitting={form.formState.isSubmitting}
-          prevStep={handlePrev}
-          nextStep={handleNext}
-          onCancel={onCancel}
-        />
+        {/* Navigation buttons - positioned outside of ScrollArea */}
+        <div className="mt-4 pb-2 px-1">
+          <NavigationButtons 
+            currentStep={currentStep}
+            totalSteps={totalSteps}
+            isSubmitting={form.formState.isSubmitting}
+            prevStep={handlePrev}
+            nextStep={handleNext}
+            onCancel={onCancel}
+          />
+        </div>
       </form>
     </Form>
   );

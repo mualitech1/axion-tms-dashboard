@@ -41,7 +41,7 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
   ) : (
     <Dialog open={true} onOpenChange={onComplete}>
       <DialogContent 
-        className="w-full max-w-4xl p-0 bg-[#030619] border-[#1a3246] h-auto max-h-[90vh] overflow-hidden rounded-xl"
+        className="w-full max-w-4xl p-0 bg-[#030619] border-[#1a3246] max-h-[90vh] overflow-hidden rounded-xl flex flex-col"
         onInteractOutside={(e) => e.preventDefault()}
         aria-describedby="job-creation-description"
       >

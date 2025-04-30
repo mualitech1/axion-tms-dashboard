@@ -11,7 +11,7 @@ interface ProductWeightFieldsProps {
 
 export function ProductWeightFields({ form }: ProductWeightFieldsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
       <motion.div variants={{
         hidden: { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0, transition: { delay: 0.3, duration: 0.5, ease: "easeOut" } }

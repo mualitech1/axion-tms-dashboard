@@ -40,7 +40,7 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
 
   return (
     <>
-      <CardHeader className="p-0 sticky top-0 z-10">
+      <CardHeader className="p-0 z-10">
         <div className="bg-gradient-to-r from-[#051b2a] to-[#081830] border-b border-[#1a3246]">
           <motion.div 
             className="px-5 py-4"
@@ -67,7 +67,7 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
         </div>
       </CardHeader>
       
-      <CardContent className="p-4 sm:p-6 bg-[#030619]">
+      <CardContent className="p-4 sm:p-6 bg-[#030619] flex flex-col h-[calc(100%-70px)]">
         <FormContent 
           form={form}
           currentStep={currentStep}
