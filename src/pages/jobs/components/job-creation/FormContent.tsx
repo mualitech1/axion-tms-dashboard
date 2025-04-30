@@ -137,8 +137,24 @@ export function FormContent({
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="pb-4 sm:pb-6"
               >
-                {renderCurrentStep()}
+                <div className="relative">
+                  <motion.div
+                    initial={{ opacity: 0.3 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.1, duration: 0.4 }}
+                  >
+                    {renderCurrentStep()}
+                  </motion.div>
+                  
+                  {/* Step indicator */}
+                  <div className="absolute right-0 top-0">
+                    <div className="bg-[#0a9bdb]/10 text-[#0adeee] text-xs font-mono px-2.5 py-1 rounded-md border border-[#1a3246]">
+                      Step {currentStep} of {totalSteps}
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             </AnimatePresence>
           </ScrollArea>

@@ -24,7 +24,7 @@ export function DateRateFields({ form, date, setDate }: DateRateFieldsProps) {
         visible: { opacity: 1, y: 0, transition: { delay: 0.5, duration: 0.5, ease: "easeOut" } }
       }}>
         <FormItem>
-          <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider flex items-center">
+          <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider flex items-center mb-2">
             Pickup Date <span className="text-red-400 ml-1">*</span>
           </FormLabel>
           <Popover>
@@ -33,7 +33,7 @@ export function DateRateFields({ form, date, setDate }: DateRateFieldsProps) {
                 <Button
                   variant={"outline"}
                   className={cn(
-                    "w-full pl-10 relative text-left font-normal h-11 border-[#1a3246] bg-[#05101b] hover:bg-[#162233]",
+                    "w-full pl-10 relative text-left font-normal h-11 border-[#1a3246] bg-[#05101b] hover:bg-[#162233] rounded-md",
                     !date && "text-[#6b82a6]"
                   )}
                 >
@@ -64,7 +64,7 @@ export function DateRateFields({ form, date, setDate }: DateRateFieldsProps) {
           name="rate"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider">
+              <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider mb-2">
                 Rate (£)
               </FormLabel>
               <FormControl>
@@ -75,7 +75,7 @@ export function DateRateFields({ form, date, setDate }: DateRateFieldsProps) {
                     step="0.01"
                     placeholder="Enter rate" 
                     {...field} 
-                    className="pl-10 bg-[#05101b] border-[#1a3246] focus:border-[#0a9bdb] focus:ring-[#0a9bdb]/20 h-11 text-white placeholder:text-[#6b82a6]" 
+                    className="pl-10 bg-[#05101b] border-[#1a3246] focus:border-[#0a9bdb] focus:ring-[#0a9bdb]/20 h-11 text-white placeholder:text-[#6b82a6] rounded-md" 
                   />
                   <DollarSign className="absolute left-3 top-3 h-5 w-5 text-[#0a9bdb]" />
                 </div>

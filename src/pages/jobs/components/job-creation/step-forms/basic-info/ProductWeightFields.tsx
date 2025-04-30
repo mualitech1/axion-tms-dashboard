@@ -11,7 +11,7 @@ interface ProductWeightFieldsProps {
 
 export function ProductWeightFields({ form }: ProductWeightFieldsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
       <motion.div variants={{
         hidden: { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0, transition: { delay: 0.3, duration: 0.5, ease: "easeOut" } }
@@ -21,7 +21,7 @@ export function ProductWeightFields({ form }: ProductWeightFieldsProps) {
           name="productType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider">
+              <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider mb-2">
                 Product Type
               </FormLabel>
               <FormControl>
@@ -29,7 +29,7 @@ export function ProductWeightFields({ form }: ProductWeightFieldsProps) {
                   <Input 
                     placeholder="Enter product type" 
                     {...field} 
-                    className="pl-10 bg-[#05101b] border-[#1a3246] focus:border-[#0a9bdb] focus:ring-[#0a9bdb]/20 h-11 text-white placeholder:text-[#6b82a6]" 
+                    className="pl-10 bg-[#05101b] border-[#1a3246] focus:border-[#0a9bdb] focus:ring-[#0a9bdb]/20 h-11 text-white placeholder:text-[#6b82a6] rounded-md" 
                   />
                   <Package2 className="absolute left-3 top-3 h-5 w-5 text-[#0a9bdb]" />
                 </div>
@@ -48,7 +48,7 @@ export function ProductWeightFields({ form }: ProductWeightFieldsProps) {
           name="totalWeight"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider">
+              <FormLabel className="text-[#0adeee] font-semibold text-sm uppercase tracking-wider mb-2">
                 Total Weight (kg)
               </FormLabel>
               <FormControl>
@@ -58,7 +58,7 @@ export function ProductWeightFields({ form }: ProductWeightFieldsProps) {
                     min="0"
                     placeholder="Enter total weight" 
                     {...field} 
-                    className="pl-10 bg-[#05101b] border-[#1a3246] focus:border-[#0a9bdb] focus:ring-[#0a9bdb]/20 h-11 text-white placeholder:text-[#6b82a6]" 
+                    className="pl-10 bg-[#05101b] border-[#1a3246] focus:border-[#0a9bdb] focus:ring-[#0a9bdb]/20 h-11 text-white placeholder:text-[#6b82a6] rounded-md" 
                   />
                   <Scale className="absolute left-3 top-3 h-5 w-5 text-[#0a9bdb]" />
                 </div>
