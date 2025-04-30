@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
-import { Users, Star, Clock } from 'lucide-react';
+import { Users, Star, Clock, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface CustomerFiltersProps {
   activeFilter: string;
@@ -21,53 +21,47 @@ const CustomerFilters = ({
   onHoldCount,
   onFilterChange
 }: CustomerFiltersProps) => {
+  // Calculate key accounts (assuming 20% of active customers are key accounts for this example)
+  const keyAccountsCount = Math.round(activeCount * 0.2);
+  
   const filters = [
-    { id: 'all', name: 'All Customers', count: totalCustomers, icon: Users },
-    { id: 'key', name: 'Key Accounts', count: activeCount, icon: Star },
-    { id: 'active', name: 'Active', count: activeCount, icon: Users },
-    { id: 'onhold', name: 'On Hold', count: onHoldCount, icon: Clock },
-    { id: 'inactive', name: 'Inactive', count: inactiveCount, icon: Users },
+    { id: 'all', name: 'All Customers', count: totalCustomers, icon: Users, color: 'indigo' },
+    { id: 'key', name: 'Key Accounts', count: keyAccountsCount, icon: Star, color: 'blue' },
+    { id: 'active', name: 'Active', count: activeCount, icon: CheckCircle, color: 'green' },
+    { id: 'onhold', name: 'On Hold', count: onHoldCount, icon: Clock, color: 'amber' },
+    { id: 'inactive', name: 'Inactive', count: inactiveCount, icon: AlertCircle, color: 'gray' },
   ];
 
   return (
-    <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 p-5 rounded-xl mb-6 shadow-md">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-xl font-semibold text-white">Customer List</h2>
-          <p className="text-indigo-200 text-sm">View and manage your customer accounts</p>
-        </div>
-        
-        <div className="flex-1 flex flex-wrap gap-2 justify-end">
-          {filters.map((filter) => (
-            <motion.div 
-              key={filter.id}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
+    <div className="flex flex-wrap gap-2 mb-4 justify-center sm:justify-start">
+      {filters.map((filter) => (
+        <motion.div 
+          key={filter.id}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <Button 
+            variant={activeFilter === filter.id ? "default" : "outline"} 
+            size="sm"
+            onClick={() => onFilterChange(filter.id)}
+            className={`h-9 gap-1 ${activeFilter === filter.id 
+              ? `bg-${filter.color}-600 hover:bg-${filter.color}-700` 
+              : `border-${filter.color}-200 text-${filter.color}-800 hover:bg-${filter.color}-50`
+            } transition-all duration-200`}
+          >
+            <filter.icon className={`h-4 w-4 ${activeFilter === filter.id ? 'text-white' : `text-${filter.color}-600`}`} />
+            {filter.name}
+            <Badge 
+              className={`ml-1 ${activeFilter === filter.id 
+                ? `bg-${filter.color}-700 text-white` 
+                : `bg-${filter.color}-100 text-${filter.color}-800`
+              } rounded-full px-2 py-0 text-xs`}
             >
-              <Button 
-                variant={activeFilter === filter.id ? "default" : "outline"} 
-                size="sm"
-                onClick={() => onFilterChange(filter.id)}
-                className={activeFilter === filter.id 
-                  ? "bg-white text-indigo-700 hover:bg-indigo-50 border-0" 
-                  : "bg-indigo-800/40 text-white border-indigo-500/50 hover:bg-indigo-800/60"
-                }
-              >
-                <filter.icon className="h-4 w-4 mr-2" />
-                {filter.name}
-                <Badge 
-                  className={`ml-2 ${activeFilter === filter.id 
-                    ? "bg-indigo-100 text-indigo-800" 
-                    : "bg-indigo-700 text-indigo-100"
-                  }`}
-                >
-                  {filter.count}
-                </Badge>
-              </Button>
-            </motion.div>
-          ))}
-        </div>
-      </div>
+              {filter.count}
+            </Badge>
+          </Button>
+        </motion.div>
+      ))}
     </div>
   );
 };

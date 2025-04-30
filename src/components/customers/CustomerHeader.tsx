@@ -8,10 +8,11 @@ import {
   DialogDescription,
   DialogHeader,
 } from '@/components/ui/dialog';
-import { PlusCircle, Users, Search, FileText, Filter, DownloadCloud } from 'lucide-react';
+import { PlusCircle, Users, Search, FileText, Filter, DownloadCloud, BookOpen, Bell } from 'lucide-react';
 import { Customer } from '@/types/customer';
 import AddCustomerForm from './AddCustomerForm';
 import { Input } from '@/components/ui/input';
+import { motion } from 'framer-motion';
 
 interface CustomerHeaderProps {
   onAddCustomer?: (customer: Customer) => void;
@@ -28,21 +29,30 @@ const CustomerHeader = ({ onAddCustomer }: CustomerHeaderProps) => {
   };
 
   return (
-    <div className="space-y-4">
+    <motion.div 
+      className="space-y-4 bg-white p-6 rounded-xl border border-gray-100 shadow-sm"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <h2 className="text-3xl font-bold tracking-tight">Customer Management</h2>
-          <p className="text-muted-foreground max-w-md">
-            Manage your customers, their information and documents
-          </p>
+        <div className="flex items-center">
+          <div className="bg-indigo-50 p-3 rounded-full mr-4">
+            <Users className="h-6 w-6 text-indigo-600" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900">Customer Management</h2>
+            <p className="text-gray-500 max-w-md">
+              Manage your customers, their information and documents
+            </p>
+          </div>
         </div>
         
         <div className="flex gap-2">
           <Button 
             variant="outline"
             size="sm"
-            className="hidden md:flex items-center gap-1"
-            onClick={() => {}}
+            className="hidden md:flex items-center gap-1 border-gray-200 hover:bg-gray-50"
           >
             <FileText className="h-4 w-4" />
             <span>Import</span>
@@ -51,8 +61,7 @@ const CustomerHeader = ({ onAddCustomer }: CustomerHeaderProps) => {
           <Button 
             variant="outline"
             size="sm"
-            className="hidden md:flex items-center gap-1"
-            onClick={() => {}}
+            className="hidden md:flex items-center gap-1 border-gray-200 hover:bg-gray-50"
           >
             <DownloadCloud className="h-4 w-4" />
             <span>Export</span>
@@ -68,32 +77,30 @@ const CustomerHeader = ({ onAddCustomer }: CustomerHeaderProps) => {
         </div>
       </div>
       
-      <div className="flex flex-col md:flex-row justify-between gap-4">
+      <div className="flex flex-col md:flex-row justify-between gap-4 pt-4 border-t border-gray-100">
         <div className="relative w-full max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Search customers..."
-            className="pl-10 w-full"
+            className="pl-10 w-full border-gray-200"
           />
         </div>
         
         <div className="flex gap-2 items-center">
-          <Button variant="outline" size="sm" className="flex items-center gap-1">
+          <Button variant="outline" size="sm" className="flex items-center gap-1 border-gray-200">
             <Filter className="h-4 w-4" />
             <span>Filter</span>
           </Button>
           
-          <div className="flex items-center gap-2 ml-2">
-            <Button variant="ghost" size="sm" className="hover:bg-blue-50 text-blue-600 border border-blue-100 rounded-full">
-              All
-            </Button>
-            <Button variant="ghost" size="sm" className="hover:bg-blue-50">
-              Active
-            </Button>
-            <Button variant="ghost" size="sm" className="hover:bg-blue-50">
-              Inactive
-            </Button>
-          </div>
+          <Button variant="outline" size="sm" className="flex items-center gap-1 border-gray-200">
+            <BookOpen className="h-4 w-4" />
+            <span>Reports</span>
+          </Button>
+          
+          <Button variant="outline" size="sm" className="flex items-center gap-1 border-gray-200">
+            <Bell className="h-4 w-4" />
+            <span>Notifications</span>
+          </Button>
         </div>
       </div>
       
@@ -115,7 +122,7 @@ const CustomerHeader = ({ onAddCustomer }: CustomerHeaderProps) => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </motion.div>
   );
 };
 

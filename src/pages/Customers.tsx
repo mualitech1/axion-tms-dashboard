@@ -8,6 +8,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import CustomerMetrics from '@/components/customers/CustomerMetrics';
 import { motion } from 'framer-motion';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function Customers() {
   const { toast } = useToast();
@@ -45,21 +46,29 @@ export default function Customers() {
 
   return (
     <MainLayout title="Customers">
-      <div className="animate-fade-in">
+      <div className="animate-fade-in px-1 md:px-4">
         {isRootPath && (
           <motion.div 
-            className="mb-8"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 space-y-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <CustomerHeader onAddCustomer={handleAddCustomer} />
             <motion.div 
-              className="mt-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
             >
+              <CustomerHeader onAddCustomer={handleAddCustomer} />
+            </motion.div>
+            
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
+            >
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Key Performance Metrics</h3>
               <CustomerMetrics {...metricsData} />
             </motion.div>
           </motion.div>

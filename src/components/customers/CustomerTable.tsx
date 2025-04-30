@@ -67,14 +67,14 @@ const CustomerTable = ({ customers, onViewDetails }: CustomerTableProps) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm mb-6 overflow-hidden border border-indigo-100/50">
-      <div className="p-4 border-b border-indigo-100 bg-gradient-to-r from-indigo-50 to-purple-50">
+    <div className="bg-white shadow-sm mb-6 overflow-hidden border-t border-gray-50">
+      <div className="p-4 bg-slate-50/50 border-b border-slate-100">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="relative w-full sm:w-96">
+          <div className="relative w-full sm:w-80">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-indigo-400" />
             <Input
-              placeholder="Search customers..."
-              className="pl-10 w-full border-indigo-200 focus:border-indigo-400 bg-white"
+              placeholder="Filter table..."
+              className="pl-10 w-full border-indigo-100 focus:border-indigo-300 bg-white"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -95,9 +95,9 @@ const CustomerTable = ({ customers, onViewDetails }: CustomerTableProps) => {
       
       <div className="overflow-x-auto">
         <Table>
-          <TableHeader className="bg-gradient-to-r from-indigo-50 to-purple-50">
+          <TableHeader className="bg-slate-50">
             <TableRow>
-              <TableHead className="w-[250px] text-indigo-900 font-medium">Customer</TableHead>
+              <TableHead className="w-[280px] text-indigo-900 font-medium">Customer</TableHead>
               <TableHead className="text-indigo-900 font-medium">Contact</TableHead>
               <TableHead className="text-indigo-900 font-medium">Status</TableHead>
               <TableHead className="text-right text-indigo-900 font-medium">Credit Limit</TableHead>
@@ -116,7 +116,7 @@ const CustomerTable = ({ customers, onViewDetails }: CustomerTableProps) => {
                   className="group"
                 >
                   <TableRow
-                    className="hover:bg-indigo-50/50 cursor-pointer group border-b border-indigo-100/50"
+                    className="hover:bg-indigo-50/50 cursor-pointer group border-b border-indigo-50/30"
                     onClick={() => handleRowClick(customer)}
                   >
                     <TableCell>
@@ -127,7 +127,7 @@ const CustomerTable = ({ customers, onViewDetails }: CustomerTableProps) => {
                           </div>
                           <motion.button
                             whileTap={{ scale: 0.9 }}
-                            className="absolute -top-1 -right-1 p-0.5 rounded-full bg-white"
+                            className="absolute -top-1 -right-1 p-0.5 rounded-full bg-white shadow-sm"
                             onClick={(e) => toggleFavorite(e, customer.id)}
                           >
                             <Heart 
@@ -191,33 +191,33 @@ const CustomerTable = ({ customers, onViewDetails }: CustomerTableProps) => {
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-white border-indigo-200">
+                        <DropdownMenuContent align="end" className="bg-white border-indigo-100 shadow-md rounded-xl">
                           <DropdownMenuItem onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/customers/${customer.id}`);
                           }}
-                          className="text-indigo-700 focus:text-indigo-900 focus:bg-indigo-50">
+                          className="text-indigo-700 focus:text-indigo-900 focus:bg-indigo-50 cursor-pointer">
                             View Details
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/customers/${customer.id}/documents`);
                           }}
-                          className="text-indigo-700 focus:text-indigo-900 focus:bg-indigo-50">
+                          className="text-indigo-700 focus:text-indigo-900 focus:bg-indigo-50 cursor-pointer">
                             Documents
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/customers/${customer.id}/portal`);
                           }}
-                          className="text-indigo-700 focus:text-indigo-900 focus:bg-indigo-50">
+                          className="text-indigo-700 focus:text-indigo-900 focus:bg-indigo-50 cursor-pointer">
                             Portal Access
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={(e) => {
                             e.stopPropagation();
                             toggleFavorite(e, customer.id);
                           }}
-                          className="text-pink-600 focus:text-pink-700 focus:bg-pink-50">
+                          className="text-pink-600 focus:text-pink-700 focus:bg-pink-50 cursor-pointer">
                             {favorites.includes(customer.id) ? (
                               <>
                                 <Heart className="h-4 w-4 mr-2 fill-pink-500" />
