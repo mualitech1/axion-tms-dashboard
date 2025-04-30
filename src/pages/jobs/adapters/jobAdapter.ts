@@ -6,18 +6,43 @@ import { Job, JobLocation } from '@/types/job';
  * Converts a database job object to the format expected by the Jobs UI components
  */
 export function adaptDatabaseJobToJobType(dbJob: DatabaseJob): Job {
-  // Ensure pickup_location and delivery_location are properly handled
-  const pickupLocation = dbJob.pickup_location || {};
-  const deliveryLocation = dbJob.delivery_location || {};
+  // Handle pickup_location and delivery_location properly
+  let pickupLocation: JobLocation | Record<string, any> = { address: '', city: '', postcode: '', country: '' };
+  let deliveryLocation: JobLocation | Record<string, any> = { address: '', city: '', postcode: '', country: '' };
   
-  // Convert JSON to string for locations if needed
+  // Parse locations if they exist
+  if (dbJob.pickup_location) {
+    if (typeof dbJob.pickup_location === 'string') {
+      try {
+        pickupLocation = JSON.parse(dbJob.pickup_location);
+      } catch (e) {
+        console.error('Error parsing pickup location:', e);
+      }
+    } else {
+      pickupLocation = dbJob.pickup_location;
+    }
+  }
+  
+  if (dbJob.delivery_location) {
+    if (typeof dbJob.delivery_location === 'string') {
+      try {
+        deliveryLocation = JSON.parse(dbJob.delivery_location);
+      } catch (e) {
+        console.error('Error parsing delivery location:', e);
+      }
+    } else {
+      deliveryLocation = dbJob.delivery_location;
+    }
+  }
+  
+  // Get city values safely
   const pickupCity = typeof pickupLocation === 'object' && pickupLocation.city 
     ? pickupLocation.city 
-    : (typeof pickupLocation === 'string' ? JSON.parse(pickupLocation).city : 'Unknown');
+    : 'Unknown';
   
   const deliveryCity = typeof deliveryLocation === 'object' && deliveryLocation.city 
     ? deliveryLocation.city 
-    : (typeof deliveryLocation === 'string' ? JSON.parse(deliveryLocation).city : 'Unknown');
+    : 'Unknown';
   
   return {
     id: dbJob.id,

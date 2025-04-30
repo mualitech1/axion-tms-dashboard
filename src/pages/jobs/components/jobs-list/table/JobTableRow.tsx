@@ -4,7 +4,7 @@ import { TableRow, TableCell } from "@/components/ui/table";
 import { JobStatusBadge } from "./JobStatusBadge";
 import { JobPriorityBadge } from "./JobPriorityBadge";
 import { JobsTableActions } from "./JobsTableActions";
-import { Job } from "../../../types/jobTypes";
+import { Job } from "@/types/job";
 
 interface JobTableRowProps {
   job: Job;

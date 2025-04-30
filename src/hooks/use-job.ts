@@ -5,6 +5,23 @@ import { Job, JobLocation } from '@/types/job';
 import { useToast } from '@/hooks/use-toast';
 import { getErrorMessage } from '@/utils/error-handler';
 import { adaptDatabaseJobsToJobTypes, adaptJobTypeToDatabase, adaptDatabaseJobToJobType } from '@/pages/jobs/adapters/jobAdapter';
+import { Json } from '@/integrations/supabase/types';
+
+// Helper function to ensure we're working with JSON objects
+const ensureJobLocationObject = (location: any): JobLocation => {
+  if (!location) return { address: '', city: '', postcode: '', country: '' };
+  
+  if (typeof location === 'string') {
+    try {
+      return JSON.parse(location);
+    } catch (e) {
+      console.error('Error parsing location object:', e);
+      return { address: '', city: '', postcode: '', country: '' };
+    }
+  }
+  
+  return location as JobLocation;
+};
 
 // Hook for fetching all jobs with filters
 export function useJobs(filters?: Record<string, any>) {
@@ -44,7 +61,7 @@ export function useJobs(filters?: Record<string, any>) {
         const { data, error } = await query.order('created_at', { ascending: false });
         if (error) throw error;
         
-        // Transform the data to match our Job type - handle JSON conversion
+        // Transform the data to match our Job type using the adapter function
         return adaptDatabaseJobsToJobTypes(data);
       } catch (error) {
         console.error("Error fetching jobs:", error);
@@ -74,6 +91,7 @@ export function useJobs(filters?: Record<string, any>) {
           supabaseJob.pickup_date = new Date().toISOString();
         }
         
+        // Make sure pickup_location and delivery_location are defined
         if (!supabaseJob.pickup_location) {
           supabaseJob.pickup_location = { address: '', city: '', postcode: '', country: '' };
         }
@@ -117,17 +135,52 @@ export function useJobs(filters?: Record<string, any>) {
       try {
         // Convert id to string for Supabase
         const jobId = id.toString();
+        
+        // Transform updates for database
         const supabaseUpdates = adaptJobTypeToDatabase(updates);
+        
+        // Ensure delivery_location and pickup_location are defined if needed
+        if (!supabaseUpdates.delivery_location && !supabaseUpdates.pickup_location) {
+          // If we're not updating locations, we don't need to include them
+          // This avoids the TypeScript error about required fields
+          
+          const { data, error } = await supabase
+            .from('jobs')
+            .update(supabaseUpdates)
+            .eq('id', jobId)
+            .select()
+            .single();
 
-        const { data, error } = await supabase
-          .from('jobs')
-          .update(supabaseUpdates)
-          .eq('id', jobId)
-          .select()
-          .single();
+          if (error) throw error;
+          return data;
+        } else {
+          // If updating locations, we need to ensure they're properly formatted
+          // For this, we need to first fetch the current job
+          const { data: currentJob, error: fetchError } = await supabase
+            .from('jobs')
+            .select('pickup_location, delivery_location')
+            .eq('id', jobId)
+            .single();
+            
+          if (fetchError) throw fetchError;
+          
+          // Ensure locations are properly defined
+          const updatedJob = {
+            ...supabaseUpdates,
+            pickup_location: supabaseUpdates.pickup_location || currentJob.pickup_location,
+            delivery_location: supabaseUpdates.delivery_location || currentJob.delivery_location,
+          };
+          
+          const { data, error } = await supabase
+            .from('jobs')
+            .update(updatedJob)
+            .eq('id', jobId)
+            .select()
+            .single();
 
-        if (error) throw error;
-        return data;
+          if (error) throw error;
+          return data;
+        }
       } catch (error) {
         console.error("Error updating job:", error);
         throw new Error(getErrorMessage(error));

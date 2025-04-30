@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useJobs } from '@/hooks/use-job';
 import MainLayout from '@/components/layout/MainLayout';
@@ -30,10 +31,10 @@ export default function JobsPage() {
     refetch();
   };
   
-  // Convert our jobs to the format expected by JobsList - no need for extra parsing now
+  // No need for extra parsing now, our useJobs hook returns proper Job[] type
   const jobsForList = jobs || [];
   
-  // Filter jobs based on tab selection (fallback for when we're not using API filtering)
+  // Filter jobs based on tab selection if we're not using API filtering
   const filteredJobs = currentTab === 'all' 
     ? jobsForList 
     : jobsForList.filter(job => job.status === currentTab);
