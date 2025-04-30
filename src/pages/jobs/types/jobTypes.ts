@@ -11,7 +11,7 @@ export type JobStatus =
   | "issues";
 
 export interface Job {
-  id: string | number;
+  id: string | number; // Updated to accept both string and number
   title: string;
   client: string;
   date: string;

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useJobs } from '@/hooks/use-job';
 import MainLayout from '@/components/layout/MainLayout';
@@ -31,11 +30,8 @@ export default function JobsPage() {
     refetch();
   };
   
-  // Convert our jobs to the format expected by JobsList
-  const jobsForList = jobs?.map(job => ({
-    ...job,
-    id: typeof job.id === 'string' ? parseInt(job.id, 10) || job.id : job.id
-  })) || [];
+  // Convert our jobs to the format expected by JobsList - no need for extra parsing now
+  const jobsForList = jobs || [];
   
   // Filter jobs based on tab selection (fallback for when we're not using API filtering)
   const filteredJobs = currentTab === 'all' 

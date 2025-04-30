@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Job, JobLocation } from '@/types/job';
 import { useToast } from '@/hooks/use-toast';
 import { getErrorMessage } from '@/utils/error-handler';
-import { adaptDatabaseJobsToJobTypes, adaptJobTypeToDatabase } from '@/pages/jobs/adapters/jobAdapter';
+import { adaptDatabaseJobsToJobTypes, adaptJobTypeToDatabase, adaptDatabaseJobToJobType } from '@/pages/jobs/adapters/jobAdapter';
 
 // Hook for fetching all jobs with filters
 export function useJobs(filters?: Record<string, any>) {
@@ -44,7 +44,7 @@ export function useJobs(filters?: Record<string, any>) {
         const { data, error } = await query.order('created_at', { ascending: false });
         if (error) throw error;
         
-        // Transform the data to match our Job type
+        // Transform the data to match our Job type - handle JSON conversion
         return adaptDatabaseJobsToJobTypes(data);
       } catch (error) {
         console.error("Error fetching jobs:", error);
@@ -68,6 +68,19 @@ export function useJobs(filters?: Record<string, any>) {
       try {
         // Transform the job data for the database using our adapter
         const supabaseJob = adaptJobTypeToDatabase(jobData);
+        
+        // Ensure required fields for database insertion
+        if (!supabaseJob.pickup_date) {
+          supabaseJob.pickup_date = new Date().toISOString();
+        }
+        
+        if (!supabaseJob.pickup_location) {
+          supabaseJob.pickup_location = { address: '', city: '', postcode: '', country: '' };
+        }
+        
+        if (!supabaseJob.delivery_location) {
+          supabaseJob.delivery_location = { address: '', city: '', postcode: '', country: '' };
+        }
 
         const { data, error } = await supabase
           .from('jobs')

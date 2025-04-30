@@ -74,7 +74,10 @@ export function JobsTable({ jobs }: JobsTableProps) {
       
       switch (sortColumn) {
         case "id":
-          comparison = a.id - b.id;
+          // Convert IDs to strings for comparison
+          const idA = a.id.toString();
+          const idB = b.id.toString();
+          comparison = idA.localeCompare(idB);
           break;
         case "client":
           comparison = a.client.localeCompare(b.client);
@@ -113,7 +116,7 @@ export function JobsTable({ jobs }: JobsTableProps) {
     }
   };
   
-  const handleViewJob = (jobId: number) => {
+  const handleViewJob = (jobId: string | number) => {
     navigate(`/jobs/${jobId}`);
   };
 

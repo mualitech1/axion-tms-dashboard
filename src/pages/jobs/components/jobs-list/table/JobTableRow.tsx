@@ -8,7 +8,7 @@ import { Job } from "../../../types/jobTypes";
 
 interface JobTableRowProps {
   job: Job;
-  onRowClick: (id: number | string) => void;
+  onRowClick: (id: string | number) => void;
 }
 
 export function JobTableRow({ job, onRowClick }: JobTableRowProps) {
@@ -28,7 +28,7 @@ export function JobTableRow({ job, onRowClick }: JobTableRowProps) {
       className="hover:bg-muted/20 cursor-pointer"
       onClick={() => onRowClick(job.id)}
     >
-      <TableCell className="font-medium">#{job.id}</TableCell>
+      <TableCell className="font-medium">#{job.id.toString()}</TableCell>
       <TableCell><JobStatusBadge status={job.status} /></TableCell>
       <TableCell><JobPriorityBadge priority={job.priority} /></TableCell>
       <TableCell>{job.client}</TableCell>

@@ -22,7 +22,10 @@ export function JobsTable({ jobs }: JobsTableProps) {
     
     switch (sortColumn) {
       case "id":
-        comparison = a.id - b.id;
+        // Convert both to strings for comparison if they're not already
+        const idA = a.id.toString();
+        const idB = b.id.toString();
+        comparison = idA.localeCompare(idB);
         break;
       case "client":
         comparison = a.client.localeCompare(b.client);
@@ -65,7 +68,7 @@ export function JobsTable({ jobs }: JobsTableProps) {
     return sortDirection === "asc" ? <SortAsc className="h-3 w-3 ml-1" /> : <SortDesc className="h-3 w-3 ml-1" />;
   };
 
-  const handleViewJob = (jobId: number) => {
+  const handleViewJob = (jobId: string | number) => {
     navigate(`/jobs/${jobId}`);
   };
   
@@ -141,7 +144,7 @@ export function JobsTable({ jobs }: JobsTableProps) {
               className="hover:bg-muted/20 cursor-pointer"
               onClick={() => handleViewJob(job.id)}
             >
-              <TableCell className="font-medium">#{job.id}</TableCell>
+              <TableCell className="font-medium">#{job.id.toString()}</TableCell>
               <TableCell>{getStatusBadge(job.status)}</TableCell>
               <TableCell>{getPriorityBadge(job.priority)}</TableCell>
               <TableCell>{job.client}</TableCell>
