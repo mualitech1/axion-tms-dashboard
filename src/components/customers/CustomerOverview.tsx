@@ -1,102 +1,130 @@
 
-import { Users, Building, Plus, Phone, Mail } from 'lucide-react';
-import DashboardCard from '@/components/dashboard/DashboardCard';
+import { Users, Building, Plus, Phone, Mail, Calendar, Clock, User } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const CustomerOverview = () => {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <DashboardCard title="Customer Overview">
-        <div className="space-y-4">
-          <div className="flex items-center">
-            <div className="bg-tms-blue-light p-2 rounded-full mr-3">
-              <Users className="h-4 w-4 text-tms-blue" />
-            </div>
-            <div>
-              <div className="text-2xl font-semibold text-tms-gray-800">158</div>
-              <div className="text-sm text-tms-gray-500">Total Customers</div>
-            </div>
-          </div>
-          
-          <div className="flex items-center">
-            <div className="bg-tms-green-light p-2 rounded-full mr-3">
-              <Building className="h-4 w-4 text-tms-green" />
-            </div>
-            <div>
-              <div className="text-2xl font-semibold text-tms-gray-800">142</div>
-              <div className="text-sm text-tms-gray-500">Active Customers</div>
-            </div>
-          </div>
-          
-          <div className="flex items-center">
-            <div className="bg-tms-yellow-light p-2 rounded-full mr-3">
-              <Plus className="h-4 w-4 text-tms-yellow" />
-            </div>
-            <div>
-              <div className="text-2xl font-semibold text-tms-gray-800">24</div>
-              <div className="text-sm text-tms-gray-500">New (Last 30 Days)</div>
-            </div>
-          </div>
-        </div>
-      </DashboardCard>
+    <Card className="shadow-md border-indigo-100 h-full">
+      <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50">
+        <CardTitle className="text-indigo-700">Customer Overview</CardTitle>
+        <CardDescription>
+          Analytics and insights about your customer base
+        </CardDescription>
+      </CardHeader>
       
-      <DashboardCard title="Contact Metrics">
-        <div className="space-y-4">
-          <div className="flex items-center">
-            <div className="bg-tms-blue-light p-2 rounded-full mr-3">
-              <Phone className="h-4 w-4 text-tms-blue" />
-            </div>
-            <div>
-              <div className="text-2xl font-semibold text-tms-gray-800">68</div>
-              <div className="text-sm text-tms-gray-500">Calls This Week</div>
-            </div>
-          </div>
+      <CardContent className="p-0">
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid grid-cols-3 w-full rounded-none bg-muted/50">
+            <TabsTrigger value="overview" className="rounded-none border-b-2 data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent">
+              Customer Overview
+            </TabsTrigger>
+            <TabsTrigger value="metrics" className="rounded-none border-b-2 data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent">
+              Contact Metrics
+            </TabsTrigger>
+            <TabsTrigger value="activity" className="rounded-none border-b-2 data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent">
+              Recent Activity
+            </TabsTrigger>
+          </TabsList>
           
-          <div className="flex items-center">
-            <div className="bg-tms-green-light p-2 rounded-full mr-3">
-              <Mail className="h-4 w-4 text-tms-green" />
+          <TabsContent value="overview" className="p-4 space-y-4">
+            <div className="flex items-center">
+              <div className="bg-blue-100 p-3 rounded-full mr-3">
+                <Users className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <div className="text-3xl font-semibold text-blue-700">158</div>
+                <div className="text-sm text-muted-foreground">Total Customers</div>
+              </div>
             </div>
-            <div>
-              <div className="text-2xl font-semibold text-tms-gray-800">173</div>
-              <div className="text-sm text-tms-gray-500">Emails This Week</div>
+            
+            <div className="flex items-center">
+              <div className="bg-green-100 p-3 rounded-full mr-3">
+                <Building className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <div className="text-3xl font-semibold text-green-700">142</div>
+                <div className="text-sm text-muted-foreground">Active Customers</div>
+              </div>
             </div>
-          </div>
-          
-          <div className="flex items-center">
-            <div className="bg-tms-yellow-light p-2 rounded-full mr-3">
-              <Users className="h-4 w-4 text-tms-yellow" />
+            
+            <div className="flex items-center">
+              <div className="bg-amber-100 p-3 rounded-full mr-3">
+                <User className="h-5 w-5 text-amber-600" />
+              </div>
+              <div>
+                <div className="text-3xl font-semibold text-amber-700">24</div>
+                <div className="text-sm text-muted-foreground">
+                  New <span className="text-xs">(Last 30 Days)</span>
+                </div>
+              </div>
             </div>
-            <div>
-              <div className="text-2xl font-semibold text-tms-gray-800">12</div>
-              <div className="text-sm text-tms-gray-500">Meetings Scheduled</div>
+          </TabsContent>
+          
+          <TabsContent value="metrics" className="p-4 space-y-4">
+            <div className="flex items-center">
+              <div className="bg-blue-100 p-3 rounded-full mr-3">
+                <Phone className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <div className="text-3xl font-semibold text-blue-700">68</div>
+                <div className="text-sm text-muted-foreground">Calls This Week</div>
+              </div>
             </div>
-          </div>
-        </div>
-      </DashboardCard>
-      
-      <DashboardCard title="Recent Activity">
-        <div className="space-y-4">
-          <div className="border-l-2 border-tms-blue pl-4 py-1">
-            <p className="text-sm text-tms-gray-800">New customer added: Oscorp Industries</p>
-            <p className="text-xs text-tms-gray-500">Today, 10:30 AM</p>
-          </div>
+            
+            <div className="flex items-center">
+              <div className="bg-indigo-100 p-3 rounded-full mr-3">
+                <Mail className="h-5 w-5 text-indigo-600" />
+              </div>
+              <div>
+                <div className="text-3xl font-semibold text-indigo-700">173</div>
+                <div className="text-sm text-muted-foreground">Emails This Week</div>
+              </div>
+            </div>
+            
+            <div className="flex items-center">
+              <div className="bg-purple-100 p-3 rounded-full mr-3">
+                <Calendar className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <div className="text-3xl font-semibold text-purple-700">12</div>
+                <div className="text-sm text-muted-foreground">Meetings Scheduled</div>
+              </div>
+            </div>
+          </TabsContent>
           
-          <div className="border-l-2 border-tms-green pl-4 py-1">
-            <p className="text-sm text-tms-gray-800">Credit limit updated: Wayne Enterprises</p>
-            <p className="text-xs text-tms-gray-500">Yesterday, 3:15 PM</p>
-          </div>
-          
-          <div className="border-l-2 border-tms-yellow pl-4 py-1">
-            <p className="text-sm text-tms-gray-800">Customer status changed: Daily Planet</p>
-            <p className="text-xs text-tms-gray-500">Yesterday, 11:45 AM</p>
-          </div>
-          
-          <div className="border-l-2 border-tms-gray-400 pl-4 py-1">
-            <p className="text-sm text-tms-gray-800">Contact details updated: Stark Industries</p>
-            <p className="text-xs text-tms-gray-500">Jun 14, 2023, 2:30 PM</p>
-          </div>
-        </div>
-      </DashboardCard>
-    </div>
+          <TabsContent value="activity" className="p-4 space-y-4">
+            <div className="border-l-2 border-blue-500 pl-4 py-1">
+              <p className="text-sm font-medium">New customer added: Oscorp Industries</p>
+              <p className="text-xs text-muted-foreground flex items-center">
+                <Clock className="h-3 w-3 mr-1 inline" /> Today, 10:30 AM
+              </p>
+            </div>
+            
+            <div className="border-l-2 border-green-500 pl-4 py-1">
+              <p className="text-sm font-medium">Credit limit updated: Wayne Enterprises</p>
+              <p className="text-xs text-muted-foreground flex items-center">
+                <Clock className="h-3 w-3 mr-1 inline" /> Yesterday, 3:15 PM
+              </p>
+            </div>
+            
+            <div className="border-l-2 border-amber-500 pl-4 py-1">
+              <p className="text-sm font-medium">Customer status changed: Daily Planet</p>
+              <p className="text-xs text-muted-foreground flex items-center">
+                <Clock className="h-3 w-3 mr-1 inline" /> Yesterday, 11:45 AM
+              </p>
+            </div>
+            
+            <div className="border-l-2 border-gray-400 pl-4 py-1">
+              <p className="text-sm font-medium">Contact details updated: Stark Industries</p>
+              <p className="text-xs text-muted-foreground flex items-center">
+                <Clock className="h-3 w-3 mr-1 inline" /> Jun 14, 2023, 2:30 PM
+              </p>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 };
 

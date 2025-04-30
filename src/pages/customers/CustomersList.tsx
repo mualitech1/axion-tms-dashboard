@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Customer } from '@/types/customer';
@@ -202,18 +201,7 @@ export default function CustomersList() {
             transition={{ duration: 0.5, delay: 0.5 }}
             className="lg:col-span-1"
           >
-            <Card className="shadow-md border-indigo-100 h-full">
-              <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50">
-                <CardTitle className="text-indigo-700">Customer Overview</CardTitle>
-                <CardDescription>
-                  Analytics and insights about your customer base
-                </CardDescription>
-              </CardHeader>
-              <Separator />
-              <CardContent className="pt-6">
-                <CustomerOverview />
-              </CardContent>
-            </Card>
+            <CustomerOverview />
           </motion.div>
         </div>
       </div>

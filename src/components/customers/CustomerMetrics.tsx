@@ -1,6 +1,7 @@
 
 import { Phone, Mail, Calendar, User, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface CustomerMetricsProps {
   totalCalls: number;
@@ -41,18 +42,20 @@ const CustomerMetrics = ({
     >
       <motion.div 
         variants={item}
-        className="bg-white rounded-lg shadow-sm border border-indigo-100 p-4 hover:shadow-md transition-shadow duration-200"
+        className="bg-white rounded-lg shadow-sm border border-blue-100 p-4 hover:shadow-md transition-shadow duration-200"
       >
         <div className="flex items-center mb-2">
-          <div className="bg-indigo-100 h-8 w-8 rounded-full flex items-center justify-center mr-2">
-            <Phone className="h-4 w-4 text-indigo-600" />
+          <div className="bg-blue-100 h-10 w-10 rounded-full flex items-center justify-center mr-3">
+            <Phone className="h-5 w-5 text-blue-600" />
           </div>
-          <h3 className="text-sm font-medium text-indigo-800">Calls This Week</h3>
+          <div>
+            <p className="text-2xl font-semibold text-blue-700">{totalCalls}</p>
+            <p className="text-sm text-muted-foreground">Calls This Week</p>
+          </div>
         </div>
         <div className="mt-2">
-          <p className="text-2xl font-bold text-indigo-900">{totalCalls}</p>
-          <p className="text-xs text-indigo-500 mt-1">
-            <Clock className="h-3 w-3 inline mr-1" />
+          <p className="text-xs text-blue-500 flex items-center">
+            <Clock className="h-3 w-3 mr-1" />
             Last activity: {activityTimestamp}
           </p>
         </div>
@@ -63,51 +66,53 @@ const CustomerMetrics = ({
         className="bg-white rounded-lg shadow-sm border border-indigo-100 p-4 hover:shadow-md transition-shadow duration-200"
       >
         <div className="flex items-center mb-2">
-          <div className="bg-pink-100 h-8 w-8 rounded-full flex items-center justify-center mr-2">
-            <Mail className="h-4 w-4 text-pink-600" />
+          <div className="bg-indigo-100 h-10 w-10 rounded-full flex items-center justify-center mr-3">
+            <Mail className="h-5 w-5 text-indigo-600" />
           </div>
-          <h3 className="text-sm font-medium text-pink-800">Emails This Week</h3>
+          <div>
+            <p className="text-2xl font-semibold text-indigo-700">{totalEmails}</p>
+            <p className="text-sm text-muted-foreground">Emails This Week</p>
+          </div>
         </div>
-        <div className="mt-2">
-          <p className="text-2xl font-bold text-pink-900">{totalEmails}</p>
-          <div className="flex items-center mt-1">
-            <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-              <div className="h-full bg-pink-500 rounded-full" style={{ width: '65%' }}></div>
-            </div>
-            <span className="text-xs text-pink-600 ml-2">+12%</span>
-          </div>
+        <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden mt-2">
+          <div className="h-full bg-indigo-500 rounded-full" style={{ width: '65%' }}></div>
+          <p className="text-xs text-indigo-600 mt-1">+12% from last week</p>
         </div>
       </motion.div>
 
       <motion.div 
         variants={item}
-        className="bg-white rounded-lg shadow-sm border border-indigo-100 p-4 hover:shadow-md transition-shadow duration-200"
+        className="bg-white rounded-lg shadow-sm border border-green-100 p-4 hover:shadow-md transition-shadow duration-200"
       >
         <div className="flex items-center mb-2">
-          <div className="bg-green-100 h-8 w-8 rounded-full flex items-center justify-center mr-2">
-            <User className="h-4 w-4 text-green-600" />
+          <div className="bg-green-100 h-10 w-10 rounded-full flex items-center justify-center mr-3">
+            <User className="h-5 w-5 text-green-600" />
           </div>
-          <h3 className="text-sm font-medium text-green-800">New Customers</h3>
+          <div>
+            <p className="text-2xl font-semibold text-green-700">{newCustomers}</p>
+            <p className="text-sm text-muted-foreground">New Customers</p>
+          </div>
         </div>
         <div className="mt-2">
-          <p className="text-2xl font-bold text-green-900">{newCustomers}</p>
-          <p className="text-xs text-green-600 mt-1">Last 30 days</p>
+          <p className="text-xs text-green-600">Last 30 days</p>
         </div>
       </motion.div>
 
       <motion.div 
         variants={item}
-        className="bg-white rounded-lg shadow-sm border border-indigo-100 p-4 hover:shadow-md transition-shadow duration-200"
+        className="bg-white rounded-lg shadow-sm border border-amber-100 p-4 hover:shadow-md transition-shadow duration-200"
       >
         <div className="flex items-center mb-2">
-          <div className="bg-amber-100 h-8 w-8 rounded-full flex items-center justify-center mr-2">
-            <Calendar className="h-4 w-4 text-amber-600" />
+          <div className="bg-amber-100 h-10 w-10 rounded-full flex items-center justify-center mr-3">
+            <Calendar className="h-5 w-5 text-amber-600" />
           </div>
-          <h3 className="text-sm font-medium text-amber-800">Meetings</h3>
+          <div>
+            <p className="text-2xl font-semibold text-amber-700">{scheduledMeetings}</p>
+            <p className="text-sm text-muted-foreground">Meetings</p>
+          </div>
         </div>
         <div className="mt-2">
-          <p className="text-2xl font-bold text-amber-900">{scheduledMeetings}</p>
-          <p className="text-xs text-amber-600 mt-1">Scheduled this week</p>
+          <p className="text-xs text-amber-600">Scheduled this week</p>
         </div>
       </motion.div>
     </motion.div>
