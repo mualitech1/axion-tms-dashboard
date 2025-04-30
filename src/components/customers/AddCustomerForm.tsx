@@ -100,9 +100,13 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
       
       // Create the complete customer object with contacts
       const newCustomer: Customer = {
-        ...values,
-        address: customerAddress, // Use the non-optional address object
         id: Date.now().toString(), // Generate string ID from timestamp
+        name: values.name, // Explicitly include the name property
+        status: values.status,
+        creditLimit: values.creditLimit,
+        notes: values.notes,
+        acceptedTerms: values.acceptedTerms,
+        address: customerAddress, // Use the non-optional address object
         contacts: [
           { ...primaryContact, isPrimary: true, role: 'Primary' },
           ...(invoiceContact ? [{ ...invoiceContact, role: 'Invoice' }] : []),
