@@ -70,18 +70,9 @@ export function useJobs(filters?: Record<string, any>) {
         // Transform the job data for the database using our adapter
         const supabaseJob = adaptJobTypeToDatabase(jobData);
         
-        // Ensure required fields are present for database insertion
-        if (!supabaseJob.pickup_location) {
-          supabaseJob.pickup_location = { address: '', city: '', postcode: '', country: '' };
-        }
-        
-        if (!supabaseJob.delivery_location) {
-          supabaseJob.delivery_location = { address: '', city: '', postcode: '', country: '' };
-        }
-        
         const { data, error } = await supabase
           .from('jobs')
-          .insert(supabaseJob)
+          .insert(supabaseJob as any)
           .select()
           .single();
 
@@ -120,7 +111,7 @@ export function useJobs(filters?: Record<string, any>) {
         
         const { data, error } = await supabase
           .from('jobs')
-          .update(supabaseUpdates)
+          .update(supabaseUpdates as any)
           .eq('id', jobId)
           .select()
           .single();

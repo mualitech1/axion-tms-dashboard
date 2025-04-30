@@ -34,11 +34,6 @@ export default function JobsPage() {
   // Jobs are already properly typed from our useJobs hook
   const jobsForList = jobs || [];
   
-  // Filter jobs based on tab selection if we're not using API filtering
-  const filteredJobs = currentTab === 'all' 
-    ? jobsForList 
-    : jobsForList.filter(job => job.status === currentTab);
-
   return (
     <MainLayout title="Jobs Management">
       {showCreateJob && (
@@ -95,12 +90,12 @@ export default function JobsPage() {
             </div>
             
             <TabsContent value="all" className="p-4">
-              <JobsList jobs={filteredJobs} isLoading={isLoading} />
+              <JobsList jobs={jobsForList} isLoading={isLoading} />
             </TabsContent>
             
             {['booked', 'in-progress', 'completed', 'issues'].map((status) => (
               <TabsContent key={status} value={status} className="p-4">
-                <JobsList jobs={filteredJobs} isLoading={isLoading} />
+                <JobsList jobs={jobsForList} isLoading={isLoading} />
               </TabsContent>
             ))}
           </Tabs>

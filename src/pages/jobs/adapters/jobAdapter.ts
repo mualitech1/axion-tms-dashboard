@@ -117,19 +117,9 @@ export function adaptJobTypeToDatabase(job: Partial<Job>): Partial<DatabaseJob> 
     pickup_date: job.date || new Date().toISOString(),
   };
   
-  // Always include these required location fields to avoid type errors
-  if (job.date) {
-    dbJob.pickup_date = job.date;
-  }
-  
-  // Only include these fields if updating an existing job (to prevent nullifying existing data)
-  if ('pickup_location' in job) {
-    dbJob.pickup_location = defaultLocation;
-  }
-  
-  if ('delivery_location' in job) {
-    dbJob.delivery_location = defaultLocation;
-  }
+  // Always ensure required fields are present
+  dbJob.pickup_location = defaultLocation;
+  dbJob.delivery_location = defaultLocation;
   
   return dbJob;
 }
