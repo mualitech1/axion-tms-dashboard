@@ -86,20 +86,6 @@ export function useJobs(filters?: Record<string, any>) {
         // Transform the job data for the database using our adapter
         const supabaseJob = adaptJobTypeToDatabase(jobData);
         
-        // Ensure required fields for database insertion
-        if (!supabaseJob.pickup_date) {
-          supabaseJob.pickup_date = new Date().toISOString();
-        }
-        
-        // Make sure pickup_location and delivery_location are defined
-        if (!supabaseJob.pickup_location) {
-          supabaseJob.pickup_location = { address: '', city: '', postcode: '', country: '' };
-        }
-        
-        if (!supabaseJob.delivery_location) {
-          supabaseJob.delivery_location = { address: '', city: '', postcode: '', country: '' };
-        }
-
         const { data, error } = await supabase
           .from('jobs')
           .insert(supabaseJob)
@@ -139,48 +125,15 @@ export function useJobs(filters?: Record<string, any>) {
         // Transform updates for database
         const supabaseUpdates = adaptJobTypeToDatabase(updates);
         
-        // Ensure delivery_location and pickup_location are defined if needed
-        if (!supabaseUpdates.delivery_location && !supabaseUpdates.pickup_location) {
-          // If we're not updating locations, we don't need to include them
-          // This avoids the TypeScript error about required fields
-          
-          const { data, error } = await supabase
-            .from('jobs')
-            .update(supabaseUpdates)
-            .eq('id', jobId)
-            .select()
-            .single();
+        const { data, error } = await supabase
+          .from('jobs')
+          .update(supabaseUpdates)
+          .eq('id', jobId)
+          .select()
+          .single();
 
-          if (error) throw error;
-          return data;
-        } else {
-          // If updating locations, we need to ensure they're properly formatted
-          // For this, we need to first fetch the current job
-          const { data: currentJob, error: fetchError } = await supabase
-            .from('jobs')
-            .select('pickup_location, delivery_location')
-            .eq('id', jobId)
-            .single();
-            
-          if (fetchError) throw fetchError;
-          
-          // Ensure locations are properly defined
-          const updatedJob = {
-            ...supabaseUpdates,
-            pickup_location: supabaseUpdates.pickup_location || currentJob.pickup_location,
-            delivery_location: supabaseUpdates.delivery_location || currentJob.delivery_location,
-          };
-          
-          const { data, error } = await supabase
-            .from('jobs')
-            .update(updatedJob)
-            .eq('id', jobId)
-            .select()
-            .single();
-
-          if (error) throw error;
-          return data;
-        }
+        if (error) throw error;
+        return data;
       } catch (error) {
         console.error("Error updating job:", error);
         throw new Error(getErrorMessage(error));

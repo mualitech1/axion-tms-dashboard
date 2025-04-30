@@ -31,7 +31,7 @@ export default function JobsPage() {
     refetch();
   };
   
-  // No need for extra parsing now, our useJobs hook returns proper Job[] type
+  // Jobs are already properly typed from our useJobs hook
   const jobsForList = jobs || [];
   
   // Filter jobs based on tab selection if we're not using API filtering
