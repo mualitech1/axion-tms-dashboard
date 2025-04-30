@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -91,9 +90,18 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
     setIsSubmitting(true);
 
     try {
+      // Ensure address fields are not optional when creating the customer object
+      const customerAddress = {
+        street: values.address.street || '',
+        city: values.address.city || '',
+        postcode: values.address.postcode || '',
+        country: values.address.country || '',
+      };
+      
       // Create the complete customer object with contacts
-      const newCustomer: Omit<Customer, 'id'> & { id: string } = {
+      const newCustomer: Customer = {
         ...values,
+        address: customerAddress, // Use the non-optional address object
         id: Date.now().toString(), // Generate string ID from timestamp
         contacts: [
           { ...primaryContact, isPrimary: true, role: 'Primary' },
@@ -105,7 +113,7 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
         email: primaryContact ? primaryContact.email : '',
         phone: primaryContact ? primaryContact.phone : '',
         lastOrder: '-',
-        // Add empty collections for related data
+        // Initialize empty collections for related data
         documents: [],
         rateCards: [],
         jobs: []
