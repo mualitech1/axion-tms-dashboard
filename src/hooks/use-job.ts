@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { getErrorMessage } from '@/utils/error-handler';
 import { adaptDatabaseJobsToJobTypes, adaptJobTypeToDatabase, adaptDatabaseJobToJobType } from '@/pages/jobs/adapters/jobAdapter';
 import { Json } from '@/integrations/supabase/types';
+import { DatabaseJob } from '@/types/database';
 
 // Hook for fetching all jobs with filters
 export function useJobs(filters?: Record<string, any>) {
@@ -48,7 +49,8 @@ export function useJobs(filters?: Record<string, any>) {
         console.log("Raw jobs data:", data); // Debug: Log raw data
         
         // Use our adapter to transform database jobs to UI jobs
-        return adaptDatabaseJobsToJobTypes(data);
+        // Add type assertion to resolve TypeScript error
+        return adaptDatabaseJobsToJobTypes(data as any);
       } catch (error) {
         console.error("Error fetching jobs:", error);
         throw new Error(getErrorMessage(error));
@@ -221,7 +223,8 @@ export function useJob(id?: string | number) {
         console.log("Raw job data:", data); // Debug: Log raw data
         
         // Use our adapter to transform database job to UI job
-        return data ? adaptDatabaseJobToJobType(data) : null;
+        // Add type assertion to resolve TypeScript error
+        return data ? adaptDatabaseJobToJobType(data as any) : null;
       } catch (error) {
         console.error(`Error fetching job with ID ${id}:`, error);
         throw new Error(getErrorMessage(error));

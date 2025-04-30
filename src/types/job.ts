@@ -14,7 +14,7 @@ export type JobStatus =
 // Priority levels
 export type JobPriority = "low" | "medium" | "high";
 
-// Common location interface 
+// Common location interface with a flexible index signature
 export interface JobLocation {
   address: string;
   city: string;
