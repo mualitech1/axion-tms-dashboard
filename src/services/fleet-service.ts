@@ -63,9 +63,15 @@ export const fleetService = {
    */
   async createVehicle(vehicleData: Omit<Vehicle, 'id'>): Promise<Vehicle> {
     try {
+      // Convert year to number if it's a string
+      const processedData = {
+        ...vehicleData,
+        year: vehicleData.year ? Number(vehicleData.year) : null
+      };
+      
       const { data, error } = await supabase
         .from('vehicles')
-        .insert([vehicleData])
+        .insert([processedData])
         .select()
         .single();
       
@@ -82,9 +88,15 @@ export const fleetService = {
    */
   async updateVehicle(id: string, vehicleData: Partial<Vehicle>): Promise<Vehicle> {
     try {
+      // Convert year to number if it's present and a string
+      const processedData = {
+        ...vehicleData,
+        year: vehicleData.year !== undefined ? Number(vehicleData.year) : undefined
+      };
+      
       const { data, error } = await supabase
         .from('vehicles')
-        .update(vehicleData)
+        .update(processedData)
         .eq('id', id)
         .select()
         .single();

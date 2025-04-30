@@ -16,12 +16,14 @@ export function useVehicles(filters?: VehicleFilters) {
   } = useQuery({
     queryKey: ['vehicles', filters],
     queryFn: () => fleetService.getVehicles(filters),
-    onError: (error: Error) => {
-      toast({
-        title: 'Error',
-        description: `Failed to load vehicles: ${error.message}`,
-        variant: 'destructive',
-      });
+    meta: {
+      onError: (error: Error) => {
+        toast({
+          title: 'Error',
+          description: `Failed to load vehicles: ${error.message}`,
+          variant: 'destructive',
+        });
+      }
     }
   });
   
@@ -45,12 +47,14 @@ export function useVehicleById(id?: string) {
     queryKey: ['vehicle', id],
     queryFn: () => id ? fleetService.getVehicleById(id) : null,
     enabled,
-    onError: (error: Error) => {
-      toast({
-        title: 'Error',
-        description: `Failed to load vehicle details: ${error.message}`,
-        variant: 'destructive',
-      });
+    meta: {
+      onError: (error: Error) => {
+        toast({
+          title: 'Error',
+          description: `Failed to load vehicle details: ${error.message}`,
+          variant: 'destructive',
+        });
+      }
     }
   });
   
@@ -73,12 +77,14 @@ export function useMaintenanceRecords(vehicleId?: string) {
     queryKey: ['maintenance', vehicleId],
     queryFn: () => vehicleId ? fleetService.getMaintenanceRecords(vehicleId) : [],
     enabled,
-    onError: (error: Error) => {
-      toast({
-        title: 'Error',
-        description: `Failed to load maintenance records: ${error.message}`,
-        variant: 'destructive',
-      });
+    meta: {
+      onError: (error: Error) => {
+        toast({
+          title: 'Error',
+          description: `Failed to load maintenance records: ${error.message}`,
+          variant: 'destructive',
+        });
+      }
     }
   });
   
