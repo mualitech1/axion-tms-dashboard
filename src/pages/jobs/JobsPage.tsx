@@ -1,94 +1,133 @@
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useJobs } from '@/hooks/use-job';
 import MainLayout from '@/components/layout/MainLayout';
-import { useJobs } from '@/hooks/use-jobs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { JobsHeader } from './components/jobs-header/JobsHeader';
 import JobsList from './components/JobsList';
 import JobCreation from './components/JobCreation';
-import JobsGrid from './components/jobs-list/JobsGrid';
-import { Card } from '@/components/ui/card';
-import { JobsHeader } from './components/jobs-header/JobsHeader';
-import { JobsStatistics } from './components/stats/JobsStatistics';
-import { JobsFilters } from './components/filters/JobsFilters';
-import { adaptDatabaseJobsToJobTypes } from './adapters/jobAdapter';
+import { JobStatus } from '@/types/job';
+import { motion } from 'framer-motion';
 
 export default function JobsPage() {
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const { jobs, isLoading, error, refetch } = useJobs();
-
-  const handleCreateJobClick = () => {
-    setShowCreateModal(true);
-  };
-
-  // Convert database jobs to the type expected by our components
-  const adaptedJobs = adaptDatabaseJobsToJobTypes(jobs);
+  const [showCreateJob, setShowCreateJob] = useState(false);
+  const [currentTab, setCurrentTab] = useState<JobStatus | 'all'>('all');
   
-  const filteredJobs = filterStatus !== 'all' 
-    ? adaptedJobs.filter(job => job.status === filterStatus) 
-    : adaptedJobs;
-
-  const jobStatusCounts = adaptedJobs.reduce((acc, job) => {
-    acc[job.status] = (acc[job.status] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  if (error) {
-    return (
-      <MainLayout title="Jobs">
-        <motion.div 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          className="flex items-center justify-center h-full"
-        >
-          <Card className="p-6 max-w-lg w-full bg-destructive/10 border-destructive">
-            <p className="text-destructive font-medium text-center">Error loading jobs: {error.message}</p>
-          </Card>
-        </motion.div>
-      </MainLayout>
-    );
-  }
+  // Use our improved hook with status filter
+  const { 
+    jobs, 
+    isLoading, 
+    error, 
+    refetch,
+    createJob 
+  } = useJobs(currentTab !== 'all' ? { status: currentTab } : undefined);
+  
+  const handleCreateJob = () => {
+    setShowCreateJob(true);
+  };
+  
+  const handleJobCreationComplete = () => {
+    setShowCreateJob(false);
+    refetch();
+  };
+  
+  // Filter jobs based on tab selection (fallback for when we're not using API filtering)
+  const filteredJobs = currentTab === 'all' ? jobs : jobs?.filter(job => job.status === currentTab);
 
   return (
-    <MainLayout title="Jobs">
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="h-full"
-      >
-        <JobsHeader onCreateJob={handleCreateJobClick} onRefresh={refetch} />
-        <JobsStatistics jobs={adaptedJobs} jobStatusCounts={jobStatusCounts} />
-        
-        <div className="bg-gradient-to-br from-aximo-dark to-aximo-darker border border-aximo-border rounded-lg p-6 shadow-lg backdrop-blur-sm">
-          <JobsFilters
-            filterStatus={filterStatus}
-            setFilterStatus={setFilterStatus}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-          />
-          
-          <motion.div
-            key={viewMode}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            {viewMode === 'list' ? (
-              <JobsList jobs={filteredJobs} isLoading={isLoading} />
-            ) : (
-              <JobsGrid jobs={filteredJobs} isLoading={isLoading} />
-            )}
-          </motion.div>
-        </div>
-      </motion.div>
-      
-      {showCreateModal && (
-        <JobCreation
-          onComplete={() => setShowCreateModal(false)}
-        />
+    <MainLayout title="Jobs Management">
+      {showCreateJob && (
+        <JobCreation onComplete={handleJobCreationComplete} />
       )}
+      
+      <div className="container mx-auto space-y-6">
+        <JobsHeader onCreateJob={handleCreateJob} onRefresh={refetch} />
+        
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-aximo-card rounded-lg shadow-sm border border-aximo-border overflow-hidden"
+        >
+          <Tabs 
+            defaultValue="all" 
+            onValueChange={(value) => setCurrentTab(value as JobStatus | 'all')}
+            className="w-full"
+          >
+            <div className="px-4 pt-4">
+              <TabsList className="grid grid-cols-5 w-full max-w-3xl bg-aximo-darker">
+                <TabsTrigger 
+                  value="all"
+                  className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
+                >
+                  All Jobs
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="booked"
+                  className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
+                >
+                  Booked
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="in-progress"
+                  className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
+                >
+                  In Progress
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="completed"
+                  className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
+                >
+                  Completed
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="issues"
+                  className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
+                >
+                  Issues
+                </TabsTrigger>
+              </TabsList>
+            </div>
+            
+            <TabsContent value="all" className="p-4">
+              <JobsList jobs={filteredJobs || []} isLoading={isLoading} />
+            </TabsContent>
+            
+            {['booked', 'in-progress', 'completed', 'issues'].map((status) => (
+              <TabsContent key={status} value={status} className="p-4">
+                <JobsList jobs={filteredJobs || []} isLoading={isLoading} />
+              </TabsContent>
+            ))}
+          </Tabs>
+        </motion.div>
+        
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Error loading jobs</h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>{error.message}</p>
+                </div>
+                <div className="mt-4">
+                  <button
+                    type="button"
+                    onClick={() => refetch()}
+                    className="text-sm font-medium text-red-600 hover:text-red-500"
+                  >
+                    Try again
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </MainLayout>
   );
 }

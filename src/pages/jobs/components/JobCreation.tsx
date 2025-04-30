@@ -1,10 +1,11 @@
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import JobCreationForm from "./job-creation/JobCreationForm";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { X } from "lucide-react";
 import { motion } from "framer-motion";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface JobCreationProps {
   onComplete: () => void;
@@ -42,7 +43,12 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
       <DialogContent 
         className="w-full max-w-4xl p-0 bg-[#030619] border-[#1a3246] h-auto max-h-[90vh] overflow-hidden rounded-xl"
         onInteractOutside={(e) => e.preventDefault()}
+        aria-describedby="job-creation-description"
       >
+        <VisuallyHidden>
+          <DialogTitle>Create New Job</DialogTitle>
+          <p id="job-creation-description">Form to create a new transportation job</p>
+        </VisuallyHidden>
         <ExitButton />
         <JobCreationForm onComplete={onComplete} />
       </DialogContent>
