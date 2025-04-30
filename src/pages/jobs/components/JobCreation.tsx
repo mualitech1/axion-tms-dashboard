@@ -25,6 +25,7 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
       transition={{ duration: 0.2 }}
     >
       <X className="h-5 w-5" />
+      <span className="sr-only">Close</span>
     </motion.button>
   );
   
@@ -32,7 +33,7 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
     <Sheet open={true} onOpenChange={onComplete}>
       <SheetContent 
         side="bottom" 
-        className="h-[95vh] p-0 bg-[#030619] border-t border-[#1a3246] rounded-t-xl overflow-hidden"
+        className="h-[92vh] p-0 bg-[#030619] border-t border-[#1a3246] rounded-t-xl overflow-hidden"
       >
         <ExitButton />
         <JobCreationForm onComplete={onComplete} />
@@ -41,7 +42,7 @@ export default function JobCreation({ onComplete }: JobCreationProps) {
   ) : (
     <Dialog open={true} onOpenChange={onComplete}>
       <DialogContent 
-        className="w-full max-w-4xl p-0 bg-[#030619] border-[#1a3246] max-h-[90vh] overflow-hidden rounded-xl flex flex-col"
+        className="w-full max-w-4xl p-0 bg-[#030619] border-[#1a3246] max-h-[92vh] overflow-hidden rounded-xl flex flex-col"
         onInteractOutside={(e) => e.preventDefault()}
         aria-describedby="job-creation-description"
       >

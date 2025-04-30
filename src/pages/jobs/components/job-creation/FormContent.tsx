@@ -60,8 +60,8 @@ export function FormContent({
   onSubmit
 }: FormContentProps) {
   const isMobile = useIsMobile();
-  // Adjusting the max height to ensure the form is always scrollable but not too large
-  const scrollMaxHeight = isMobile ? "calc(58vh)" : "calc(60vh)";
+  // Adjusting the max height to ensure the form fits in the viewport with space for buttons
+  const scrollMaxHeight = isMobile ? "calc(50vh)" : "calc(55vh)";
   const [direction, setDirection] = React.useState(0);
 
   // Set direction based on step change
@@ -117,59 +117,61 @@ export function FormContent({
     <Form {...form}>
       <form 
         onSubmit={form.handleSubmit(onSubmit)} 
-        className="space-y-4 sm:space-y-6 flex flex-col h-full"
+        className="space-y-4 flex flex-col h-full"
       >
-        <div className="bg-[#05101b] rounded-lg shadow-lg border border-[#1a3246] flex-grow overflow-hidden">
-          <ScrollArea 
-            className="p-4 sm:p-6" 
-            style={{ 
-              height: scrollMaxHeight,
-              overflowY: "auto"
-            }}
-            scrollHideDelay={100}
-          >
-            <AnimatePresence custom={direction} mode="wait">
-              <motion.div
-                key={currentStep}
-                custom={direction}
-                variants={variants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="pb-4 sm:pb-6"
-              >
-                <div className="relative">
-                  <motion.div
-                    initial={{ opacity: 0.3 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.1, duration: 0.4 }}
-                  >
-                    {renderCurrentStep()}
-                  </motion.div>
-                  
-                  {/* Step indicator */}
-                  <div className="absolute right-0 top-0">
-                    <div className="bg-[#0a9bdb]/10 text-[#0adeee] text-xs font-mono px-2.5 py-1 rounded-md border border-[#1a3246]">
-                      Step {currentStep} of {totalSteps}
+        <div className="flex flex-col h-full">
+          {/* Form content in scrollable area */}
+          <div className="bg-[#05101b] rounded-lg shadow-lg border border-[#1a3246] flex-grow overflow-hidden mb-4">
+            <ScrollArea 
+              className="p-4 sm:p-6" 
+              style={{ 
+                height: scrollMaxHeight,
+              }}
+              scrollHideDelay={100}
+            >
+              <AnimatePresence custom={direction} mode="wait">
+                <motion.div
+                  key={currentStep}
+                  custom={direction}
+                  variants={variants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="pb-6"
+                >
+                  <div className="relative">
+                    <motion.div
+                      initial={{ opacity: 0.3 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.1, duration: 0.4 }}
+                    >
+                      {renderCurrentStep()}
+                    </motion.div>
+                    
+                    {/* Step indicator */}
+                    <div className="absolute right-0 top-0">
+                      <div className="bg-[#0a9bdb]/10 text-[#0adeee] text-xs font-mono px-2.5 py-1 rounded-md border border-[#1a3246]">
+                        Step {currentStep} of {totalSteps}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </ScrollArea>
-        </div>
-        
-        {/* Navigation buttons - positioned outside of ScrollArea */}
-        <div className="mt-4 pb-2 px-1">
-          <NavigationButtons 
-            currentStep={currentStep}
-            totalSteps={totalSteps}
-            isSubmitting={form.formState.isSubmitting}
-            prevStep={handlePrev}
-            nextStep={handleNext}
-            onCancel={onCancel}
-          />
+                </motion.div>
+              </AnimatePresence>
+            </ScrollArea>
+          </div>
+          
+          {/* Navigation buttons - positioned outside of ScrollArea for permanent visibility */}
+          <div className="sticky bottom-0 bg-[#030619] py-4 z-10">
+            <NavigationButtons 
+              currentStep={currentStep}
+              totalSteps={totalSteps}
+              isSubmitting={form.formState.isSubmitting}
+              prevStep={handlePrev}
+              nextStep={handleNext}
+              onCancel={onCancel}
+            />
+          </div>
         </div>
       </form>
     </Form>
