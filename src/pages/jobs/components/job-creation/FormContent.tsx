@@ -8,23 +8,24 @@ import { SummaryStep } from "./step-forms/SummaryStep";
 import { NavigationButtons } from "./NavigationButtons";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { UseFormReturn } from "react-hook-form";
+import { AdditionalStop, JobCreationFormData } from "@/pages/jobs/types/formTypes";
 import * as React from "react";
 
 interface FormContentProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<JobCreationFormData>;
   currentStep: number;
   totalSteps: number;
   date: Date | undefined;
   setDate: (date: Date | undefined) => void;
   onDocumentsChange: (files: File[]) => void;
-  additionalStops: any[];
+  additionalStops: AdditionalStop[];
   addStop: () => void;
   removeStop: (index: number) => void;
-  updateAdditionalStop: (index: number, field: string, value: string) => void;
+  updateAdditionalStop: (index: number, field: keyof AdditionalStop, value: string) => void;
   nextStep: () => void;
   prevStep: () => void;
   onCancel: () => void;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: JobCreationFormData) => void;
 }
 
 const variants = {
@@ -106,7 +107,7 @@ export function FormContent({
           />
         );
       case 3:
-        return <SummaryStep form={form} />;
+        return <SummaryStep form={form} date={date} />;
       default:
         return null;
     }

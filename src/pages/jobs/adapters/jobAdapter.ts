@@ -1,5 +1,5 @@
 
-import { Job as DatabaseJob } from '@/types/database';
+import { Job as DatabaseJob } from '@/types/database-types';
 import { Job, JobLocation } from '@/types/job';
 import { Json } from '@/integrations/supabase/types';
 
@@ -59,10 +59,10 @@ export function adaptDatabaseJobToJobType(dbJob: DatabaseJob): Job {
   
   return {
     id: dbJob.id,
-    title: dbJob.title,
+    title: dbJob.title || 'Untitled Job',
     client: dbJob.customer?.name || 'Unassigned',
-    date: dbJob.pickup_date,
-    time: new Date(dbJob.pickup_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    date: dbJob.pickup_date || new Date().toISOString(),
+    time: dbJob.pickup_date ? new Date(dbJob.pickup_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '00:00',
     origin: pickupCity,
     destination: deliveryCity,
     vehicle: dbJob.vehicle ? `${dbJob.vehicle.make} ${dbJob.vehicle.model}` : 'Unassigned',
@@ -98,8 +98,19 @@ export function adaptDatabaseJobsToJobTypes(dbJobs: DatabaseJob[] | undefined): 
  * Also ensures all required fields have at least default values
  */
 export function adaptJobTypeToDatabase(job: Partial<Job>): Partial<DatabaseJob> {
-  // Define default location objects for required fields
-  const defaultLocation = { address: '', city: '', postcode: '', country: '' };
+  console.log("Adapting job for database:", job);
+  
+  // Process pickup_location and delivery_location if provided
+  let pickup_location = null;
+  let delivery_location = null;
+  
+  if ((job as any).pickup_location) {
+    pickup_location = (job as any).pickup_location;
+  }
+  
+  if ((job as any).delivery_location) {
+    delivery_location = (job as any).delivery_location;
+  }
   
   // Define minimum required fields for job creation or update
   const dbJob: Partial<DatabaseJob> = {
@@ -115,10 +126,17 @@ export function adaptJobTypeToDatabase(job: Partial<Job>): Partial<DatabaseJob> 
     issue_details: job.issueDetails,
     // Always ensure pickup_date is set for new jobs
     pickup_date: job.date || new Date().toISOString(),
-    // Always ensure required location fields are present
-    pickup_location: defaultLocation,
-    delivery_location: defaultLocation
   };
   
+  // Add locations if they were provided
+  if (pickup_location) {
+    dbJob.pickup_location = pickup_location;
+  }
+  
+  if (delivery_location) {
+    dbJob.delivery_location = delivery_location;
+  }
+  
+  console.log("Transformed dbJob:", dbJob);
   return dbJob;
 }

@@ -1,0 +1,36 @@
+
+import { JobPriority, JobStatus } from "./jobTypes";
+
+export interface AddressFormData {
+  companyName: string;
+  contactName: string;
+  addressLine1: string;
+  city: string;
+  postCode: string;
+  reference: string;
+  time: string;
+  additionalComments?: string;
+}
+
+export interface AdditionalStop extends AddressFormData {}
+
+export interface JobCreationFormData {
+  jobTitle: string;
+  vehicleType: string;
+  priority: JobPriority;
+  customer: string;
+  rate?: string;
+  productType?: string;
+  totalWeight?: string;
+  additionalInformation?: string;
+  saveTemplate: boolean;
+  collection: AddressFormData;
+  delivery: AddressFormData;
+}
+
+export interface JobFormState extends JobCreationFormData {
+  date?: Date;
+  additionalStops: AdditionalStop[];
+  documents: File[];
+  status: JobStatus;
+}

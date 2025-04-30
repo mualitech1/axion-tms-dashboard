@@ -1,45 +1,39 @@
 
 import { useState } from "react";
-
-interface AdditionalStop {
-  companyName: string;
-  contactName: string;
-  addressLine1: string;
-  city: string;
-  postCode: string;
-  reference: string;
-  time: string;
-}
+import { AdditionalStop } from "@/pages/jobs/types/formTypes";
 
 export function useAdditionalStops() {
   const [additionalStops, setAdditionalStops] = useState<AdditionalStop[]>([]);
 
   const addStop = () => {
-    const newStop: AdditionalStop = {
-      companyName: "",
-      contactName: "",
-      addressLine1: "",
-      city: "",
-      postCode: "",
-      reference: "",
-      time: "12:00"
-    };
-    setAdditionalStops([...additionalStops, newStop]);
+    setAdditionalStops([
+      ...additionalStops,
+      {
+        companyName: "",
+        contactName: "",
+        addressLine1: "",
+        city: "",
+        postCode: "",
+        reference: "",
+        time: "12:00",
+        additionalComments: ""
+      }
+    ]);
   };
 
   const removeStop = (index: number) => {
-    const newStops = [...additionalStops];
-    newStops.splice(index, 1);
-    setAdditionalStops(newStops);
+    const updatedStops = [...additionalStops];
+    updatedStops.splice(index, 1);
+    setAdditionalStops(updatedStops);
   };
 
   const updateAdditionalStop = (index: number, field: keyof AdditionalStop, value: string) => {
-    const newStops = [...additionalStops];
-    newStops[index] = {
-      ...newStops[index],
+    const updatedStops = [...additionalStops];
+    updatedStops[index] = {
+      ...updatedStops[index],
       [field]: value
     };
-    setAdditionalStops(newStops);
+    setAdditionalStops(updatedStops);
   };
 
   return {

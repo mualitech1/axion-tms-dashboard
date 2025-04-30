@@ -4,25 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import { AddressForm } from "../address/AddressForm";
-import { AdditionalStop } from "./AdditionalStop";
+import { AdditionalStop } from "../step-forms/AdditionalStop";
 import { MapPin } from "lucide-react";
-
-interface Address {
-  companyName: string;
-  contactName: string;
-  addressLine1: string;
-  city: string;
-  postCode: string;
-  reference?: string;
-  time?: string;
-}
+import { AdditionalStop as AdditionalStopType, JobCreationFormData } from "@/pages/jobs/types/formTypes";
 
 interface AddressesStepProps {
-  form: UseFormReturn<any>;
-  additionalStops: Address[];
+  form: UseFormReturn<JobCreationFormData>;
+  additionalStops: AdditionalStopType[];
   addStop: () => void;
   removeStop: (index: number) => void;
-  updateAdditionalStop: (index: number, field: keyof Address, value: string) => void;
+  updateAdditionalStop: (index: number, field: keyof AdditionalStopType, value: string) => void;
 }
 
 export function AddressesStep({ form, additionalStops, addStop, removeStop, updateAdditionalStop }: AddressesStepProps) {
