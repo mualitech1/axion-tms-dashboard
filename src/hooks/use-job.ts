@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Job, JobLocation } from '@/types/job';
@@ -6,7 +5,10 @@ import { useToast } from '@/hooks/use-toast';
 import { getErrorMessage } from '@/utils/error-handler';
 import { adaptDatabaseJobsToJobTypes, adaptJobTypeToDatabase, adaptDatabaseJobToJobType } from '@/pages/jobs/adapters/jobAdapter';
 import { Json } from '@/integrations/supabase/types';
-import { DatabaseJob } from '@/types/database';
+import { TableTypes } from '@/types/database-types';
+
+// Define a type alias for database job to make it clearer
+type DatabaseJob = TableTypes['jobs'];
 
 // Hook for fetching all jobs with filters
 export function useJobs(filters?: Record<string, any>) {
