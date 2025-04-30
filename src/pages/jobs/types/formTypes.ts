@@ -1,5 +1,8 @@
 
-import { JobPriority, JobStatus } from "./jobTypes";
+import { JobStatus } from "@/types/job";
+
+// Define JobPriority here since it's not being imported properly
+export type JobPriority = "low" | "medium" | "high";
 
 export interface AddressFormData {
   companyName: string;

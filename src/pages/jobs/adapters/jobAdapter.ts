@@ -1,5 +1,5 @@
 
-import { Job as DatabaseJob } from '@/types/database-types';
+import { Job as DatabaseJob } from '@/types/database';
 import { Job, JobLocation } from '@/types/job';
 import { Json } from '@/integrations/supabase/types';
 
