@@ -45,7 +45,9 @@ export function useJobs(filters?: Record<string, any>) {
         const { data, error } = await query.order('created_at', { ascending: false });
         if (error) throw error;
         
-        // Transform the data to match our Job type using the adapter function
+        console.log("Raw jobs data:", data); // Debug: Log raw data
+        
+        // Use our adapter to transform database jobs to UI jobs
         return adaptDatabaseJobsToJobTypes(data);
       } catch (error) {
         console.error("Error fetching jobs:", error);
@@ -216,7 +218,9 @@ export function useJob(id?: string | number) {
 
         if (error) throw error;
         
-        // Transform to our Job type using the adapter
+        console.log("Raw job data:", data); // Debug: Log raw data
+        
+        // Use our adapter to transform database job to UI job
         return data ? adaptDatabaseJobToJobType(data) : null;
       } catch (error) {
         console.error(`Error fetching job with ID ${id}:`, error);

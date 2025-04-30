@@ -6,7 +6,7 @@ import { Json } from '@/integrations/supabase/types';
 /**
  * Safely parses JSON location data from any format
  */
-const parseLocationData = (locationData: Json | JobLocation | Record<string, any> | null): JobLocation => {
+const parseLocationData = (locationData: Json | null): JobLocation => {
   // If null or undefined, return empty location object
   if (locationData === null || locationData === undefined) {
     return { address: '', city: '', postcode: '', country: '' };
@@ -115,11 +115,10 @@ export function adaptJobTypeToDatabase(job: Partial<Job>): Partial<DatabaseJob> 
     issue_details: job.issueDetails,
     // Always ensure pickup_date is set for new jobs
     pickup_date: job.date || new Date().toISOString(),
+    // Always ensure required location fields are present
+    pickup_location: defaultLocation,
+    delivery_location: defaultLocation
   };
-  
-  // Always ensure required fields are present
-  dbJob.pickup_location = defaultLocation;
-  dbJob.delivery_location = defaultLocation;
   
   return dbJob;
 }

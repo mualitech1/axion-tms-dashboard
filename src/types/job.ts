@@ -21,7 +21,7 @@ export interface JobLocation {
   postcode: string;
   country: string;
   notes?: string;
-  [key: string]: string | undefined; // Add index signature to be compatible with Json type
+  [key: string]: any; // Allow any additional properties to be compatible with Json type
 }
 
 // Hauler/carrier info 
