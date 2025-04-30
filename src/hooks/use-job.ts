@@ -7,22 +7,6 @@ import { getErrorMessage } from '@/utils/error-handler';
 import { adaptDatabaseJobsToJobTypes, adaptJobTypeToDatabase, adaptDatabaseJobToJobType } from '@/pages/jobs/adapters/jobAdapter';
 import { Json } from '@/integrations/supabase/types';
 
-// Helper function to ensure we're working with JSON objects
-const ensureJobLocationObject = (location: any): JobLocation => {
-  if (!location) return { address: '', city: '', postcode: '', country: '' };
-  
-  if (typeof location === 'string') {
-    try {
-      return JSON.parse(location);
-    } catch (e) {
-      console.error('Error parsing location object:', e);
-      return { address: '', city: '', postcode: '', country: '' };
-    }
-  }
-  
-  return location as JobLocation;
-};
-
 // Hook for fetching all jobs with filters
 export function useJobs(filters?: Record<string, any>) {
   const { toast } = useToast();
@@ -85,6 +69,15 @@ export function useJobs(filters?: Record<string, any>) {
       try {
         // Transform the job data for the database using our adapter
         const supabaseJob = adaptJobTypeToDatabase(jobData);
+        
+        // Ensure required fields are present for database insertion
+        if (!supabaseJob.pickup_location) {
+          supabaseJob.pickup_location = { address: '', city: '', postcode: '', country: '' };
+        }
+        
+        if (!supabaseJob.delivery_location) {
+          supabaseJob.delivery_location = { address: '', city: '', postcode: '', country: '' };
+        }
         
         const { data, error } = await supabase
           .from('jobs')

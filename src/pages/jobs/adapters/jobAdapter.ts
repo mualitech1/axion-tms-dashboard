@@ -12,15 +12,29 @@ const parseLocationData = (locationData: Json | JobLocation | Record<string, any
     return { address: '', city: '', postcode: '', country: '' };
   }
   
-  // If it's already an object, use it directly
-  if (typeof locationData === 'object') {
-    return locationData as JobLocation;
+  // If it's already an object with expected properties, use it directly
+  if (typeof locationData === 'object' && locationData !== null) {
+    // Ensure it has at least the required fields
+    return {
+      address: (locationData as any).address || '',
+      city: (locationData as any).city || '',
+      postcode: (locationData as any).postcode || '',
+      country: (locationData as any).country || '',
+      ...(locationData as any) // Preserve any other properties
+    };
   }
   
   // If it's a string (JSON), try to parse it
   if (typeof locationData === 'string') {
     try {
-      return JSON.parse(locationData) as JobLocation;
+      const parsed = JSON.parse(locationData);
+      return {
+        address: parsed.address || '',
+        city: parsed.city || '',
+        postcode: parsed.postcode || '',
+        country: parsed.country || '',
+        ...parsed // Preserve any other properties
+      };
     } catch (e) {
       console.error('Error parsing location data:', e);
       return { address: '', city: '', postcode: '', country: '' };
@@ -81,6 +95,7 @@ export function adaptDatabaseJobsToJobTypes(dbJobs: DatabaseJob[] | undefined): 
 
 /**
  * Converts a UI job type back to database format for saving
+ * Also ensures all required fields have at least default values
  */
 export function adaptJobTypeToDatabase(job: Partial<Job>): Partial<DatabaseJob> {
   // Define default location objects for required fields
@@ -88,21 +103,33 @@ export function adaptJobTypeToDatabase(job: Partial<Job>): Partial<DatabaseJob> 
   
   // Define minimum required fields for job creation or update
   const dbJob: Partial<DatabaseJob> = {
-    title: job.title,
-    status: job.status,
-    priority: job.priority,
-    reference: job.reference,
+    title: job.title || 'New Job', // Provide default for required fields
+    status: job.status || 'booked',
+    priority: job.priority || 'medium',
+    reference: job.reference || `REF-${Date.now()}`, // Generate a default reference if none provided
     notes: job.notes,
     value: job.value,
     estimated_duration: job.estimatedDuration,
     pod_uploaded: job.podUploaded,
     pod_document_id: job.podDocumentId,
     issue_details: job.issueDetails,
-    // Always include these required fields with default values if this is for a new job
+    // Always ensure pickup_date is set for new jobs
     pickup_date: job.date || new Date().toISOString(),
-    pickup_location: defaultLocation,
-    delivery_location: defaultLocation
   };
+  
+  // Always include these required location fields to avoid type errors
+  if (job.date) {
+    dbJob.pickup_date = job.date;
+  }
+  
+  // Only include these fields if updating an existing job (to prevent nullifying existing data)
+  if ('pickup_location' in job) {
+    dbJob.pickup_location = defaultLocation;
+  }
+  
+  if ('delivery_location' in job) {
+    dbJob.delivery_location = defaultLocation;
+  }
   
   return dbJob;
 }
