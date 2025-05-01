@@ -21,7 +21,7 @@ export function NavigationButtons({
   onCancel 
 }: NavigationButtonsProps) {
   return (
-    <div className="flex justify-between items-center w-full px-1">
+    <div className="flex justify-between items-center w-full px-1 py-2">
       {currentStep > 1 ? (
         <motion.div
           initial={{ opacity: 0, x: -10 }}

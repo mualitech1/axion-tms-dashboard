@@ -31,18 +31,18 @@ export function FileUploader({ onFilesChange }: FileUploaderProps) {
     <div className="space-y-3">
       <div 
         {...getRootProps()} 
-        className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors min-h-[180px] flex flex-col items-center justify-center ${
+        className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors min-h-[180px] flex flex-col items-center justify-center ${
           isDragActive ? 'border-[#0adeee] bg-[#0adeee]/5' : 'border-[#1a3246] hover:border-[#0a9bdb]'
         }`}
       >
         <input {...getInputProps()} />
-        <div className="flex flex-col items-center justify-center space-y-3 py-3">
+        <div className="flex flex-col items-center justify-center space-y-4 py-4">
           <motion.div 
-            className="p-3 rounded-full bg-[#0a9bdb]/20"
+            className="p-4 rounded-full bg-[#0a9bdb]/20"
             animate={{ y: isDragActive ? -5 : 0 }}
             transition={{ duration: 0.3, type: "spring" }}
           >
-            <Upload className="h-7 w-7 text-[#0adeee]" />
+            <Upload className="h-8 w-8 text-[#0adeee]" />
           </motion.div>
           <motion.p 
             className="text-sm font-medium text-white"

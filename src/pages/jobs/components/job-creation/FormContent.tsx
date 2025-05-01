@@ -61,7 +61,7 @@ export function FormContent({
 }: FormContentProps) {
   const isMobile = useIsMobile();
   // Adjusting the max height to ensure the form fits in the viewport with space for buttons
-  const scrollMaxHeight = isMobile ? "calc(50vh)" : "calc(55vh)";
+  const scrollMaxHeight = isMobile ? "calc(50vh)" : "calc(60vh)";
   const [direction, setDirection] = React.useState(0);
 
   // Set direction based on step change
@@ -160,12 +160,12 @@ export function FormContent({
               </AnimatePresence>
               
               {/* Add extra padding at the bottom to ensure content is not hidden by the buttons */}
-              <div className="h-6 md:h-8"></div>
+              <div className="h-10 md:h-12"></div>
             </ScrollArea>
           </div>
           
           {/* Navigation buttons - positioned outside of ScrollArea for permanent visibility */}
-          <div className="sticky bottom-0 bg-[#030619] py-4 pb-5 md:pb-6 z-10">
+          <div className="sticky bottom-0 bg-[#030619] pt-2 pb-6 md:pb-8 z-10">
             <NavigationButtons 
               currentStep={currentStep}
               totalSteps={totalSteps}
