@@ -14,7 +14,7 @@ import { InvoiceData } from "@/components/invoices/create-invoice-dialog/types";
 import { invoices as mockInvoices } from "@/components/invoices/mockData";
 import { useInvoiceList } from "@/hooks/use-invoice-list";
 import { useInvoiceActions } from "@/hooks/use-invoice-actions";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
