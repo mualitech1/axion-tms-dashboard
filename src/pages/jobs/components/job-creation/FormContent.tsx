@@ -158,11 +158,14 @@ export function FormContent({
                   </div>
                 </motion.div>
               </AnimatePresence>
+              
+              {/* Add extra padding at the bottom to ensure content is not hidden by the buttons */}
+              <div className="h-6 md:h-8"></div>
             </ScrollArea>
           </div>
           
           {/* Navigation buttons - positioned outside of ScrollArea for permanent visibility */}
-          <div className="sticky bottom-0 bg-[#030619] py-4 z-10">
+          <div className="sticky bottom-0 bg-[#030619] py-4 pb-5 md:pb-6 z-10">
             <NavigationButtons 
               currentStep={currentStep}
               totalSteps={totalSteps}
