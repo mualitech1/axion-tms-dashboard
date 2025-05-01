@@ -1,16 +1,16 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useJobs } from '@/hooks/use-job';
 import MainLayout from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { JobsHeader } from './components/jobs-header/JobsHeader';
 import JobsList from './components/JobsList';
-import JobCreation from './components/JobCreation';
 import { JobStatus } from '@/types/job';
 import { motion } from 'framer-motion';
 
 export default function JobsPage() {
-  const [showCreateJob, setShowCreateJob] = useState(false);
+  const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState<JobStatus | 'all'>('all');
   
   // Use our improved hook with status filter
@@ -23,12 +23,7 @@ export default function JobsPage() {
   } = useJobs(currentTab !== 'all' ? { status: currentTab } : undefined);
   
   const handleCreateJob = () => {
-    setShowCreateJob(true);
-  };
-  
-  const handleJobCreationComplete = () => {
-    setShowCreateJob(false);
-    refetch();
+    navigate('/jobs/create');
   };
   
   // Jobs are already properly typed from our useJobs hook
@@ -36,10 +31,6 @@ export default function JobsPage() {
   
   return (
     <MainLayout title="Jobs Management">
-      {showCreateJob && (
-        <JobCreation onComplete={handleJobCreationComplete} />
-      )}
-      
       <div className="container mx-auto space-y-6">
         <JobsHeader onCreateJob={handleCreateJob} onRefresh={refetch} />
         

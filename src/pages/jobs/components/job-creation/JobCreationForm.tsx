@@ -5,7 +5,6 @@ import { StepIndicator } from "./StepIndicator";
 import { FormContent } from "./FormContent";
 import { useJobCreationForm } from "./hooks/useJobCreationForm";
 import { useAdditionalStops } from "./hooks/useAdditionalStops";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
 
 interface JobCreationProps {
@@ -13,7 +12,6 @@ interface JobCreationProps {
 }
 
 export default function JobCreationForm({ onComplete }: JobCreationProps) {
-  const isMobile = useIsMobile();
   const {
     form,
     date,
@@ -67,7 +65,7 @@ export default function JobCreationForm({ onComplete }: JobCreationProps) {
         </div>
       </CardHeader>
       
-      <CardContent className="p-4 sm:p-6 bg-[#030619] flex-grow overflow-hidden">
+      <CardContent className="p-0 bg-[#030619] flex-grow">
         <FormContent 
           form={form}
           currentStep={currentStep}
