@@ -8,12 +8,14 @@ import Index from '@/pages/Index';
 import AuthPage from '@/pages/auth/AuthPage';
 import Drivers from '@/pages/Drivers';
 import Invoices from '@/pages/Invoices';
+import InvoiceDetails from '@/pages/invoices/InvoiceDetails';
 import Jobs from '@/pages/Jobs';
 import Carriers from '@/pages/Carriers';
 import CustomerPortal from '@/pages/CustomerPortal';
 import Customers from '@/pages/Customers';
 import Fleet from '@/pages/Fleet';
 import Finance from '@/pages/Finance';
+import CarrierSelfInvoices from '@/pages/finance/CarrierSelfInvoices';
 import Users from '@/pages/Users';
 import SettingsPage from '@/pages/settings/SettingsPage';
 import Pipeline from '@/pages/Pipeline';
@@ -52,6 +54,10 @@ const router = createBrowserRouter([
   {
     path: "/invoices",
     element: <Invoices />,
+  },
+  {
+    path: "/invoices/:id",
+    element: <InvoiceDetails />,
   },
   {
     path: "/jobs/*",  // Use wildcard to allow for nested routes
@@ -130,6 +136,10 @@ const router = createBrowserRouter([
   {
     path: "/finance",
     element: <Finance />,
+  },
+  {
+    path: "/finance/carrier-self-invoices",
+    element: <CarrierSelfInvoices />,
   },
   {
     path: "/users",

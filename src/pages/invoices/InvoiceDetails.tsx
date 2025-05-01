@@ -8,6 +8,8 @@ import { ArrowLeft, Printer, Download } from 'lucide-react';
 import { InvoiceDetailsHeader } from '@/components/invoices/invoice-details/InvoiceDetailsHeader';
 import { InvoiceDetailsContent } from '@/components/invoices/invoice-details/InvoiceDetailsContent';
 import { Card } from '@/components/ui/card';
+import { Breadcrumb } from '@/components/navigation/Breadcrumb';
+import { motion } from 'framer-motion';
 
 export default function InvoiceDetails() {
   const { id } = useParams();
@@ -30,6 +32,12 @@ export default function InvoiceDetails() {
       return data;
     },
   });
+
+  const breadcrumbItems = [
+    { label: "Dashboard", path: "/" },
+    { label: "Invoices", path: "/invoices" },
+    { label: `Invoice ${id?.substring(0, 8)}`, path: `/invoices/${id}` },
+  ];
 
   if (isLoading) {
     return (
@@ -59,7 +67,15 @@ export default function InvoiceDetails() {
 
   return (
     <MainLayout title={`Invoice #${invoice.invoice_number}`}>
-      <div className="space-y-6">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="space-y-6"
+      >
+        <div className="mb-6">
+          <Breadcrumb items={breadcrumbItems} />
+        </div>
+        
         <div className="flex justify-between items-center">
           <Button variant="outline" onClick={() => navigate('/invoices')}>
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -77,11 +93,11 @@ export default function InvoiceDetails() {
           </div>
         </div>
 
-        <Card className="p-6">
+        <Card className="p-6 border-aximo-border">
           <InvoiceDetailsHeader invoice={invoice} />
           <InvoiceDetailsContent invoice={invoice} />
         </Card>
-      </div>
+      </motion.div>
     </MainLayout>
   );
 }

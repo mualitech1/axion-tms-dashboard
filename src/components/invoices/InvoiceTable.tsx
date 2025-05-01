@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -57,48 +58,48 @@ export function InvoiceTable({
 
   return (
     <>
-      <div className="rounded-md border overflow-hidden">
+      <div className="rounded-md border border-aximo-border overflow-hidden">
         <Table>
-          <TableHeader className="bg-gray-50">
+          <TableHeader className="bg-gray-50 dark:bg-aximo-darker">
             <TableRow>
-              <TableHead className="font-semibold text-gray-700 cursor-pointer" onClick={() => handleSort('id')}>
+              <TableHead className="font-semibold text-gray-700 dark:text-gray-300 cursor-pointer" onClick={() => handleSort('id')}>
                 <div className="flex items-center">
                   Invoice #
                   {getSortIcon('id')}
                 </div>
               </TableHead>
-              <TableHead className="font-semibold text-gray-700 cursor-pointer" onClick={() => handleSort('customer')}>
+              <TableHead className="font-semibold text-gray-700 dark:text-gray-300 cursor-pointer" onClick={() => handleSort('customer')}>
                 <div className="flex items-center">
                   Customer
                   {getSortIcon('customer')}
                 </div>
               </TableHead>
-              <TableHead className="font-semibold text-gray-700 hidden md:table-cell cursor-pointer" onClick={() => handleSort('date')}>
+              <TableHead className="font-semibold text-gray-700 dark:text-gray-300 hidden md:table-cell cursor-pointer" onClick={() => handleSort('date')}>
                 <div className="flex items-center">
                   Issue Date
                   {getSortIcon('date')}
                 </div>
               </TableHead>
-              <TableHead className="font-semibold text-gray-700 hidden lg:table-cell cursor-pointer" onClick={() => handleSort('dueDate')}>
+              <TableHead className="font-semibold text-gray-700 dark:text-gray-300 hidden lg:table-cell cursor-pointer" onClick={() => handleSort('dueDate')}>
                 <div className="flex items-center">
                   Due Date
                   {getSortIcon('dueDate')}
                 </div>
               </TableHead>
-              <TableHead className="font-semibold text-gray-700 cursor-pointer" onClick={() => handleSort('amount')}>
+              <TableHead className="font-semibold text-gray-700 dark:text-gray-300 cursor-pointer" onClick={() => handleSort('amount')}>
                 <div className="flex items-center">
                   Amount
                   {getSortIcon('amount')}
                 </div>
               </TableHead>
-              <TableHead className="font-semibold text-gray-700">Status</TableHead>
+              <TableHead className="font-semibold text-gray-700 dark:text-gray-300">Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {invoices.length > 0 ? (
               invoices.map((invoice) => (
-                <TableRow key={invoice.id} className="hover:bg-gray-50">
+                <TableRow key={invoice.id} className="hover:bg-gray-50 dark:hover:bg-aximo-darker/50">
                   <TableCell className="font-medium">{invoice.id}</TableCell>
                   <TableCell className="max-w-[150px] truncate">{invoice.customer}</TableCell>
                   <TableCell className="hidden md:table-cell">
@@ -161,9 +162,6 @@ export function InvoiceTable({
                         onClick={() => onEditInvoice?.(invoice)}
                       >
                         <Edit className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button variant="outline" size="icon" className="h-8 w-8">
-                        <Eye className="h-3.5 w-3.5" />
                       </Button>
                       <Button variant="outline" size="icon" className="h-8 w-8">
                         <Download className="h-3.5 w-3.5" />
