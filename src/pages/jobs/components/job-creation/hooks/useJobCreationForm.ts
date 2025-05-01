@@ -3,10 +3,44 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { JobStatus } from "@/types/job";
-import { AdditionalStop, JobCreationFormData, JobFormState } from "@/pages/jobs/types/formTypes";
+import { AdditionalStop, JobCreationFormData } from "@/pages/jobs/types/formTypes";
 import { useJobs } from "@/hooks/use-job";
 import { Job } from "@/types/job";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+// Basic validation schema for the form
+const jobFormSchema = z.object({
+  jobTitle: z.string().min(1, { message: "Job title is required" }),
+  vehicleType: z.string().min(1, { message: "Vehicle type is required" }),
+  priority: z.string(),
+  customer: z.string().min(1, { message: "Customer is required" }),
+  rate: z.string().optional(),
+  productType: z.string().optional(),
+  totalWeight: z.string().optional(),
+  additionalInformation: z.string().optional(),
+  saveTemplate: z.boolean(),
+  collection: z.object({
+    companyName: z.string().optional(),
+    contactName: z.string().optional(),
+    addressLine1: z.string().min(1, { message: "Collection address is required" }),
+    city: z.string().min(1, { message: "Collection city is required" }),
+    postCode: z.string().min(1, { message: "Collection postcode is required" }),
+    reference: z.string().optional(),
+    time: z.string(),
+    additionalComments: z.string().optional()
+  }),
+  delivery: z.object({
+    companyName: z.string().optional(),
+    contactName: z.string().optional(),
+    addressLine1: z.string().min(1, { message: "Delivery address is required" }),
+    city: z.string().min(1, { message: "Delivery city is required" }),
+    postCode: z.string().min(1, { message: "Delivery postcode is required" }),
+    reference: z.string().optional(),
+    time: z.string(),
+    additionalComments: z.string().optional()
+  })
+});
 
 export function useJobCreationForm({ onComplete }: { onComplete: () => void }) {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -18,6 +52,7 @@ export function useJobCreationForm({ onComplete }: { onComplete: () => void }) {
   const { createJob } = useJobs();
   
   const form = useForm<JobCreationFormData>({
+    resolver: zodResolver(jobFormSchema),
     defaultValues: {
       jobTitle: "",
       vehicleType: "",
@@ -48,36 +83,12 @@ export function useJobCreationForm({ onComplete }: { onComplete: () => void }) {
         time: "14:00",
         additionalComments: ""
       }
-    }
+    },
+    mode: "onChange"
   });
 
-  const nextStep = () => {
-    // Validate the current step before proceeding
-    if (currentStep === 1) {
-      const { jobTitle, vehicleType, customer } = form.getValues();
-      if (!jobTitle || !vehicleType || !customer) {
-        form.trigger(["jobTitle", "vehicleType", "customer"]);
-        // Display error toast for better UX
-        toast({
-          title: "Required Fields",
-          description: "Please fill in all required fields before continuing",
-          variant: "destructive",
-        });
-        return;
-      }
-    } else if (currentStep === 2) {
-      const { collection, delivery } = form.getValues();
-      if (!collection.addressLine1 || !delivery.addressLine1) {
-        form.trigger(["collection.addressLine1", "delivery.addressLine1"]);
-        toast({
-          title: "Address Required",
-          description: "Please provide both collection and delivery addresses",
-          variant: "destructive",
-        });
-        return;
-      }
-    }
-    
+  const nextStep = async () => {
+    // Let the FormContent component handle validation
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
