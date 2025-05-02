@@ -23,7 +23,7 @@ const CustomerPortalLayout = ({ children }: CustomerPortalLayoutProps) => {
       >
         Customer Portal
       </motion.h1>
-      <Card className="p-6 shadow-md border-indigo-100 dark:border-indigo-800/30 dark:bg-indigo-950/20 overflow-hidden">
+      <Card className="p-6 shadow-lg border-indigo-100 dark:border-indigo-800/30 dark:bg-indigo-950/20 overflow-hidden">
         {children}
       </Card>
     </motion.div>

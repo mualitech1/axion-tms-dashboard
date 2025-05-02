@@ -67,25 +67,25 @@ const CustomerTable = ({ customers, onViewDetails }: CustomerTableProps) => {
   };
 
   return (
-    <div className="bg-white shadow-sm mb-6 overflow-hidden border-t border-gray-50">
-      <div className="p-4 bg-slate-50/50 border-b border-slate-100">
+    <div className="bg-white dark:bg-indigo-950/10 shadow-sm mb-6 overflow-hidden border-t border-indigo-50/50 dark:border-indigo-800/30">
+      <div className="p-4 bg-slate-50/50 dark:bg-indigo-900/20 border-b border-slate-100 dark:border-indigo-800/30">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="relative w-full sm:w-80">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-indigo-400" />
             <Input
               placeholder="Filter table..."
-              className="pl-10 w-full border-indigo-100 focus:border-indigo-300 bg-white"
+              className="pl-10 w-full border-indigo-100 focus:border-indigo-300 bg-white dark:bg-indigo-900/30 dark:border-indigo-700/50"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="h-9 border-indigo-200 text-indigo-700 hover:text-indigo-800 hover:border-indigo-300 bg-white">
+            <Button variant="outline" size="sm" className="h-9 border-indigo-200 text-indigo-700 hover:text-indigo-800 hover:border-indigo-300 bg-white dark:bg-indigo-900/30 dark:border-indigo-700 dark:text-indigo-300 dark:hover:bg-indigo-800/50">
               <Filter className="h-4 w-4 mr-2" />
               Filter
             </Button>
-            <Button variant="outline" size="sm" className="h-9 border-indigo-200 text-indigo-700 hover:text-indigo-800 hover:border-indigo-300 bg-white">
+            <Button variant="outline" size="sm" className="h-9 border-indigo-200 text-indigo-700 hover:text-indigo-800 hover:border-indigo-300 bg-white dark:bg-indigo-900/30 dark:border-indigo-700 dark:text-indigo-300 dark:hover:bg-indigo-800/50">
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>
@@ -95,13 +95,13 @@ const CustomerTable = ({ customers, onViewDetails }: CustomerTableProps) => {
       
       <div className="overflow-x-auto">
         <Table>
-          <TableHeader className="bg-slate-50">
-            <TableRow>
-              <TableHead className="w-[280px] text-indigo-900 font-medium">Customer</TableHead>
-              <TableHead className="text-indigo-900 font-medium">Contact</TableHead>
-              <TableHead className="text-indigo-900 font-medium">Status</TableHead>
-              <TableHead className="text-right text-indigo-900 font-medium">Credit Limit</TableHead>
-              <TableHead className="text-indigo-900 font-medium">Last Order</TableHead>
+          <TableHeader className="bg-slate-50 dark:bg-indigo-900/20">
+            <TableRow className="border-b border-indigo-50/50 dark:border-indigo-800/30">
+              <TableHead className="w-[280px] text-indigo-900 font-medium dark:text-indigo-300">Customer</TableHead>
+              <TableHead className="text-indigo-900 font-medium dark:text-indigo-300">Contact</TableHead>
+              <TableHead className="text-indigo-900 font-medium dark:text-indigo-300">Status</TableHead>
+              <TableHead className="text-right text-indigo-900 font-medium dark:text-indigo-300">Credit Limit</TableHead>
+              <TableHead className="text-indigo-900 font-medium dark:text-indigo-300">Last Order</TableHead>
               <TableHead className="w-[70px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -116,41 +116,41 @@ const CustomerTable = ({ customers, onViewDetails }: CustomerTableProps) => {
                   className="group"
                 >
                   <TableRow
-                    className="hover:bg-indigo-50/50 cursor-pointer group border-b border-indigo-50/30"
+                    className="hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 cursor-pointer group border-b border-indigo-50/30 dark:border-indigo-800/20"
                     onClick={() => handleRowClick(customer)}
                   >
                     <TableCell>
                       <div className="flex items-center">
                         <div className="relative">
-                          <div className="bg-gradient-to-br from-indigo-100 to-purple-200 h-10 w-10 rounded-full flex items-center justify-center mr-3 group-hover:from-indigo-200 group-hover:to-purple-300 transition-all duration-300">
-                            <Building className="h-5 w-5 text-indigo-600" />
+                          <div className="bg-gradient-to-br from-indigo-100 to-purple-200 dark:from-indigo-800 dark:to-purple-900 h-10 w-10 rounded-full flex items-center justify-center mr-3 group-hover:from-indigo-200 group-hover:to-purple-300 dark:group-hover:from-indigo-700 dark:group-hover:to-purple-800 transition-all duration-300 shadow-sm">
+                            <Building className="h-5 w-5 text-indigo-600 dark:text-indigo-300" />
                           </div>
                           <motion.button
                             whileTap={{ scale: 0.9 }}
-                            className="absolute -top-1 -right-1 p-0.5 rounded-full bg-white shadow-sm"
+                            className="absolute -top-1 -right-1 p-0.5 rounded-full bg-white dark:bg-indigo-900 shadow-sm"
                             onClick={(e) => toggleFavorite(e, customer.id)}
                           >
                             <Heart 
-                              className={`h-3.5 w-3.5 ${favorites.includes(customer.id) ? 'fill-pink-500 text-pink-500' : 'text-gray-400'}`} 
+                              className={`h-3.5 w-3.5 ${favorites.includes(customer.id) ? 'fill-pink-500 text-pink-500' : 'text-gray-400 dark:text-gray-500'}`} 
                             />
                           </motion.button>
                         </div>
                         <div>
-                          <div className="font-medium text-indigo-900 flex items-center">
+                          <div className="font-medium text-indigo-900 dark:text-indigo-200 flex items-center">
                             {customer.name}
                             {favorites.includes(customer.id) && (
-                              <span className="ml-2 text-xs text-pink-500 bg-pink-50 px-1.5 py-0.5 rounded-full">
+                              <span className="ml-2 text-xs text-pink-500 bg-pink-50 dark:bg-pink-900/30 px-1.5 py-0.5 rounded-full">
                                 Favorite
                               </span>
                             )}
                           </div>
-                          <div className="text-sm text-indigo-500">{customer.email}</div>
+                          <div className="text-sm text-indigo-500 dark:text-indigo-400">{customer.email}</div>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
-                        <div className="text-indigo-800 font-medium">{customer.contact}</div>
+                        <div className="text-indigo-800 dark:text-indigo-300 font-medium">{customer.contact}</div>
                         <div className="flex items-center space-x-2 text-xs text-indigo-400 mt-1">
                           <span className="flex items-center">
                             <Phone className="h-3 w-3 mr-1" />
@@ -166,18 +166,18 @@ const CustomerTable = ({ customers, onViewDetails }: CustomerTableProps) => {
                     <TableCell>
                       <Badge 
                         className={`${
-                          customer.status === 'Active' ? 'bg-green-100 text-green-800 hover:bg-green-200' :
-                          customer.status === 'On Hold' ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' :
-                          'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                          customer.status === 'Active' ? 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400' :
+                          customer.status === 'On Hold' ? 'bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400' :
+                          'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400'
                         }`}
                       >
                         {customer.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right font-medium text-indigo-900">
+                    <TableCell className="text-right font-medium text-indigo-900 dark:text-indigo-300">
                       £{customer.creditLimit.toLocaleString()}
                     </TableCell>
-                    <TableCell className="text-indigo-700">
+                    <TableCell className="text-indigo-700 dark:text-indigo-400">
                       {new Date(customer.lastOrder).toLocaleDateString('en-GB', {
                         year: 'numeric',
                         month: 'short',
@@ -187,37 +187,37 @@ const CustomerTable = ({ customers, onViewDetails }: CustomerTableProps) => {
                     <TableCell onClick={(e) => e.stopPropagation()}>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100 dark:text-indigo-400 dark:hover:bg-indigo-900">
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-white border-indigo-100 shadow-md rounded-xl">
+                        <DropdownMenuContent align="end" className="bg-white dark:bg-indigo-950 border-indigo-100 dark:border-indigo-800 shadow-lg rounded-xl">
                           <DropdownMenuItem onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/customers/${customer.id}`);
                           }}
-                          className="text-indigo-700 focus:text-indigo-900 focus:bg-indigo-50 cursor-pointer">
+                          className="text-indigo-700 focus:text-indigo-900 focus:bg-indigo-50 dark:text-indigo-300 dark:focus:bg-indigo-900/50 dark:focus:text-indigo-200 cursor-pointer">
                             View Details
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/customers/${customer.id}/documents`);
                           }}
-                          className="text-indigo-700 focus:text-indigo-900 focus:bg-indigo-50 cursor-pointer">
+                          className="text-indigo-700 focus:text-indigo-900 focus:bg-indigo-50 dark:text-indigo-300 dark:focus:bg-indigo-900/50 dark:focus:text-indigo-200 cursor-pointer">
                             Documents
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/customers/${customer.id}/portal`);
                           }}
-                          className="text-indigo-700 focus:text-indigo-900 focus:bg-indigo-50 cursor-pointer">
+                          className="text-indigo-700 focus:text-indigo-900 focus:bg-indigo-50 dark:text-indigo-300 dark:focus:bg-indigo-900/50 dark:focus:text-indigo-200 cursor-pointer">
                             Portal Access
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={(e) => {
                             e.stopPropagation();
                             toggleFavorite(e, customer.id);
                           }}
-                          className="text-pink-600 focus:text-pink-700 focus:bg-pink-50 cursor-pointer">
+                          className="text-pink-600 focus:text-pink-700 focus:bg-pink-50 dark:text-pink-400 dark:focus:bg-pink-900/30 dark:focus:text-pink-300 cursor-pointer">
                             {favorites.includes(customer.id) ? (
                               <>
                                 <Heart className="h-4 w-4 mr-2 fill-pink-500" />
@@ -238,11 +238,11 @@ const CustomerTable = ({ customers, onViewDetails }: CustomerTableProps) => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-12 text-indigo-500 bg-indigo-50/30">
+                <TableCell colSpan={6} className="text-center py-12 text-indigo-500 bg-indigo-50/30 dark:bg-indigo-900/10">
                   <div className="flex flex-col items-center justify-center">
                     <Search className="h-10 w-10 text-indigo-300 mb-3" />
-                    <p className="text-lg font-medium text-indigo-700 mb-1">No customers found</p>
-                    <p className="text-indigo-500">Try adjusting your search or filter to find what you're looking for.</p>
+                    <p className="text-lg font-medium text-indigo-700 dark:text-indigo-300 mb-1">No customers found</p>
+                    <p className="text-indigo-500 dark:text-indigo-400">Try adjusting your search or filter to find what you're looking for.</p>
                   </div>
                 </TableCell>
               </TableRow>

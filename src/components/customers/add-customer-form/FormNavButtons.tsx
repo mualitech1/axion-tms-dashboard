@@ -28,7 +28,7 @@ export const FormNavButtons = ({
             type="button" 
             variant="outline" 
             onClick={() => setActiveTab(prevStep)}
-            className="flex items-center gap-2 border-indigo-200 hover:bg-indigo-50 dark:border-indigo-700 dark:hover:bg-indigo-900/50"
+            className="flex items-center gap-2 border-indigo-200 hover:bg-indigo-50 dark:border-indigo-700 dark:hover:bg-indigo-900/50 dark:text-indigo-300"
           >
             <ArrowLeft className="h-4 w-4" />
             {activeTab === "contacts" ? "Back to Company Info" : "Back to Contacts"}

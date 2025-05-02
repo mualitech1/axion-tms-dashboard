@@ -59,7 +59,7 @@ export default function CustomersList() {
         initial={{ opacity: 0, y: 20 }} 
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-indigo-600 rounded-xl overflow-hidden shadow-md"
+        className="bg-gradient-to-r from-indigo-600 to-indigo-700 rounded-xl overflow-hidden shadow-xl"
       >
         <div className="p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -119,7 +119,7 @@ export default function CustomersList() {
           className="grid grid-cols-2 md:grid-cols-4 gap-px bg-indigo-700 border-t border-indigo-500"
         >
           <div className="bg-indigo-600 p-4 flex items-center hover:bg-indigo-500 transition-colors">
-            <div className="bg-white/10 rounded-full p-3 mr-4">
+            <div className="bg-white/10 backdrop-blur-sm rounded-full p-3 mr-4">
               <Users className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -129,7 +129,7 @@ export default function CustomersList() {
           </div>
           
           <div className="bg-indigo-600 p-4 flex items-center hover:bg-indigo-500 transition-colors">
-            <div className="bg-green-400/20 rounded-full p-3 mr-4">
+            <div className="bg-green-400/20 backdrop-blur-sm rounded-full p-3 mr-4">
               <Users className="h-5 w-5 text-green-300" />
             </div>
             <div>
@@ -139,7 +139,7 @@ export default function CustomersList() {
           </div>
           
           <div className="bg-indigo-600 p-4 flex items-center hover:bg-indigo-500 transition-colors">
-            <div className="bg-amber-400/20 rounded-full p-3 mr-4">
+            <div className="bg-amber-400/20 backdrop-blur-sm rounded-full p-3 mr-4">
               <Users className="h-5 w-5 text-amber-300" />
             </div>
             <div>
@@ -149,7 +149,7 @@ export default function CustomersList() {
           </div>
           
           <div className="bg-indigo-600 p-4 flex items-center hover:bg-indigo-500 transition-colors">
-            <div className="bg-red-400/20 rounded-full p-3 mr-4">
+            <div className="bg-red-400/20 backdrop-blur-sm rounded-full p-3 mr-4">
               <Users className="h-5 w-5 text-red-300" />
             </div>
             <div>
@@ -183,28 +183,28 @@ export default function CustomersList() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <Card className="shadow-md border-indigo-50 overflow-hidden rounded-xl">
-            <CardHeader className="pb-0 border-b border-indigo-50">
+          <Card className="shadow-lg border-indigo-50 overflow-hidden rounded-xl dark:bg-indigo-950/20 dark:border-indigo-800/30">
+            <CardHeader className="pb-0 border-b border-indigo-50 dark:border-indigo-800/30 bg-indigo-50/50 dark:bg-indigo-900/20">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <CardTitle className="text-xl font-semibold text-indigo-800">
+                  <CardTitle className="text-xl font-semibold text-indigo-800 dark:text-indigo-200">
                     {filterType === 'all' ? 'All Customers' :
                      filterType === 'key' ? 'Key Accounts' :
                      filterType === 'active' ? 'Active Customers' :
                      filterType === 'onhold' ? 'On Hold Customers' :
                      'Inactive Customers'}
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-indigo-600/70 dark:text-indigo-400/70">
                     Showing {filteredCustomers.length} of {customers.length} customers
                   </CardDescription>
                 </div>
                 
                 <div className="flex gap-2 flex-wrap sm:flex-nowrap">
                   <div className="w-full sm:w-auto relative">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-400" />
                     <Input
                       placeholder="Search customers..."
-                      className="pl-8 w-full sm:w-[240px] border-gray-200"
+                      className="pl-8 w-full sm:w-[240px] border-indigo-100 focus:border-indigo-300 bg-white dark:bg-indigo-900/30 dark:border-indigo-700/50"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -215,7 +215,7 @@ export default function CustomersList() {
                       variant="outline" 
                       size="sm" 
                       onClick={() => setViewMode('list')}
-                      className={`${viewMode === 'list' ? 'bg-indigo-100 border-indigo-200 text-indigo-800' : ''}`}
+                      className={`${viewMode === 'list' ? 'bg-indigo-100 border-indigo-200 text-indigo-800 dark:bg-indigo-900/50 dark:border-indigo-700 dark:text-indigo-300' : 'dark:border-indigo-800 dark:text-indigo-300'}`}
                     >
                       <List className="h-4 w-4 mr-1" />
                       List
@@ -224,12 +224,12 @@ export default function CustomersList() {
                       variant="outline" 
                       size="sm"
                       onClick={() => setViewMode('cards')}
-                      className={`${viewMode === 'cards' ? 'bg-indigo-100 border-indigo-200 text-indigo-800' : ''}`}
+                      className={`${viewMode === 'cards' ? 'bg-indigo-100 border-indigo-200 text-indigo-800 dark:bg-indigo-900/50 dark:border-indigo-700 dark:text-indigo-300' : 'dark:border-indigo-800 dark:text-indigo-300'}`}
                     >
                       <LayoutGrid className="h-4 w-4 mr-1" />
                       Cards
                     </Button>
-                    <Button className="bg-indigo-600 hover:bg-indigo-700">
+                    <Button className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white transition-all duration-200 shadow-md">
                       <Plus className="h-4 w-4 mr-1" />
                       Add Customer
                     </Button>

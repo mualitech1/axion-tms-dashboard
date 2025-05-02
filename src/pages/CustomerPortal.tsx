@@ -8,6 +8,7 @@ import CustomerDocumentsSection from "@/components/customer-portal/CustomerDocum
 import CustomerEmailSystem from "@/components/customer-portal/CustomerEmailSystem";
 import { QuickNavigation } from "@/components/navigation/QuickNavigation";
 import { Customer } from "@/types/customer";
+import CustomerPortalNavigation from "@/components/customer-portal/CustomerPortalNavigation";
 
 // Mock customer data for demonstration
 const mockCustomer: Customer = {
@@ -74,19 +75,32 @@ export default function CustomerPortal() {
     setCustomer(updatedCustomer);
   };
 
+  // Check if any documents are expiring soon (within 30 days)
+  const hasExpiringDocuments = customer.documents?.some(
+    doc => doc.expiryDate && new Date(doc.expiryDate) < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+  ) || false;
+
   return (
     <CustomerPortalLayout>
       {/* Add temporary navigation for testing */}
       <QuickNavigation />
       
-      <Routes>
-        <Route path="dashboard" element={<CustomerPortalDashboard customer={customer} />} />
-        <Route path="profile" element={<CustomerProfileForm customer={customer} onUpdateCustomer={handleUpdateCustomer} />} />
-        <Route path="documents" element={<CustomerDocumentsSection customer={customer} />} />
-        <Route path="communications" element={<CustomerEmailSystem customer={customer} />} />
-        <Route path="rates" element={<div>Rate Cards</div>} />
-        <Route path="*" element={<Navigate to="/customer-portal/dashboard" replace />} />
-      </Routes>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="md:col-span-1">
+          <CustomerPortalNavigation hasExpiringDocuments={hasExpiringDocuments} />
+        </div>
+        
+        <div className="md:col-span-3">
+          <Routes>
+            <Route path="dashboard" element={<CustomerPortalDashboard customer={customer} />} />
+            <Route path="profile" element={<CustomerProfileForm customer={customer} onUpdateCustomer={handleUpdateCustomer} />} />
+            <Route path="documents" element={<CustomerDocumentsSection customer={customer} />} />
+            <Route path="communications" element={<CustomerEmailSystem customer={customer} />} />
+            <Route path="rates" element={<div>Rate Cards</div>} />
+            <Route path="*" element={<Navigate to="/customer-portal/dashboard" replace />} />
+          </Routes>
+        </div>
+      </div>
     </CustomerPortalLayout>
   );
 }
