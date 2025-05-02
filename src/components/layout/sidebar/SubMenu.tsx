@@ -18,10 +18,10 @@ export const SubMenu = ({ isCollapsed }: SubMenuProps) => {
         to="/pipeline/dashboard"
         className={({ isActive }) =>
           cn(
-            "flex items-center py-1 px-2 text-sm rounded-md transition-colors",
+            "flex items-center py-1.5 px-2 text-sm rounded-md transition-all",
             isActive 
-              ? "text-aximo-primary font-medium" 
-              : "text-aximo-text-secondary hover:text-aximo-text"
+              ? "text-aximo-primary font-medium bg-aximo-primary/10" 
+              : "text-aximo-text-secondary hover:text-aximo-text hover:bg-aximo-card/60"
           )
         }
       >
@@ -33,10 +33,10 @@ export const SubMenu = ({ isCollapsed }: SubMenuProps) => {
         to="/pipeline/board"
         className={({ isActive }) =>
           cn(
-            "flex items-center py-1 px-2 text-sm rounded-md transition-colors",
+            "flex items-center py-1.5 px-2 text-sm rounded-md transition-all",
             isActive 
-              ? "text-aximo-primary font-medium" 
-              : "text-aximo-text-secondary hover:text-aximo-text"
+              ? "text-aximo-primary font-medium bg-aximo-primary/10" 
+              : "text-aximo-text-secondary hover:text-aximo-text hover:bg-aximo-card/60"
           )
         }
       >
@@ -48,12 +48,12 @@ export const SubMenu = ({ isCollapsed }: SubMenuProps) => {
         to="/pipeline/tasks"
         className={({ isActive }) =>
           cn(
-            "flex items-center py-1 px-2 text-sm rounded-md transition-colors",
+            "flex items-center py-1.5 px-2 text-sm rounded-md transition-all",
             isActive || 
             location.pathname === '/pipeline/tasks/calendar' || 
             location.pathname === '/pipeline/tasks/tags'
-              ? "text-aximo-primary font-medium" 
-              : "text-aximo-text-secondary hover:text-aximo-text"
+              ? "text-aximo-primary font-medium bg-aximo-primary/10" 
+              : "text-aximo-text-secondary hover:text-aximo-text hover:bg-aximo-card/60"
           )
         }
       >

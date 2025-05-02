@@ -77,20 +77,68 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #05101b;
+  background: rgba(5, 16, 27, 0.2);
+  border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #1a3246;
-  border-radius: 4px;
+  background: rgba(26, 50, 70, 0.6);
+  border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #0a9bdb;
+  background: rgba(10, 155, 219, 0.7);
+}
+
+/* Shadow glow for active elements */
+.shadow-glow {
+  box-shadow: 0 0 8px rgba(0, 144, 255, 0.3);
+}
+
+/* Glassmorphism effect */
+.glass {
+  background: rgba(10, 20, 30, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Hover effects */
+.card-hover-effect {
+  transition: all 0.3s ease;
+}
+
+.card-hover-effect:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px -5px rgba(0, 144, 255, 0.3);
+}
+
+/* Pulsing animation for notification indicators */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.6;
+    box-shadow: 0 0 5px rgba(0, 144, 255, 0.5);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 15px rgba(0, 144, 255, 0.8);
+  }
+}
+
+.pulse-aximo {
+  animation: pulse-glow 2s infinite;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(to right, #0090FF, #33C3F0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 

@@ -11,9 +11,11 @@ export default function Pipeline() {
   return (
     <ReminderProvider>
       <AutoReminder />
-      <MainLayout title="Sales Pipeline">
-        <Outlet />
-      </MainLayout>
+      <div className="bg-gradient-to-b from-aximo-darker to-[#050A14] min-h-screen">
+        <MainLayout title="Sales Pipeline">
+          <Outlet />
+        </MainLayout>
+      </div>
     </ReminderProvider>
   );
 }

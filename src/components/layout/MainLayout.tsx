@@ -25,11 +25,11 @@ export default function MainLayout({ children, title }: MainLayoutProps) {
   }, [isMobile]);
 
   return (
-    <div className="min-h-screen bg-aximo-dark flex w-full overflow-x-hidden">
+    <div className="min-h-screen flex w-full overflow-hidden">
       <Sidebar />
       
       <div className={cn(
-        "flex-1 transition-all duration-300 ease-in-out bg-aximo-darker",
+        "flex-1 transition-all duration-300 ease-in-out",
         isMobile ? "ml-0" : (isSidebarCollapsed ? "ml-16" : "ml-64")
       )}>
         <Header title={title} />
@@ -38,10 +38,12 @@ export default function MainLayout({ children, title }: MainLayoutProps) {
           {isPipelinePath && !isMobile && <PipelineSidebar />}
           
           <main className={cn(
-            "p-2 sm:p-4 md:p-6 lg:p-8 flex-1 overflow-x-hidden",
+            "p-4 md:p-6 lg:p-8 flex-1 overflow-hidden",
             isPipelinePath && !isMobile && "border-l border-aximo-border"
           )}>
-            {children}
+            <div className="overflow-auto max-h-[calc(100vh-4rem)] custom-scrollbar">
+              {children}
+            </div>
           </main>
         </div>
       </div>

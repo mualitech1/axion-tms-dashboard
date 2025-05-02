@@ -3,10 +3,17 @@ import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, MoreHorizontal } from 'lucide-react';
 import TaskCard from './TaskCard';
 import TaskDialog from './TaskDialog';
 import { toast } from '@/hooks/use-toast';
+import { motion } from 'framer-motion';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
 
 // Sample task data
 const initialTasks = {
@@ -26,9 +33,9 @@ const initialTasks = {
 };
 
 const columns = [
-  { id: 'todo', title: 'To Do' },
-  { id: 'inProgress', title: 'In Progress' },
-  { id: 'completed', title: 'Completed' }
+  { id: 'todo', title: 'To Do', color: 'bg-blue-500' },
+  { id: 'inProgress', title: 'In Progress', color: 'bg-amber-500' },
+  { id: 'completed', title: 'Completed', color: 'bg-green-500' }
 ];
 
 interface TaskBoardProps {
@@ -142,38 +149,85 @@ export default function TaskBoard({ viewFilter }: TaskBoardProps) {
         completed: tasks.completed.filter(task => viewFilter === 'mine' ? task.assignee === 'John Doe' : true)
       };
   
+  // Container animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+  
+  // Card animation variants
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
+  
   return (
     <>
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {columns.map(column => (
-            <div key={column.id} className="h-full">
-              <Card className="h-full">
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg flex items-center gap-2">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-3 gap-4"
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+        >
+          {columns.map((column, index) => (
+            <motion.div 
+              key={column.id} 
+              className="h-full"
+              variants={cardVariants}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+            >
+              <Card className="h-full border border-aximo-border bg-aximo-darker overflow-hidden shadow-md hover:shadow-aximo transition-shadow duration-300">
+                <CardHeader className="pb-2 border-b border-aximo-border relative">
+                  <div className="absolute top-0 left-0 h-1 w-full" style={{ backgroundColor: column.color.replace('bg-', '') }}></div>
+                  <div className="flex justify-between items-center pt-1">
+                    <CardTitle className="text-lg flex items-center gap-2 text-aximo-text">
                       {column.title}
-                      <span className="text-sm font-normal bg-muted rounded-full px-2">
+                      <span className="text-sm font-normal px-2 py-0.5 rounded-full bg-aximo-card/50 text-aximo-text-secondary">
                         {filteredTasks[column.id as keyof typeof filteredTasks].length}
                       </span>
                     </CardTitle>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-8 w-8 p-0"
-                      onClick={() => handleAddTask(column.id)}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
+                    
+                    <div className="flex items-center gap-1">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-aximo-text-secondary hover:text-aximo-text">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Actions</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-aximo-card border-aximo-border">
+                          <DropdownMenuItem className="text-aximo-text hover:bg-aximo-darker">Sort by due date</DropdownMenuItem>
+                          <DropdownMenuItem className="text-aximo-text hover:bg-aximo-darker">Sort by priority</DropdownMenuItem>
+                          <DropdownMenuItem className="text-aximo-text hover:bg-aximo-darker">Collapse column</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0 text-aximo-text-secondary hover:text-aximo-primary hover:bg-aximo-primary/10"
+                        onClick={() => handleAddTask(column.id)}
+                      >
+                        <Plus className="h-4 w-4" />
+                        <span className="sr-only">Add task</span>
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
-                <CardContent>
+                
+                <CardContent className="p-2 overflow-y-auto min-h-[70vh] max-h-[70vh] custom-scrollbar">
                   <Droppable droppableId={column.id}>
                     {(provided) => (
                       <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className="min-h-[200px]"
+                        className="min-h-[150px] space-y-2"
                       >
                         {filteredTasks[column.id as keyof typeof filteredTasks].map((task, index) => (
                           <Draggable 
@@ -186,7 +240,6 @@ export default function TaskBoard({ viewFilter }: TaskBoardProps) {
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
-                                className="mb-2"
                               >
                                 <TaskCard 
                                   task={task} 
@@ -202,9 +255,9 @@ export default function TaskBoard({ viewFilter }: TaskBoardProps) {
                   </Droppable>
                 </CardContent>
               </Card>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </DragDropContext>
       
       <TaskDialog

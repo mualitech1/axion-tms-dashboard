@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { motion } from 'framer-motion';
 
 interface Task {
   id: string;
@@ -43,49 +44,77 @@ export default function TaskCard({ task, onEdit }: TaskCardProps) {
     return 'outline';
   };
 
+  // Calculate due date urgency
+  const dueDate = new Date(task.dueDate);
+  const today = new Date();
+  const daysUntilDue = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  
+  const getDueDateClass = () => {
+    if (daysUntilDue < 0) return 'text-red-500';
+    if (daysUntilDue <= 2) return 'text-amber-500';
+    return 'text-aximo-text-secondary';
+  };
+
   return (
-    <div className="bg-card border rounded-lg p-3 shadow-sm hover:shadow transition-shadow">
-      <div className="flex justify-between items-start mb-3">
-        <div className="font-medium">{task.title}</div>
+    <motion.div 
+      className="bg-aximo-card border border-aximo-border rounded-lg p-3 shadow-sm hover:shadow-aximo hover:border-aximo-border/80 transition-all duration-200"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ scale: 1.01 }}
+      transition={{ duration: 0.2 }}
+    >
+      <div className="flex justify-between items-start mb-2.5">
+        <div className="font-medium text-aximo-text">{task.title}</div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+            <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-aximo-text-secondary hover:text-aximo-text">
               <span className="sr-only">Open menu</span>
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onEdit}>Edit Task</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Mark as Complete</DropdownMenuItem>
+          <DropdownMenuContent align="end" className="bg-aximo-card border-aximo-border">
+            <DropdownMenuItem onClick={onEdit} className="text-aximo-text hover:bg-aximo-darker">
+              Edit Task
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-aximo-border" />
+            <DropdownMenuItem className="text-aximo-text hover:bg-aximo-darker">
+              Mark as Complete
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-red-500 hover:bg-red-500/10">
+              Delete Task
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
       
-      <div className="text-sm text-muted-foreground mb-3">
+      <div className="text-sm text-aximo-text-secondary mb-3">
         {task.company}
       </div>
       
       <div className="flex flex-wrap gap-1 mb-3">
         {task.tags.map(tag => (
-          <Badge key={tag} variant={getTagColor(tag) as any}>
+          <Badge 
+            key={tag} 
+            variant={getTagColor(tag) as any}
+            className="text-xs py-0 px-2 h-5 bg-opacity-80 hover:bg-opacity-100"
+          >
             {tag}
           </Badge>
         ))}
       </div>
       
       <div className="flex justify-between items-center">
-        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-          <Calendar className="h-3.5 w-3.5" />
-          <span>{format(new Date(task.dueDate), 'MMM d')}</span>
+        <div className="flex items-center gap-1 text-xs">
+          <Calendar className={`h-3 w-3 ${getDueDateClass()}`} />
+          <span className={`${getDueDateClass()}`}>{format(dueDate, 'MMM d')}</span>
         </div>
         
-        <Avatar className="h-6 w-6">
-          <AvatarFallback className="text-xs bg-primary/10 text-primary">
+        <Avatar className="h-6 w-6 border border-aximo-primary/30">
+          <AvatarFallback className="text-xs bg-aximo-primary/10 text-aximo-primary">
             {getInitials(task.assignee)}
           </AvatarFallback>
         </Avatar>
       </div>
-    </div>
+    </motion.div>
   );
 }
