@@ -63,9 +63,11 @@ export default function ReminderDialog({ open, onClose, leadId, company }: Remin
     // Add the reminder to our context
     addReminder({
       title,
-      leadId,
+      date: reminderDate.toISOString(),
+      type: 'Follow-up',
+      completed: false,
       company,
-      dateTime: reminderDate.toISOString(),
+      leadId,
       notifyMinutesBefore: parseInt(notifyBefore)
     });
     

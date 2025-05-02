@@ -17,11 +17,11 @@ import {
 import { Badge } from '@/components/ui/badge';
 
 export default function PipelineReminders() {
-  const { reminders, markAsCompleted, deleteReminder } = useReminders();
+  const { reminders, markAsComplete, deleteReminder } = useReminders();
   const [showReminderDialog, setShowReminderDialog] = useState(false);
   
   const handleComplete = (reminder: Reminder) => {
-    markAsCompleted(reminder.id);
+    markAsComplete(reminder.id);
   };
   
   const handleDelete = (reminder: Reminder) => {
@@ -29,7 +29,7 @@ export default function PipelineReminders() {
   };
   
   const getReminderStatusBadge = (reminder: Reminder) => {
-    const reminderDate = new Date(reminder.dateTime);
+    const reminderDate = new Date(reminder.date);
     
     if (reminder.completed) {
       return <Badge variant="outline">Completed</Badge>;
@@ -87,7 +87,7 @@ export default function PipelineReminders() {
               reminders
                 .sort((a, b) => {
                   if (a.completed === b.completed) {
-                    return new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime();
+                    return new Date(a.date).getTime() - new Date(b.date).getTime();
                   }
                   return a.completed ? 1 : -1;
                 })
@@ -98,7 +98,7 @@ export default function PipelineReminders() {
                   >
                     <TableCell className="font-medium">{reminder.title}</TableCell>
                     <TableCell>{reminder.company || "—"}</TableCell>
-                    <TableCell>{format(new Date(reminder.dateTime), "MMM d, yyyy 'at' h:mm a")}</TableCell>
+                    <TableCell>{format(new Date(reminder.date), "MMM d, yyyy 'at' h:mm a")}</TableCell>
                     <TableCell>{getReminderStatusBadge(reminder)}</TableCell>
                     <TableCell className="text-right space-x-2">
                       {!reminder.completed && (

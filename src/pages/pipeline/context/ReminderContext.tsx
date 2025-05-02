@@ -4,9 +4,12 @@ import React, { createContext, useContext, useState } from 'react';
 export interface Reminder {
   id: string;
   title: string;
-  date: string;
+  date: string; // Existing property
   type: string;
   completed: boolean;
+  company?: string; // Added for compatibility with PipelineReminders
+  leadId?: string; // Added for compatibility with ReminderDialog
+  notifyMinutesBefore?: number; // Added for compatibility with ReminderDialog
 }
 
 interface ReminderContextType {
@@ -26,21 +29,24 @@ export function ReminderProvider({ children }: { children: React.ReactNode }) {
       title: 'Follow up with ABC Logistics',
       date: '2025-05-02T14:00:00',
       type: 'Follow-up',
-      completed: false
+      completed: false,
+      company: 'ABC Logistics'
     },
     {
       id: 'reminder-2',
       title: 'Review Global Freight proposal',
       date: '2025-05-03T11:00:00',
       type: 'Document',
-      completed: false
+      completed: false,
+      company: 'Global Freight'
     },
     {
       id: 'reminder-3',
       title: 'Call FastTrack CEO',
       date: '2025-05-03T10:30:00',
       type: 'Call',
-      completed: false
+      completed: false,
+      company: 'FastTrack'
     }
   ]);
 
