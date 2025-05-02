@@ -1,98 +1,114 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export interface Reminder {
   id: string;
   title: string;
-  date: string; // Existing property
-  type: string;
+  leadId?: string;
+  company?: string;
+  dateTime: string;
+  notifyMinutesBefore: number;
   completed: boolean;
-  company?: string; // Added for compatibility with PipelineReminders
-  leadId?: string; // Added for compatibility with ReminderDialog
-  notifyMinutesBefore?: number; // Added for compatibility with ReminderDialog
+  createdAt: string;
 }
 
 interface ReminderContextType {
   reminders: Reminder[];
-  addReminder: (reminder: Omit<Reminder, 'id'>) => void;
-  updateReminder: (id: string, updates: Partial<Reminder>) => void;
-  deleteReminder: (id: string) => void;
-  markAsComplete: (id: string) => void;
+  addReminder: (reminder: Omit<Reminder, 'id' | 'createdAt' | 'completed'>) => void;
+  markAsCompleted: (reminderId: string) => void;
+  deleteReminder: (reminderId: string) => void;
+  activeReminders: Reminder[];
 }
 
 const ReminderContext = createContext<ReminderContextType | undefined>(undefined);
 
-export function ReminderProvider({ children }: { children: React.ReactNode }) {
-  const [reminders, setReminders] = useState<Reminder[]>([
-    {
-      id: 'reminder-1',
-      title: 'Follow up with ABC Logistics',
-      date: '2025-05-02T14:00:00',
-      type: 'Follow-up',
-      completed: false,
-      company: 'ABC Logistics'
-    },
-    {
-      id: 'reminder-2',
-      title: 'Review Global Freight proposal',
-      date: '2025-05-03T11:00:00',
-      type: 'Document',
-      completed: false,
-      company: 'Global Freight'
-    },
-    {
-      id: 'reminder-3',
-      title: 'Call FastTrack CEO',
-      date: '2025-05-03T10:30:00',
-      type: 'Call',
-      completed: false,
-      company: 'FastTrack'
-    }
-  ]);
+export function useReminders() {
+  const context = useContext(ReminderContext);
+  if (!context) {
+    throw new Error('useReminders must be used within a ReminderProvider');
+  }
+  return context;
+}
 
-  const addReminder = (reminder: Omit<Reminder, 'id'>) => {
-    const newReminder = {
-      ...reminder,
-      id: `reminder-${Date.now()}`
+// In a real app, this would come from an API or database
+const initialReminders: Reminder[] = [
+  {
+    id: 'reminder-1',
+    title: 'Follow up with Acme Logistics proposal',
+    leadId: 'lead-1',
+    company: 'Acme Logistics',
+    dateTime: '2025-04-10T14:00:00',
+    notifyMinutesBefore: 30,
+    completed: false,
+    createdAt: '2025-04-07T09:00:00'
+  },
+  {
+    id: 'reminder-2',
+    title: 'Call Tech Innovations about pricing',
+    leadId: 'lead-3',
+    company: 'Tech Innovations',
+    dateTime: '2025-04-09T11:00:00',
+    notifyMinutesBefore: 15,
+    completed: false,
+    createdAt: '2025-04-06T16:00:00'
+  },
+  {
+    id: 'reminder-3',
+    title: 'Send rate card to Global Freight',
+    leadId: 'lead-5',
+    company: 'Global Freight',
+    dateTime: '2025-04-08T09:30:00',
+    notifyMinutesBefore: 60,
+    completed: true,
+    createdAt: '2025-04-05T10:30:00'
+  }
+];
+
+export function ReminderProvider({ children }: { children: React.ReactNode }) {
+  const [reminders, setReminders] = useState<Reminder[]>(initialReminders);
+
+  // Get active (non-completed) reminders
+  const activeReminders = reminders.filter(reminder => !reminder.completed);
+
+  // Add a new reminder
+  const addReminder = (newReminder: Omit<Reminder, 'id' | 'createdAt' | 'completed'>) => {
+    const reminder: Reminder = {
+      ...newReminder,
+      id: `reminder-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      completed: false
     };
-    setReminders([...reminders, newReminder]);
+    
+    setReminders(prev => [reminder, ...prev]);
   };
 
-  const updateReminder = (id: string, updates: Partial<Reminder>) => {
-    setReminders(
-      reminders.map(reminder =>
-        reminder.id === id ? { ...reminder, ...updates } : reminder
+  // Mark a reminder as completed
+  const markAsCompleted = (reminderId: string) => {
+    setReminders(prev => 
+      prev.map(reminder => 
+        reminder.id === reminderId 
+          ? { ...reminder, completed: true }
+          : reminder
       )
     );
   };
-
-  const deleteReminder = (id: string) => {
-    setReminders(reminders.filter(reminder => reminder.id !== id));
-  };
-
-  const markAsComplete = (id: string) => {
-    updateReminder(id, { completed: true });
+  
+  // Delete a reminder
+  const deleteReminder = (reminderId: string) => {
+    setReminders(prev => prev.filter(reminder => reminder.id !== reminderId));
   };
 
   return (
-    <ReminderContext.Provider
-      value={{
-        reminders,
-        addReminder,
-        updateReminder,
+    <ReminderContext.Provider 
+      value={{ 
+        reminders, 
+        addReminder, 
+        markAsCompleted, 
         deleteReminder,
-        markAsComplete
+        activeReminders
       }}
     >
       {children}
     </ReminderContext.Provider>
   );
-}
-
-export function useReminders() {
-  const context = useContext(ReminderContext);
-  if (context === undefined) {
-    throw new Error('useReminders must be used within a ReminderProvider');
-  }
-  return context;
 }

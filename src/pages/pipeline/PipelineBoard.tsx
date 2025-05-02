@@ -8,7 +8,6 @@ import KanbanBoard from './components/kanban/KanbanBoard';
 import { pipelineStages, initialLeadsData } from './data/pipelineData';
 import { Link } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
-import { motion } from 'framer-motion';
 
 export default function PipelineBoard() {
   const [leads, setLeads] = useState(initialLeadsData);
@@ -85,60 +84,36 @@ export default function PipelineBoard() {
 
   return (
     <MainLayout title="Pipeline Board">
-      <motion.div 
-        className="space-y-6"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <motion.h1 
-              className="text-2xl font-bold tracking-tight bg-gradient-to-r from-aximo-text to-aximo-primary bg-clip-text text-transparent"
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              Pipeline Board
-            </motion.h1>
-            <motion.p 
-              className="text-aximo-text-secondary"
-              initial={{ y: -10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              Drag & drop leads between pipeline stages
-            </motion.p>
-          </div>
-          <motion.div 
-            className="flex gap-2"
-            initial={{ x: 20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            <Button variant="outline" className="border-aximo-border bg-aximo-dark hover:bg-aximo-primary/10 hover:text-aximo-primary transition-all">
-              <Filter className="mr-2 h-4 w-4" />
-              Filter
-            </Button>
-            <Button variant="outline" className="border-aximo-border bg-aximo-dark hover:bg-aximo-primary/10 hover:text-aximo-primary transition-all">
-              <SortAsc className="mr-2 h-4 w-4" />
-              Sort
-            </Button>
-            <Link to="/pipeline/lead/new">
-              <Button className="bg-aximo-primary hover:bg-aximo-primary/90 text-white shadow-aximo">
-                <Plus className="mr-2 h-4 w-4" />
-                Add New Lead
-              </Button>
-            </Link>
-          </motion.div>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Pipeline Board</h1>
+          <p className="text-muted-foreground">
+            Drag & drop leads between pipeline stages
+          </p>
         </div>
+        <div className="flex gap-2">
+          <Button variant="outline">
+            <Filter className="mr-2 h-4 w-4" />
+            Filter
+          </Button>
+          <Button variant="outline">
+            <SortAsc className="mr-2 h-4 w-4" />
+            Sort
+          </Button>
+          <Link to="/pipeline/lead/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Add New Lead
+            </Button>
+          </Link>
+        </div>
+      </div>
 
-        <KanbanBoard 
-          stages={pipelineStages}
-          leads={leads}
-          onDragEnd={handleDragEnd}
-        />
-      </motion.div>
+      <KanbanBoard 
+        stages={pipelineStages}
+        leads={leads}
+        onDragEnd={handleDragEnd}
+      />
     </MainLayout>
   );
 }
