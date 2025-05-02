@@ -6,7 +6,9 @@ import {
   Kanban,
   ListTodo,
   Calendar,
-  Tag
+  Tag,
+  Settings,
+  Bell
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -18,8 +20,8 @@ const PipelineSidebarItem = ({ to, icon: Icon, label }: { to: string; icon: Reac
         cn(
           "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
           isActive 
-            ? "bg-blue-100 text-blue-700 font-medium" 
-            : "text-gray-700 hover:bg-gray-100"
+            ? "bg-aximo-primary/20 text-aximo-primary font-medium" 
+            : "text-aximo-text-secondary hover:bg-aximo-card/60"
         )
       }
     >
@@ -33,8 +35,8 @@ export default function PipelineSidebar() {
   const location = useLocation();
   
   return (
-    <div className="w-56 border-r min-h-full bg-white p-4 flex flex-col gap-1">
-      <h3 className="font-medium text-sm text-gray-500 uppercase tracking-wider mb-2 px-3">
+    <div className="w-56 border-r border-aximo-border min-h-full bg-aximo-dark p-4 flex flex-col gap-1">
+      <h3 className="font-medium text-sm text-aximo-text-secondary uppercase tracking-wider mb-2 px-3">
         Sales Pipeline
       </h3>
       
@@ -51,7 +53,7 @@ export default function PipelineSidebar() {
       />
       
       <div className="mt-2 mb-1 pl-3">
-        <h4 className="text-xs font-medium text-gray-500">Task Management</h4>
+        <h4 className="text-xs font-medium text-aximo-text-secondary">Task Management</h4>
       </div>
       
       <PipelineSidebarItem 
@@ -70,6 +72,22 @@ export default function PipelineSidebar() {
         to="/pipeline/tasks/tags" 
         icon={Tag} 
         label="Task Tags"
+      />
+      
+      <div className="mt-2 mb-1 pl-3">
+        <h4 className="text-xs font-medium text-aximo-text-secondary">Management</h4>
+      </div>
+      
+      <PipelineSidebarItem 
+        to="/pipeline/reminders" 
+        icon={Bell} 
+        label="Reminders"
+      />
+      
+      <PipelineSidebarItem 
+        to="/pipeline/settings" 
+        icon={Settings} 
+        label="Settings"
       />
     </div>
   );

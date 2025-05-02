@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import MainLayout from '@/components/layout/MainLayout';
 import CreateLeadForm from './CreateLeadForm';
 import { pipelineStages } from '../../data/pipelineData';
 import { toast } from '@/hooks/use-toast';
+import { Breadcrumb } from '@/components/navigation/Breadcrumb';
 
 /**
  * CreateLeadPage component for creating new leads in the sales pipeline
@@ -18,15 +18,35 @@ export default function CreateLeadPage() {
    * Navigates back to the pipeline board
    */
   const handleLeadCreated = () => {
-    navigate('/sales-pipeline/board');
+    toast({
+      title: "Lead created successfully",
+      description: "Your new lead has been added to the pipeline",
+    });
+    navigate('/pipeline/board');
   };
   
+  // Breadcrumb navigation
+  const breadcrumbItems = [
+    { label: 'Pipeline', path: '/pipeline' },
+    { label: 'Create Lead', path: '/pipeline/lead/new' }
+  ];
+  
   return (
-    <MainLayout title="Create Lead">
+    <div className="animate-in fade-in duration-500">
+      <div className="mb-6">
+        <Breadcrumb items={breadcrumbItems} />
+        <h1 className="text-2xl font-bold text-aximo-text bg-gradient-to-r from-aximo-primary to-aximo-light bg-clip-text text-transparent mb-2">
+          Create New Lead
+        </h1>
+        <p className="text-aximo-text-secondary">
+          Add a new lead to your sales pipeline
+        </p>
+      </div>
+      
       <CreateLeadForm 
         stages={pipelineStages} 
         onLeadCreated={handleLeadCreated} 
       />
-    </MainLayout>
+    </div>
   );
 }

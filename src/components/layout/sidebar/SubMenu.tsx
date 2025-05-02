@@ -13,13 +13,15 @@ export const SubMenu = ({ isCollapsed }: SubMenuProps) => {
   if (isCollapsed) return null;
 
   return (
-    <div className="ml-7 space-y-1 border-l pl-2 border-tms-gray-200 mt-1">
+    <div className="ml-7 space-y-1 border-l pl-2 border-aximo-border mt-1">
       <NavLink 
         to="/pipeline/dashboard"
         className={({ isActive }) =>
           cn(
             "flex items-center py-1 px-2 text-sm rounded-md transition-colors",
-            isActive ? "text-tms-blue font-medium" : "text-tms-gray-600 hover:text-tms-blue"
+            isActive 
+              ? "text-aximo-primary font-medium" 
+              : "text-aximo-text-secondary hover:text-aximo-text"
           )
         }
       >
@@ -32,7 +34,9 @@ export const SubMenu = ({ isCollapsed }: SubMenuProps) => {
         className={({ isActive }) =>
           cn(
             "flex items-center py-1 px-2 text-sm rounded-md transition-colors",
-            isActive ? "text-tms-blue font-medium" : "text-tms-gray-600 hover:text-tms-blue"
+            isActive 
+              ? "text-aximo-primary font-medium" 
+              : "text-aximo-text-secondary hover:text-aximo-text"
           )
         }
       >
@@ -48,8 +52,8 @@ export const SubMenu = ({ isCollapsed }: SubMenuProps) => {
             isActive || 
             location.pathname === '/pipeline/tasks/calendar' || 
             location.pathname === '/pipeline/tasks/tags'
-              ? "text-tms-blue font-medium" 
-              : "text-tms-gray-600 hover:text-tms-blue"
+              ? "text-aximo-primary font-medium" 
+              : "text-aximo-text-secondary hover:text-aximo-text"
           )
         }
       >

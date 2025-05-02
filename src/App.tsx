@@ -17,6 +17,7 @@ import Fleet from '@/pages/Fleet';
 import Finance from '@/pages/Finance';
 import CarrierSelfInvoices from '@/pages/finance/CarrierSelfInvoices';
 import Users from '@/pages/Users';
+import Settings from '@/pages/Settings';
 import SettingsPage from '@/pages/settings/SettingsPage';
 import Pipeline from '@/pages/Pipeline';
 import PipelineReports from '@/pages/pipeline/PipelineReports';
@@ -36,6 +37,13 @@ import CustomersList from '@/pages/customers/CustomersList';
 import CustomerDetails from '@/pages/customers/CustomerDetails';
 import CustomerDocumentsPage from '@/pages/customers/CustomerDocumentsPage';
 import CustomerPortalAccess from '@/pages/customers/CustomerPortalAccess';
+import PipelineDashboard from '@/pages/pipeline/PipelineDashboard';
+import PipelineBoard from '@/pages/pipeline/PipelineBoard';
+import PipelineTasks from '@/pages/pipeline/PipelineTasks';
+import PipelineSettings from '@/pages/pipeline/PipelineSettings';
+import PipelineReminders from '@/pages/pipeline/PipelineReminders';
+import LeadDetails from '@/pages/pipeline/LeadDetails';
+import CreateLeadPage from '@/pages/pipeline/components/leads/CreateLeadPage';
 
 // Define all routes at the top level
 const router = createBrowserRouter([
@@ -68,7 +76,7 @@ const router = createBrowserRouter([
     element: <Carriers />,
   },
   {
-    path: "/customer-portal",
+    path: "/customer-portal/*", // Use wildcard for nested routes
     element: <CustomerPortal />,
   },
   {
@@ -147,15 +155,57 @@ const router = createBrowserRouter([
   },
   {
     path: "/settings",
-    element: <SettingsPage />,
+    element: <Settings />,
   },
   {
     path: "/pipeline",
     element: <Pipeline />,
-  },
-  {
-    path: "/pipeline/reports",
-    element: <PipelineReports />,
+    children: [
+      {
+        path: "", // Root pipeline path redirects to dashboard
+        element: <PipelineDashboard />
+      },
+      {
+        path: "dashboard",
+        element: <PipelineDashboard />
+      },
+      {
+        path: "board",
+        element: <PipelineBoard />
+      },
+      {
+        path: "tasks",
+        element: <PipelineTasks />
+      },
+      {
+        path: "tasks/calendar",
+        element: <PipelineTasks defaultTab="calendar" />
+      },
+      {
+        path: "tasks/tags",
+        element: <PipelineTasks defaultTab="tags" />
+      },
+      {
+        path: "lead/new",
+        element: <CreateLeadPage />
+      },
+      {
+        path: "lead/:id",
+        element: <LeadDetails />
+      },
+      {
+        path: "reports",
+        element: <PipelineReports />
+      },
+      {
+        path: "settings",
+        element: <PipelineSettings />
+      },
+      {
+        path: "reminders",
+        element: <PipelineReminders />
+      }
+    ]
   },
   {
     path: "/analytics",
@@ -172,6 +222,8 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+  console.log("App component rendering with router configuration");
+  
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
