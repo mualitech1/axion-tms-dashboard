@@ -61,15 +61,15 @@ const CustomerDetailDialog = ({ customer, open, onOpenChange }: CustomerDetailDi
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
-        <DialogHeader className="px-6 py-4 border-b sticky top-0 bg-white z-10">
+        <DialogHeader className="px-6 py-4 border-b sticky top-0 bg-gradient-to-r from-indigo-50 to-white dark:from-indigo-950 dark:to-indigo-900 z-10">
           <div className="flex items-center gap-3">
-            <div className="bg-blue-100 h-10 w-10 rounded-full flex items-center justify-center text-blue-600 font-semibold">
+            <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold shadow-md">
               {customer.name.substring(0, 1)}
             </div>
             <div>
-              <DialogTitle className="text-xl">{customer.name}</DialogTitle>
+              <DialogTitle className="text-xl bg-gradient-to-r from-indigo-800 to-indigo-600 bg-clip-text text-transparent dark:from-indigo-300 dark:to-indigo-500">{customer.name}</DialogTitle>
               <div className="text-sm text-muted-foreground mt-1 flex items-center gap-2">
-                <span className="bg-green-100 text-green-700 text-xs py-0.5 px-2 rounded-full flex items-center gap-1">
+                <span className="bg-green-100 text-green-700 text-xs py-0.5 px-2 rounded-full flex items-center gap-1 dark:bg-green-900/30 dark:text-green-400">
                   <CheckCircle className="h-3 w-3" />
                   <span>Active Customer</span>
                 </span>
@@ -81,29 +81,29 @@ const CustomerDetailDialog = ({ customer, open, onOpenChange }: CustomerDetailDi
         </DialogHeader>
         
         <Tabs defaultValue="general" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="px-6 pt-4 border-b">
-            <TabsList className="grid grid-cols-6 bg-muted/50 rounded-lg p-1">
-              <TabsTrigger value="general" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
+          <div className="px-6 pt-4 border-b bg-gradient-to-r from-indigo-50/50 to-white dark:from-indigo-950/50 dark:to-indigo-900/50">
+            <TabsList className="grid grid-cols-6 bg-indigo-100/70 rounded-lg p-1 dark:bg-indigo-900/30">
+              <TabsTrigger value="general" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-indigo-800 dark:text-indigo-200">
                 <Building className="h-4 w-4 mr-2" />
                 General
               </TabsTrigger>
-              <TabsTrigger value="contacts" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <TabsTrigger value="contacts" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-indigo-800 dark:text-indigo-200">
                 <User className="h-4 w-4 mr-2" />
                 Contacts
               </TabsTrigger>
-              <TabsTrigger value="documents" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <TabsTrigger value="documents" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-indigo-800 dark:text-indigo-200">
                 <FileText className="h-4 w-4 mr-2" />
                 Documents
               </TabsTrigger>
-              <TabsTrigger value="rates" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <TabsTrigger value="rates" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-indigo-800 dark:text-indigo-200">
                 <CreditCard className="h-4 w-4 mr-2" />
                 Rates
               </TabsTrigger>
-              <TabsTrigger value="invoices" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <TabsTrigger value="invoices" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-indigo-800 dark:text-indigo-200">
                 <FileBarChart className="h-4 w-4 mr-2" />
                 Invoices
               </TabsTrigger>
-              <TabsTrigger value="history" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <TabsTrigger value="history" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-indigo-800 dark:text-indigo-200">
                 <Clock className="h-4 w-4 mr-2" />
                 History
               </TabsTrigger>
@@ -128,18 +128,18 @@ const CustomerDetailDialog = ({ customer, open, onOpenChange }: CustomerDetailDi
             </TabsContent>
             
             <TabsContent value="invoices" className="mt-0 animate-fade-in">
-              <div className="p-6 border rounded-lg bg-white shadow-sm">
+              <div className="p-6 border rounded-lg bg-white shadow-sm dark:bg-indigo-950/20 dark:border-indigo-800/30">
                 <div className="mb-4 flex justify-between items-center">
                   <h3 className="text-lg font-medium">Customer Invoices</h3>
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                  <Button size="sm" className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white shadow-md">
                     <FileText className="h-4 w-4 mr-2" />
                     Generate Invoice
                   </Button>
                 </div>
-                <div className="bg-slate-50 p-8 rounded-md text-center border border-dashed border-slate-200">
-                  <FileText className="h-12 w-12 mx-auto mb-3 text-slate-300" />
-                  <p className="text-muted-foreground font-medium">No invoices found for this customer</p>
-                  <p className="text-sm text-muted-foreground mt-1">Create your first invoice by clicking the button above</p>
+                <div className="bg-indigo-50/70 p-8 rounded-md text-center border border-dashed border-indigo-200 dark:bg-indigo-950/30 dark:border-indigo-800/30">
+                  <FileText className="h-12 w-12 mx-auto mb-3 text-indigo-300" />
+                  <p className="text-indigo-600 font-medium dark:text-indigo-300">No invoices found for this customer</p>
+                  <p className="text-sm text-indigo-500 mt-1 dark:text-indigo-400">Create your first invoice by clicking the button above</p>
                 </div>
               </div>
             </TabsContent>
@@ -150,10 +150,10 @@ const CustomerDetailDialog = ({ customer, open, onOpenChange }: CustomerDetailDi
           </div>
         </Tabs>
         
-        <DialogFooter className="px-6 py-4 border-t bg-gray-50">
+        <DialogFooter className="px-6 py-4 border-t bg-gradient-to-r from-indigo-50 to-white dark:from-indigo-950/50 dark:to-indigo-900/50">
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
           <Button 
-            className="bg-blue-600 hover:bg-blue-700 text-white" 
+            className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white shadow-md" 
             disabled={isSaving} 
             onClick={handleSave}
           >

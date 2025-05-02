@@ -8,7 +8,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import CustomerMetrics from '@/components/customers/CustomerMetrics';
 import { motion } from 'framer-motion';
-import { Card, CardContent } from '@/components/ui/card';
 
 export default function Customers() {
   const { toast } = useToast();
@@ -66,9 +65,9 @@ export default function Customers() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
+              className="bg-gradient-to-br from-white to-indigo-50/50 dark:from-indigo-950/20 dark:to-indigo-900/10 p-6 rounded-xl shadow-md border border-indigo-100/50 dark:border-indigo-800/30"
             >
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Key Performance Metrics</h3>
+              <h3 className="text-lg font-semibold text-indigo-900 dark:text-indigo-300 mb-4">Key Performance Metrics</h3>
               <CustomerMetrics {...metricsData} />
             </motion.div>
           </motion.div>
