@@ -1,88 +1,135 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Phone, Mail, FileText, ArrowRight } from 'lucide-react';
-
-interface ActivityItem {
-  id: string;
-  icon: React.ReactNode;
-  iconBg: string;
-  company: string;
-  description: string;
-  user: string;
-  time: string;
-}
+import { motion } from 'framer-motion';
+import { Activity, Users, MessageSquare, FileText, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 export default function RecentActivityPanel() {
-  const activities: ActivityItem[] = [
+  const activities = [
     {
-      id: '1',
-      icon: <Phone className="h-4 w-4 text-blue-600" />,
-      iconBg: 'bg-blue-100',
-      company: 'Acme Logistics',
-      description: 'Follow-up call to discuss proposal',
-      user: 'John Doe',
-      time: '1 day ago'
+      id: 1,
+      type: 'contact',
+      title: 'Call with ABC Logistics',
+      description: 'Discussed transportation requirements',
+      time: '2 hours ago',
+      icon: <Users size={16} className="text-blue-400" />,
+      iconBg: 'bg-blue-500/10'
     },
     {
-      id: '2',
-      icon: <Mail className="h-4 w-4 text-green-600" />,
-      iconBg: 'bg-green-100',
-      company: 'Quick Deliveries',
-      description: 'Sent revised pricing structure',
-      user: 'John Doe',
-      time: '2 days ago'
+      id: 2,
+      type: 'message',
+      title: 'Email sent to XYZ Transport',
+      description: 'Quote for warehouse services',
+      time: '4 hours ago',
+      icon: <MessageSquare size={16} className="text-violet-400" />,
+      iconBg: 'bg-violet-500/10'
     },
     {
-      id: '3',
-      icon: <FileText className="h-4 w-4 text-purple-600" />,
-      iconBg: 'bg-purple-100',
-      company: 'Food Distributors UK',
-      description: 'Final contract review meeting',
-      user: 'Alice Thompson',
-      time: '2 days ago'
+      id: 3,
+      type: 'document',
+      title: 'Proposal updated',
+      description: 'Revised proposal for FastTrack Inc.',
+      time: 'Yesterday',
+      icon: <FileText size={16} className="text-amber-400" />,
+      iconBg: 'bg-amber-500/10'
     },
     {
-      id: '4',
-      icon: <ArrowRight className="h-4 w-4 text-yellow-600" />,
-      iconBg: 'bg-yellow-100',
-      company: 'Retail Solutions',
-      description: 'Moved from Proposal to Negotiation',
-      user: 'Sarah Wilson',
-      time: '4 days ago'
+      id: 4,
+      type: 'contact',
+      title: 'Meeting with Global Freight',
+      description: 'New lead discussion',
+      time: '2 days ago',
+      icon: <Users size={16} className="text-blue-400" />,
+      iconBg: 'bg-blue-500/10'
     },
-    {
-      id: '5',
-      icon: <FileText className="h-4 w-4 text-gray-600" />,
-      iconBg: 'bg-gray-100',
-      company: 'Tech Innovations',
-      description: 'Customer requested detailed insurance information',
-      user: 'Sarah Wilson',
-      time: '4 days ago'
-    }
   ];
 
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: { duration: 0.5 } 
+    },
+    hover: { 
+      scale: 1.02, 
+      boxShadow: "0 10px 30px -10px rgba(0, 144, 255, 0.3)",
+      transition: { duration: 0.2 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { opacity: 1, x: 0 },
+    hover: { 
+      x: 5, 
+      transition: { duration: 0.2 }
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Recent Activity</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {activities.map((activity) => (
-            <div key={activity.id} className="flex gap-3">
-              <div className={`${activity.iconBg} p-2 rounded-full h-8 w-8 flex items-center justify-center flex-shrink-0`}>
-                {activity.icon}
-              </div>
-              <div className="space-y-1">
-                <p className="font-medium">{activity.company}</p>
-                <p className="text-sm text-muted-foreground">{activity.description}</p>
-                <p className="text-xs text-muted-foreground">{activity.user} • {activity.time}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <motion.div
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
+      whileHover="hover"
+      className="h-full"
+    >
+      <Card className="border-aximo-border bg-gradient-to-br from-aximo-dark to-aximo-darker shadow-aximo h-full">
+        <CardHeader className="pb-2 flex justify-between items-start">
+          <div>
+            <CardTitle className="text-aximo-text font-semibold flex items-center">
+              <Activity size={18} className="mr-2 text-aximo-primary" />
+              Recent Activity
+            </CardTitle>
+          </div>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-aximo-text-secondary hover:text-aximo-primary hover:bg-aximo-primary/10">
+            <ChevronRight size={18} />
+            <span className="sr-only">View all</span>
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {activities.map((activity, index) => (
+              <motion.div
+                key={activity.id}
+                className="flex gap-3 group cursor-pointer"
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: index * 0.1 }}
+                whileHover="hover"
+              >
+                <div className={`${activity.iconBg} p-2 rounded-full mt-0.5 h-fit`}>
+                  {activity.icon}
+                </div>
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <h4 className="text-sm font-medium text-aximo-text group-hover:text-aximo-primary transition-colors">
+                      {activity.title}
+                    </h4>
+                    <span className="text-xs text-aximo-text-secondary">
+                      {activity.time}
+                    </span>
+                  </div>
+                  <p className="text-xs text-aximo-text-secondary mt-0.5">
+                    {activity.description}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          <div className="mt-4 pt-3 border-t border-aximo-border">
+            <Link to="/pipeline/activity">
+              <Button variant="ghost" size="sm" className="w-full text-aximo-text-secondary hover:text-aximo-primary hover:bg-aximo-primary/10">
+                View All Activity
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }

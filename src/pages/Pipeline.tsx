@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { ReminderProvider } from './pipeline/context/ReminderContext';
 import AutoReminder from './pipeline/components/reminders/AutoReminder';
 import MainLayout from '@/components/layout/MainLayout';
+import { motion } from 'framer-motion';
 
 export default function Pipeline() {
   console.log("Pipeline component rendering");
@@ -11,11 +12,15 @@ export default function Pipeline() {
   return (
     <ReminderProvider>
       <AutoReminder />
-      <div className="bg-gradient-to-b from-aximo-darker to-[#050A14] min-h-screen">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
         <MainLayout title="Sales Pipeline">
           <Outlet />
         </MainLayout>
-      </div>
+      </motion.div>
     </ReminderProvider>
   );
 }

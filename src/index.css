@@ -142,3 +142,76 @@
   color: transparent;
 }
 
+/* Animation utilities */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+/* Card hover effects */
+.aximo-card {
+  @apply bg-gradient-to-br from-aximo-dark to-aximo-darker border border-aximo-border rounded-lg p-4 shadow-aximo transition-all duration-300;
+}
+
+.aximo-card:hover {
+  @apply shadow-aximo-strong border-aximo-primary/20;
+  transform: translateY(-2px) scale(1.01);
+}
+
+/* Icon container styles */
+.aximo-icon-container {
+  @apply p-2 rounded-lg bg-aximo-primary/10 text-aximo-primary transition-all duration-300;
+}
+
+.aximo-card:hover .aximo-icon-container {
+  @apply bg-aximo-primary/20;
+  box-shadow: 0 0 15px rgba(0, 144, 255, 0.3);
+}
+
+/* Text styles */
+.aximo-headline {
+  @apply text-xl font-bold bg-gradient-to-r from-aximo-primary to-aximo-light bg-clip-text text-transparent;
+}
+
+/* Glow effect for borders */
+.aximo-glow {
+  box-shadow: 0 0 15px rgba(0, 144, 255, 0.2);
+}
+
+/* Text animation */
+@keyframes text-shimmer {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-text {
+  background-size: 200% auto;
+  animation: text-shimmer 2s linear infinite;
+}

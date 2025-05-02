@@ -6,6 +6,7 @@ import Header from './Header';
 import PipelineSidebar from './PipelineSidebar';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { motion } from 'framer-motion';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -25,7 +26,12 @@ export default function MainLayout({ children, title }: MainLayoutProps) {
   }, [isMobile]);
 
   return (
-    <div className="min-h-screen flex w-full overflow-hidden">
+    <motion.div 
+      className="min-h-screen flex w-full overflow-hidden bg-gradient-to-b from-aximo-darker to-[#050A14]"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       <Sidebar />
       
       <div className={cn(
@@ -47,6 +53,6 @@ export default function MainLayout({ children, title }: MainLayoutProps) {
           </main>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
