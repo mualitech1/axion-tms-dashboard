@@ -16,10 +16,9 @@ export default function Pipeline() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
+        className="h-full"
       >
-        <MainLayout title="Sales Pipeline">
-          <Outlet />
-        </MainLayout>
+        <Outlet />
       </motion.div>
     </ReminderProvider>
   );
