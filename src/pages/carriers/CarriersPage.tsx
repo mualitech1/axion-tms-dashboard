@@ -114,7 +114,7 @@ export default function CarriersPage() {
           className="space-y-6"
         >
           {/* Enhanced Header Section */}
-          <div className="relative overflow-hidden rounded-xl">
+          <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600/10 to-indigo-600/10 backdrop-blur-sm">
             <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/20 to-purple-600/20 backdrop-blur-sm z-0"></div>
             <motion.div
               initial={{ y: -20 }}
@@ -162,7 +162,7 @@ export default function CarriersPage() {
                 <Download className="h-4 w-4 mr-1" />
                 <span>Export</span>
               </Button>
-              <Button size="sm" className="bg-indigo-600 text-white hover:bg-indigo-700" onClick={handleAddCarrier}>
+              <Button size="sm" className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:opacity-90 shadow-md" onClick={handleAddCarrier}>
                 <PlusCircle className="h-4 w-4 mr-1" />
                 <span>Add Carrier</span>
               </Button>
@@ -205,10 +205,10 @@ export default function CarriersPage() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.5 }}
-                className="bg-aximo-card border border-aximo-border shadow-aximo rounded-lg p-5"
+                className="bg-aximo-card border border-aximo-border shadow-aximo rounded-lg p-5 bg-gradient-to-br from-aximo-card to-indigo-900/10"
               >
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="p-2.5 rounded-full bg-indigo-600/20 text-indigo-600">
+                  <div className="p-2.5 rounded-full bg-indigo-600/20 text-indigo-600 shadow-lg shadow-indigo-600/10">
                     <Radio className="h-5 w-5" />
                   </div>
                   <div>
@@ -222,24 +222,24 @@ export default function CarriersPage() {
                     <span className="text-aximo-text-secondary">London</span>
                     <span className="text-aximo-text">43 carriers</span>
                   </div>
-                  <div className="h-2 w-full bg-aximo-darker rounded-full overflow-hidden">
-                    <div className="h-full bg-indigo-600" style={{ width: '75%' }}></div>
+                  <div className="h-2 w-full bg-aximo-darker rounded-full overflow-hidden shadow-inner">
+                    <div className="h-full bg-gradient-to-r from-indigo-600 to-purple-600" style={{ width: '75%' }}></div>
                   </div>
                   
                   <div className="flex justify-between text-sm">
                     <span className="text-aximo-text-secondary">Manchester</span>
                     <span className="text-aximo-text">27 carriers</span>
                   </div>
-                  <div className="h-2 w-full bg-aximo-darker rounded-full overflow-hidden">
-                    <div className="h-full bg-indigo-600" style={{ width: '55%' }}></div>
+                  <div className="h-2 w-full bg-aximo-darker rounded-full overflow-hidden shadow-inner">
+                    <div className="h-full bg-gradient-to-r from-indigo-600 to-purple-600" style={{ width: '55%' }}></div>
                   </div>
                   
                   <div className="flex justify-between text-sm">
                     <span className="text-aximo-text-secondary">Birmingham</span>
                     <span className="text-aximo-text">21 carriers</span>
                   </div>
-                  <div className="h-2 w-full bg-aximo-darker rounded-full overflow-hidden">
-                    <div className="h-full bg-indigo-600" style={{ width: '45%' }}></div>
+                  <div className="h-2 w-full bg-aximo-darker rounded-full overflow-hidden shadow-inner">
+                    <div className="h-full bg-gradient-to-r from-indigo-600 to-purple-600" style={{ width: '45%' }}></div>
                   </div>
                 </div>
               </motion.div>
@@ -251,7 +251,7 @@ export default function CarriersPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.7 }}
-            className="bg-aximo-card rounded-lg shadow-sm border border-aximo-border overflow-hidden"
+            className="bg-aximo-card rounded-lg shadow-md border border-aximo-border overflow-hidden"
           >
             <Tabs defaultValue="all" onValueChange={setSelectedTab} className="w-full">
               <div className="px-4 pt-4">
@@ -304,19 +304,19 @@ export default function CarriersPage() {
           {/* Quick Action Links */}
           <div className="flex flex-wrap gap-2 justify-center mt-6">
             <Link to="/carriers/compliance">
-              <Button variant="outline" size="sm" className="flex items-center gap-1 bg-aximo-dark border-aximo-border text-aximo-text-secondary">
+              <Button variant="outline" size="sm" className="flex items-center gap-1 bg-gradient-to-r from-aximo-dark to-indigo-950/30 border-aximo-border text-aximo-text-secondary hover:text-white hover:bg-indigo-600/20 transition-all duration-300">
                 <Scale className="h-4 w-4" />
                 <span>Compliance Dashboard</span>
               </Button>
             </Link>
             <Link to="/carriers/reports">
-              <Button variant="outline" size="sm" className="flex items-center gap-1 bg-aximo-dark border-aximo-border text-aximo-text-secondary">
+              <Button variant="outline" size="sm" className="flex items-center gap-1 bg-gradient-to-r from-aximo-dark to-indigo-950/30 border-aximo-border text-aximo-text-secondary hover:text-white hover:bg-indigo-600/20 transition-all duration-300">
                 <LineChart className="h-4 w-4" />
                 <span>Performance Reports</span>
               </Button>
             </Link>
             <Link to="/carriers/messaging">
-              <Button variant="outline" size="sm" className="flex items-center gap-1 bg-aximo-dark border-aximo-border text-aximo-text-secondary">
+              <Button variant="outline" size="sm" className="flex items-center gap-1 bg-gradient-to-r from-aximo-dark to-indigo-950/30 border-aximo-border text-aximo-text-secondary hover:text-white hover:bg-indigo-600/20 transition-all duration-300">
                 <MessageSquare className="h-4 w-4" />
                 <span>Message Carriers</span>
               </Button>
