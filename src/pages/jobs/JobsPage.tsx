@@ -8,10 +8,14 @@ import { JobsHeader } from './components/jobs-header/JobsHeader';
 import JobsList from './components/JobsList';
 import { JobStatus } from '@/types/job';
 import { motion } from 'framer-motion';
+import PlanningCalendar from './components/PlanningCalendar';
+import JobsMapView from './components/map/JobsMapView';
 
 export default function JobsPage() {
   const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState<JobStatus | 'all'>('all');
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'map'>('list');
   
   // Use our improved hook with status filter
   const { 
@@ -26,71 +30,111 @@ export default function JobsPage() {
     navigate('/jobs/create');
   };
   
+  const handleDateChange = (date: Date) => {
+    setSelectedDate(date);
+  };
+  
   // Jobs are already properly typed from our useJobs hook
   const jobsForList = jobs || [];
   
   return (
     <MainLayout title="Jobs Management">
       <div className="container mx-auto space-y-6">
-        <JobsHeader onCreateJob={handleCreateJob} onRefresh={refetch} />
+        <JobsHeader 
+          onCreateJob={handleCreateJob} 
+          onRefresh={refetch} 
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
         
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-aximo-card rounded-lg shadow-sm border border-aximo-border overflow-hidden"
-        >
-          <Tabs 
-            defaultValue="all" 
-            onValueChange={(value) => setCurrentTab(value as JobStatus | 'all')}
-            className="w-full"
+        {viewMode === 'calendar' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-6"
           >
-            <div className="px-4 pt-4">
-              <TabsList className="grid grid-cols-5 w-full max-w-3xl bg-aximo-darker">
-                <TabsTrigger 
-                  value="all"
-                  className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
-                >
-                  All Jobs
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="booked"
-                  className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
-                >
-                  Booked
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="in-progress"
-                  className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
-                >
-                  In Progress
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="completed"
-                  className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
-                >
-                  Completed
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="issues"
-                  className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
-                >
-                  Issues
-                </TabsTrigger>
-              </TabsList>
-            </div>
-            
-            <TabsContent value="all" className="p-4">
-              <JobsList jobs={jobsForList} isLoading={isLoading} />
-            </TabsContent>
-            
-            {['booked', 'in-progress', 'completed', 'issues'].map((status) => (
-              <TabsContent key={status} value={status} className="p-4">
+            <PlanningCalendar 
+              selectedDate={selectedDate} 
+              onDateChange={handleDateChange} 
+            />
+          </motion.div>
+        )}
+        
+        {viewMode === 'map' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-6"
+          >
+            <JobsMapView 
+              selectedDate={selectedDate} 
+              jobs={jobsForList}
+              isLoading={isLoading}
+            />
+          </motion.div>
+        )}
+        
+        {viewMode === 'list' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-aximo-card rounded-lg shadow-sm border border-aximo-border overflow-hidden"
+          >
+            <Tabs 
+              defaultValue="all" 
+              onValueChange={(value) => setCurrentTab(value as JobStatus | 'all')}
+              className="w-full"
+            >
+              <div className="px-4 pt-4">
+                <TabsList className="grid grid-cols-5 w-full max-w-3xl bg-aximo-darker">
+                  <TabsTrigger 
+                    value="all"
+                    className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
+                  >
+                    All Jobs
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="booked"
+                    className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
+                  >
+                    Booked
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="in-progress"
+                    className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
+                  >
+                    In Progress
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="completed"
+                    className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
+                  >
+                    Completed
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="issues"
+                    className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
+                  >
+                    Issues
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+              
+              <TabsContent value="all" className="p-4">
                 <JobsList jobs={jobsForList} isLoading={isLoading} />
               </TabsContent>
-            ))}
-          </Tabs>
-        </motion.div>
+              
+              {['booked', 'in-progress', 'completed', 'issues'].map((status) => (
+                <TabsContent key={status} value={status} className="p-4">
+                  <JobsList jobs={jobsForList} isLoading={isLoading} />
+                </TabsContent>
+              ))}
+            </Tabs>
+          </motion.div>
+        )}
         
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">

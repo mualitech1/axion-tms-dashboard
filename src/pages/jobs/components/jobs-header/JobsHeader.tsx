@@ -1,54 +1,61 @@
 
-import { Plus, RefreshCcw } from 'lucide-react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { Plus, RefreshCcw, Calendar, MapPin, List } from 'lucide-react';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 interface JobsHeaderProps {
   onCreateJob: () => void;
   onRefresh: () => void;
+  viewMode: 'list' | 'calendar' | 'map';
+  onViewModeChange: (mode: 'list' | 'calendar' | 'map') => void;
 }
 
-export function JobsHeader({ onCreateJob, onRefresh }: JobsHeaderProps) {
-  const { toast } = useToast();
-
-  const handleRefresh = () => {
-    onRefresh();
-    toast({
-      title: "Refreshing jobs",
-      description: "The jobs list is being refreshed."
-    });
-  };
-
+export function JobsHeader({ onCreateJob, onRefresh, viewMode, onViewModeChange }: JobsHeaderProps) {
   return (
-    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-      <div className="relative">
-        <h1 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-aximo-primary via-blue-400 to-purple-500 mb-1 animate-text">
-          Jobs Dashboard
-        </h1>
-        <p className="text-aximo-text-secondary">
-          Manage and track all your transportation jobs in one place
-        </p>
-        <div className="absolute -inset-1 bg-gradient-to-r from-aximo-primary/20 to-transparent blur-lg opacity-50 -z-10" />
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div>
+        <h1 className="text-2xl font-bold text-aximo-text">Jobs</h1>
+        <p className="text-aximo-text-secondary">Manage and track all your transportation jobs</p>
       </div>
       
-      <div className="flex flex-col md:flex-row gap-2 w-full lg:w-auto">
-        <Button 
-          onClick={onCreateJob}
-          className="bg-gradient-to-r from-aximo-primary to-blue-600 hover:from-blue-600 hover:to-aximo-primary text-white transition-all duration-300 shadow-lg hover:shadow-aximo-primary/20"
-          size="lg"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Create Job
-        </Button>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && onViewModeChange(value as 'list' | 'calendar' | 'map')}>
+          <ToggleGroupItem value="list" aria-label="List View">
+            <List className="h-4 w-4 mr-1" />
+            List
+          </ToggleGroupItem>
+          <ToggleGroupItem value="calendar" aria-label="Calendar View">
+            <Calendar className="h-4 w-4 mr-1" />
+            Calendar
+          </ToggleGroupItem>
+          <ToggleGroupItem value="map" aria-label="Map View">
+            <MapPin className="h-4 w-4 mr-1" />
+            Map
+          </ToggleGroupItem>
+        </ToggleGroup>
         
-        <Button 
-          variant="outline" 
-          onClick={handleRefresh} 
-          size="icon" 
-          className="border-aximo-border hover:border-aximo-primary hover:bg-aximo-primary/10 transition-all duration-300"
-        >
-          <RefreshCcw className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onRefresh}
+            className="text-aximo-text"
+          >
+            <RefreshCcw className="h-4 w-4 mr-1" />
+            Refresh
+          </Button>
+          
+          <Button
+            variant="default"
+            size="sm"
+            onClick={onCreateJob}
+            className="bg-aximo-primary text-white hover:bg-aximo-primary/90"
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            New Job
+          </Button>
+        </div>
       </div>
     </div>
   );
