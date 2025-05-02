@@ -3,7 +3,6 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { ReminderProvider } from './pipeline/context/ReminderContext';
 import AutoReminder from './pipeline/components/reminders/AutoReminder';
-import MainLayout from '@/components/layout/MainLayout';
 import { motion } from 'framer-motion';
 
 export default function Pipeline() {
