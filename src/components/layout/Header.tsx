@@ -11,7 +11,11 @@ interface HeaderProps {
 }
 
 export default function Header({ title }: HeaderProps) {
-  const { signOut, user } = useAuth();
+  const { signOut, user, loading } = useAuth();
+
+  // Provide default UI while authentication is loading
+  const userInitial = user?.email ? user.email.charAt(0).toUpperCase() : 'A';
+  const userEmail = user?.email || 'admin@aximo.ai';
 
   return (
     <div className="flex h-16 items-center justify-between border-b border-aximo-border bg-aximo-darker px-4 md:px-6">
@@ -43,10 +47,10 @@ export default function Header({ title }: HeaderProps) {
         </Button>
         <div className="flex items-center gap-2 md:gap-4">
           <div className="hidden md:block">
-            <span className="text-sm text-aximo-text-secondary">{user?.email || 'admin@aximo.ai'}</span>
+            <span className="text-sm text-aximo-text-secondary">{userEmail}</span>
           </div>
           <div className="h-8 w-8 rounded-full bg-aximo-primary/20 flex items-center justify-center text-aximo-primary font-medium">
-            {user?.email ? user.email.charAt(0).toUpperCase() : 'A'}
+            {userInitial}
           </div>
           <Button 
             variant="ghost" 

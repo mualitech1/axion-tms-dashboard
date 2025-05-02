@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState } from 'react';
 
-interface Reminder {
+export interface Reminder {
   id: string;
   title: string;
   date: string;
