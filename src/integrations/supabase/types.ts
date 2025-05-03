@@ -9,6 +9,53 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      api_usage: {
+        Row: {
+          endpoint: string
+          error: string | null
+          id: string
+          integration_id: string
+          method: string
+          request_payload: Json | null
+          response_payload: Json | null
+          response_time: number
+          status_code: number
+          timestamp: string
+        }
+        Insert: {
+          endpoint: string
+          error?: string | null
+          id?: string
+          integration_id: string
+          method: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+          response_time: number
+          status_code: number
+          timestamp?: string
+        }
+        Update: {
+          endpoint?: string
+          error?: string | null
+          id?: string
+          integration_id?: string
+          method?: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+          response_time?: number
+          status_code?: number
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_usage_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "integrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claude_tasks: {
         Row: {
           completed_at: string | null
@@ -401,6 +448,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      integrations: {
+        Row: {
+          access_token: string | null
+          api_key: string | null
+          api_secret: string | null
+          base_url: string | null
+          created_at: string
+          enabled: boolean
+          expires_at: string | null
+          id: string
+          name: string
+          provider: string
+          refresh_token: string | null
+          settings: Json | null
+          type: string
+          updated_at: string
+          usage_quota: number | null
+          webhook_url: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          api_key?: string | null
+          api_secret?: string | null
+          base_url?: string | null
+          created_at?: string
+          enabled?: boolean
+          expires_at?: string | null
+          id?: string
+          name: string
+          provider: string
+          refresh_token?: string | null
+          settings?: Json | null
+          type: string
+          updated_at?: string
+          usage_quota?: number | null
+          webhook_url?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          api_key?: string | null
+          api_secret?: string | null
+          base_url?: string | null
+          created_at?: string
+          enabled?: boolean
+          expires_at?: string | null
+          id?: string
+          name?: string
+          provider?: string
+          refresh_token?: string | null
+          settings?: Json | null
+          type?: string
+          updated_at?: string
+          usage_quota?: number | null
+          webhook_url?: string | null
+        }
+        Relationships: []
       }
       invoice_items: {
         Row: {
@@ -970,6 +1074,44 @@ export type Database = {
             columns: ["assigned_driver_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhook_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          integration_id: string
+          payload: Json
+          processed: boolean
+          processed_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          integration_id: string
+          payload: Json
+          processed?: boolean
+          processed_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          integration_id?: string
+          payload?: Json
+          processed?: boolean
+          processed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_events_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "integrations"
             referencedColumns: ["id"]
           },
         ]

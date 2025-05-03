@@ -47,6 +47,75 @@ export interface WebhookEvent {
   createdAt: string;
 }
 
+// Helper functions for data mapping
+const mapDbIntegrationToConfig = (dbData: any): IntegrationConfig => {
+  if (!dbData) return {} as IntegrationConfig;
+  
+  return {
+    id: dbData.id,
+    name: dbData.name,
+    type: dbData.type as IntegrationType,
+    provider: dbData.provider,
+    apiKey: dbData.api_key,
+    apiSecret: dbData.api_secret,
+    baseUrl: dbData.base_url,
+    enabled: dbData.enabled,
+    webhookUrl: dbData.webhook_url,
+    refreshToken: dbData.refresh_token,
+    accessToken: dbData.access_token,
+    expiresAt: dbData.expires_at,
+    settings: dbData.settings,
+    usageQuota: dbData.usage_quota,
+    createdAt: dbData.created_at,
+    updatedAt: dbData.updated_at,
+  };
+};
+
+const mapConfigToDbIntegration = (config: Partial<IntegrationConfig>): any => {
+  return {
+    name: config.name,
+    type: config.type,
+    provider: config.provider,
+    api_key: config.apiKey,
+    api_secret: config.apiSecret,
+    base_url: config.baseUrl,
+    enabled: config.enabled,
+    webhook_url: config.webhookUrl,
+    refresh_token: config.refreshToken,
+    access_token: config.accessToken,
+    expires_at: config.expiresAt,
+    settings: config.settings,
+    usage_quota: config.usageQuota
+  };
+};
+
+const mapDbApiUsageToRecord = (dbData: any): ApiUsageRecord => {
+  return {
+    id: dbData.id,
+    integrationId: dbData.integration_id,
+    endpoint: dbData.endpoint,
+    method: dbData.method,
+    statusCode: dbData.status_code,
+    responseTime: dbData.response_time,
+    timestamp: dbData.timestamp,
+    requestPayload: dbData.request_payload,
+    responsePayload: dbData.response_payload,
+    error: dbData.error
+  };
+};
+
+const mapDbWebhookToEvent = (dbData: any): WebhookEvent => {
+  return {
+    id: dbData.id,
+    integrationId: dbData.integration_id,
+    eventType: dbData.event_type,
+    payload: dbData.payload,
+    processed: dbData.processed,
+    processedAt: dbData.processed_at,
+    createdAt: dbData.created_at
+  };
+};
+
 // Integration service for managing third-party integrations
 class IntegrationService {
   // Get all integrations
@@ -58,7 +127,7 @@ class IntegrationService {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data as IntegrationConfig[];
+      return data.map(mapDbIntegrationToConfig);
     } catch (error) {
       console.error('Failed to fetch integrations:', error);
       throw new Error(getErrorMessage(error));
@@ -75,7 +144,7 @@ class IntegrationService {
         .single();
       
       if (error) throw error;
-      return data as IntegrationConfig;
+      return mapDbIntegrationToConfig(data);
     } catch (error) {
       console.error(`Failed to fetch integration with ID ${id}:`, error);
       throw new Error(getErrorMessage(error));
@@ -91,7 +160,7 @@ class IntegrationService {
         .eq('type', type);
       
       if (error) throw error;
-      return data as IntegrationConfig[];
+      return data.map(mapDbIntegrationToConfig);
     } catch (error) {
       console.error(`Failed to fetch integrations of type ${type}:`, error);
       throw new Error(getErrorMessage(error));
@@ -101,14 +170,14 @@ class IntegrationService {
   // Create new integration
   async createIntegration(integration: Omit<IntegrationConfig, 'id'>): Promise<IntegrationConfig> {
     try {
+      const dbIntegration = mapConfigToDbIntegration(integration);
       const { data, error } = await supabase
         .from('integrations')
-        .insert([integration])
-        .select()
-        .single();
+        .insert([dbIntegration])
+        .select();
       
       if (error) throw error;
-      return data as IntegrationConfig;
+      return mapDbIntegrationToConfig(data[0]);
     } catch (error) {
       console.error('Failed to create integration:', error);
       throw new Error(getErrorMessage(error));
@@ -118,15 +187,15 @@ class IntegrationService {
   // Update integration
   async updateIntegration(id: string, updates: Partial<IntegrationConfig>): Promise<IntegrationConfig> {
     try {
+      const dbUpdates = mapConfigToDbIntegration(updates);
       const { data, error } = await supabase
         .from('integrations')
-        .update(updates)
+        .update(dbUpdates)
         .eq('id', id)
-        .select()
-        .single();
+        .select();
       
       if (error) throw error;
-      return data as IntegrationConfig;
+      return mapDbIntegrationToConfig(data[0]);
     } catch (error) {
       console.error(`Failed to update integration with ID ${id}:`, error);
       throw new Error(getErrorMessage(error));
@@ -153,7 +222,17 @@ class IntegrationService {
     try {
       const { error } = await supabase
         .from('api_usage')
-        .insert([usage]);
+        .insert([{
+          integration_id: usage.integrationId,
+          endpoint: usage.endpoint,
+          method: usage.method,
+          status_code: usage.statusCode,
+          response_time: usage.responseTime,
+          timestamp: usage.timestamp,
+          request_payload: usage.requestPayload,
+          response_payload: usage.responsePayload,
+          error: usage.error
+        }]);
       
       if (error) throw error;
     } catch (error) {
@@ -241,7 +320,7 @@ class IntegrationService {
       const { data, error } = await query;
       
       if (error) throw error;
-      return data as ApiUsageRecord[];
+      return data.map(mapDbApiUsageToRecord);
     } catch (error) {
       console.error(`Failed to fetch API usage for integration ${integrationId}:`, error);
       throw new Error(getErrorMessage(error));
@@ -274,12 +353,15 @@ class IntegrationService {
     try {
       const { error } = await supabase
         .from('webhook_events')
-        .insert([event]);
+        .insert([{
+          integration_id: event.integrationId,
+          event_type: event.eventType,
+          payload: event.payload,
+          processed: event.processed,
+          created_at: event.createdAt
+        }]);
       
       if (error) throw error;
-      
-      // You can add additional processing logic here
-      // For example, triggering specific actions based on event type
     } catch (error) {
       console.error('Failed to process webhook event:', error);
       throw new Error(getErrorMessage(error));
@@ -302,7 +384,7 @@ class IntegrationService {
       const { data, error } = await query;
       
       if (error) throw error;
-      return data as WebhookEvent[];
+      return data.map(mapDbWebhookToEvent);
     } catch (error) {
       console.error(`Failed to fetch webhook events for integration ${integrationId}:`, error);
       throw new Error(getErrorMessage(error));
