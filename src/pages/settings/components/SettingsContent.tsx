@@ -6,6 +6,8 @@ import GeneralSettings from './GeneralSettings';
 import SecuritySettings from './SecuritySettings';
 import NotificationSettings from './NotificationSettings';
 import IntegrationSettings from './IntegrationSettings';
+import IntegrationManagement from './IntegrationManagement';
+import IntegrationAnalytics from './IntegrationAnalytics';
 import AISettings from './AISettings';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { 
@@ -13,7 +15,8 @@ import {
   Shield, 
   Bell, 
   Link, 
-  Brain
+  Brain,
+  BarChart
 } from 'lucide-react';
 
 export default function SettingsContent() {
@@ -32,6 +35,8 @@ export default function SettingsContent() {
     { id: 'security', label: 'Security', icon: Shield, description: 'Privacy and security controls' },
     { id: 'notifications', label: 'Notifications', icon: Bell, description: 'Configure alert preferences' },
     { id: 'integrations', label: 'Integrations', icon: Link, description: 'Connect with external services' },
+    { id: 'integration-management', label: 'Integration Management', icon: Link, description: 'Manage API integrations' },
+    { id: 'integration-analytics', label: 'API Analytics', icon: BarChart, description: 'Monitor API usage and performance' },
     { id: 'ai', label: 'AI Settings', icon: Brain, description: 'Configure Aximo AI behavior' }
   ];
 
@@ -94,6 +99,14 @@ export default function SettingsContent() {
           
           <TabsContent value="integrations" className="mt-0">
             <IntegrationSettings />
+          </TabsContent>
+
+          <TabsContent value="integration-management" className="mt-0">
+            <IntegrationManagement />
+          </TabsContent>
+          
+          <TabsContent value="integration-analytics" className="mt-0">
+            <IntegrationAnalytics />
           </TabsContent>
           
           <TabsContent value="ai" className="mt-0">
