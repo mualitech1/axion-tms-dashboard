@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import { User } from '../types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -12,13 +11,17 @@ import { useUserFiltering } from '../hooks/useUserFiltering';
 import { Checkbox } from '@/components/ui/checkbox';
 import UserBulkActions from './UserBulkActions';
 import { ArrowUpDown } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Key } from 'lucide-react';
+import UserPermissionsDialog from './UserPermissionsDialog';
 
 interface UserTableProps {
   users: User[];
   searchTerm: string;
   onSearchChange: (value: string) => void;
-  onEditUser?: (user: User) => void;
-  onToggleUserStatus?: (user: User) => void;
+  onEditUser: (user: User) => void;
+  onToggleUserStatus: (user: User) => void;
   onManage2FA?: (userId: string) => void;
   roleFilter: string[];
   onRoleFilterChange: (roles: string[]) => void;
@@ -26,11 +29,11 @@ interface UserTableProps {
   onStatusFilterChange: (statuses: string[]) => void;
 }
 
-export default function UserTable({ 
-  users, 
-  searchTerm, 
-  onSearchChange, 
-  onEditUser, 
+export default function UserTable({
+  users,
+  searchTerm,
+  onSearchChange,
+  onEditUser,
   onToggleUserStatus,
   onManage2FA,
   roleFilter,
@@ -41,7 +44,9 @@ export default function UserTable({
   const [showFilters, setShowFilters] = useState(false);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
-  
+  const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
   const availableRoles = useMemo(() => {
     return Array.from(new Set(users.map(user => user.role)));
   }, [users]);
@@ -74,6 +79,12 @@ export default function UserTable({
   // Check if a user is selected
   const isUserSelected = (userId: number) => {
     return selectedUsers.some(user => user.id === userId);
+  };
+
+  // New function to open permissions dialog
+  const handleManagePermissions = (user: User) => {
+    setSelectedUser(user);
+    setPermissionsDialogOpen(true);
   };
 
   return (
@@ -195,6 +206,15 @@ export default function UserTable({
           </TableBody>
         </Table>
       </div>
+      
+      {/* Add permissions dialog */}
+      {selectedUser && (
+        <UserPermissionsDialog
+          open={permissionsDialogOpen}
+          onOpenChange={setPermissionsDialogOpen}
+          user={selectedUser}
+        />
+      )}
     </div>
   );
 }
