@@ -46,15 +46,15 @@ class AuditService {
         console.warn('Attempting to log audit action without authenticated user');
       }
       
-      const logEntry: AuditLogEntry = {
-        userId,
-        actionType,
-        entityType,
-        entityId,
-        previousState,
-        newState,
-        ipAddress: getClientIP(),
-        userAgent: getDeviceInfo(),
+      const logEntry = {
+        user_id: userId,
+        action_type: actionType,
+        entity_type: entityType,
+        entity_id: entityId,
+        previous_state: previousState,
+        new_state: newState,
+        ip_address: getClientIP(),
+        user_agent: getDeviceInfo(),
         metadata: metadata || {},
       };
       
@@ -127,7 +127,21 @@ class AuditService {
       const { data, error } = await query;
       
       if (error) throw error;
-      return data as AuditLogEntry[];
+      
+      // Convert from snake_case to camelCase format
+      return data.map(log => ({
+        id: log.id,
+        userId: log.user_id,
+        actionType: log.action_type,
+        entityType: log.entity_type,
+        entityId: log.entity_id,
+        previousState: log.previous_state,
+        newState: log.new_state,
+        ipAddress: log.ip_address,
+        userAgent: log.user_agent,
+        createdAt: log.created_at,
+        metadata: log.metadata
+      }));
     } catch (error) {
       console.error('Failed to fetch audit logs:', error);
       throw new Error(getErrorMessage(error));

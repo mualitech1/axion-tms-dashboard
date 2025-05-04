@@ -93,7 +93,7 @@ class ComplianceService {
       
       if (error) throw error;
       
-      // Map database fields to camelCase for frontend use
+      // Map database fields to camelCase for frontend use and convert status to expected type
       return data.map(doc => ({
         id: doc.id,
         title: doc.title,
@@ -101,7 +101,7 @@ class ComplianceService {
         documentType: doc.document_type,
         filePath: doc.file_path,
         version: doc.version,
-        status: doc.status,
+        status: doc.status as ComplianceDocument['status'],
         effectiveDate: doc.effective_date,
         expiryDate: doc.expiry_date,
         ownerId: doc.owner_id,
@@ -109,7 +109,7 @@ class ComplianceService {
         approvalDate: doc.approval_date,
         createdAt: doc.created_at,
         updatedAt: doc.updated_at,
-        metadata: doc.metadata
+        metadata: doc.metadata || {}
       }));
     } catch (error) {
       console.error('Failed to fetch compliance documents:', error);
@@ -135,7 +135,7 @@ class ComplianceService {
         documentType: data.document_type,
         filePath: data.file_path,
         version: data.version,
-        status: data.status,
+        status: data.status as ComplianceDocument['status'],
         effectiveDate: data.effective_date,
         expiryDate: data.expiry_date,
         ownerId: data.owner_id,
@@ -143,7 +143,7 @@ class ComplianceService {
         approvalDate: data.approval_date,
         createdAt: data.created_at,
         updatedAt: data.updated_at,
-        metadata: data.metadata
+        metadata: data.metadata || {}
       };
     } catch (error) {
       console.error(`Failed to fetch compliance document with ID ${id}:`, error);
@@ -187,7 +187,7 @@ class ComplianceService {
         documentType: data[0].document_type,
         filePath: data[0].file_path,
         version: data[0].version,
-        status: data[0].status,
+        status: data[0].status as ComplianceDocument['status'],
         effectiveDate: data[0].effective_date,
         expiryDate: data[0].expiry_date,
         ownerId: data[0].owner_id,
@@ -195,7 +195,7 @@ class ComplianceService {
         approvalDate: data[0].approval_date,
         createdAt: data[0].created_at,
         updatedAt: data[0].updated_at,
-        metadata: data[0].metadata
+        metadata: data[0].metadata || {}
       };
       
       // Log document creation
@@ -255,7 +255,7 @@ class ComplianceService {
         documentType: data[0].document_type,
         filePath: data[0].file_path,
         version: data[0].version,
-        status: data[0].status,
+        status: data[0].status as ComplianceDocument['status'],
         effectiveDate: data[0].effective_date,
         expiryDate: data[0].expiry_date,
         ownerId: data[0].owner_id,
@@ -263,7 +263,7 @@ class ComplianceService {
         approvalDate: data[0].approval_date,
         createdAt: data[0].created_at,
         updatedAt: data[0].updated_at,
-        metadata: data[0].metadata
+        metadata: data[0].metadata || {}
       };
       
       // Log document update
@@ -320,7 +320,7 @@ class ComplianceService {
         documentType: data[0].document_type,
         filePath: data[0].file_path,
         version: data[0].version,
-        status: data[0].status,
+        status: data[0].status as ComplianceDocument['status'],
         effectiveDate: data[0].effective_date,
         expiryDate: data[0].expiry_date,
         ownerId: data[0].owner_id,
@@ -328,7 +328,7 @@ class ComplianceService {
         approvalDate: data[0].approval_date,
         createdAt: data[0].created_at,
         updatedAt: data[0].updated_at,
-        metadata: data[0].metadata
+        metadata: data[0].metadata || {}
       };
     } catch (error) {
       console.error(`Failed to approve document with ID ${documentId}:`, error);

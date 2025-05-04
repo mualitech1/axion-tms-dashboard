@@ -14,7 +14,7 @@ import { ArrowUpDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Key } from 'lucide-react';
-import UserPermissionsDialog from './UserPermissionsDialog';
+import { UserPermissionsDialog } from './UserPermissionsDialog';
 
 interface UserTableProps {
   users: User[];

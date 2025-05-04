@@ -1,177 +1,163 @@
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { UserLog } from './types';
 import { format } from 'date-fns';
-import { ArrowLeft, Lock, FileText, AlertTriangle, CheckCircle, User, Key, Shield } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { UserLog } from '../types';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { AuditLogEntry, auditService } from '@/services/audit-service';
+import { Filter, Search, ArrowLeft, RefreshCw } from 'lucide-react';
 
 export default function UserLogsPage() {
-  const { id } = useParams();
-  const { toast } = useToast();
-  const [user, setUser] = useState<any>(null);
+  const { id } = useParams<{ id: string }>();
+  const [logs, setLogs] = useState<UserLog[]>([]);
   const [loading, setLoading] = useState(true);
-  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
-  const [activeTab, setActiveTab] = useState('security');
-  
+  const [filterType, setFilterType] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+
+  // Mock logs data
   useEffect(() => {
-    const fetchUserAndLogs = async () => {
-      setLoading(true);
-      try {
-        // In a real app, we would fetch the user from the database
-        // For demo, we're using mock data
-        setUser({
-          id: parseInt(id as string),
-          name: 'John Smith',
-          email: 'john.smith@example.com',
-          role: 'Operations Manager',
-          department: 'Operations'
-        });
-        
-        // Fetch security logs from audit service
-        if (id) {
-          const logs = await auditService.getAuditLogs({
-            userId: id,
-            limit: 50
-          });
-          setAuditLogs(logs);
+    // In a real app, this would fetch from an API
+    setLoading(true);
+    setTimeout(() => {
+      const mockLogs: UserLog[] = [
+        {
+          id: '1',
+          timestamp: new Date().toISOString(),
+          action: 'login_success',
+          details: 'Successful login via password',
+          ipAddress: '192.168.1.1',
+          userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/96.0.4664.110'
+        },
+        {
+          id: '2',
+          timestamp: new Date(Date.now() - 1000*60*60).toISOString(), // 1 hour ago
+          action: 'profile_update',
+          details: 'Updated profile information',
+          ipAddress: '192.168.1.1',
+          userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/96.0.4664.110'
+        },
+        {
+          id: '3',
+          timestamp: new Date(Date.now() - 1000*60*60*24).toISOString(), // 1 day ago
+          action: 'permission_granted',
+          details: 'Granted "view_finance" permission',
+          ipAddress: '192.168.1.1',
+          userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/96.0.4664.110'
         }
-      } catch (error) {
-        console.error('Error fetching user logs:', error);
-        toast({
-          title: 'Error',
-          description: 'Could not fetch user logs',
-          variant: 'destructive'
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchUserAndLogs();
-  }, [id, toast]);
-  
-  // Get icon based on the action type
-  const getActionIcon = (actionType: string) => {
-    if (actionType.includes('login') || actionType.includes('signin')) return <User className="h-4 w-4 text-blue-500" />;
-    if (actionType.includes('permission')) return <Key className="h-4 w-4 text-purple-500" />;
-    if (actionType.includes('compliance')) return <FileText className="h-4 w-4 text-green-500" />;
-    if (actionType.includes('fail') || actionType.includes('error')) return <AlertTriangle className="h-4 w-4 text-red-500" />;
-    if (actionType.includes('success')) return <CheckCircle className="h-4 w-4 text-green-500" />;
-    if (actionType.includes('security')) return <Lock className="h-4 w-4 text-amber-500" />;
-    return <Shield className="h-4 w-4 text-gray-500" />;
-  };
-  
+      ];
+      setLogs(mockLogs);
+      setLoading(false);
+    }, 1000);
+  }, [id]);
+
+  // Filter logs based on type and search term
+  const filteredLogs = logs.filter(log => {
+    const matchesFilter = filterType === 'all' || log.action.includes(filterType);
+    const matchesSearch = 
+      searchTerm === '' || 
+      log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (log.details && log.details.toLowerCase().includes(searchTerm.toLowerCase()));
+    return matchesFilter && matchesSearch;
+  });
+
   return (
-    <MainLayout title="User Logs">
-      <div className="flex flex-col space-y-6 py-6">
-        <div className="flex items-center mb-4">
-          <Link to="/users" className="text-blue-600 hover:text-blue-800 mr-2">
-            <ArrowLeft className="h-4 w-4 inline" /> Back to Users
-          </Link>
-        </div>
+    <MainLayout title="User Activity Logs">
+      <div className="container py-6">
+        <Button variant="outline" size="sm" className="mb-4" onClick={() => window.history.back()}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to User
+        </Button>
         
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div>
-          </div>
-        ) : (
-          <>
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div>
-                    User Logs for {user?.name}
-                    <span className="text-sm font-normal text-gray-500 ml-2">
-                      ({user?.email})
-                    </span>
-                  </div>
-                  <Button size="sm" variant="outline">
-                    <Shield className="h-4 w-4 mr-1" />
-                    Export Logs
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="security" className="w-full" onValueChange={setActiveTab}>
-                  <TabsList className="mb-4">
-                    <TabsTrigger value="security">Security Logs</TabsTrigger>
-                    <TabsTrigger value="activity">Activity Logs</TabsTrigger>
-                    <TabsTrigger value="compliance">Compliance</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="security" className="space-y-4">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-[180px]">Timestamp</TableHead>
-                          <TableHead>Action</TableHead>
-                          <TableHead>Entity Type</TableHead>
-                          <TableHead>IP Address</TableHead>
-                          <TableHead>Details</TableHead>
+        <Card>
+          <CardHeader>
+            <CardTitle>User Activity Logs</CardTitle>
+            <CardDescription>
+              View security events and activity history for user ID: {id}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                  <Input 
+                    type="search"
+                    placeholder="Search logs..." 
+                    className="pl-8"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="w-full md:w-64">
+                <Select
+                  value={filterType}
+                  onValueChange={setFilterType}
+                >
+                  <SelectTrigger className="w-full">
+                    <Filter className="h-4 w-4 mr-2" />
+                    <SelectValue placeholder="Filter by type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Activities</SelectItem>
+                    <SelectItem value="login">Login Events</SelectItem>
+                    <SelectItem value="permission">Permission Changes</SelectItem>
+                    <SelectItem value="profile">Profile Updates</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button variant="outline" onClick={() => window.location.reload()}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+            </div>
+            
+            {loading ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin h-8 w-8 border-4 border-primary rounded-full border-t-transparent"></div>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[180px]">Timestamp</TableHead>
+                      <TableHead>Action</TableHead>
+                      <TableHead>Details</TableHead>
+                      <TableHead>IP Address</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredLogs.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-8 text-gray-500">
+                          No log entries found.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredLogs.map(log => (
+                        <TableRow key={log.id}>
+                          <TableCell className="font-mono text-xs">
+                            {format(new Date(log.timestamp), 'MMM d, yyyy HH:mm:ss')}
+                          </TableCell>
+                          <TableCell>
+                            {log.action.replace(/_/g, ' ')}
+                          </TableCell>
+                          <TableCell>{log.details || '-'}</TableCell>
+                          <TableCell>{log.ipAddress || '-'}</TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {auditLogs.length === 0 ? (
-                          <TableRow>
-                            <TableCell colSpan={5} className="text-center py-4 text-gray-500">
-                              No security logs found for this user
-                            </TableCell>
-                          </TableRow>
-                        ) : (
-                          auditLogs.map((log) => (
-                            <TableRow key={log.id}>
-                              <TableCell className="font-mono text-xs">
-                                {log.createdAt ? format(new Date(log.createdAt), 'yyyy-MM-dd HH:mm:ss') : '-'}
-                              </TableCell>
-                              <TableCell>
-                                <div className="flex items-center gap-2">
-                                  {getActionIcon(log.actionType)}
-                                  <span>{log.actionType.replace(/_/g, ' ')}</span>
-                                </div>
-                              </TableCell>
-                              <TableCell>{log.entityType}</TableCell>
-                              <TableCell className="font-mono text-xs">
-                                {log.ipAddress || '-'}
-                              </TableCell>
-                              <TableCell>
-                                <Button variant="ghost" size="sm">
-                                  View Details
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))
-                        )}
-                      </TableBody>
-                    </Table>
-                  </TabsContent>
-                  
-                  <TabsContent value="activity">
-                    <div className="text-center py-8 text-gray-500">
-                      <Shield className="h-10 w-10 mx-auto mb-2 opacity-50" />
-                      <p>Activity logging functionality is coming soon</p>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="compliance">
-                    <div className="text-center py-8 text-gray-500">
-                      <FileText className="h-10 w-10 mx-auto mb-2 opacity-50" />
-                      <p>Compliance logging functionality is coming soon</p>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
-          </>
-        )}
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </MainLayout>
   );

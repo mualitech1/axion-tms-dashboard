@@ -29,6 +29,9 @@ export interface UserPermission {
   expiresAt?: string;
 }
 
+// Type for app roles from the database
+export type AppRole = 'admin' | 'operations' | 'accounts' | 'sales' | 'driver' | 'customer';
+
 // Handler for permission management
 class PermissionService {
   // Check if current user has a specific permission
@@ -113,7 +116,7 @@ class PermissionService {
   }
 
   // Assign permission to role
-  async assignPermissionToRole(rolePermission: { role: string, permissionId: string }): Promise<void> {
+  async assignPermissionToRole(rolePermission: { role: AppRole, permissionId: string }): Promise<void> {
     try {
       const { error } = await supabase
         .from('role_permissions')
@@ -139,7 +142,7 @@ class PermissionService {
   }
 
   // Get permissions for a role
-  async getRolePermissions(role: string): Promise<Permission[]> {
+  async getRolePermissions(role: AppRole): Promise<Permission[]> {
     try {
       const { data, error } = await supabase
         .from('role_permissions')
