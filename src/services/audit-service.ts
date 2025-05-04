@@ -26,6 +26,22 @@ function getDeviceInfo(): string {
   return navigator.userAgent;
 }
 
+// Helper to safely convert JSON to Record type
+function safeJsonToRecord(json: any): Record<string, any> {
+  if (typeof json === 'object' && json !== null) {
+    return json;
+  }
+  if (typeof json === 'string') {
+    try {
+      const parsed = JSON.parse(json);
+      return typeof parsed === 'object' && parsed !== null ? parsed : {};
+    } catch (e) {
+      return {};
+    }
+  }
+  return {};
+}
+
 // Main audit service for recording security events and user actions
 class AuditService {
   // Record an audit log entry
@@ -61,7 +77,7 @@ class AuditService {
       // Record in the audit_logs table
       const { error } = await supabase
         .from('audit_logs')
-        .insert([logEntry]);
+        .insert(logEntry);
       
       if (error) {
         console.error('Failed to record audit log:', error);
@@ -128,19 +144,19 @@ class AuditService {
       
       if (error) throw error;
       
-      // Convert from snake_case to camelCase format
+      // Convert from snake_case to camelCase format with safe type conversions
       return data.map(log => ({
         id: log.id,
         userId: log.user_id,
         actionType: log.action_type,
         entityType: log.entity_type,
         entityId: log.entity_id,
-        previousState: log.previous_state,
-        newState: log.new_state,
+        previousState: safeJsonToRecord(log.previous_state),
+        newState: safeJsonToRecord(log.new_state),
         ipAddress: log.ip_address,
         userAgent: log.user_agent,
         createdAt: log.created_at,
-        metadata: log.metadata
+        metadata: safeJsonToRecord(log.metadata)
       }));
     } catch (error) {
       console.error('Failed to fetch audit logs:', error);

@@ -120,10 +120,10 @@ class PermissionService {
     try {
       const { error } = await supabase
         .from('role_permissions')
-        .insert([{
+        .insert({
           role: rolePermission.role,
           permission_id: rolePermission.permissionId
-        }]);
+        });
       
       if (error) throw error;
       

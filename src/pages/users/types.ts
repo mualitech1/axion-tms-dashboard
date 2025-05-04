@@ -4,6 +4,7 @@ export interface User {
   name: string;
   email: string;
   role: string;
+  department: string; // Added department property
   status: string;
   lastLogin?: string;
   lastActive?: string;
@@ -19,4 +20,13 @@ export interface UserLog {
   details?: string;
   ipAddress?: string;
   userAgent?: string;
+}
+
+// Adding RolePermissions interface
+export interface Permission {
+  [key: string]: boolean;
+}
+
+export interface RolePermissions {
+  [role: string]: Permission;
 }

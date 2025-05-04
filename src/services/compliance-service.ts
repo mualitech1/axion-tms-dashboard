@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { getErrorMessage } from '@/utils/error-handler';
 import { auditService } from './audit-service';
 
+export type ComplianceStatus = 'draft' | 'pending_approval' | 'approved' | 'revoked' | 'expired';
+
 export interface ComplianceDocument {
   id?: string;
   title: string;
@@ -10,7 +12,7 @@ export interface ComplianceDocument {
   documentType: string;
   filePath: string;
   version: string;
-  status: 'draft' | 'pending_approval' | 'approved' | 'expired' | 'revoked';
+  status: ComplianceStatus;
   effectiveDate?: string;
   expiryDate?: string;
   ownerId?: string;
@@ -30,70 +32,73 @@ export interface ComplianceAcknowledgement {
   userAgent?: string;
 }
 
-// Helper function to get client IP
-function getClientIP(): string {
-  return sessionStorage.getItem('client_ip') || 'unknown';
+// Helper to safely convert JSON to Record type
+function safeJsonToRecord(json: any): Record<string, any> {
+  if (typeof json === 'object' && json !== null) {
+    return json;
+  }
+  if (typeof json === 'string') {
+    try {
+      const parsed = JSON.parse(json);
+      return typeof parsed === 'object' && parsed !== null ? parsed : {};
+    } catch (e) {
+      return {};
+    }
+  }
+  return {};
 }
 
-// Helper function to get device info
-function getDeviceInfo(): string {
-  return navigator.userAgent;
-}
-
-// Service for handling compliance documents and acknowledgements
 class ComplianceService {
-  // Get all compliance documents with filtering
-  async getComplianceDocuments(filters?: {
+  // Get all compliance documents
+  async getDocuments(filters: {
     documentType?: string;
-    status?: string;
+    status?: ComplianceStatus;
     ownerId?: string;
     effectiveAfter?: string;
     effectiveBefore?: string;
-    expiredAfter?: string;
-    expiredBefore?: string;
-  }): Promise<ComplianceDocument[]> {
+    expiryAfter?: string;
+    expiryBefore?: string;
+  } = {}): Promise<ComplianceDocument[]> {
     try {
       let query = supabase
         .from('compliance_documents')
         .select('*')
         .order('created_at', { ascending: false });
       
-      // Apply filters if provided
-      if (filters) {
-        if (filters.documentType) {
-          query = query.eq('document_type', filters.documentType);
-        }
-        
-        if (filters.status) {
-          query = query.eq('status', filters.status);
-        }
-        
-        if (filters.ownerId) {
-          query = query.eq('owner_id', filters.ownerId);
-        }
-        
-        if (filters.effectiveAfter) {
-          query = query.gte('effective_date', filters.effectiveAfter);
-        }
-        
-        if (filters.effectiveBefore) {
-          query = query.lte('effective_date', filters.effectiveBefore);
-        }
-        
-        if (filters.expiredAfter) {
-          query = query.gte('expiry_date', filters.expiredAfter);
-        }
-        
-        if (filters.expiredBefore) {
-          query = query.lte('expiry_date', filters.expiredBefore);
-        }
+      // Apply filters
+      if (filters.documentType) {
+        query = query.eq('document_type', filters.documentType);
+      }
+      
+      if (filters.status) {
+        query = query.eq('status', filters.status);
+      }
+      
+      if (filters.ownerId) {
+        query = query.eq('owner_id', filters.ownerId);
+      }
+      
+      if (filters.effectiveAfter) {
+        query = query.gte('effective_date', filters.effectiveAfter);
+      }
+      
+      if (filters.effectiveBefore) {
+        query = query.lte('effective_date', filters.effectiveBefore);
+      }
+      
+      if (filters.expiryAfter) {
+        query = query.gte('expiry_date', filters.expiryAfter);
+      }
+      
+      if (filters.expiryBefore) {
+        query = query.lte('expiry_date', filters.expiryBefore);
       }
       
       const { data, error } = await query;
       
       if (error) throw error;
       
-      // Map database fields to camelCase for frontend use and convert status to expected type
+      // Convert from snake_case to camelCase and ensure type safety
       return data.map(doc => ({
         id: doc.id,
         title: doc.title,
@@ -101,7 +106,7 @@ class ComplianceService {
         documentType: doc.document_type,
         filePath: doc.file_path,
         version: doc.version,
-        status: doc.status as ComplianceDocument['status'],
+        status: doc.status as ComplianceStatus,
         effectiveDate: doc.effective_date,
         expiryDate: doc.expiry_date,
         ownerId: doc.owner_id,
@@ -109,7 +114,7 @@ class ComplianceService {
         approvalDate: doc.approval_date,
         createdAt: doc.created_at,
         updatedAt: doc.updated_at,
-        metadata: doc.metadata || {}
+        metadata: safeJsonToRecord(doc.metadata)
       }));
     } catch (error) {
       console.error('Failed to fetch compliance documents:', error);
@@ -118,7 +123,7 @@ class ComplianceService {
   }
 
   // Get a single compliance document by ID
-  async getComplianceDocumentById(id: string): Promise<ComplianceDocument> {
+  async getDocument(id: string): Promise<ComplianceDocument> {
     try {
       const { data, error } = await supabase
         .from('compliance_documents')
@@ -128,6 +133,7 @@ class ComplianceService {
       
       if (error) throw error;
       
+      // Convert to camelCase
       return {
         id: data.id,
         title: data.title,
@@ -135,7 +141,7 @@ class ComplianceService {
         documentType: data.document_type,
         filePath: data.file_path,
         version: data.version,
-        status: data.status as ComplianceDocument['status'],
+        status: data.status as ComplianceStatus,
         effectiveDate: data.effective_date,
         expiryDate: data.expiry_date,
         ownerId: data.owner_id,
@@ -143,7 +149,7 @@ class ComplianceService {
         approvalDate: data.approval_date,
         createdAt: data.created_at,
         updatedAt: data.updated_at,
-        metadata: data.metadata || {}
+        metadata: safeJsonToRecord(data.metadata)
       };
     } catch (error) {
       console.error(`Failed to fetch compliance document with ID ${id}:`, error);
@@ -152,274 +158,208 @@ class ComplianceService {
   }
 
   // Create a new compliance document
-  async createComplianceDocument(document: Omit<ComplianceDocument, 'id' | 'createdAt' | 'updatedAt'>): Promise<ComplianceDocument> {
+  async createDocument(document: Omit<ComplianceDocument, 'id' | 'createdAt' | 'updatedAt'>): Promise<ComplianceDocument> {
     try {
-      // Get current user for ownership
+      // Get current user for audit
       const { data: userData } = await supabase.auth.getUser();
-      const ownerId = document.ownerId || userData?.user?.id;
-      
-      const dbDocument = {
-        title: document.title,
-        description: document.description,
-        document_type: document.documentType,
-        file_path: document.filePath,
-        version: document.version,
-        status: document.status,
-        effective_date: document.effectiveDate,
-        expiry_date: document.expiryDate,
-        owner_id: ownerId,
-        approved_by: document.approvedBy,
-        approval_date: document.approvalDate,
-        metadata: document.metadata || {}
-      };
+      const userId = userData?.user?.id;
       
       const { data, error } = await supabase
         .from('compliance_documents')
-        .insert([dbDocument])
-        .select();
+        .insert([{
+          title: document.title,
+          description: document.description,
+          document_type: document.documentType,
+          file_path: document.filePath,
+          version: document.version,
+          status: document.status,
+          effective_date: document.effectiveDate,
+          expiry_date: document.expiryDate,
+          owner_id: document.ownerId || userId,
+          approved_by: document.approvedBy,
+          approval_date: document.approvalDate,
+          metadata: document.metadata || {}
+        }])
+        .select()
+        .single();
       
       if (error) throw error;
       
-      const createdDoc = {
-        id: data[0].id,
-        title: data[0].title,
-        description: data[0].description,
-        documentType: data[0].document_type,
-        filePath: data[0].file_path,
-        version: data[0].version,
-        status: data[0].status as ComplianceDocument['status'],
-        effectiveDate: data[0].effective_date,
-        expiryDate: data[0].expiry_date,
-        ownerId: data[0].owner_id,
-        approvedBy: data[0].approved_by,
-        approvalDate: data[0].approval_date,
-        createdAt: data[0].created_at,
-        updatedAt: data[0].updated_at,
-        metadata: data[0].metadata || {}
+      // Convert response to camelCase
+      const createdDocument: ComplianceDocument = {
+        id: data.id,
+        title: data.title,
+        description: data.description,
+        documentType: data.document_type,
+        filePath: data.file_path,
+        version: data.version,
+        status: data.status as ComplianceStatus,
+        effectiveDate: data.effective_date,
+        expiryDate: data.expiry_date,
+        ownerId: data.owner_id,
+        approvedBy: data.approved_by,
+        approvalDate: data.approval_date,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+        metadata: safeJsonToRecord(data.metadata)
       };
       
-      // Log document creation
+      // Log document creation in audit trail
       await auditService.logAction(
-        'compliance_document_created',
+        'document_created',
         'compliance_documents',
-        createdDoc.id,
+        createdDocument.id,
         null,
-        createdDoc
+        createdDocument
       );
       
-      return createdDoc;
+      return createdDocument;
     } catch (error) {
       console.error('Failed to create compliance document:', error);
       throw new Error(getErrorMessage(error));
     }
   }
 
-  // Update an existing compliance document
-  async updateComplianceDocument(id: string, updates: Partial<ComplianceDocument>): Promise<ComplianceDocument> {
+  // Update a compliance document
+  async updateDocument(id: string, updates: Partial<ComplianceDocument>): Promise<ComplianceDocument> {
     try {
-      // Get current document for audit
-      const { data: oldDoc } = await supabase
-        .from('compliance_documents')
-        .select('*')
-        .eq('id', id)
-        .single();
+      // First get the current document state for audit
+      const original = await this.getDocument(id);
       
-      // Prepare updates in snake_case for the DB
-      const dbUpdates: Record<string, any> = {};
+      // Prepare update object with snake_case
+      const updateData: Record<string, any> = {};
       
-      if (updates.title !== undefined) dbUpdates.title = updates.title;
-      if (updates.description !== undefined) dbUpdates.description = updates.description;
-      if (updates.documentType !== undefined) dbUpdates.document_type = updates.documentType;
-      if (updates.filePath !== undefined) dbUpdates.file_path = updates.filePath;
-      if (updates.version !== undefined) dbUpdates.version = updates.version;
-      if (updates.status !== undefined) dbUpdates.status = updates.status;
-      if (updates.effectiveDate !== undefined) dbUpdates.effective_date = updates.effectiveDate;
-      if (updates.expiryDate !== undefined) dbUpdates.expiry_date = updates.expiryDate;
-      if (updates.approvedBy !== undefined) dbUpdates.approved_by = updates.approvedBy;
-      if (updates.approvalDate !== undefined) dbUpdates.approval_date = updates.approvalDate;
-      if (updates.metadata !== undefined) dbUpdates.metadata = updates.metadata;
+      if ('title' in updates) updateData.title = updates.title;
+      if ('description' in updates) updateData.description = updates.description;
+      if ('documentType' in updates) updateData.document_type = updates.documentType;
+      if ('filePath' in updates) updateData.file_path = updates.filePath;
+      if ('version' in updates) updateData.version = updates.version;
+      if ('status' in updates) updateData.status = updates.status;
+      if ('effectiveDate' in updates) updateData.effective_date = updates.effectiveDate;
+      if ('expiryDate' in updates) updateData.expiry_date = updates.expiryDate;
+      if ('ownerId' in updates) updateData.owner_id = updates.ownerId;
+      if ('approvedBy' in updates) updateData.approved_by = updates.approvedBy;
+      if ('approvalDate' in updates) updateData.approval_date = updates.approvalDate;
+      if ('metadata' in updates && updates.metadata) updateData.metadata = updates.metadata;
       
-      // Update the document
       const { data, error } = await supabase
         .from('compliance_documents')
-        .update(dbUpdates)
+        .update(updateData)
         .eq('id', id)
-        .select();
+        .select()
+        .single();
       
       if (error) throw error;
       
-      const updatedDoc = {
-        id: data[0].id,
-        title: data[0].title,
-        description: data[0].description,
-        documentType: data[0].document_type,
-        filePath: data[0].file_path,
-        version: data[0].version,
-        status: data[0].status as ComplianceDocument['status'],
-        effectiveDate: data[0].effective_date,
-        expiryDate: data[0].expiry_date,
-        ownerId: data[0].owner_id,
-        approvedBy: data[0].approved_by,
-        approvalDate: data[0].approval_date,
-        createdAt: data[0].created_at,
-        updatedAt: data[0].updated_at,
-        metadata: data[0].metadata || {}
+      // Convert response to camelCase
+      const updatedDocument: ComplianceDocument = {
+        id: data.id,
+        title: data.title,
+        description: data.description,
+        documentType: data.document_type,
+        filePath: data.file_path,
+        version: data.version,
+        status: data.status as ComplianceStatus,
+        effectiveDate: data.effective_date,
+        expiryDate: data.expiry_date,
+        ownerId: data.owner_id,
+        approvedBy: data.approved_by,
+        approvalDate: data.approval_date,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+        metadata: safeJsonToRecord(data.metadata)
       };
       
-      // Log document update
+      // Log document update in audit trail
       await auditService.logAction(
-        'compliance_document_updated',
+        'document_updated',
         'compliance_documents',
-        id,
-        oldDoc,
-        updatedDoc
+        updatedDocument.id,
+        original,
+        updatedDocument
       );
       
-      return updatedDoc;
+      return updatedDocument;
     } catch (error) {
       console.error(`Failed to update compliance document with ID ${id}:`, error);
       throw new Error(getErrorMessage(error));
     }
   }
-
-  // Approve a compliance document
-  async approveDocument(documentId: string): Promise<ComplianceDocument> {
+  
+  // Record a user acknowledgement of a document
+  async recordAcknowledgement(documentId: string): Promise<void> {
     try {
       // Get current user
       const { data: userData } = await supabase.auth.getUser();
-      if (!userData?.user) throw new Error('User not authenticated');
+      const userId = userData?.user?.id;
       
-      // Update document status
-      const updates = {
-        status: 'approved' as const,
-        approved_by: userData.user.id,
-        approval_date: new Date().toISOString()
-      };
+      if (!userId) {
+        throw new Error('User must be authenticated to acknowledge documents');
+      }
       
-      const { data, error } = await supabase
-        .from('compliance_documents')
-        .update(updates)
-        .eq('id', documentId)
-        .select();
-      
-      if (error) throw error;
-      
-      // Log approval
-      await auditService.logAction(
-        'compliance_document_approved',
-        'compliance_documents',
-        documentId,
-        { status: 'pending_approval' },
-        { status: 'approved', approved_by: userData.user.id }
-      );
-      
-      return {
-        id: data[0].id,
-        title: data[0].title,
-        description: data[0].description,
-        documentType: data[0].document_type,
-        filePath: data[0].file_path,
-        version: data[0].version,
-        status: data[0].status as ComplianceDocument['status'],
-        effectiveDate: data[0].effective_date,
-        expiryDate: data[0].expiry_date,
-        ownerId: data[0].owner_id,
-        approvedBy: data[0].approved_by,
-        approvalDate: data[0].approval_date,
-        createdAt: data[0].created_at,
-        updatedAt: data[0].updated_at,
-        metadata: data[0].metadata || {}
-      };
-    } catch (error) {
-      console.error(`Failed to approve document with ID ${documentId}:`, error);
-      throw new Error(getErrorMessage(error));
-    }
-  }
-
-  // Acknowledge a document as read/understood
-  async acknowledgeDocument(documentId: string): Promise<void> {
-    try {
-      // Get current user
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData?.user) throw new Error('User not authenticated');
-      
-      const acknowledgement = {
-        document_id: documentId,
-        user_id: userData.user.id,
-        ip_address: getClientIP(),
-        user_agent: getDeviceInfo()
-      };
+      // Get IP address and user agent 
+      const ipAddress = sessionStorage.getItem('client_ip') || 'unknown';
+      const userAgent = navigator.userAgent;
       
       const { error } = await supabase
         .from('compliance_acknowledgements')
-        .insert([acknowledgement]);
+        .insert([{
+          document_id: documentId,
+          user_id: userId,
+          ip_address: ipAddress,
+          user_agent: userAgent
+        }]);
       
-      if (error) throw error;
+      if (error) {
+        // Handle unique constraint violation - user already acknowledged
+        if (error.code === '23505') {
+          console.log('User has already acknowledged this document');
+          return;
+        }
+        throw error;
+      }
       
-      // Log acknowledgement
+      // Log acknowledgement in audit trail
       await auditService.logAction(
-        'compliance_document_acknowledged',
+        'document_acknowledged',
         'compliance_acknowledgements',
-        undefined,
+        documentId,
         null,
-        { document_id: documentId, user_id: userData.user.id }
+        { documentId, userId, timestamp: new Date().toISOString() }
       );
     } catch (error) {
-      console.error(`Failed to acknowledge document with ID ${documentId}:`, error);
+      console.error('Failed to record document acknowledgement:', error);
       throw new Error(getErrorMessage(error));
     }
   }
 
   // Check if a user has acknowledged a document
-  async hasUserAcknowledged(documentId: string, userId?: string): Promise<boolean> {
+  async hasAcknowledged(documentId: string, userId?: string): Promise<boolean> {
     try {
-      // Use provided userId or get current user
-      let userToCheck: string;
+      // If userId not provided, use current user
+      let userIdToCheck: string | undefined = userId;
       
-      if (userId) {
-        userToCheck = userId;
-      } else {
+      if (!userIdToCheck) {
         const { data: userData } = await supabase.auth.getUser();
-        if (!userData?.user) throw new Error('User not authenticated');
-        userToCheck = userData.user.id;
+        userIdToCheck = userData?.user?.id;
+        
+        if (!userIdToCheck) {
+          throw new Error('User ID required to check acknowledgement');
+        }
       }
       
       const { data, error } = await supabase
         .from('compliance_acknowledgements')
         .select('id')
         .eq('document_id', documentId)
-        .eq('user_id', userToCheck)
+        .eq('user_id', userIdToCheck)
         .maybeSingle();
       
       if (error) throw error;
+      
       return !!data;
     } catch (error) {
-      console.error(`Failed to check acknowledgement for document ${documentId}:`, error);
-      return false;
-    }
-  }
-
-  // Get all users who have acknowledged a document
-  async getDocumentAcknowledgements(documentId: string): Promise<ComplianceAcknowledgement[]> {
-    try {
-      const { data, error } = await supabase
-        .from('compliance_acknowledgements')
-        .select('*')
-        .eq('document_id', documentId)
-        .order('acknowledged_at', { ascending: false });
-      
-      if (error) throw error;
-      
-      return data.map(ack => ({
-        id: ack.id,
-        documentId: ack.document_id,
-        userId: ack.user_id,
-        acknowledgedAt: ack.acknowledged_at,
-        ipAddress: ack.ip_address,
-        userAgent: ack.user_agent
-      }));
-    } catch (error) {
-      console.error(`Failed to get acknowledgements for document ${documentId}:`, error);
+      console.error('Failed to check document acknowledgement status:', error);
       throw new Error(getErrorMessage(error));
     }
   }

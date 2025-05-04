@@ -1,68 +1,45 @@
 
 import { UserLog } from '../types';
 
-export const generateUserLogs = (userId: number): UserLog[] => {
-  const actions = [
-    'Login',
-    'Logout', 
-    'Password Change', 
-    'Profile Update',
-    'Permission Change',
-    'Failed Login Attempt',
-    'Export Data',
-    'Created Job',
-    'Updated Carrier',
-    'Viewed Customer Details',
-    'Generated Report',
-    'Modified Settings'
-  ];
-  
-  const browsers = ['Chrome', 'Firefox', 'Safari', 'Edge'];
-  const devices = ['Windows', 'MacOS', 'iOS', 'Android'];
-  
-  // Generate logs for the past 30 days
-  const logs: UserLog[] = [];
-  const now = new Date();
-  
-  // Create between 20-50 logs for the user
-  const logCount = Math.floor(Math.random() * 30) + 20;
-  
-  for (let i = 0; i < logCount; i++) {
-    const daysAgo = Math.floor(Math.random() * 30);
-    const hoursAgo = Math.floor(Math.random() * 24);
-    const minutesAgo = Math.floor(Math.random() * 60);
-    
-    const logDate = new Date(now);
-    logDate.setDate(logDate.getDate() - daysAgo);
-    logDate.setHours(logDate.getHours() - hoursAgo);
-    logDate.setMinutes(logDate.getMinutes() - minutesAgo);
-    
-    const action = actions[Math.floor(Math.random() * actions.length)];
-    const browser = browsers[Math.floor(Math.random() * browsers.length)];
-    const device = devices[Math.floor(Math.random() * devices.length)];
-    const ipOctets = Array.from({ length: 4 }, () => Math.floor(Math.random() * 255));
-    
-    logs.push({
-      id: i + 1,
-      userId,
-      action,
-      details: `${action} action performed`,
-      ipAddress: ipOctets.join('.'),
-      userAgent: `${browser} on ${device}`,
-      timestamp: logDate.toISOString()
-    });
+export const userLogsData: UserLog[] = [
+  {
+    id: "1",
+    timestamp: new Date().toISOString(),
+    action: "login_success",
+    details: "User logged in successfully",
+    ipAddress: "192.168.1.100",
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/96.0.4664.110"
+  },
+  {
+    id: "2",
+    timestamp: new Date(Date.now() - 3600000).toISOString(),
+    action: "profile_update",
+    details: "Updated profile information",
+    ipAddress: "192.168.1.100",
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/96.0.4664.110"
+  },
+  {
+    id: "3", 
+    timestamp: new Date(Date.now() - 7200000).toISOString(),
+    action: "permission_change",
+    details: "Changed user permissions",
+    ipAddress: "192.168.1.100",
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/96.0.4664.110"
+  },
+  {
+    id: "4",
+    timestamp: new Date(Date.now() - 86400000).toISOString(),
+    action: "password_reset",
+    details: "Requested password reset",
+    ipAddress: "192.168.1.100",
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/96.0.4664.110"
+  },
+  {
+    id: "5", // Changed from number to string
+    timestamp: new Date(Date.now() - 172800000).toISOString(),
+    action: "account_created",
+    details: "Account created",
+    ipAddress: "192.168.1.100",
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/96.0.4664.110"
   }
-  
-  // Sort logs by timestamp (newest first)
-  return logs.sort((a, b) => 
-    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-  );
-};
-
-// Pre-generate logs for all users
-export const userLogsData: Record<number, UserLog[]> = {};
-
-// This will populate logs for users 1-15 when imported
-for (let i = 1; i <= 15; i++) {
-  userLogsData[i] = generateUserLogs(i);
-}
+];
