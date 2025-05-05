@@ -1,26 +1,10 @@
 
 import React from 'react';
-import { Outlet } from 'react-router-dom';
-import { ReminderProvider } from './pipeline/context/ReminderContext';
-import AutoReminder from './pipeline/components/reminders/AutoReminder';
-import MainLayout from '@/components/layout/MainLayout';
-import { motion } from 'framer-motion';
+import { Navigate } from 'react-router-dom';
 
+/**
+ * Pipeline page that redirects to the pipeline dashboard
+ */
 export default function Pipeline() {
-  console.log("Pipeline component rendering");
-  
-  return (
-    <ReminderProvider>
-      <AutoReminder />
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <MainLayout title="Sales Pipeline">
-          <Outlet />
-        </MainLayout>
-      </motion.div>
-    </ReminderProvider>
-  );
+  return <Navigate to="/pipeline/dashboard" replace />;
 }

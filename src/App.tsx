@@ -34,7 +34,7 @@ import PipelineReports from './pages/pipeline/PipelineReports';
 import PipelineSettings from './pages/pipeline/PipelineSettings';
 import LeadDetails from './pages/pipeline/LeadDetails';
 import AnalyticsAdvanced from './pages/analytics/AnalyticsAdvanced';
-import AuthPage from './pages/AuthPage';
+import AuthPage from './pages/auth/AuthPage';
 import CustomerPortal from './pages/portals/CustomerPortal';
 import CustomerPortalAccess from './pages/customers/CustomerPortalAccess';
 import CarrierRegistration from './pages/carriers/CarrierRegistration';
