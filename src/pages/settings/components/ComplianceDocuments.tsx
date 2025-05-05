@@ -43,7 +43,7 @@ export default function ComplianceDocuments() {
         filter = { status: "expired" };
       }
 
-      const docs = await complianceService.getComplianceDocuments(filter);
+      const docs = await complianceService.getDocuments(filter);
       setDocuments(docs);
     } catch (error) {
       console.error("Failed to load compliance documents:", error);
@@ -72,7 +72,7 @@ export default function ComplianceDocuments() {
     setSelectedDocument(document);
     try {
       // Check if the user has already acknowledged this document
-      const acknowledged = await complianceService.hasUserAcknowledged(document.id!);
+      const acknowledged = await complianceService.hasAcknowledged(document.id!);
       setDocumentAcknowledged(acknowledged);
       setViewDialogOpen(true);
     } catch (error) {
@@ -87,7 +87,7 @@ export default function ComplianceDocuments() {
     if (!selectedDocument) return;
     
     try {
-      await complianceService.acknowledgeDocument(selectedDocument.id!);
+      await complianceService.recordAcknowledgement(selectedDocument.id!);
       setDocumentAcknowledged(true);
       toast({
         title: "Document Acknowledged",
