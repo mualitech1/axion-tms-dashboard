@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { 
   Map, 
-  MobilePhone, 
+  Phone, 
   Calendar, 
   Clock, 
   Search, 
@@ -170,7 +170,7 @@ export default function MobileOperations() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <MobilePhone className="h-5 w-5" /> Mobile Operations
+          <Phone className="h-5 w-5" /> Mobile Operations
         </CardTitle>
         <CardDescription>
           Track mobile operations activities, check-ins, location history, and app interactions
