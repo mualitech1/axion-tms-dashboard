@@ -19,69 +19,69 @@ export type NavigationItem = {
 export const navigationConfig: NavigationItem[] = [
   {
     title: "Dashboard",
-    icon: <Home />,
+    icon: Home,
     href: "/",
   },
   {
     title: "Jobs",
-    icon: <Truck />,
+    icon: Truck,
     href: "/jobs",
     children: [
       {
         title: "All Jobs",
         href: "/jobs",
-        icon: <List />
+        icon: List
       },
       {
         title: "Create Job",
         href: "/jobs/create",
-        icon: <Plus />
+        icon: Plus
       },
       {
         title: "Planning Calendar",
         href: "/jobs?view=calendar",
-        icon: <Calendar />
+        icon: Calendar
       },
     ],
   },
   {
     title: "Customers",
-    icon: <Users />,
+    icon: Users,
     href: "/customers",
   },
   {
     title: "Carriers",
-    icon: <Forklift />,
+    icon: Forklift,
     href: "/carriers",
   },
   {
     title: "Fleet",
-    icon: <Bus />,
+    icon: Bus,
     href: "/fleet",
   },
   {
     title: "Drivers",
-    icon: <User />,
+    icon: User,
     href: "/drivers",
   },
   {
     title: "Invoices",
-    icon: <Receipt />,
+    icon: Receipt,
     href: "/invoices",
   },
   {
     title: "Finance",
-    icon: <Wallet />,
+    icon: Wallet,
     href: "/finance",
   },
   {
     title: "Supply Chain",
-    icon: <Box />,
+    icon: Box,
     href: "/supply-chain",
   },
   {
     title: "Pipeline",
-    icon: <PipelineIcon />,
+    icon: PipelineIcon,
     href: "/pipeline/dashboard",
     badge: {
       content: "New",
@@ -90,12 +90,12 @@ export const navigationConfig: NavigationItem[] = [
   },
   {
     title: "Analytics",
-    icon: <BarChart3 />,
+    icon: BarChart3,
     href: "/analytics",
   },
   {
     title: "Settings",
-    icon: <Settings />,
+    icon: Settings,
     href: "/settings",
   },
 ];
