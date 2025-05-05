@@ -1,101 +1,105 @@
+import { Home, Truck, Users, Forklift, Bus, User, Receipt, Wallet, BarChart3, Settings, List, Plus, Calendar, Box } from "lucide-react";
+import { PipelineIcon } from "@/components/icons/pipeline-icon";
 
-import { Icons } from "@/components/ui/icons"
+export type NavigationItem = {
+  title: string;
+  icon: React.ReactNode;
+  href: string;
+  disabled?: boolean;
+  external?: boolean;
+  description?: string;
+  badge?: {
+    content: string;
+    variant: "default" | "destructive";
+  };
+  children?: NavigationItem[];
+};
 
-export type SidebarNavItem = {
-  title: string
-  disabled?: boolean
-  external?: boolean
-  icon?: keyof typeof Icons
-} & (
-  | {
-      href: string
-      items?: never
-    }
-  | {
-      href?: string
-      items: SidebarNavItem[]
-    }
-)
-
-export const sidebarItems = [
+export const navigationConfig: NavigationItem[] = [
   {
     title: "Dashboard",
+    icon: <Home />,
     href: "/",
-    icon: "home",
   },
   {
     title: "Jobs",
+    icon: <Truck />,
     href: "/jobs",
-    icon: "package",
-  },
-  {
-    title: "Invoices",
-    href: "/invoices",
-    icon: "file-text",
-  },
-  {
-    title: "Drivers",
-    href: "/drivers",
-    icon: "truck",
-  },
-  {
-    title: "Carriers",
-    href: "/carriers",
-    icon: "shipping",
-  },
-  {
-    title: "Customers",
-    href: "/customers",
-    icon: "users",
-  },
-  {
-    title: "Fleet",
-    href: "/fleet",
-    icon: "car",
-  },
-  {
-    title: "Finance",
-    href: "/finance",
-    icon: "credit-card",
-  },
-  {
-    title: "Users",
-    href: "/users",
-    icon: "user",
-  },
-  {
-    title: "Analytics",
-    icon: "bar-chart-2",
-    items: [
+    children: [
       {
-        title: "Overview",
-        href: "/analytics",
+        title: "All Jobs",
+        href: "/jobs",
+        icon: <List />
       },
       {
-        title: "Advanced Analytics",
-        href: "/analytics/advanced",
+        title: "Create Job",
+        href: "/jobs/create",
+        icon: <Plus />
       },
       {
-        title: "Pipeline Reports",
-        href: "/pipeline/reports",
-      },
-      {
-        title: "Carrier Reports",
-        href: "/carriers/reports",
+        title: "Planning Calendar",
+        href: "/jobs?view=calendar",
+        icon: <Calendar />
       },
     ],
   },
   {
+    title: "Customers",
+    icon: <Users />,
+    href: "/customers",
+  },
+  {
+    title: "Carriers",
+    icon: <Forklift />,
+    href: "/carriers",
+  },
+  {
+    title: "Fleet",
+    icon: <Bus />,
+    href: "/fleet",
+  },
+  {
+    title: "Drivers",
+    icon: <User />,
+    href: "/drivers",
+  },
+  {
+    title: "Invoices",
+    icon: <Receipt />,
+    href: "/invoices",
+  },
+  {
+    title: "Finance",
+    icon: <Wallet />,
+    href: "/finance",
+  },
+  {
+    title: "Supply Chain",
+    icon: <Box />,
+    href: "/supply-chain",
+  },
+  {
     title: "Pipeline",
-    href: "/pipeline",
-    icon: "trending-up",
+    icon: <PipelineIcon />,
+    href: "/pipeline/dashboard",
+    badge: {
+      content: "New",
+      variant: "default",
+    },
+  },
+  {
+    title: "Analytics",
+    icon: <BarChart3 />,
+    href: "/analytics",
   },
   {
     title: "Settings",
+    icon: <Settings />,
     href: "/settings",
-    icon: "settings",
   },
-] as const;
+];
 
-// Export navigationItems alias for backward compatibility
-export const navigationItems = sidebarItems;
+export const getSectionTitle = (pathName: string): string => {
+  const route = navigationConfig.find((item) => item.href === pathName);
+  return route?.title || "Dashboard";
+};

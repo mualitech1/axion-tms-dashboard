@@ -5,7 +5,7 @@ import ActionableMetricsSection from '@/components/dashboard/ActionableMetricsSe
 import ChartsSection from '@/components/dashboard/ChartsSection';
 import ComplianceAndAlertSection from '@/components/dashboard/ComplianceAndAlertSection';
 import { Link } from 'react-router-dom';
-import { ArrowRightIcon, BrainIcon, Database, FileText, Truck, Users } from 'lucide-react';
+import { ArrowRightIcon, BrainIcon, Database, FileText, Truck, Users, Box } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 // Import mock data
@@ -22,7 +22,7 @@ export default function Index() {
             subtitle="Your AI-powered transport operations platform"
           />
           
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-6">
             <Link to="/analytics" className="col-span-1">
               <div className="aximo-card flex flex-col items-center text-center h-full">
                 <div className="aximo-icon-container mb-3">
@@ -60,6 +60,16 @@ export default function Index() {
                 </div>
                 <h3 className="font-semibold text-aximo-text">Invoicing</h3>
                 <p className="text-sm text-aximo-text-secondary mt-2">Automated billing and payment tracking</p>
+              </div>
+            </Link>
+            
+            <Link to="/supply-chain" className="col-span-1">
+              <div className="aximo-card flex flex-col items-center text-center h-full">
+                <div className="aximo-icon-container mb-3">
+                  <Box className="h-6 w-6" />
+                </div>
+                <h3 className="font-semibold text-aximo-text">Supply Chain</h3>
+                <p className="text-sm text-aximo-text-secondary mt-2">Vendor and inventory intelligence</p>
               </div>
             </Link>
             

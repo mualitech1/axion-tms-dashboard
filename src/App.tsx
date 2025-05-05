@@ -1,235 +1,105 @@
-
 import React from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { AuthProvider } from '@/hooks/use-auth';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '@/config/query-client';
-import Index from '@/pages/Index';
-import AuthPage from '@/pages/auth/AuthPage';
-import Drivers from '@/pages/Drivers';
-import Invoices from '@/pages/Invoices';
-import InvoiceDetails from '@/pages/invoices/InvoiceDetails';
-import Jobs from '@/pages/Jobs';
-import Carriers from '@/pages/Carriers';
-import CustomerPortal from '@/pages/CustomerPortal';
-import Customers from '@/pages/Customers';
-import Fleet from '@/pages/Fleet';
-import Finance from '@/pages/Finance';
-import CarrierSelfInvoices from '@/pages/finance/CarrierSelfInvoices';
-import Users from '@/pages/Users';
-import Settings from '@/pages/Settings';
-import SettingsPage from '@/pages/settings/SettingsPage';
-import Pipeline from '@/pages/Pipeline';
-import PipelineReports from '@/pages/pipeline/PipelineReports';
-import Analytics from '@/pages/Analytics';
-import NotFound from '@/pages/NotFound';
-import CarrierReports from '@/pages/carriers/CarrierReports';
-import CarrierMessaging from '@/pages/carriers/CarrierMessaging';
-import BroadcastMessaging from '@/pages/carriers/BroadcastMessaging';
-import CarrierRegistration from '@/pages/carriers/CarrierRegistration';
-import CarrierDetails from '@/pages/carriers/CarrierDetails';
-import CarrierCompliance from '@/pages/carriers/CarrierCompliance';
-import CarrierMatching from '@/pages/carriers/CarrierMatching';
-import CarrierPortal from '@/pages/carriers/CarrierPortal';
-import CarrierPayments from '@/pages/carriers/CarrierPayments';
-import AnalyticsAdvanced from '@/pages/analytics/AnalyticsAdvanced';
-import CustomersList from '@/pages/customers/CustomersList';
-import CustomerDetails from '@/pages/customers/CustomerDetails';
-import CustomerDocumentsPage from '@/pages/customers/CustomerDocumentsPage';
-import CustomerPortalAccess from '@/pages/customers/CustomerPortalAccess';
-import PipelineDashboard from '@/pages/pipeline/PipelineDashboard';
-import PipelineBoard from '@/pages/pipeline/PipelineBoard';
-import PipelineTasks from '@/pages/pipeline/PipelineTasks';
-import PipelineSettings from '@/pages/pipeline/PipelineSettings';
-import PipelineReminders from '@/pages/pipeline/PipelineReminders';
-import LeadDetails from '@/pages/pipeline/LeadDetails';
-import CreateLeadPage from '@/pages/pipeline/components/leads/CreateLeadPage';
-
-// Define all routes at the top level
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Index />,
-  },
-  {
-    path: "/auth",
-    element: <AuthPage />,
-  },
-  {
-    path: "/drivers/*",  // Use wildcard to allow for nested routes
-    element: <Drivers />,
-  },
-  {
-    path: "/invoices",
-    element: <Invoices />,
-  },
-  {
-    path: "/invoices/:id",
-    element: <InvoiceDetails />,
-  },
-  {
-    path: "/jobs/*",  // Use wildcard to allow for nested routes
-    element: <Jobs />,
-  },
-  {
-    path: "/carriers/*",  // Use wildcard to allow for nested routes
-    element: <Carriers />,
-  },
-  {
-    path: "/customer-portal/*", // Use wildcard for nested routes
-    element: <CustomerPortal />,
-  },
-  {
-    path: "/carriers/reports",
-    element: <CarrierReports />,
-  },
-  {
-    path: "/carriers/messaging",
-    element: <CarrierMessaging />,
-  },
-  {
-    path: "/carriers/register",
-    element: <CarrierRegistration />,
-  },
-  {
-    path: "/carriers/details/:id",
-    element: <CarrierDetails />,
-  },
-  {
-    path: "/carriers/compliance",
-    element: <CarrierCompliance />,
-  },
-  {
-    path: "/carriers/matching",
-    element: <CarrierMatching />,
-  },
-  {
-    path: "/carriers/broadcast",
-    element: <BroadcastMessaging />,
-  },
-  {
-    path: "/carriers/portal",
-    element: <CarrierPortal />,
-  },
-  {
-    path: "/carriers/payments",
-    element: <CarrierPayments />,
-  },
-  {
-    path: "/customers",
-    element: <Customers />,
-    children: [
-      {
-        path: "", // Root path for customers
-        element: <CustomersList />
-      },
-      {
-        path: ":id", // Customer details page
-        element: <CustomerDetails />
-      },
-      {
-        path: ":id/documents", // Customer documents page
-        element: <CustomerDocumentsPage />
-      },
-      {
-        path: ":id/portal", // Customer portal access page
-        element: <CustomerPortalAccess />
-      }
-    ]
-  },
-  {
-    path: "/fleet",
-    element: <Fleet />,
-  },
-  {
-    path: "/finance",
-    element: <Finance />,
-  },
-  {
-    path: "/finance/carrier-self-invoices",
-    element: <CarrierSelfInvoices />,
-  },
-  {
-    path: "/users",
-    element: <Users />,
-  },
-  {
-    path: "/settings",
-    element: <Settings />,
-  },
-  {
-    path: "/pipeline",
-    element: <Pipeline />,
-    children: [
-      {
-        path: "", // Root pipeline path redirects to dashboard
-        element: <PipelineDashboard />
-      },
-      {
-        path: "dashboard",
-        element: <PipelineDashboard />
-      },
-      {
-        path: "board",
-        element: <PipelineBoard />
-      },
-      {
-        path: "tasks",
-        element: <PipelineTasks />
-      },
-      {
-        path: "tasks/calendar",
-        element: <PipelineTasks defaultTab="calendar" />
-      },
-      {
-        path: "tasks/tags",
-        element: <PipelineTasks defaultTab="tags" />
-      },
-      {
-        path: "lead/new",
-        element: <CreateLeadPage />
-      },
-      {
-        path: "lead/:id",
-        element: <LeadDetails />
-      },
-      {
-        path: "reports",
-        element: <PipelineReports />
-      },
-      {
-        path: "settings",
-        element: <PipelineSettings />
-      },
-      {
-        path: "reminders",
-        element: <PipelineReminders />
-      }
-    ]
-  },
-  {
-    path: "/analytics",
-    element: <Analytics />,
-  },
-  {
-    path: "/analytics/advanced",
-    element: <AnalyticsAdvanced />,
-  },
-  {
-    path: "*",
-    element: <NotFound />,
-  },
-]);
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+} from "react-router-dom";
+import Index from './pages/Index';
+import Jobs from './pages/Jobs';
+import Customers from './pages/Customers';
+import Analytics from './pages/analytics/Analytics';
+import Invoices from './pages/Invoices';
+import Carriers from './pages/Carriers';
+import Finance from './pages/Finance';
+import Fleet from './pages/Fleet';
+import Drivers from './pages/Drivers';
+import Users from './pages/Users';
+import Settings from './pages/Settings';
+import NotFound from './pages/NotFound';
+import CreateJobPage from './pages/jobs/CreateJobPage';
+import JobDetailPage from './pages/jobs/JobDetailPage';
+import CustomerDetails from './pages/customers/CustomerDetails';
+import CustomerDocumentsPage from './pages/customers/CustomerDocumentsPage';
+import InvoiceDetails from './pages/invoices/InvoiceDetails';
+import VehicleDetailPage from './pages/fleet/VehicleDetailPage';
+import UserDetailsPage from './pages/users/UserDetailsPage';
+import UserLogsPage from './pages/users/UserLogsPage';
+import Pipeline from './pages/pipeline/Pipeline';
+import PipelineDashboard from './pages/pipeline/PipelineDashboard';
+import PipelineBoard from './pages/pipeline/PipelineBoard';
+import PipelineTasks from './pages/pipeline/PipelineTasks';
+import PipelineReminders from './pages/pipeline/PipelineReminders';
+import PipelineReports from './pages/pipeline/PipelineReports';
+import PipelineSettings from './pages/pipeline/PipelineSettings';
+import LeadDetails from './pages/pipeline/LeadDetails';
+import AnalyticsAdvanced from './pages/analytics/AnalyticsAdvanced';
+import AuthPage from './pages/AuthPage';
+import CustomerPortal from './pages/portals/CustomerPortal';
+import CustomerPortalAccess from './pages/customers/CustomerPortalAccess';
+import CarrierRegistration from './pages/carriers/CarrierRegistration';
+import CarrierCompliance from './pages/carriers/CarrierCompliance';
+import CarrierMatching from './pages/carriers/CarrierMatching';
+import CarrierMessaging from './pages/carriers/CarrierMessaging';
+import CarrierPayments from './pages/carriers/CarrierPayments';
+import CarrierPortal from './pages/carriers/CarrierPortal';
+import CarrierReports from './pages/carriers/CarrierReports';
+import CarrierDetails from './pages/carriers/CarrierDetails';
+import PaymentRuns from './pages/finance/PaymentRuns';
+import CarrierSelfInvoices from './pages/finance/CarrierSelfInvoices';
+import DisputeManagement from './pages/finance/DisputeManagement';
+import SupplyChain from './pages/SupplyChain';
 
 function App() {
-  console.log("App component rendering with router configuration");
-  
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <RouterProvider router={router} />
-      </AuthProvider>
-    </QueryClientProvider>
+    <Router>
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/dashboard" element={<Index />} />
+      <Route path="/jobs" element={<Jobs />} />
+      <Route path="/jobs/create" element={<CreateJobPage />} />
+      <Route path="/jobs/:id" element={<JobDetailPage />} />
+      <Route path="/customers" element={<Customers />} />
+      <Route path="/customers/documents" element={<CustomerDocumentsPage />} />
+      <Route path="/customers/:id" element={<CustomerDetails />} />
+      <Route path="/customers/:id/portal" element={<CustomerPortalAccess />} />
+      <Route path="/analytics" element={<Analytics />} />
+      <Route path="/analytics/advanced" element={<AnalyticsAdvanced />} />
+      <Route path="/invoices" element={<Invoices />} />
+      <Route path="/invoices/:id" element={<InvoiceDetails />} />
+      <Route path="/carriers" element={<Carriers />} />
+      <Route path="/carriers/registration" element={<CarrierRegistration />} />
+      <Route path="/carriers/compliance" element={<CarrierCompliance />} />
+      <Route path="/carriers/matching" element={<CarrierMatching />} />
+      <Route path="/carriers/messaging" element={<CarrierMessaging />} />
+      <Route path="/carriers/payments" element={<CarrierPayments />} />
+      <Route path="/carriers/portal" element={<CarrierPortal />} />
+      <Route path="/carriers/reports" element={<CarrierReports />} />
+      <Route path="/carriers/:id" element={<CarrierDetails />} />
+      <Route path="/finance" element={<Finance />} />
+      <Route path="/finance/payment-runs" element={<PaymentRuns />} />
+      <Route path="/finance/self-invoices" element={<CarrierSelfInvoices />} />
+      <Route path="/finance/dispute-management" element={<DisputeManagement />} />
+      <Route path="/fleet" element={<Fleet />} />
+      <Route path="/fleet/:id" element={<VehicleDetailPage />} />
+      <Route path="/drivers" element={<Drivers />} />
+      <Route path="/users" element={<Users />} />
+      <Route path="/users/:id" element={<UserDetailsPage />} />
+      <Route path="/users/logs" element={<UserLogsPage />} />
+      <Route path="/pipeline" element={<Pipeline />} />
+      <Route path="/pipeline/dashboard" element={<PipelineDashboard />} />
+      <Route path="/pipeline/board" element={<PipelineBoard />} />
+      <Route path="/pipeline/tasks" element={<PipelineTasks />} />
+      <Route path="/pipeline/reminders" element={<PipelineReminders />} />
+      <Route path="/pipeline/reports" element={<PipelineReports />} />
+      <Route path="/pipeline/settings" element={<PipelineSettings />} />
+      <Route path="/pipeline/:id" element={<LeadDetails />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/supply-chain" element={<SupplyChain />} />
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/customer-portal/*" element={<CustomerPortal />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+    </Router>
   );
 }
 
