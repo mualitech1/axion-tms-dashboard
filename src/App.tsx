@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   BrowserRouter as Router,
@@ -24,7 +25,7 @@ import InvoiceDetails from './pages/invoices/InvoiceDetails';
 import VehicleDetailPage from './pages/fleet/VehicleDetailPage';
 import UserDetailsPage from './pages/users/UserDetailsPage';
 import UserLogsPage from './pages/users/UserLogsPage';
-import Pipeline from './pages/pipeline/Pipeline';
+import Pipeline from './pages/Pipeline';
 import PipelineDashboard from './pages/pipeline/PipelineDashboard';
 import PipelineBoard from './pages/pipeline/PipelineBoard';
 import PipelineTasks from './pages/pipeline/PipelineTasks';
