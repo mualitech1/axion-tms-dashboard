@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Home, Truck, Users, Forklift, Bus, User, Receipt, Wallet, BarChart3, Settings, List, Plus, Calendar, Box } from "lucide-react";
+import { Home, Truck, Users, Forklift, Bus, User, Receipt, Wallet, BarChart3, Settings, List, Plus, Calendar, Box, ShieldCheck, FileCheck } from "lucide-react";
 import { PipelineIcon } from "@/components/icons/pipeline-icon";
 
 export type NavigationItem = {
@@ -54,6 +54,28 @@ export const navigationConfig: NavigationItem[] = [
     title: "Carriers",
     icon: Forklift,
     href: "/carriers",
+    children: [
+      {
+        title: "All Carriers",
+        href: "/carriers",
+        icon: List
+      },
+      {
+        title: "Compliance",
+        href: "/carriers/compliance",
+        icon: ShieldCheck
+      },
+      {
+        title: "Registration",
+        href: "/carriers/registration",
+        icon: FileCheck
+      },
+      {
+        title: "Messaging",
+        href: "/carriers/messaging",
+        icon: Receipt
+      }
+    ],
   },
   {
     title: "Fleet",
@@ -81,15 +103,6 @@ export const navigationConfig: NavigationItem[] = [
     href: "/supply-chain",
   },
   {
-    title: "Pipeline",
-    icon: PipelineIcon,
-    href: "/pipeline/dashboard",
-    badge: {
-      content: "New",
-      variant: "default",
-    },
-  },
-  {
     title: "Analytics",
     icon: BarChart3,
     href: "/analytics",
@@ -102,6 +115,24 @@ export const navigationConfig: NavigationItem[] = [
 ];
 
 export const getSectionTitle = (pathName: string): string => {
-  const route = navigationConfig.find((item) => item.href === pathName);
-  return route?.title || "Dashboard";
+  // First check for exact match
+  const exactRoute = navigationConfig.find((item) => item.href === pathName);
+  if (exactRoute) return exactRoute.title;
+  
+  // Check for parent routes
+  for (const item of navigationConfig) {
+    if (pathName.startsWith(item.href + '/') && item.href !== '/') {
+      return item.title;
+    }
+    
+    // Check children if available
+    if (item.children) {
+      const childRoute = item.children.find(child => 
+        child.href === pathName || pathName.startsWith(child.href + '/')
+      );
+      if (childRoute) return `${item.title} - ${childRoute.title}`;
+    }
+  }
+  
+  return "Dashboard";
 };
