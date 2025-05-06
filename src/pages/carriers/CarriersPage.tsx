@@ -98,7 +98,17 @@ export default function CarriersPage() {
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
-    handleFilterChange({});
+    // Fix: Create a default filter object with all required properties
+    const defaultFilters: CarrierFilterOptions = {
+      status: null,
+      region: null,
+      fleetType: null,
+      complianceStatus: null,
+      favorites: false,
+      capabilities: [],
+      regions: []
+    };
+    handleFilterChange(defaultFilters);
   };
 
   // Region options for filter
