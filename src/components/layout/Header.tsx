@@ -11,6 +11,7 @@ interface HeaderProps {
 }
 
 export default function Header({ title }: HeaderProps) {
+  // Use optional chaining to safely access auth methods
   const { signOut, user } = useAuth();
 
   return (
