@@ -10,10 +10,10 @@ interface PerformanceMetricsCardProps {
 
 export default function PerformanceMetricsCard({ metrics }: PerformanceMetricsCardProps) {
   return (
-    <Card>
+    <Card className="border-aximo-border bg-indigo-500/5 shadow-md">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center">
-          <LineChart className="h-5 w-5 mr-2 text-tms-blue" />
+          <LineChart className="h-5 w-5 mr-2 text-indigo-400" />
           {metrics.carrierName}
           <span className="text-sm font-normal text-muted-foreground ml-2">
             ({metrics.period})
@@ -24,29 +24,29 @@ export default function PerformanceMetricsCard({ metrics }: PerformanceMetricsCa
         <div className="space-y-1">
           <div className="flex justify-between items-center text-sm">
             <div className="flex items-center">
-              <Clock className="h-4 w-4 mr-2 text-tms-blue" />
+              <Clock className="h-4 w-4 mr-2 text-indigo-400" />
               <span className="font-medium">On-Time Delivery</span>
             </div>
             <span className="font-semibold">{metrics.onTimeDeliveryRate}%</span>
           </div>
-          <Progress value={metrics.onTimeDeliveryRate} className="h-2" />
+          <Progress value={metrics.onTimeDeliveryRate} className="h-2" indicatorClassName="bg-indigo-500" />
         </div>
 
         <div className="space-y-1">
           <div className="flex justify-between items-center text-sm">
             <div className="flex items-center">
-              <FileCheck className="h-4 w-4 mr-2 text-tms-green" />
+              <FileCheck className="h-4 w-4 mr-2 text-green-500" />
               <span className="font-medium">Compliance Score</span>
             </div>
             <span className="font-semibold">{metrics.complianceScore}%</span>
           </div>
-          <Progress value={metrics.complianceScore} className="h-2" indicatorClassName="bg-tms-green" />
+          <Progress value={metrics.complianceScore} className="h-2" indicatorClassName="bg-green-500" />
         </div>
 
         <div className="space-y-1">
           <div className="flex justify-between items-center text-sm">
             <div className="flex items-center">
-              <AlertTriangle className="h-4 w-4 mr-2 text-tms-yellow" />
+              <AlertTriangle className="h-4 w-4 mr-2 text-amber-500" />
               <span className="font-medium">Incident Rate</span>
             </div>
             <span className="font-semibold">{metrics.incidentRate} per 100</span>
@@ -54,14 +54,14 @@ export default function PerformanceMetricsCard({ metrics }: PerformanceMetricsCa
           <Progress 
             value={100 - (metrics.incidentRate * 10)} 
             className="h-2" 
-            indicatorClassName="bg-tms-yellow" 
+            indicatorClassName="bg-amber-500" 
           />
         </div>
 
         <div className="space-y-1">
           <div className="flex justify-between items-center text-sm">
             <div className="flex items-center">
-              <Star className="h-4 w-4 mr-2 text-tms-blue" />
+              <Star className="h-4 w-4 mr-2 text-blue-400" />
               <span className="font-medium">Customer Satisfaction</span>
             </div>
             <span className="font-semibold">{metrics.customerSatisfactionScore} / 5</span>
@@ -69,7 +69,7 @@ export default function PerformanceMetricsCard({ metrics }: PerformanceMetricsCa
           <Progress 
             value={(metrics.customerSatisfactionScore / 5) * 100} 
             className="h-2" 
-            indicatorClassName="bg-tms-blue"
+            indicatorClassName="bg-blue-400"
           />
         </div>
       </CardContent>

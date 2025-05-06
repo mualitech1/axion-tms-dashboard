@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   LineChart,
@@ -24,10 +25,10 @@ interface PerformanceOverTimeChartProps {
 
 export function PerformanceOverTimeChart({ data }: PerformanceOverTimeChartProps) {
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-aximo-border bg-aximo-card shadow-md">
+      <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center">
-          <LineChartIcon className="h-5 w-5 mr-2 text-tms-blue" />
+          <LineChartIcon className="h-5 w-5 mr-2 text-indigo-400" />
           Performance Trends
         </CardTitle>
       </CardHeader>
@@ -43,29 +44,32 @@ export function PerformanceOverTimeChart({ data }: PerformanceOverTimeChartProps
                 bottom: 5,
               }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
               <XAxis dataKey="name" />
               <YAxis />
-              <Tooltip />
+              <Tooltip contentStyle={{ backgroundColor: '#1A1F2C', borderColor: '#394150' }} />
               <Legend />
               <Line
                 type="monotone"
                 dataKey="onTime"
                 name="On-Time Delivery (%)"
-                stroke="#0077C8"
+                stroke="#818CF8"
                 activeDot={{ r: 8 }}
+                strokeWidth={2}
               />
               <Line
                 type="monotone"
                 dataKey="compliance"
                 name="Compliance Score (%)"
                 stroke="#10b981"
+                strokeWidth={2}
               />
               <Line
                 type="monotone"
                 dataKey="incidents"
                 name="Incidents (per 100)"
                 stroke="#f59e0b"
+                strokeWidth={2}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -81,10 +85,10 @@ interface CarrierScoresChartProps {
 
 export function CarrierScoresChart({ data }: CarrierScoresChartProps) {
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-aximo-border bg-aximo-card shadow-md">
+      <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center">
-          <BarChartIcon className="h-5 w-5 mr-2 text-tms-blue" />
+          <BarChartIcon className="h-5 w-5 mr-2 text-indigo-400" />
           Top Carrier Performance
         </CardTitle>
       </CardHeader>
@@ -100,11 +104,11 @@ export function CarrierScoresChart({ data }: CarrierScoresChartProps) {
                 bottom: 5,
               }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
               <XAxis dataKey="name" />
               <YAxis domain={[0, 100]} />
-              <Tooltip />
-              <Bar dataKey="performanceScore" name="Performance Score" fill="#0077C8" />
+              <Tooltip contentStyle={{ backgroundColor: '#1A1F2C', borderColor: '#394150' }} />
+              <Bar dataKey="performanceScore" name="Performance Score" fill="#818CF8" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -121,10 +125,10 @@ export function ComplianceStatusChart({ data }: ComplianceStatusChartProps) {
   const total = data.reduce((sum, item) => sum + item.count, 0);
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-aximo-border bg-aximo-card shadow-md">
+      <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center">
-          <PieChartIcon className="h-5 w-5 mr-2 text-tms-blue" />
+          <PieChartIcon className="h-5 w-5 mr-2 text-indigo-400" />
           Compliance Status
         </CardTitle>
       </CardHeader>
@@ -147,6 +151,7 @@ export function ComplianceStatusChart({ data }: ComplianceStatusChartProps) {
                 ))}
               </Pie>
               <Tooltip 
+                contentStyle={{ backgroundColor: '#1A1F2C', borderColor: '#394150' }}
                 formatter={(value, name, props) => [`${value} carriers (${((value as number)/total*100).toFixed(1)}%)`, props.payload.status]}
               />
             </PieChart>
