@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -15,7 +14,7 @@ import CustomerSegmentationChart from '@/components/customers/CustomerSegmentati
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Download, FileText, Plus, Search, LayoutGrid, List, Users } from 'lucide-react';
+import { Download, FileText, Plus, Search, LayoutGrid, List, Users, Phone } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 export default function CustomersPage() {
