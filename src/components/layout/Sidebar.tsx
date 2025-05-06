@@ -45,6 +45,7 @@ export default function Sidebar() {
     const hasChildren = item.children && item.children.length > 0;
     const isSubMenuOpen = openSubMenus.includes(item.title);
     const active = isActive(item.href);
+    const IconComponent = item.icon;
 
     return (
       <div key={item.title} className="mb-1">
@@ -68,7 +69,7 @@ export default function Sidebar() {
           >
             {item.icon && 
               <span className={cn("text-current", isCollapsed ? "text-xl" : "mr-2")}>
-                {typeof item.icon === 'function' ? item.icon({className: "h-5 w-5"}) : item.icon}
+                <IconComponent className="h-5 w-5" />
               </span>
             }
             {!isCollapsed && (
@@ -86,25 +87,28 @@ export default function Sidebar() {
         {/* Render submenu if open */}
         {!isCollapsed && hasChildren && isSubMenuOpen && (
           <div className="pl-8 mt-1 space-y-1">
-            {item.children?.map(child => (
-              <Link
-                key={child.href}
-                to={child.href}
-                className={cn(
-                  "flex items-center py-1.5 px-3 rounded-md text-sm transition-colors",
-                  isActive(child.href)
-                    ? "bg-aximo-primary/10 text-aximo-primary"
-                    : "text-aximo-text-secondary hover:bg-aximo-border hover:text-aximo-text"
-                )}
-              >
-                {child.icon && typeof child.icon === 'function' && 
-                  <span className="mr-2">
-                    {child.icon({className: "h-4 w-4"})}
-                  </span>
-                }
-                <span>{child.title}</span>
-              </Link>
-            ))}
+            {item.children?.map(child => {
+              const ChildIconComponent = child.icon;
+              return (
+                <Link
+                  key={child.href}
+                  to={child.href}
+                  className={cn(
+                    "flex items-center py-1.5 px-3 rounded-md text-sm transition-colors",
+                    isActive(child.href)
+                      ? "bg-aximo-primary/10 text-aximo-primary"
+                      : "text-aximo-text-secondary hover:bg-aximo-border hover:text-aximo-text"
+                  )}
+                >
+                  {child.icon && 
+                    <span className="mr-2">
+                      <ChildIconComponent className="h-4 w-4" />
+                    </span>
+                  }
+                  <span>{child.title}</span>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>

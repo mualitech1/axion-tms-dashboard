@@ -1,10 +1,11 @@
 
+import React from 'react';
 import { Home, Truck, Users, Forklift, Bus, User, Receipt, Wallet, BarChart3, Settings, List, Plus, Calendar, Box } from "lucide-react";
 import { PipelineIcon } from "@/components/icons/pipeline-icon";
 
 export type NavigationItem = {
   title: string;
-  icon: React.ReactNode;
+  icon: React.ComponentType<{ className?: string }>;
   href: string;
   disabled?: boolean;
   external?: boolean;
