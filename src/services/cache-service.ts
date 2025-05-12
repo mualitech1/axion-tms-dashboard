@@ -1,5 +1,5 @@
 
-import { queryClient } from './supabase-client';
+import { queryClient } from '../config/query-client';
 
 // Predefined entity types for type safety
 export type EntityType = 'jobs' | 'companies' | 'vehicles' | 'drivers' | 'documents';

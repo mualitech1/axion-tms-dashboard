@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Job, JobLocation } from '@/types/job';
@@ -56,15 +57,6 @@ export function useJobs(filters?: Record<string, any>) {
       } catch (error) {
         console.error("Error fetching jobs:", error);
         throw new Error(getErrorMessage(error));
-      }
-    },
-    meta: {
-      onError: (error: Error) => {
-        toast({
-          title: 'Error',
-          description: `Failed to load jobs: ${error.message}`,
-          variant: 'destructive',
-        });
       }
     }
   });
@@ -232,16 +224,7 @@ export function useJob(id?: string | number) {
         throw new Error(getErrorMessage(error));
       }
     },
-    enabled,
-    meta: {
-      onError: (error: Error) => {
-        toast({
-          title: 'Error',
-          description: `Failed to load job details: ${error.message}`,
-          variant: 'destructive',
-        });
-      }
-    }
+    enabled
   });
 
   return {
