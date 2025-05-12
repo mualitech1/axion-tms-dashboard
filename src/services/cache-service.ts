@@ -1,4 +1,3 @@
-
 import { queryClient } from '../config/query-client';
 
 // Predefined entity types for type safety
