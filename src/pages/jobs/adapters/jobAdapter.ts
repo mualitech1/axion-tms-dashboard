@@ -1,7 +1,14 @@
-
 import { Job as DatabaseJob } from '@/types/database';
 import { Job, JobLocation } from '@/types/job';
 import { Json } from '@/integrations/supabase/types';
+
+// Define an extended interface that might include legacy fields like job_reference
+interface ExtendedJobData extends Partial<Job> {
+  job_reference?: string; // LEGACY FIELD - This should never be sent to the database
+  pickup_location?: any;
+  delivery_location?: any;
+  [key: string]: any; // Allow any other properties
+}
 
 /**
  * Safely parses JSON location data from any format
@@ -16,11 +23,11 @@ const parseLocationData = (locationData: Json | null): JobLocation => {
   if (typeof locationData === 'object' && locationData !== null) {
     // Ensure it has at least the required fields
     return {
-      address: (locationData as any).address || '',
-      city: (locationData as any).city || '',
-      postcode: (locationData as any).postcode || '',
-      country: (locationData as any).country || '',
-      ...(locationData as any) // Preserve any other properties
+      address: (locationData as Record<string, string>).address || '',
+      city: (locationData as Record<string, string>).city || '',
+      postcode: (locationData as Record<string, string>).postcode || '',
+      country: (locationData as Record<string, string>).country || '',
+      ...(locationData as Record<string, string>) // Preserve any other properties
     };
   }
   
@@ -49,6 +56,8 @@ const parseLocationData = (locationData: Json | null): JobLocation => {
  * Converts a database job object to the format expected by the Jobs UI components
  */
 export function adaptDatabaseJobToJobType(dbJob: DatabaseJob): Job {
+  console.log('adaptDatabaseJobToJobType INPUT:', dbJob);
+  
   // Parse locations properly regardless of format
   const pickupLocation = parseLocationData(dbJob.pickup_location);
   const deliveryLocation = parseLocationData(dbJob.delivery_location);
@@ -57,7 +66,7 @@ export function adaptDatabaseJobToJobType(dbJob: DatabaseJob): Job {
   const pickupCity = pickupLocation?.city || 'Unknown';
   const deliveryCity = deliveryLocation?.city || 'Unknown';
   
-  return {
+  const adaptedJob = {
     id: dbJob.id,
     title: dbJob.title || 'Untitled Job',
     client: dbJob.customer?.name || 'Unassigned',
@@ -83,6 +92,9 @@ export function adaptDatabaseJobToJobType(dbJob: DatabaseJob): Job {
     podDocumentId: dbJob.pod_document_id || undefined,
     issueDetails: dbJob.issue_details || undefined
   };
+  
+  console.log('adaptDatabaseJobToJobType OUTPUT:', adaptedJob);
+  return adaptedJob;
 }
 
 /**
@@ -97,19 +109,29 @@ export function adaptDatabaseJobsToJobTypes(dbJobs: DatabaseJob[] | undefined): 
  * Converts a UI job type back to database format for saving
  * Also ensures all required fields have at least default values
  */
-export function adaptJobTypeToDatabase(job: Partial<Job>): Partial<DatabaseJob> {
-  console.log("Adapting job for database:", job);
+export function adaptJobTypeToDatabase(job: ExtendedJobData): Partial<DatabaseJob> {
+  console.log("🔄 adaptJobTypeToDatabase - INPUT:", job);
+  
+  // CRITICAL: First check for and handle job_reference
+  if (job.job_reference) {
+    console.warn("⚠️ CRITICAL: Found legacy job_reference field - converting to reference");
+    if (!job.reference) {
+      job.reference = job.job_reference;
+    }
+    // Always delete job_reference to ensure it's never sent to the database
+    delete job.job_reference;
+  }
   
   // Process pickup_location and delivery_location if provided
   let pickup_location = null;
   let delivery_location = null;
   
-  if ((job as any).pickup_location) {
-    pickup_location = (job as any).pickup_location;
+  if (job.pickup_location) {
+    pickup_location = job.pickup_location;
   }
   
-  if ((job as any).delivery_location) {
-    delivery_location = (job as any).delivery_location;
+  if (job.delivery_location) {
+    delivery_location = job.delivery_location;
   }
   
   // Define minimum required fields for job creation or update
@@ -137,6 +159,17 @@ export function adaptJobTypeToDatabase(job: Partial<Job>): Partial<DatabaseJob> 
     dbJob.delivery_location = delivery_location;
   }
   
-  console.log("Transformed dbJob:", dbJob);
-  return dbJob;
+  // Create a copy to safely remove any non-database fields
+  const result = { ...dbJob };
+  
+  // FINAL SAFETY CHECK: Ensure absolutely no job_reference field is present
+  const finalResult = result as unknown as Record<string, unknown>;
+  
+  if ('job_reference' in finalResult) {
+    console.warn("🛡️ FINAL SAFETY CHECK: job_reference found in output - removing");
+    delete finalResult.job_reference;
+  }
+  
+  console.log("🔄 adaptJobTypeToDatabase - OUTPUT:", result);
+  return result;
 }
