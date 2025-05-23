@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2, CreditCard, Check } from "lucide-react";
+import { Loader2, Zap, Check, Sparkles } from "lucide-react";
 import { formatCurrency } from "@/utils/format";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -46,7 +45,7 @@ export function InvoicePaymentModal({
           invoiceId: invoice.id,
           amount: invoice.amount,
           customer: invoice.customer,
-          description: `Payment for invoice ${invoice.id}`
+          description: `Quantum entanglement for operation ${invoice.id}`
         }
       });
 
@@ -59,8 +58,8 @@ export function InvoicePaymentModal({
         setSuccess(true);
         
         toast({
-          title: "Payment processed successfully",
-          description: `Invoice ${invoice.id} has been paid.`,
+          title: "Quantum entanglement complete",
+          description: `Transaction ${invoice.id} has been successfully entangled.`,
         });
         
         // Wait a moment to show success state
@@ -74,8 +73,8 @@ export function InvoicePaymentModal({
     } catch (error) {
       setLoading(false);
       toast({
-        title: "Payment processing failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        title: "Entanglement process failed",
+        description: error instanceof Error ? error.message : "A quantum anomaly occurred",
         variant: "destructive",
       });
     }
@@ -85,40 +84,40 @@ export function InvoicePaymentModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="bg-aximo-darker border-aximo-border sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Process Payment</DialogTitle>
+          <DialogTitle className="text-aximo-text">Quantum Entanglement Process</DialogTitle>
         </DialogHeader>
         
         <div className="py-6 space-y-4">
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Invoice ID:</span>
-            <span className="font-medium">{invoice.id}</span>
+            <span className="text-aximo-text-secondary">Quantum ID:</span>
+            <span className="font-medium text-aximo-text">{invoice.id}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Customer:</span>
-            <span className="font-medium">{invoice.customer}</span>
+            <span className="text-aximo-text-secondary">Entity:</span>
+            <span className="font-medium text-aximo-text">{invoice.customer}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Amount:</span>
-            <span className="font-medium">{formatCurrency(invoice.amount)}</span>
+            <span className="text-aximo-text-secondary">Energy Units:</span>
+            <span className="font-medium text-aximo-text">{formatCurrency(invoice.amount)}</span>
           </div>
           
           {success ? (
-            <div className="flex flex-col items-center justify-center p-4 bg-green-50 rounded-lg">
-              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-2">
-                <Check className="h-6 w-6 text-green-600" />
+            <div className="flex flex-col items-center justify-center p-4 bg-green-950/30 border border-green-500/20 rounded-lg">
+              <div className="w-12 h-12 rounded-full bg-green-950/50 flex items-center justify-center mb-2">
+                <Sparkles className="h-6 w-6 text-green-400" />
               </div>
-              <p className="font-medium text-green-800">Payment Successful</p>
+              <p className="font-medium text-green-400">Quantum Entanglement Successful</p>
             </div>
           ) : (
-            <div className="border rounded-lg p-4 bg-gray-50">
-              <p className="text-center text-sm text-gray-600 mb-3">
-                This is a demo payment interface. In production, this would connect to Stripe Elements or Checkout.
+            <div className="border border-aximo-border rounded-lg p-4 bg-aximo-card">
+              <p className="text-center text-sm text-aximo-text-secondary mb-3">
+                Initiating quantum entanglement protocol. Stabilizing energy field for transaction processing.
               </p>
-              <div className="flex items-center justify-center space-x-2 border rounded p-3 bg-white">
-                <CreditCard className="h-5 w-5 text-gray-400" />
-                <span className="text-gray-800">**** **** **** 4242</span>
+              <div className="flex items-center justify-center space-x-2 border border-aximo-border rounded p-3 bg-aximo-darker">
+                <Zap className="h-5 w-5 text-aximo-primary" />
+                <span className="text-aximo-text">Quantum Key: ****-****-****-4242</span>
               </div>
             </div>
           )}
@@ -127,12 +126,21 @@ export function InvoicePaymentModal({
         <DialogFooter>
           {!success && (
             <>
-              <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
-                Cancel
+              <Button 
+                variant="outline" 
+                onClick={() => onOpenChange(false)} 
+                disabled={loading}
+                className="border-aximo-border text-aximo-text hover:bg-aximo-darker/80"
+              >
+                Cancel Process
               </Button>
-              <Button onClick={handleProcessPayment} disabled={loading || success}>
+              <Button 
+                onClick={handleProcessPayment} 
+                disabled={loading || success}
+                className="bg-gradient-to-r from-aximo-primary to-purple-600 hover:from-aximo-primary/90 hover:to-purple-700"
+              >
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {loading ? 'Processing...' : 'Pay Now'}
+                {loading ? 'Entangling...' : 'Initiate Entanglement'}
               </Button>
             </>
           )}

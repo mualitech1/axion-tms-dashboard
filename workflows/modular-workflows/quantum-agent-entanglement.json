@@ -1,0 +1,60 @@
+{
+  "name": "AetherForge Quantum Agent Entanglement",
+  "nodes": [
+    {
+      "id": "8",
+      "name": "Find Compatible Agents",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [100, 100],
+      "credentials": { "supabaseApi": { "id": "YOUR_SUPABASE_CREDENTIAL_ID", "name": "Supabase account" } },
+      "parameters": {
+        "operation": "select",
+        "from": "agents",
+        "select": "id, name, type, orbital_level, capabilities",
+        "filters": {
+          "conditions": [
+            { "field": "orbital_level", "operator": "gte", "value": "={{ $json.agentBaseData.orbital_level - 1 }}" },
+            { "field": "orbital_level", "operator": "lte", "value": "={{ $json.agentBaseData.orbital_level + 1 }}" },
+            { "field": "status", "operator": "eq", "value": "active" },
+            { "field": "id", "operator": "neq", "value": "={{ $json.agentId }}" }
+          ]
+        }
+      },
+      "connections": { "main": [ [ { "node": "9", "input": "main" } ] ] }
+    },
+    {
+      "id": "9",
+      "name": "Prepare Tunneling & Entanglement Calc",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [300, 100],
+      "parameters": {
+        "functionCode": "const calculateTunnelingProbability = (sourceOrbital, targetOrbital, capabilities) => {\n    const energyDiff = Math.abs((-1/(2*Math.pow(sourceOrbital || 1, 2))) - (-1/(2*Math.pow(targetOrbital || 1, 2))));\n    const capFactor = Math.min(1, (capabilities || []).length / 10);\n    const distFactor = Math.exp(-Math.abs(targetOrbital - sourceOrbital));\n    const transmissionCoeff = Math.exp(-2 * Math.sqrt(2 * energyDiff));\n    return { probability: (transmissionCoeff * capFactor * distFactor).toFixed(6), energy_barrier: energyDiff.toFixed(6), source_orbital: sourceOrbital, target_orbital: targetOrbital, capability_modifier: capFactor.toFixed(4) };\n};\n\nconst agentData = $input.item.json;\nconst thisAgent = agentData.agentBaseData;\nconst compatibleAgents = $input.item.json.items || [];\n\nconst tunnelingProbabilities = {};\nfor (let i = 1; i <= 7; i++) {\n  if (i === thisAgent.orbital_level) continue;\n  tunnelingProbabilities[i] = calculateTunnelingProbability(thisAgent.orbital_level, i, thisAgent.capabilities);\n}\n\nconst potentialEntanglements = compatibleAgents.map(agent => {\n  let targetCaps = agent.capabilities;\n  if (typeof targetCaps === 'string') {\n     try { targetCaps = JSON.parse(targetCaps); } catch(e) { targetCaps = []; }\n  } else if (!Array.isArray(targetCaps)) {\n     targetCaps = [];\n  }\n  return { targetAgent: { ...agent, capabilities: targetCaps }, tunneling_data: tunnelingProbabilities[agent.orbital_level] };\n});\n\nitem.json.tunneling_probabilities = tunnelingProbabilities;\nitem.json.potential_entanglements = potentialEntanglements;\nreturn item;"
+      },
+      "connections": { "main": [ [ { "node": "11", "input": "main" } ] ] }
+    },
+    {
+      "id": "11",
+      "name": "Calculate Entanglement (Tensor)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [500, 100],
+      "parameters": {
+        "functionCode": "function createCapabilityTensor(capabilities) {\n    const dimensions = { 'data_processing': 0, 'communication': 1, 'security': 2, 'automation': 3, 'intelligence': 4 };\n    const tensor = Array(5).fill(0);\n    (capabilities || []).forEach(cap => {\n        if (typeof cap !== 'string') return;\n        if (cap.includes('data') || cap.includes('analysis')) tensor[dimensions.data_processing] += 1;\n        if (cap.includes('comm') || cap.includes('api') || cap.includes('msg')) tensor[dimensions.communication] += 1;\n        if (cap.includes('sec') || cap.includes('enc') || cap.includes('auth')) tensor[dimensions.security] += 1;\n        if (cap.includes('work') || cap.includes('auto')) tensor[dimensions.automation] += 1;\n        if (cap.includes('ai') || cap.includes('ml') || cap.includes('nlp') || cap.includes('learn')) tensor[dimensions.intelligence] += 1;\n    });\n    const magnitude = Math.sqrt(tensor.reduce((sum, val) => sum + val * val, 0));\n    return magnitude > 0 ? tensor.map(v => v / magnitude) : tensor;\n}\nfunction tensorDotProduct(tensor1, tensor2) { return tensor1.reduce((sum, val, idx) => sum + val * tensor2[idx], 0); }\nconst calculateEntanglementStrength = (agent1, agent2) => {\n    const orbitalDiff = Math.abs(agent1.orbital_level - agent2.orbital_level);\n    const caps1 = agent1.capabilities;\n    const caps2 = agent2.capabilities;\n    const capTensor1 = createCapabilityTensor(caps1); \n    const capTensor2 = createCapabilityTensor(caps2);\n    const tensorSimilarity = tensorDotProduct(capTensor1, capTensor2);\n    const proximityFactor = orbitalDiff === 0 ? 1.0 : 1.0 / Math.pow(orbitalDiff || 1, 2);\n    let entanglementType, decayRate, coherenceFactor;\n    if (orbitalDiff === 0) { entanglementType = 'intra_orbital'; decayRate = 0.01; coherenceFactor = 0.9; } \n    else if (orbitalDiff === 1) { entanglementType = 'adjacent_orbital'; decayRate = 0.05; coherenceFactor = 0.7; } \n    else { entanglementType = 'cross_orbital'; decayRate = 0.1; coherenceFactor = 0.5; }\n    const typeRelationships = { 'workflow':{'workflow':0.8,'script':0.7,'monitor':0.9}, 'script':{'workflow':0.7,'script':0.8}, 'monitor':{'workflow':0.9,'monitor':0.7} };\n    const typeFactor = (typeRelationships[agent1.type]?.[agent2.type] || 0.5);\n    const strength = (tensorSimilarity * 0.4 + proximityFactor * 0.3 + typeFactor * 0.3) * coherenceFactor;\n    return { strength: Math.min(1, strength).toFixed(4), type: entanglementType, metrics: { tensor_similarity: tensorSimilarity.toFixed(4), proximity_factor: proximityFactor.toFixed(4), type_compatibility: typeFactor.toFixed(4) } };\n};\n\nconst agentData = $input.item.json;\nconst thisAgent = agentData.agentBaseData;\nconst potentialEntanglements = agentData.potential_entanglements || [];\n\nconst entanglementResults = potentialEntanglements.map(potential => {\n  const entanglement = calculateEntanglementStrength(thisAgent, potential.targetAgent);\n  return { target_agent_id: potential.targetAgent.id, strength: parseFloat(entanglement.strength), type: entanglement.type, metrics: entanglement.metrics };\n});\n\nconst strongEntanglements = entanglementResults.filter(e => e.strength > 0.5);\nstrongEntanglements.sort((a, b) => b.strength - a.strength);\nconst maxEntanglements = Math.min(strongEntanglements.length, thisAgent.orbital_level * 2); \nconst finalEntangledAgentIds = strongEntanglements.slice(0, maxEntanglements).map(e => e.target_agent_id);\n\nitem.json.entanglement_results = entanglementResults;\nitem.json.entangled_agents = finalEntangledAgentIds;\nreturn item;"
+      },
+      "connections": { "main": [ [ { "node": "16", "input": "main" } ] ] }
+    },
+    {
+      "id": "16",
+      "name": "Assign Habitat & Trigger Deployment",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [700, 100],
+      "parameters": {
+        "functionCode": "const assignOptimalHabitat = (agentData) => {\n    const rng = Math.random;\n    const habitatAffinities = { workflow: {primary: 'orchestration_hub'}, script:{primary: 'code_sanctuary'}, monitor:{primary:'observatory_hub'}, security:{primary:'security_vault'}, microservice:{primary:'service_mesh'} };\n    const capabilityHabitatMap = { 'data_analysis': 'data_lake', 'nlp': 'semantic_space' };\n    const baseAffinity = habitatAffinities[agentData.type] || {primary: 'general_purpose', secondary: 'staging_area'};\n    let primaryHabitat = baseAffinity.primary; let secondaryHabitat = baseAffinity.secondary;\n    (agentData.capabilities || []).forEach(cap => { if (capabilityHabitatMap[cap]) secondaryHabitat = capabilityHabitatMap[cap]; });\n    const calculateHabitatPosition = (habitat, orbitalLevel, bohrRadius, agentId) => { \n        const size = 1000;\n        return { x:(rng()*size).toFixed(2), y:(rng()*size).toFixed(2), z:(rng()*size).toFixed(2), region:'dynamic', habitat_affinity: (1.0 - (rng() * 0.2)).toFixed(4) }; \n    }; \n    const primaryPosition = calculateHabitatPosition(primaryHabitat, agentData.orbital_level, agentData.bohr_radius, agentData.id);\n    const secondaryPosition = calculateHabitatPosition(secondaryHabitat, agentData.orbital_level, agentData.bohr_radius, agentData.id);\n    const isInSuperposition = agentData.orbital_level >= 3 && (agentData.capabilities || []).length >= 3;\n    return { \n        primary: { habitat_id: primaryHabitat, position: primaryPosition, assignment_role: 'primary', assignment_strength: isInSuperposition ? 0.7 : 1.0 },\n        secondary: isInSuperposition ? { habitat_id: secondaryHabitat, position: secondaryPosition, assignment_role: 'secondary', assignment_strength: 0.3 } : null,\n        is_in_superposition: isInSuperposition,\n        superposition_coherence: isInSuperposition ? 0.85 : 1.0,\n        quantum_location_probability: { primary: isInSuperposition ? 0.7 : 1.0, secondary: isInSuperposition ? 0.3 : 0.0 },\n        last_habitat_collapse: new Date().toISOString()\n     };\n};\n\nconst agentData = $input.item.json;\nconst agentProps = agentData.agentBaseData;\nconst habitatInfo = assignOptimalHabitat(agentProps);\nconst deploymentStatus = { triggered: true, target: 'quantum_cluster_alpha' };\n\nitem.json.habitat_assignment = habitatInfo;\nitem.json.deployment_status = deploymentStatus; \nreturn item;"
+      }
+    }
+  ],
+  "connections": {}
+} 

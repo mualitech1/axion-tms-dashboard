@@ -1,9 +1,8 @@
-
 import { Driver } from '../types/driverTypes';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { BellRing, Calendar, AlertTriangle, Eye, PhoneCall, Mail, User } from 'lucide-react';
+import { BellRing, Calendar, AlertTriangle, Eye, Network, Zap, Orbit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { motion } from 'framer-motion';
@@ -14,6 +13,13 @@ interface DriversTableProps {
 
 export default function DriversTable({ drivers }: DriversTableProps) {
   const navigate = useNavigate();
+
+  // Status mapping for quantum terminology
+  const statusMap: Record<string, string> = {
+    'Active': 'Entangled',
+    'On Leave': 'Recalibrating',
+    'Inactive': 'Dormant'
+  };
 
   const getStatusColor = (status: string) => {
     switch(status) {
@@ -34,11 +40,11 @@ export default function DriversTable({ drivers }: DriversTableProps) {
     const daysLeft = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     
     if (daysLeft < 0) {
-      return <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/20 flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Expired</Badge>;
+      return <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/20 flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Decoherent</Badge>;
     } else if (daysLeft <= 30) {
-      return <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/20 flex items-center gap-1"><Calendar className="h-3 w-3" /> {daysLeft} days left</Badge>;
+      return <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/20 flex items-center gap-1"><Calendar className="h-3 w-3" /> {daysLeft} cycles left</Badge>;
     } else if (daysLeft <= 90) {
-      return <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20 flex items-center gap-1"><Calendar className="h-3 w-3" /> {daysLeft} days left</Badge>;
+      return <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20 flex items-center gap-1"><Calendar className="h-3 w-3" /> {daysLeft} cycles left</Badge>;
     }
     
     return <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 flex items-center gap-1"><Calendar className="h-3 w-3" />{formatDistanceToNow(new Date(expiryDate), { addSuffix: true })}</Badge>;
@@ -64,13 +70,13 @@ export default function DriversTable({ drivers }: DriversTableProps) {
       <Table>
         <TableHeader className="bg-aximo-darker">
           <TableRow className="hover:bg-transparent border-aximo-border">
-            <TableHead className="text-aximo-text font-semibold">Name</TableHead>
-            <TableHead className="text-aximo-text font-semibold">Status</TableHead>
-            <TableHead className="text-aximo-text font-semibold">National Insurance</TableHead>
-            <TableHead className="text-aximo-text font-semibold">License Expiry</TableHead>
-            <TableHead className="text-aximo-text font-semibold">CPC Expiry</TableHead>
-            <TableHead className="text-aximo-text font-semibold">Performance</TableHead>
-            <TableHead className="text-aximo-text font-semibold text-right">Actions</TableHead>
+            <TableHead className="text-aximo-text font-semibold">Operator</TableHead>
+            <TableHead className="text-aximo-text font-semibold">Quantum State</TableHead>
+            <TableHead className="text-aximo-text font-semibold">Quantum ID</TableHead>
+            <TableHead className="text-aximo-text font-semibold">Cert Expiry</TableHead>
+            <TableHead className="text-aximo-text font-semibold">Phase Alignment</TableHead>
+            <TableHead className="text-aximo-text font-semibold">Coherence</TableHead>
+            <TableHead className="text-aximo-text font-semibold text-right">Controls</TableHead>
           </TableRow>
         </TableHeader>
         <motion.tbody
@@ -89,14 +95,14 @@ export default function DriversTable({ drivers }: DriversTableProps) {
                 <TableCell className="font-medium p-3">
                   <div className="flex items-center gap-3">
                     <div className="bg-aximo-primary/20 text-aximo-primary p-1.5 rounded-full">
-                      <User className="w-4 h-4" />
+                      <Orbit className="w-4 h-4" />
                     </div>
                     <span className="text-aximo-text">{driver.name}</span>
                   </div>
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline" className={`${getStatusColor(driver.status)}`}>
-                    {driver.status}
+                    {statusMap[driver.status] || driver.status}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-aximo-text">{driver.nationalInsurance}</TableCell>
@@ -128,17 +134,17 @@ export default function DriversTable({ drivers }: DriversTableProps) {
                     </Button>
                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-aximo-text hover:bg-aximo-primary/10 hover:text-aximo-primary" onClick={(e) => {
                       e.stopPropagation();
-                      // Action to call driver
+                      // Action to connect with operator
                     }}>
-                      <PhoneCall className="h-4 w-4" />
-                      <span className="sr-only">Call</span>
+                      <Network className="h-4 w-4" />
+                      <span className="sr-only">Connect</span>
                     </Button>
                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-aximo-text hover:bg-aximo-primary/10 hover:text-aximo-primary" onClick={(e) => {
                       e.stopPropagation();
-                      // Action to email driver
+                      // Action to calibrate operator
                     }}>
-                      <Mail className="h-4 w-4" />
-                      <span className="sr-only">Email</span>
+                      <Zap className="h-4 w-4" />
+                      <span className="sr-only">Calibrate</span>
                     </Button>
                   </div>
                 </TableCell>
@@ -147,7 +153,11 @@ export default function DriversTable({ drivers }: DriversTableProps) {
           ) : (
             <TableRow className="border-aximo-border">
               <TableCell colSpan={7} className="h-24 text-center text-aximo-text-secondary">
-                No drivers found.
+                <div className="flex flex-col items-center justify-center text-aximo-text-secondary">
+                  <Orbit size={36} className="mb-2 opacity-30" />
+                  <h3 className="font-medium">No quantum operators found</h3>
+                  <p className="text-sm">Adjust your search parameters to recalibrate results</p>
+                </div>
               </TableCell>
             </TableRow>
           )}

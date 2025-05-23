@@ -1,0 +1,219 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-job",
+        "options": {}
+      },
+      "id": "7be8a775-f3fe-4fdc-a87d-25ad53b0b4b9",
+      "name": "Webhook: New Job",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Log the incoming job data\nconsole.log('New job received:', JSON.stringify(items[0].json, null, 2));\n\n// Extract job details from the incoming webhook\nconst jobData = items[0].json;\n\n// Return the job data for the next node\nreturn [\n  {\n    json: {\n      jobId: jobData.id || 'job-' + Date.now(),\n      customerName: jobData.customerName,\n      pickupLocation: jobData.pickupLocation,\n      deliveryLocation: jobData.deliveryLocation,\n      cargoType: jobData.cargoType,\n      weight: jobData.weight,\n      volume: jobData.volume,\n      pickupTime: jobData.pickupTime,\n      deliveryDeadline: jobData.deliveryDeadline,\n      specialRequirements: jobData.specialRequirements || []\n    }\n  }\n];"
+      },
+      "id": "f5e7f267-c6a5-4c2d-a14d-80b084b0b6b4",
+      "name": "Process Job Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://your-api-endpoint.com/api/carriers/available",
+        "options": {
+          "fullResponse": true
+        }
+      },
+      "id": "456a48cb-7b7d-45ae-bedb-c7c57c3fe012",
+      "name": "Fetch Available Carriers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// This is where your carrier matching algorithm goes\n// It should consider factors like:\n// - Proximity to pickup location\n// - Vehicle capacity vs cargo requirements\n// - Driver availability and hours of service\n// - Historical performance with this customer\n// - Special requirements matching\n\n// For demonstration purposes, this is a simplified algorithm\n// In production, you would implement more sophisticated matching logic\n\nconst jobData = items[0].json;\nconst availableCarriers = items[1].json.data || [];\n\n// Simple scoring system (0-100)\nconst scoredCarriers = availableCarriers.map(carrier => {\n  let score = 0;\n  \n  // Example scoring factors\n  // 1. Distance to pickup (closer is better)\n  if (carrier.currentLocation && jobData.pickupLocation) {\n    // In reality, you would calculate actual distance\n    // This is just for demonstration\n    const mockDistance = Math.random() * 100;\n    score += (100 - mockDistance) * 0.3; // 30% weight for distance\n  }\n  \n  // 2. Vehicle capacity\n  if (carrier.vehicleCapacity >= jobData.weight) {\n    score += 20; // Full points if capacity sufficient\n  } else {\n    score += (carrier.vehicleCapacity / jobData.weight) * 20; // Partial points\n  }\n  \n  // 3. Historical performance (customer rating)\n  if (carrier.rating) {\n    score += carrier.rating * 10; // Up to 50 points for a 5-star carrier\n  }\n  \n  return {\n    carrierId: carrier.id,\n    carrierName: carrier.name,\n    score: Math.round(score),\n    contactInfo: carrier.contactInfo,\n    vehicleType: carrier.vehicleType\n  };\n});\n\n// Sort by score (highest first)\nscoredCarriers.sort((a, b) => b.score - a.score);\n\n// Get the best match\nconst bestMatch = scoredCarriers[0];\n\n// Return both the best match and all scored carriers for reference\nreturn [\n  {\n    json: {\n      jobData,\n      bestMatch,\n      allCarriers: scoredCarriers\n    }\n  }\n];"
+      },
+      "id": "a8f1263c-c42e-4b76-ad9a-b7d4b1ef5a6e",
+      "name": "Match Algorithm",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://your-api-endpoint.com/api/jobs/{{$node[\"Process Job Data\"].json[\"jobId\"]}}/assign",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "carrierId",
+              "value": "={{ $json.bestMatch.carrierId }}"
+            },
+            {
+              "name": "assignmentScore",
+              "value": "={{ $json.bestMatch.score }}"
+            },
+            {
+              "name": "assignmentTime",
+              "value": "={{ $now.toISOString() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e9675697-43f3-49e8-a5b9-b4b19b67c1fb",
+      "name": "Update TMS Assignment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1050,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.bestMatch.contactInfo.preferredContact }}",
+              "value2": "email"
+            }
+          ]
+        }
+      },
+      "id": "6fcfe14b-9bed-4ae5-9e9b-9e2d54e66a69",
+      "name": "Contact Preference?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "dispatch@yourtmscompany.com",
+        "toEmail": "={{ $json.bestMatch.contactInfo.email }}",
+        "subject": "New Job Assignment: {{ $json.jobData.jobId }}",
+        "text": "=Dear {{ $json.bestMatch.carrierName }},\n\nYou have been assigned a new delivery job:\n\n- Job ID: {{ $json.jobData.jobId }}\n- Customer: {{ $json.jobData.customerName }}\n- Pickup: {{ $json.jobData.pickupLocation }}\n- Delivery: {{ $json.jobData.deliveryLocation }}\n- Pickup Time: {{ $json.jobData.pickupTime }}\n\nPlease log in to the driver portal to accept this assignment and view full details.\n\nThank you,\nAximo AI Logistics Team",
+        "options": {}
+      },
+      "id": "77e3cb14-d583-4f47-a47b-d66b3a77adbe",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [
+        1450,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "to": "={{ $json.bestMatch.contactInfo.phone }}",
+        "message": "=New job assigned: {{ $json.jobData.jobId }} for {{ $json.jobData.customerName }}. Pickup at {{ $json.jobData.pickupLocation }} at {{ $json.jobData.pickupTime }}. Log in to driver portal for details."
+      },
+      "id": "ec16257e-4b1d-42ae-8a4b-d44c3f90d1ad",
+      "name": "Send SMS Notification",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1450,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook: New Job": {
+      "main": [
+        [
+          {
+            "node": "Process Job Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Job Data": {
+      "main": [
+        [
+          {
+            "node": "Fetch Available Carriers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Available Carriers": {
+      "main": [
+        [
+          {
+            "node": "Match Algorithm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Algorithm": {
+      "main": [
+        [
+          {
+            "node": "Update TMS Assignment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update TMS Assignment": {
+      "main": [
+        [
+          {
+            "node": "Contact Preference?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact Preference?": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send SMS Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

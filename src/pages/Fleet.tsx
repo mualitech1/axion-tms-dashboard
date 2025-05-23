@@ -1,4 +1,3 @@
-
 import { Routes, Route, Navigate } from 'react-router-dom';
 import FleetPage from './fleet/FleetPage';
 import VehicleDetailPage from './fleet/VehicleDetailPage';

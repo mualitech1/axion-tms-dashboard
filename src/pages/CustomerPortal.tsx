@@ -1,5 +1,4 @@
-
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import CustomerPortalLayout from "@/components/customer-portal/CustomerPortalLayout";
 import CustomerPortalDashboard from "@/components/customer-portal/CustomerPortalDashboard";
@@ -9,6 +8,7 @@ import CustomerEmailSystem from "@/components/customer-portal/CustomerEmailSyste
 import { QuickNavigation } from "@/components/navigation/QuickNavigation";
 import { Customer } from "@/types/customer";
 import CustomerPortalNavigation from "@/components/customer-portal/CustomerPortalNavigation";
+import IslamicBlessingBanner from "@/components/customer-portal/IslamicBlessingBanner";
 
 // Mock customer data for demonstration
 const mockCustomer: Customer = {
@@ -70,6 +70,7 @@ const mockCustomer: Customer = {
 
 export default function CustomerPortal() {
   const [customer, setCustomer] = useState<Customer>(mockCustomer);
+  const location = useLocation();
 
   const handleUpdateCustomer = (updatedCustomer: Customer) => {
     setCustomer(updatedCustomer);
@@ -80,8 +81,16 @@ export default function CustomerPortal() {
     doc => doc.expiryDate && new Date(doc.expiryDate) < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
   ) || false;
 
+  // If at the root customer portal path, redirect to dashboard
+  if (location.pathname === '/customer-portal') {
+    return <Navigate to="/customer-portal/dashboard" replace />;
+  }
+  
   return (
     <CustomerPortalLayout>
+      {/* Add Islamic Blessing Banner at the top */}
+      <IslamicBlessingBanner />
+      
       {/* Add temporary navigation for testing */}
       <QuickNavigation />
       

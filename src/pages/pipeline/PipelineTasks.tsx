@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, ListTodo, Tag, Users, Plus, Filter } from 'lucide-react';
+import { Calendar, ListTodo, Tag, Users as UsersIcon, Plus, Filter } from 'lucide-react';
 import TaskBoard from './components/tasks/TaskBoard';
 import TaskCalendar from './components/tasks/TaskCalendar';
 import TaskTags from './components/tasks/TaskTags';
@@ -59,7 +58,7 @@ export default function PipelineTasks({ defaultTab = 'board' }: PipelineTasksPro
                 onClick={() => setView('team')}
                 className={view === 'team' ? "bg-aximo-primary text-white" : "text-aximo-text-secondary hover:text-aximo-text"}
               >
-                <Users className="h-3.5 w-3.5 mr-1" />
+                <UsersIcon className="h-3.5 w-3.5 mr-1" />
                 Team
               </Button>
               <Button 

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RecentTransactionsTable } from "./RecentTransactionsTable";
@@ -14,9 +13,19 @@ export function FinanceTabContent() {
       value={activeTab}
       onValueChange={setActiveTab}
     >
-      <TabsList>
-        <TabsTrigger value="transactions">Recent Transactions</TabsTrigger>
-        <TabsTrigger value="pending">Pending Payments</TabsTrigger>
+      <TabsList className="bg-aximo-darker border border-aximo-border">
+        <TabsTrigger 
+          value="transactions"
+          className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
+        >
+          Recent Quantum Exchanges
+        </TabsTrigger>
+        <TabsTrigger 
+          value="pending"
+          className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
+        >
+          Pending Entanglements
+        </TabsTrigger>
       </TabsList>
       
       <TabsContent value="transactions" className="mt-4">

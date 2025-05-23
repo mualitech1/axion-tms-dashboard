@@ -1,7 +1,6 @@
-
 import * as React from "react"
 import { 
-  Home, Package, FileText, Truck, Users, Car, CreditCard, 
+  Home, Package, FileText, Truck, Users as UsersIcon, Car, CreditCard, 
   User, BarChart2, TrendingUp, Settings, Info, Bell, HelpCircle, Loader2, Scale
 } from "lucide-react"
 
@@ -16,7 +15,7 @@ export const Icons = {
   package: Package,
   "file-text": FileText,
   truck: Truck,
-  users: Users,
+  users: UsersIcon,
   car: Car,
   "credit-card": CreditCard,
   user: User,

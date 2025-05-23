@@ -1,6 +1,8 @@
-
 import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useResponsive } from "@/hooks/use-responsive";
+import { MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 interface DashboardCardProps {
   title: string;
@@ -10,6 +12,9 @@ interface DashboardCardProps {
   isLoading?: boolean;
   icon?: React.ReactNode;
   accentColor?: 'blue' | 'green' | 'amber' | 'red';
+  actions?: React.ReactNode;
+  onExpand?: () => void;
+  collapsible?: boolean;
 }
 
 export default function DashboardCard({ 
@@ -19,9 +24,13 @@ export default function DashboardCard({
   footer,
   isLoading = false,
   icon,
-  accentColor
+  accentColor,
+  actions,
+  onExpand,
+  collapsible = false
 }: DashboardCardProps) {
-  const isMobile = useIsMobile();
+  const { isMobile, isTablet, isDesktopAndAbove } = useResponsive();
+  const [isCollapsed, setIsCollapsed] = useState(false);
   
   const getBorderClass = () => {
     if (!accentColor) return "border-aximo-border";
@@ -34,22 +43,87 @@ export default function DashboardCard({
       default: return "border-aximo-border";
     }
   };
+
+  const getAccentGradient = () => {
+    if (!accentColor) return "";
+    
+    switch (accentColor) {
+      case 'blue': return "bg-gradient-to-r from-aximo-primary/10 to-transparent";
+      case 'green': return "bg-gradient-to-r from-green-500/10 to-transparent";
+      case 'amber': return "bg-gradient-to-r from-amber-500/10 to-transparent";
+      case 'red': return "bg-gradient-to-r from-red-500/10 to-transparent";
+      default: return "";
+    }
+  };
+  
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
   
   return (
     <div className={cn(
-      "bg-aximo-card border rounded-lg shadow-aximo overflow-hidden animate-scale-in p-4 md:p-5",
+      "bg-aximo-card border rounded-lg shadow-aximo overflow-hidden transition-all duration-300",
       getBorderClass(),
-      isMobile ? "p-3" : "",
+      isDesktopAndAbove && "hover:shadow-aximo-strong",
+      isMobile ? "p-3" : isTablet ? "p-4" : "p-5",
       className
     )}>
-      <div className="flex items-center justify-between mb-3 md:mb-4">
+      <div className={cn(
+        "flex items-center justify-between",
+        isMobile ? "mb-2" : isTablet ? "mb-3" : "mb-4",
+        isDesktopAndAbove && getAccentGradient(),
+        isDesktopAndAbove && "-mx-5 px-5 py-1"
+      )}>
         <div className="flex items-center">
           {icon && (
-            <div className="mr-3 text-aximo-primary">
+            <div className={cn(
+              "mr-3 text-aximo-primary", 
+              isDesktopAndAbove && "transition-transform group-hover:scale-110"
+            )}>
               {icon}
             </div>
           )}
-          <h3 className="text-xs md:text-sm font-medium text-aximo-text-secondary">{title}</h3>
+          <h3 className={cn(
+            "font-medium text-aximo-text-primary",
+            isMobile ? "text-xs" : isTablet ? "text-sm" : "text-base"
+          )}>
+            {title}
+          </h3>
+        </div>
+        
+        <div className="flex items-center gap-1">
+          {actions && (
+            <div className="mr-1">
+              {actions}
+            </div>
+          )}
+          
+          {collapsible && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 rounded-full"
+              onClick={toggleCollapse}
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          )}
+          
+          {onExpand && isDesktopAndAbove && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onExpand}
+              className="h-7 w-7 rounded-full"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="h-4 w-4">
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <polyline points="9 21 3 21 3 15"></polyline>
+                <line x1="21" y1="3" x2="14" y2="10"></line>
+                <line x1="3" y1="21" x2="10" y2="14"></line>
+              </svg>
+            </Button>
+          )}
         </div>
       </div>
       
@@ -59,13 +133,20 @@ export default function DashboardCard({
           <div className="h-16 md:h-24 bg-aximo-border rounded-md animate-pulse" />
         </div>
       ) : (
-        <div className={isMobile ? "text-sm" : ""}>
+        <div className={cn(
+          "transition-all duration-300 ease-in-out",
+          isCollapsed ? "h-0 opacity-0 overflow-hidden" : "opacity-100",
+          isMobile ? "text-sm" : ""
+        )}>
           {children}
         </div>
       )}
       
-      {footer && (
-        <div className="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-aximo-border">
+      {footer && !isCollapsed && (
+        <div className={cn(
+          "pt-3 border-t border-aximo-border",
+          isMobile ? "mt-2" : isTablet ? "mt-3" : "mt-4"
+        )}>
           {footer}
         </div>
       )}

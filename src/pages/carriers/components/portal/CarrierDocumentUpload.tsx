@@ -11,8 +11,9 @@ import { UploadCloud, FileText, AlertCircle, Check, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DocumentUploadDialog } from '../../components/registration/documents/DocumentUploadDialog';
-import { getDocumentVerificationLabel } from '@/utils/documents/documentVerification';
+import { getDocumentVerificationLabel, VerificationStatus } from '@/utils/documents/documentVerification';
 import { toast } from '@/hooks/use-toast';
+import { Document } from '@/types/customer';
 
 interface CarrierDocumentUploadProps {
   carrierName: string;
@@ -20,30 +21,28 @@ interface CarrierDocumentUploadProps {
 
 export default function CarrierDocumentUpload({ carrierName }: CarrierDocumentUploadProps) {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
-  const [documents, setDocuments] = useState<any[]>([
+  const [documents, setDocuments] = useState<Document[]>([
     {
       id: 'doc1',
       name: 'Insurance_Policy_2023.pdf',
-      type: 'insurance',
+      type: 'insurance_git',
       filePath: '/documents/insurance_policy.pdf',
-      fileSize: 1458000,
+      fileSize: '1.4 MB',
       dateUploaded: '2023-09-15T10:30:00Z',
-      verificationStatus: 'verified',
-      notes: 'Annual policy renewal'
+      verificationStatus: VerificationStatus.VERIFIED,
     },
     {
       id: 'doc2',
       name: 'Vehicle_Registration_Certificate.pdf',
       type: 'license',
       filePath: '/documents/vehicle_registration.pdf',
-      fileSize: 890000,
+      fileSize: '890 KB',
       dateUploaded: '2023-09-16T14:20:00Z',
-      verificationStatus: 'pending',
-      notes: ''
+      verificationStatus: VerificationStatus.PENDING,
     }
   ]);
 
-  const handleUploadDocument = (document: any) => {
+  const handleUploadDocument = (document: Document) => {
     setDocuments(prev => [...prev, document]);
     toast({
       title: "Document uploaded",
@@ -59,11 +58,11 @@ export default function CarrierDocumentUpload({ carrierName }: CarrierDocumentUp
     });
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: VerificationStatus | undefined) => {
     switch (status) {
-      case 'verified':
+      case VerificationStatus.VERIFIED:
         return <Check className="h-4 w-4 text-green-500" />;
-      case 'rejected':
+      case VerificationStatus.REJECTED:
         return <X className="h-4 w-4 text-red-500" />;
       default:
         return <AlertCircle className="h-4 w-4 text-amber-500" />;
@@ -139,7 +138,7 @@ export default function CarrierDocumentUpload({ carrierName }: CarrierDocumentUp
                             variant="ghost"
                             size="sm"
                             onClick={() => handleRemoveDocument(doc.id)}
-                            disabled={doc.verificationStatus === 'verified'}
+                            disabled={doc.verificationStatus === VerificationStatus.VERIFIED}
                           >
                             <X className="h-4 w-4" />
                           </Button>

@@ -1,7 +1,6 @@
-
 import { Card } from '@/components/ui/card';
 import { drivers } from '../data/driverData';
-import { ArrowUpIcon, ArrowDownIcon, Activity, Fuel, Shield, Star } from 'lucide-react';
+import { ArrowUpIcon, ArrowDownIcon, Activity, Orbit, Shield, Star, Zap, Network } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function DriverKPIOverview() {
@@ -23,42 +22,42 @@ export default function DriverKPIOverview() {
 
   const kpiItems = [
     {
-      label: "On-time Delivery",
+      label: "Temporal Precision",
       value: averageKPIs.onTimeDeliveries,
-      icon: Activity,
-      color: "text-blue-500",
-      bgColor: "bg-blue-500/10",
-      borderColor: "border-blue-500/20",
+      icon: Network,
+      color: "text-aximo-primary",
+      bgColor: "bg-aximo-primary/10",
+      borderColor: "border-aximo-primary/20",
       change: 2,
       positive: true
     },
     {
-      label: "Fuel Efficiency",
+      label: "Quantum Efficiency",
       value: averageKPIs.fuelEfficiency,
-      icon: Fuel,
-      color: "text-green-500",
-      bgColor: "bg-green-500/10",
+      icon: Zap,
+      color: "text-green-400",
+      bgColor: "bg-green-950/30",
       borderColor: "border-green-500/20",
       change: 1,
       positive: true
     },
     {
-      label: "Safety Score",
+      label: "Stability Matrix",
       value: averageKPIs.safetyScore,
       icon: Shield,
-      color: "text-amber-500",
-      bgColor: "bg-amber-500/10",
+      color: "text-amber-400",
+      bgColor: "bg-amber-950/30",
       borderColor: "border-amber-500/20",
       change: 0.5,
       positive: false
     },
     {
-      label: "Customer Rating",
+      label: "Entanglement Rating",
       value: averageKPIs.customerSatisfaction,
-      icon: Star,
-      color: "text-purple-500",
-      bgColor: "bg-purple-500/10",
-      borderColor: "border-purple-500/20",
+      icon: Orbit,
+      color: "text-aximo-light",
+      bgColor: "bg-aximo-light/10",
+      borderColor: "border-aximo-light/20",
       change: 3,
       positive: true
     }
@@ -80,8 +79,8 @@ export default function DriverKPIOverview() {
           <Activity className="h-5 w-5" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-aximo-text">Driver Performance Overview</h3>
-          <p className="text-sm text-aximo-text-secondary">{activeDrivers.length} active drivers</p>
+          <h3 className="text-lg font-semibold text-aximo-text">Quantum Operator Metrics</h3>
+          <p className="text-sm text-aximo-text-secondary">{activeDrivers.length} entangled operators</p>
         </div>
       </div>
       
@@ -102,7 +101,7 @@ export default function DriverKPIOverview() {
                 </div>
                 <span className={`text-xs font-medium ${item.color}`}>{item.label}</span>
               </div>
-              <span className={`flex items-center text-xs ${item.positive ? 'text-green-500' : 'text-red-500'}`}>
+              <span className={`flex items-center text-xs ${item.positive ? 'text-green-400' : 'text-red-400'}`}>
                 {item.positive ? (
                   <ArrowUpIcon className="h-3 w-3 mr-1" />
                 ) : (
@@ -118,9 +117,9 @@ export default function DriverKPIOverview() {
             <div className="mt-2 h-1.5 w-full bg-aximo-darker rounded-full overflow-hidden">
               <div 
                 className={`h-full ${
-                  item.value > 90 ? 'bg-green-500' : 
-                  item.value > 80 ? 'bg-amber-500' : 
-                  'bg-red-500'
+                  item.value > 90 ? 'bg-green-400' : 
+                  item.value > 80 ? 'bg-amber-400' : 
+                  'bg-red-400'
                 }`}
                 style={{ width: `${item.value}%` }}
               ></div>
@@ -136,39 +135,39 @@ export default function DriverKPIOverview() {
           transition={{ delay: 0.5, duration: 0.5 }}
           className="bg-gradient-to-r from-aximo-primary/20 to-aximo-light/10 rounded-lg p-5 border border-aximo-primary/20 backdrop-blur-sm shadow-aximo"
         >
-          <h4 className="text-sm font-medium mb-3 text-aximo-text">Top Performing Driver</h4>
+          <h4 className="text-sm font-medium mb-3 text-aximo-text">Prime Quantum Operator</h4>
           <div className="flex items-center gap-4">
             <div className="h-14 w-14 rounded-full bg-aximo-primary/30 flex items-center justify-center">
-              <Star className="h-7 w-7 text-aximo-primary" />
+              <Orbit className="h-7 w-7 text-aximo-primary" />
             </div>
             <div className="flex-1">
               <div className="flex items-center justify-between">
                 <p className="text-lg font-semibold text-aximo-text">{bestDriver.name}</p>
                 <div className="px-2.5 py-1 rounded-full bg-aximo-primary/20 text-aximo-primary text-xs font-medium">
-                  Star Driver
+                  Singularity Class
                 </div>
               </div>
               <div className="mt-1 grid grid-cols-2 gap-x-8 gap-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-aximo-text-secondary">On-time:</span>
+                  <span className="text-aximo-text-secondary">Temporal:</span>
                   <span className="font-medium text-aximo-text">{bestDriver.kpi.onTimeDeliveries.toFixed(1)}%</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-aximo-text-secondary">Safety:</span>
+                  <span className="text-aximo-text-secondary">Stability:</span>
                   <span className="font-medium text-aximo-text">{bestDriver.kpi.safetyScore.toFixed(1)}%</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-aximo-text-secondary">Fuel:</span>
+                  <span className="text-aximo-text-secondary">Efficiency:</span>
                   <span className="font-medium text-aximo-text">{bestDriver.kpi.fuelEfficiency.toFixed(1)}%</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-aximo-text-secondary">Rating:</span>
+                  <span className="text-aximo-text-secondary">Entanglement:</span>
                   <span className="font-medium text-aximo-text">{bestDriver.kpi.customerSatisfaction.toFixed(1)}%</span>
                 </div>
               </div>
               <div className="mt-3">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-aximo-text-secondary">Overall Performance</span>
+                  <span className="text-aximo-text-secondary">Quantum Coherence</span>
                   <span className="font-medium text-aximo-text">{((bestDriver.kpi.onTimeDeliveries + 
                     bestDriver.kpi.fuelEfficiency + bestDriver.kpi.safetyScore + 
                     bestDriver.kpi.customerSatisfaction) / 4).toFixed(1)}%</span>

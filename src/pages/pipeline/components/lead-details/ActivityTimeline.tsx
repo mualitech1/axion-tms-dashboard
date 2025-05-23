@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Tag, Mail, Phone, Users, BarChart3, History } from 'lucide-react';
+import { Tag, Mail, Phone, Users as UsersIcon, BarChart3, History } from 'lucide-react';
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -24,7 +23,7 @@ export default function ActivityTimeline({
       case ActivityType.NOTE: return <Tag className="h-4 w-4 mr-2" />;
       case ActivityType.EMAIL: return <Mail className="h-4 w-4 mr-2" />;
       case ActivityType.CALL: return <Phone className="h-4 w-4 mr-2" />;
-      case ActivityType.MEETING: return <Users className="h-4 w-4 mr-2" />;
+      case ActivityType.MEETING: return <UsersIcon className="h-4 w-4 mr-2" />;
       case ActivityType.STAGE_CHANGED: return <BarChart3 className="h-4 w-4 mr-2" />;
       default: return <History className="h-4 w-4 mr-2" />;
     }

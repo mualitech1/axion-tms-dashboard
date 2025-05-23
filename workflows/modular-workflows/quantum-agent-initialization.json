@@ -1,0 +1,68 @@
+{
+  "name": "AetherForge Quantum Agent Initialization",
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Validate & Init Quantum Params",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [100, 100],
+      "parameters": {
+        "functionCode": "function murmurhash3(str) { \n    let hash = 0;\n    for (let i = 0; i < str.length; i++) {\n        const char = str.charCodeAt(i);\n        hash = ((hash << 5) - hash) + char;\n        hash |= 0; \n    }\n    return Math.abs(hash); \n}\n\nfunction generateULID() {\n  // Crockford's Base32 character set (excludes I, L, O, U to avoid confusion)\n  const ENCODING_CHARS = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';\n  \n  // Time part (48 bits) - first 10 characters\n  const timestamp = Date.now();\n  let encodedTime = '';\n  let timeLeft = timestamp;\n  \n  for (let i = 0; i < 10; i++) {\n    const mod = timeLeft % 32;\n    timeLeft = Math.floor(timeLeft / 32);\n    encodedTime = ENCODING_CHARS[mod] + encodedTime;\n  }\n  \n  // Random part (80 bits) - last 16 characters\n  let encodedRandom = '';\n  for (let i = 0; i < 16; i++) {\n    const randIndex = Math.floor(Math.random() * 32);\n    encodedRandom += ENCODING_CHARS[randIndex];\n  }\n  \n  // Combine time and random parts\n  return encodedTime + encodedRandom;\n}\n\nconst generateQuantumSignature = (id, radius, capabilities = [], energyLevel) => {\n    const basis = { id: id.split('-').map(part => parseInt(part.substring(0,4), 16)), radius, energy: energyLevel, caps: capabilities.reduce((acc, cap) => acc + cap.length, 0) };\n    const coefficients = [];\n    for (let i = 0; i < 8; i++) {\n        const angle = (basis.id[i % basis.id.length] % 360) * Math.PI / 180;\n        const amplitude = Math.cos(angle) * basis.radius / Math.abs(basis.energy || 1);\n        coefficients.push(amplitude.toFixed(5));\n    }\n    const phase = Math.atan2(basis.radius, Math.abs(basis.energy || 1)) * 180 / Math.PI;\n    const entropy = capabilities.map(c => c.charCodeAt(0)).reduce((acc, val) => (acc + val) % 256, 0) / 256;\n    const qHash = murmurhash3(id + radius + capabilities.join('') + energyLevel);\n    return `qsig_${id.substring(0, 8)}_${phase.toFixed(2)}_${entropy.toFixed(4)}_${qHash}`;\n};\n\nconst body = $input.item.json.body || {};\n// Generate ULID if no agent ID provided\nconst agentId = body.agentId || generateULID();\nconst agentName = body.name || `Agent-${agentId.substring(0, 8)}`;\nconst agentType = body.type || 'workflow';\nconst orbitalLevel = parseInt(body.orbitalLevel || '1');\nconst bohrRadius = parseFloat(body.bohrRadius || '1.0');\nconst creatorId = body.creatorId || 'system';\nconst requestedCapabilities = body.capabilities || [];\nconst blueprintId = body.blueprintId || null;\nconst timestamp = new Date().toISOString();\nconst energyLevel = -1 / (2 * Math.pow(orbitalLevel || 1, 2));\nconst quantumSignature = generateQuantumSignature(agentId, bohrRadius, requestedCapabilities, energyLevel);\nconst initialCapabilityVector = requestedCapabilities.map(() => Math.random());\n\nitem.json = { initData: { agentId, name: agentName, type: agentType, orbitalLevel, bohrRadius, creatorId, requestedCapabilities, blueprintId, timestamp, energyLevel, quantumSignature, capabilityVector: initialCapabilityVector } };\nreturn item;"
+      },
+      "connections": {
+        "main": [ [ { "node": "2", "input": "main" } ] ]
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check for Existing Agent",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [300, 100],
+      "credentials": { "supabaseApi": { "id": "YOUR_SUPABASE_CREDENTIAL_ID", "name": "Supabase account" } },
+      "parameters": {
+        "operation": "select",
+        "from": "agents",
+        "select": "id",
+        "filters": { "conditions": [ { "field": "id", "operator": "eq", "value": "={{ $json.initData.agentId }}" } ] },
+        "options": { "limit": 1, "count": "exact" }
+      },
+      "connections": { "main": [ [ { "node": "3", "input": "main" } ] ] }
+    },
+    {
+      "id": "3",
+      "name": "Branch: Agent Exists?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [500, 100],
+      "parameters": { "conditions": { "number": [ { "value1": "={{ $json.count }}", "operation": "larger", "value2": 0 } ] } },
+      "connections": { "true": [ [ { "node": "4", "input": "main" } ] ], "false": [ [ { "node": "6", "input": "main" } ] ] }
+    },
+    {
+      "id": "4",
+      "name": "Respond Agent Exists",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [700, 50],
+      "parameters": { "responseCode": 409, "responseData": "={{ { \"success\": false, \"message\": \"Agent already exists\", \"agentId\": $json.initData.agentId } }}" }
+    },
+    {
+      "id": "6",
+      "name": "Fetch Blueprint",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [700, 150],
+      "credentials": { "supabaseApi": { "id": "YOUR_SUPABASE_CREDENTIAL_ID", "name": "Supabase account" } },
+      "parameters": {
+        "operation": "select",
+        "from": "agent_blueprints",
+        "filters": { "conditions": [ { "field": "id", "operator": "eq", "value": "={{ $json.initData.blueprintId }}" } ] },
+        "options": { "limit": 1, "single": true }
+      },
+      "continueOnFail": true,
+      "connections": { "main": [ [ { "node": "5", "input": "main" } ] ] }
+    }
+  ],
+  "connections": {}
+} 

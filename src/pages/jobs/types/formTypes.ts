@@ -1,4 +1,3 @@
-
 import { JobStatus } from "@/types/job";
 
 // Define JobPriority here since it's not being imported properly
@@ -13,6 +12,7 @@ export interface AddressFormData {
   reference: string;
   time: string;
   additionalComments?: string;
+  instructions?: string;
 }
 
 export interface AdditionalStop extends AddressFormData {}
@@ -22,6 +22,7 @@ export interface JobCreationFormData {
   vehicleType: string;
   priority: JobPriority;
   customer: string;
+  pickupDate: Date;
   rate?: string;
   productType?: string;
   totalWeight?: string;

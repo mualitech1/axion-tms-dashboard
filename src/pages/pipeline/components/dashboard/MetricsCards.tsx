@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Users, CreditCard, BarChart2, ArrowUpRight } from 'lucide-react';
+import { Users as UsersIcon, CreditCard, BarChart2, ArrowUpRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
 export default function MetricsCards() {
@@ -10,7 +9,7 @@ export default function MetricsCards() {
       value: '32',
       change: '+8% from last month',
       trend: 'up',
-      icon: <Users className="h-4 w-4 text-muted-foreground" />
+      icon: <UsersIcon className="h-4 w-4 text-muted-foreground" />
     },
     {
       title: 'Pipeline Value',

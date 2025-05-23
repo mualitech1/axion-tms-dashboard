@@ -1,0 +1,120 @@
+{
+  "name": "Customer Experience - Job Status Update Module",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "job-status-update",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "63d52c13-5018-4d7b-8fd9-32fc7fc7059b",
+      "name": "Webhook: Job Status Update",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://your-api-endpoint.com/api/jobs/{{$json.jobId}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_TOKEN"
+            }
+          ]
+        },
+        "options": {
+          "responseFormat": "json"
+        }
+      },
+      "id": "b8715e7b-d3ec-4a1d-9e21-2b93156423da",
+      "name": "Get Job Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        420,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract incoming data\nconst jobData = items[0].json;\nconst status = jobData.status;\nconst jobId = jobData.id;\nconst customerId = jobData.customerId;\nconst customerName = jobData.customerName;\nconst customerEmail = jobData.customerEmail;\nconst customerPhone = jobData.customerPhone;\nconst customerPreferredComms = jobData.customerPreferredComms || \"email\";\nconst pickupAddress = jobData.pickupAddress;\nconst deliveryAddress = jobData.deliveryAddress;\nconst estimatedDeliveryDate = jobData.estimatedDeliveryDate;\nconst trackingLink = `https://your-tms-domain.com/tracking/${jobId}`;\n\n// Get carrier data if available\nconst carrierName = jobData.carrier?.name || \"our delivery team\";\nconst carrierPhone = jobData.carrier?.phone || \"\";\n\n// Generate appropriate message based on status\nlet subject = \"\";\nlet message = \"\";\nlet emailTemplate = \"\";\nlet smsTemplate = \"\";\n\nswitch(status) {\n  case \"created\":\n    subject = `Your delivery #${jobId} has been booked`;\n    emailTemplate = \"jobCreated\";\n    smsTemplate = \"New delivery booked! Track at: \" + trackingLink;\n    message = `We've received your delivery request. Your tracking number is ${jobId}. We'll notify you when a carrier is assigned.`;\n    break;\n    \n  case \"assigned\":\n    subject = `Carrier assigned to your delivery #${jobId}`;\n    emailTemplate = \"carrierAssigned\";\n    smsTemplate = `${carrierName} will handle your delivery #${jobId}. Track at: ${trackingLink}`;\n    message = `${carrierName} has been assigned to your delivery. You can expect pickup on ${new Date(jobData.scheduledPickupTime).toLocaleDateString()}.`;\n    break;\n    \n  case \"pickedUp\":\n    subject = `Your delivery #${jobId} has been picked up`;\n    emailTemplate = \"inTransit\";\n    smsTemplate = `Your items for delivery #${jobId} have been picked up and are on the way! ETA: ${new Date(estimatedDeliveryDate).toLocaleDateString()}`;\n    message = `Your items have been picked up from ${pickupAddress} and are now in transit. Estimated delivery: ${new Date(estimatedDeliveryDate).toLocaleDateString()}.`;\n    break;\n    \n  case \"inTransit\":\n    subject = `Your delivery #${jobId} is in transit`;\n    emailTemplate = \"inTransit\";\n    smsTemplate = `Delivery #${jobId} is on the way! Current ETA: ${new Date(estimatedDeliveryDate).toLocaleDateString()}`;\n    message = `Your delivery is on its way to ${deliveryAddress}. Estimated delivery: ${new Date(estimatedDeliveryDate).toLocaleDateString()}.`;\n    break;\n    \n  case \"outForDelivery\":\n    subject = `Your delivery #${jobId} is out for delivery today`;\n    emailTemplate = \"outForDelivery\";\n    smsTemplate = `Your delivery #${jobId} will arrive today! Track final status at: ${trackingLink}`;\n    message = `Good news! Your delivery is out for delivery and scheduled to arrive today at ${deliveryAddress}.`;\n    break;\n    \n  case \"delivered\":\n    subject = `Your delivery #${jobId} has been completed`;\n    emailTemplate = \"delivered\";\n    smsTemplate = `Your delivery #${jobId} is complete! We'd love your feedback: ${trackingLink}/feedback`;\n    message = `Your delivery has been successfully completed. Thank you for choosing our service. We'd appreciate your feedback.`;\n    break;\n    \n  case \"delayed\":\n    subject = `Update on your delivery #${jobId}`;\n    emailTemplate = \"delayed\";\n    smsTemplate = `Delivery #${jobId} has been delayed. New ETA: ${new Date(estimatedDeliveryDate).toLocaleDateString()}. We apologize for the inconvenience.`;\n    message = `We wanted to inform you that your delivery has been delayed. New estimated delivery: ${new Date(estimatedDeliveryDate).toLocaleDateString()}. We apologize for any inconvenience.`;\n    break;\n    \n  default:\n    subject = `Update on your delivery #${jobId}`;\n    emailTemplate = \"statusUpdate\";\n    smsTemplate = `Status update for delivery #${jobId}: ${status}. Track at: ${trackingLink}`;\n    message = `The status of your delivery has been updated to: ${status}. Track your delivery at ${trackingLink}.`;\n}\n\n// Return communication data along with job details\nreturn [{\n  json: {\n    jobId,\n    customerId,\n    customerName,\n    customerEmail,\n    customerPhone,\n    customerPreferredComms,\n    status,\n    subject,\n    message,\n    emailTemplate,\n    smsTemplate,\n    trackingLink,\n    jobData\n  }\n}];"
+      },
+      "id": "47e4c719-48f8-4e9e-99c9-9dfc2299d38d",
+      "name": "Prepare Customer Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2.1,
+      "position": [
+        600,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.customerPreferredComms }}",
+              "value2": "email"
+            }
+          ]
+        }
+      },
+      "id": "1f48136d-2bf2-44f9-a750-008c399d4c76",
+      "name": "Communication Preference",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        780,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook: Job Status Update": {
+      "main": [
+        [
+          {
+            "node": "Get Job Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Job Details": {
+      "main": [
+        [
+          {
+            "node": "Prepare Customer Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Customer Message": {
+      "main": [
+        [
+          {
+            "node": "Communication Preference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+} 

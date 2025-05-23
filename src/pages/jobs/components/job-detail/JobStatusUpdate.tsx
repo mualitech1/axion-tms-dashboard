@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,7 +33,7 @@ import {
 import { PodUploadDialog } from "./PodUploadDialog";
 
 interface JobStatusUpdateProps {
-  jobId: number;
+  jobId: string | number;
   status: JobStatus;
   onStatusChange: (status: JobStatus) => void;
 }

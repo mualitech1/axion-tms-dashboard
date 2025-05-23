@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Customer } from '@/types/customer';
+import { Customer, Document } from '@/types/customer';
 import { Button } from '@/components/ui/button';
 import { 
   Table,
@@ -19,7 +18,8 @@ import {
   Plus, 
   Calendar,
   AlertTriangle,
-  CheckCircle2
+  CheckCircle2,
+  Trash2
 } from 'lucide-react';
 import {
   isDocumentExpiringSoon,
@@ -29,19 +29,101 @@ import {
   formatDocumentDate,
   getFileTypeFromPath
 } from '@/utils/documentUtils';
+import DocumentUploadDialog from './DocumentUploadDialog';
+import { useToast } from '@/components/ui/use-toast';
 
 interface CustomerDocumentsProps {
   customer: Customer;
 }
 
+interface DocumentUploadData {
+  name: string;
+  type: 'contract' | 'terms' | 'rate_card' | 'invoice' | 'pod' | 'insurance' | 'license' | 'other';
+  dateUploaded: string;
+  expiryDate?: string;
+  filePath: string;
+  fileSize: string;
+  verificationStatus?: 'pending' | 'verified' | 'rejected';
+}
+
 const CustomerDocuments = ({ customer }: CustomerDocumentsProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [documents, setDocuments] = useState(customer.documents || []);
+  const [documents, setDocuments] = useState<Document[]>(customer.documents || []);
+  const [isUploading, setIsUploading] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const { toast } = useToast();
   
   // Filter documents by search term
   const filteredDocuments = documents.filter(
     doc => doc.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleUploadDocument = async (documentData: Omit<Document, 'id'>) => {
+    setIsUploading(true);
+    
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Create a new document object
+      const newDocument: Document = {
+        id: `doc-${Date.now()}`,
+        ...documentData
+      };
+      
+      // Add the new document to the documents array
+      setDocuments(prev => [...prev, newDocument]);
+      
+      toast({
+        title: "Document uploaded",
+        description: "The document has been successfully uploaded.",
+        variant: "default",
+      });
+      
+      setDialogOpen(false);
+    } catch (error) {
+      console.error("Error uploading document:", error);
+      toast({
+        title: "Upload failed",
+        description: "There was an error uploading the document. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDeleteDocument = async (documentId: string) => {
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Remove the document from the documents array
+      setDocuments(prev => prev.filter(doc => doc.id !== documentId));
+      
+      toast({
+        title: "Document deleted",
+        description: "The document has been successfully deleted.",
+        variant: "default",
+      });
+    } catch (error) {
+      toast({
+        title: "Delete failed",
+        description: "There was an error deleting the document. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDownloadDocument = (doc: Document) => {
+    toast({
+      title: "Download started",
+      description: `Downloading ${doc.name}...`,
+      variant: "default",
+    });
+    
+    // In a real application, this would trigger an actual download
+  };
 
   return (
     <div className="space-y-4">
@@ -55,7 +137,7 @@ const CustomerDocuments = ({ customer }: CustomerDocumentsProps) => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Button>
+        <Button onClick={() => setDialogOpen(true)}>
           <Plus className="h-4 w-4 mr-1" />
           Upload Document
         </Button>
@@ -119,8 +201,21 @@ const CustomerDocuments = ({ customer }: CustomerDocumentsProps) => {
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
-                        <Button variant="outline" size="icon" className="h-8 w-8">
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          className="h-8 w-8"
+                          onClick={() => handleDownloadDocument(doc)}
+                        >
                           <Download className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                          onClick={() => handleDeleteDocument(doc.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>
@@ -137,12 +232,20 @@ const CustomerDocuments = ({ customer }: CustomerDocumentsProps) => {
           <p className="text-sm text-muted-foreground mb-3">
             Upload documents such as contracts, terms & conditions, or other related files
           </p>
-          <Button size="sm">
+          <Button size="sm" onClick={() => setDialogOpen(true)}>
             <Plus className="h-4 w-4 mr-1" />
             Upload Document
           </Button>
         </div>
       )}
+
+      <DocumentUploadDialog 
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onUploadDocument={handleUploadDocument}
+        customerId={customer.id}
+        isUploading={isUploading}
+      />
     </div>
   );
 };

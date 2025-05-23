@@ -1,6 +1,7 @@
+import { VerificationStatus } from '@/utils/documents/documentVerification';
 
 export interface ContactPerson {
-  id: string;
+  id: string; // Text format ID (previously UUID)
   name: string;
   role: string;
   email: string;
@@ -9,27 +10,28 @@ export interface ContactPerson {
 }
 
 export interface Document {
-  id: string;
+  id: string; // Text format ID (previously UUID)
   name: string;
-  type: 'contract' | 'terms' | 'rate_card' | 'invoice' | 'pod' | 'insurance' | 'license' | 'other';
+  type: 'contract' | 'terms' | 'rate_card' | 'invoice' | 'pod' | 'insurance' | 'insurance_git' | 'insurance_fleet' | 'license' | 'other';
   dateUploaded: string;
   expiryDate?: string;
   filePath: string;
   fileSize: string;
-  verificationStatus?: 'pending' | 'verified' | 'rejected';
+  verificationStatus?: VerificationStatus;
 }
 
 export interface RateCard {
-  id: string;
+  id: string; // Text format ID (previously UUID)
   name: string;
   dateCreated: string;
   validFrom: string;
   validTo: string;
   status: 'active' | 'pending' | 'expired';
+  notes?: string;
 }
 
 export interface JobRecord {
-  id: string;
+  id: string; // Text format ID (previously UUID)
   reference: string;
   date: string;
   from: string;
@@ -39,14 +41,15 @@ export interface JobRecord {
 }
 
 export interface Customer {
-  id: string; // Changed from number to string
+  id: string; // Text format ID (previously UUID)
   name: string;
   contact: string;
   email: string;
   phone: string;
   status: string;
   creditLimit: number;
-  lastOrder: string;
+  lastOrder?: string;
+  createdAt?: string;
   address?: {
     street: string;
     city: string;

@@ -1,12 +1,11 @@
-
 import React, { useState } from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import { Tabs } from '@/components/ui/tabs';
 import { AnalyticsHeader } from './components/AnalyticsHeader';
 import { AnalyticsTabs } from './components/AnalyticsTabs';
 import { AnalyticsTabContent } from './components/AnalyticsTabContent';
 import { mockInvoices } from './data/mockInvoices';
 import { motion } from 'framer-motion';
+import { Breadcrumb } from '@/components/navigation/Breadcrumb';
 
 export default function Analytics() {
   const [dateRange, setDateRange] = useState('30days');
@@ -21,21 +20,34 @@ export default function Analytics() {
     return () => clearTimeout(timer);
   }, []);
   
+  const breadcrumbItems = [
+    { label: "Quantum Hub", path: "/" },
+    { label: "Quantum Intelligence", path: "/analytics" }
+  ];
+  
   return (
-    <MainLayout title="Analytics">
+    <div className="space-y-6 animate-fade-in">
       <motion.div 
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
+        className="bg-gradient-to-r from-aximo-primary/20 to-aximo-light/10 p-6 rounded-lg border border-aximo-border"
+      >
+        <Breadcrumb items={breadcrumbItems} />
+        <AnalyticsHeader dateRange={dateRange} setDateRange={setDateRange} />
+      </motion.div>
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
         className="space-y-6"
       >
-        <AnalyticsHeader dateRange={dateRange} setDateRange={setDateRange} />
-        
         <Tabs defaultValue="overview" className="space-y-6">
           <AnalyticsTabs defaultValue="overview" />
           <AnalyticsTabContent invoices={mockInvoices} isLoading={isLoading} />
         </Tabs>
       </motion.div>
-    </MainLayout>
+    </div>
   );
 }

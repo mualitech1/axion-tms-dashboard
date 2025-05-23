@@ -1,6 +1,3 @@
-
-import MainLayout from '@/components/layout/MainLayout';
-import SettingsHeader from '@/pages/settings/components/SettingsHeader';
 import ProfileSettings from '@/pages/settings/components/GeneralSettings';
 import NotificationsSettings from '@/pages/settings/components/NotificationSettings';
 import SecuritySettings from '@/pages/settings/components/SecuritySettings';
@@ -13,6 +10,8 @@ import { SubscriptionSettings } from "@/components/settings/SubscriptionSettings
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Sparkles } from 'lucide-react';
 
 export default function SettingsPage() {
   const { user, loading, checkSession } = useAuth();
@@ -31,33 +30,100 @@ export default function SettingsPage() {
     
     verifyAuth();
   }, [loading, navigate, checkSession]);
-  
+
   if (loading) {
     return (
-      <MainLayout title="Settings">
-        <div className="container mx-auto py-6 flex justify-center items-center h-[60vh]">
-          <div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div>
+      <div className="container mx-auto py-6 flex justify-center items-center h-[60vh]">
+        <div className="relative flex items-center justify-center">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full opacity-75 animate-pulse"></div>
+          <div className="relative bg-black/60 rounded-full p-4">
+            <Sparkles className="h-8 w-8 text-purple-400 animate-spin" />
+          </div>
         </div>
-      </MainLayout>
+      </div>
     );
   }
 
   return (
-    <MainLayout title="Settings">
-      <div className="container mx-auto py-6 space-y-8">
-        <SettingsHeader />
-        <div className="grid gap-6">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className="space-y-8"
+    >
+      <div className="grid gap-6">
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
           <SubscriptionSettings />
+        </motion.div>
+        
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+        >
           <ProfileSettings />
+        </motion.div>
+        
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+        >
           <SecuritySettings />
+        </motion.div>
+        
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.4 }}
+        >
           <DeviceManagement />
+        </motion.div>
+        
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.5 }}
+        >
           <MobileOperations />
+        </motion.div>
+        
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.6 }}
+        >
           <ComplianceDocuments />
+        </motion.div>
+        
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.7 }}
+        >
           <IntegrationSettings />
+        </motion.div>
+        
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.8 }}
+        >
           <SecurityLogs />
+        </motion.div>
+        
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.9 }}
+        >
           <NotificationsSettings />
-        </div>
+        </motion.div>
       </div>
-    </MainLayout>
+    </motion.div>
   );
 }

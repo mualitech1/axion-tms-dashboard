@@ -1,5 +1,4 @@
-
-import { InvoiceData } from "./create-invoice-dialog/CreateInvoiceDialog";
+import { InvoiceData } from "./create-invoice-dialog/types";
 
 // Mock invoice data
 export const invoices: InvoiceData[] = [

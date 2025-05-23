@@ -1,20 +1,20 @@
-
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import JobsPage from './jobs/JobsPage';
-import JobDetailPage from './jobs/JobDetailPage';
 import CreateJobPage from './jobs/CreateJobPage';
+import JobDetailsPage from './jobs/JobDetailsPage';
+import JobTrackingPage from './jobs/JobTrackingPage';
+import JobReportsPage from './jobs/JobReportsPage';
+import JobSchedulePage from './jobs/JobSchedulePage';
 
 export default function Jobs() {
-  console.log("Jobs component rendered");
-  
-  // Log to verify routes are registered
-  console.log("Jobs routes registered: / (JobsPage), /:id (JobDetailPage), and /create (CreateJobPage)");
-  
   return (
     <Routes>
       <Route index element={<JobsPage />} />
       <Route path="create" element={<CreateJobPage />} />
-      <Route path=":id" element={<JobDetailPage />} />
+      <Route path="details/:id" element={<JobDetailsPage />} />
+      <Route path="tracking/:id" element={<JobTrackingPage />} />
+      <Route path="reports" element={<JobReportsPage />} />
+      <Route path="schedule" element={<JobSchedulePage />} />
       <Route path="*" element={<Navigate to="/jobs" replace />} />
     </Routes>
   );

@@ -1,20 +1,22 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar } from 'lucide-react';
+import { Atom, Network } from 'lucide-react';
 
 export function LogisticsTab() {
   return (
-    <Card>
+    <Card className="bg-aximo-darker border-aximo-border">
       <CardHeader>
-        <CardTitle>Logistics Analytics</CardTitle>
-        <CardDescription>Coming soon - delivery performance metrics and route analysis</CardDescription>
+        <CardTitle className="text-aximo-text">Spatial Dynamics Analytics</CardTitle>
+        <CardDescription className="text-aximo-text-secondary">Coming soon - quantum transport efficiency metrics and dimensional fold analysis</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center justify-center h-[400px] text-center">
-        <Calendar className="h-12 w-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium mb-2">Logistics Analytics Module</h3>
-        <p className="text-muted-foreground max-w-md">
-          This feature is coming soon. It will include delivery performance metrics, route optimization analysis, and fleet utilization reports.
+        <div className="relative mb-4">
+          <Atom className="h-12 w-12 text-aximo-primary" />
+          <Network className="h-8 w-8 text-blue-400 absolute bottom-0 right-0" />
+        </div>
+        <h3 className="text-lg font-medium mb-2 text-aximo-text">Quantum Spatial Dynamics Module</h3>
+        <p className="text-aximo-text-secondary max-w-md">
+          This feature is coming soon. It will include quantum transport efficiency metrics, dimensional fold optimization analysis, and spatio-temporal flux utilization reports.
         </p>
       </CardContent>
     </Card>

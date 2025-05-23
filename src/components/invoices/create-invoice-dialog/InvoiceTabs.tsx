@@ -1,4 +1,3 @@
-
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface InvoiceTabsProps {
@@ -8,9 +7,19 @@ interface InvoiceTabsProps {
 
 export function InvoiceTabs({ activeTab, setActiveTab }: InvoiceTabsProps) {
   return (
-    <TabsList className="grid w-full grid-cols-2 mb-4 mt-4">
-      <TabsTrigger value="details">Invoice Details</TabsTrigger>
-      <TabsTrigger value="items">Line Items</TabsTrigger>
+    <TabsList className="grid w-full grid-cols-2 mb-4 mt-4 bg-aximo-darker border border-aximo-border">
+      <TabsTrigger 
+        value="details" 
+        className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
+      >
+        Quantum Parameters
+      </TabsTrigger>
+      <TabsTrigger 
+        value="items"
+        className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
+      >
+        Energy Distribution
+      </TabsTrigger>
     </TabsList>
   );
 }

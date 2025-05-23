@@ -12,42 +12,58 @@ import { TabsNavigation } from './add-customer-form/TabsNavigation';
 import { CompanyInfoTab } from './add-customer-form/CompanyInfoTab';
 import { ContactsTab } from './add-customer-form/ContactsTab';
 import { TermsTab } from './add-customer-form/TermsTab';
-import { customerSchema, CustomerFormValues } from './add-customer-form/types';
+import { customerFormSchema, CustomerFormValues } from './add-customer-form/types';
 
 interface AddCustomerFormProps {
-  onClose: () => void;
-  onAddCustomer?: (customer: Customer) => void;
+  formData: Partial<Customer>;
+  onChange: (field: string, value: any) => void;
 }
 
-const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
+const AddCustomerForm = ({ formData, onChange }: AddCustomerFormProps) => {
   const [activeTab, setActiveTab] = useState('general');
   const [primaryContact, setPrimaryContact] = useState<any>(null);
   const [invoiceContact, setInvoiceContact] = useState<any>(null);
   const [operationsContact, setOperationsContact] = useState<any>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formCompletion, setFormCompletion] = useState(0);
   
   const { toast } = useToast();
   
   const form = useForm<CustomerFormValues>({
-    resolver: zodResolver(customerSchema),
+    resolver: zodResolver(customerFormSchema),
     defaultValues: {
-      name: '',
+      name: formData.name || '',
       address: {
-        street: '',
-        city: '',
-        postcode: '',
-        country: '',
+        street: formData.address?.street || '',
+        city: formData.address?.city || '',
+        postcode: formData.address?.postcode || '',
+        country: formData.address?.country || '',
       },
-      status: 'Active',
-      creditLimit: 0,
-      acceptedTerms: false,
-      notes: '',
+      status: formData.status || 'Active',
+      creditLimit: formData.creditLimit || 0,
+      acceptedTerms: formData.acceptedTerms || false,
+      notes: formData.notes || '',
     },
   });
 
   // Watch form fields for completion percentage calculation
   const watchedFields = form.watch();
+  
+  // Update parent component when form values change
+  useEffect(() => {
+    const subscription = form.watch((value, { name, type }) => {
+      if (name && type === 'change') {
+        // Handle nested fields
+        if (name.startsWith('address.')) {
+          const field = name.split('.')[1];
+          onChange('address.' + field, value.address?.[field as keyof typeof value.address] || '');
+        } else {
+          onChange(name, value[name as keyof typeof value] || '');
+        }
+      }
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [form, onChange]);
   
   // Calculate form completion percentage
   useEffect(() => {
@@ -75,82 +91,6 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
     setActiveTab(value);
   };
 
-  const onSubmit = async (values: CustomerFormValues) => {
-    // Validation check for required contacts
-    if (!primaryContact) {
-      toast({
-        title: "Missing Information",
-        description: "Primary contact details are required",
-        variant: "destructive"
-      });
-      setActiveTab('contacts');
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      // Ensure address fields are not optional when creating the customer object
-      const customerAddress = {
-        street: values.address.street || '',
-        city: values.address.city || '',
-        postcode: values.address.postcode || '',
-        country: values.address.country || '',
-      };
-      
-      // Create the complete customer object with contacts
-      const newCustomer: Customer = {
-        id: Date.now().toString(), // Generate string ID from timestamp
-        name: values.name, // Explicitly include the name property
-        status: values.status,
-        creditLimit: values.creditLimit,
-        notes: values.notes,
-        acceptedTerms: values.acceptedTerms,
-        address: customerAddress, // Use the non-optional address object
-        contacts: [
-          { ...primaryContact, isPrimary: true, role: 'Primary' },
-          ...(invoiceContact ? [{ ...invoiceContact, role: 'Invoice' }] : []),
-          ...(operationsContact ? [{ ...operationsContact, role: 'Operations' }] : []),
-        ],
-        // Add required properties from Customer type
-        contact: primaryContact ? primaryContact.name : '',
-        email: primaryContact ? primaryContact.email : '',
-        phone: primaryContact ? primaryContact.phone : '',
-        lastOrder: '-',
-        // Initialize empty collections for related data
-        documents: [],
-        rateCards: [],
-        jobs: []
-      };
-      
-      console.log('New Customer:', newCustomer);
-      
-      // Simulate API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Now call the onAddCustomer prop if it exists
-      if (onAddCustomer) {
-        onAddCustomer(newCustomer);
-      }
-      
-      toast({
-        title: "Customer Created Successfully",
-        description: `${values.name} has been added to your customer list`,
-      });
-      
-      onClose();
-    } catch (error) {
-      console.error("Error creating customer:", error);
-      toast({
-        title: "Error",
-        description: "There was a problem creating the customer. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <div className="py-6 animate-fade-in">
       <FormHeader formCompletion={formCompletion} />
@@ -163,7 +103,7 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
         />
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="space-y-6">
             <TabsContent value="general">
               <CompanyInfoTab 
                 form={form} 
@@ -174,6 +114,9 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
             
             <TabsContent value="contacts">
               <ContactsTab 
+                control={form.control}
+                formState={form.formState}
+                trigger={form.trigger}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 primaryContact={primaryContact}
@@ -190,10 +133,10 @@ const AddCustomerForm = ({ onClose, onAddCustomer }: AddCustomerFormProps) => {
                 form={form} 
                 activeTab={activeTab} 
                 setActiveTab={setActiveTab} 
-                isSubmitting={isSubmitting} 
+                isSubmitting={false} 
               />
             </TabsContent>
-          </form>
+          </div>
         </Form>
       </Tabs>
     </div>

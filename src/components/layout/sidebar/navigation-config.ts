@@ -1,138 +1,184 @@
+import { 
+  LayoutDashboard, 
+  Users, 
+  Truck, 
+  FileText, 
+  Package, 
+  CircleDollarSign,
+  Gauge, 
+  Building2, 
+  ShieldCheck,
+  BarChart3,
+  UserCog,
+  Boxes,
+  Scan,
+  MessageSquare,
+  ClipboardList
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { AppRole } from '@/types/permissions';
+import { ResourceActions } from '@/types/permissions';
 
-import React from 'react';
-import { Home, Truck, Users, Forklift, Bus, User, Receipt, Wallet, BarChart3, Settings, List, Plus, Calendar, Box, ShieldCheck, FileCheck } from "lucide-react";
-import { PipelineIcon } from "@/components/icons/pipeline-icon";
-
-export type NavigationItem = {
+export interface NavigationItem {
   title: string;
-  icon: React.ComponentType<{ className?: string }>;
   href: string;
-  disabled?: boolean;
-  external?: boolean;
-  description?: string;
-  badge?: {
-    content: string;
-    variant: "default" | "destructive";
-  };
+  icon: LucideIcon;
+  shortcut?: string;
   children?: NavigationItem[];
-};
+  requiredPermission?: {
+    resource: string;
+    action: string;
+  };
+  requiredRoles?: AppRole[];
+}
 
 export const navigationConfig: NavigationItem[] = [
   {
-    title: "Dashboard",
-    icon: Home,
-    href: "/",
+    title: 'Dashboard',
+    href: '/dashboard',
+    icon: LayoutDashboard,
+    shortcut: 'Alt+1'
   },
   {
-    title: "Jobs",
-    icon: Truck,
-    href: "/jobs",
-    children: [
-      {
-        title: "All Jobs",
-        href: "/jobs",
-        icon: List
-      },
-      {
-        title: "Create Job",
-        href: "/jobs/create",
-        icon: Plus
-      },
-      {
-        title: "Planning Calendar",
-        href: "/jobs?view=calendar",
-        icon: Calendar
-      },
-    ],
-  },
-  {
-    title: "Customers",
-    icon: Users,
-    href: "/customers",
-  },
-  {
-    title: "Carriers",
-    icon: Forklift,
-    href: "/carriers",
-    children: [
-      {
-        title: "All Carriers",
-        href: "/carriers",
-        icon: List
-      },
-      {
-        title: "Compliance",
-        href: "/carriers/compliance",
-        icon: ShieldCheck
-      },
-      {
-        title: "Registration",
-        href: "/carriers/registration",
-        icon: FileCheck
-      },
-      {
-        title: "Messaging",
-        href: "/carriers/messaging",
-        icon: Receipt
-      }
-    ],
-  },
-  {
-    title: "Fleet",
-    icon: Bus,
-    href: "/fleet",
-  },
-  {
-    title: "Drivers",
-    icon: User,
-    href: "/drivers",
-  },
-  {
-    title: "Invoices",
-    icon: Receipt,
-    href: "/invoices",
-  },
-  {
-    title: "Finance",
-    icon: Wallet,
-    href: "/finance",
-  },
-  {
-    title: "Supply Chain",
-    icon: Box,
-    href: "/supply-chain",
-  },
-  {
-    title: "Analytics",
+    title: 'Analytics',
+    href: '/analytics',
     icon: BarChart3,
-    href: "/analytics",
+    shortcut: 'Alt+2'
   },
   {
-    title: "Settings",
-    icon: Settings,
-    href: "/settings",
+    title: 'Customers',
+    href: '/customers',
+    icon: Users,
+    shortcut: 'Alt+3'
   },
+  {
+    title: 'Jobs',
+    href: '/jobs',
+    icon: Package,
+    shortcut: 'Alt+4'
+  },
+  {
+    title: 'Finance',
+    href: '/finance',
+    icon: CircleDollarSign,
+    shortcut: 'Alt+5'
+  },
+  {
+    title: 'Users',
+    href: '/users',
+    icon: UserCog,
+    shortcut: 'Alt+6',
+    requiredRoles: [AppRole.Admin]
+  },
+  {
+    title: 'Carriers',
+    href: '/carriers',
+    icon: Truck,
+    shortcut: 'Alt+7'
+  },
+  {
+    title: 'Fleet',
+    href: '/fleet',
+    icon: Truck,
+    shortcut: 'Alt+8'
+  },
+  {
+    title: 'Drivers',
+    href: '/drivers',
+    icon: Gauge,
+    shortcut: 'Alt+9'
+  },
+  {
+    title: 'Invoices',
+    href: '/invoices',
+    icon: FileText,
+    shortcut: 'Alt+0'
+  },
+  {
+    title: 'Supply Chain',
+    href: '/supply-chain',
+    icon: Boxes
+  },
+  {
+    title: 'Compliance',
+    href: '/compliance',
+    icon: ShieldCheck
+  },
+  {
+    title: 'Companies',
+    href: '/companies',
+    icon: Building2
+  },
+  {
+    title: 'Document Scanning',
+    href: '/document-scanning',
+    icon: Scan
+  },
+  // Driver-specific routes
+  {
+    title: 'My Assignments',
+    href: '/driver/assignments',
+    icon: Truck,
+    requiredRoles: [AppRole.Driver]
+  },
+  {
+    title: 'Driver Dashboard',
+    href: '/driver/dashboard',
+    icon: Gauge,
+    requiredRoles: [AppRole.Driver]
+  },
+  {
+    title: 'Delivery Status',
+    href: '/driver/status',
+    icon: ClipboardList,
+    requiredRoles: [AppRole.Driver]
+  },
+  // Customer-specific routes
+  {
+    title: 'My Shipments',
+    href: '/customer/shipments',
+    icon: Package,
+    requiredRoles: [AppRole.Customer]
+  },
+  {
+    title: 'Order History',
+    href: '/customer/orders',
+    icon: FileText,
+    requiredRoles: [AppRole.Customer]
+  },
+  {
+    title: 'Support',
+    href: '/customer/support',
+    icon: MessageSquare,
+    requiredRoles: [AppRole.Customer]
+  }
 ];
 
-export const getSectionTitle = (pathName: string): string => {
-  // First check for exact match
-  const exactRoute = navigationConfig.find((item) => item.href === pathName);
-  if (exactRoute) return exactRoute.title;
+/**
+ * Get section title from path
+ * @param path The current path
+ * @returns The title for the current section
+ */
+export function getSectionTitle(path: string): string {
+  // Extract first segment (remove trailing slash if present)
+  const normalizedPath = path.endsWith('/') ? path.slice(0, -1) : path;
+  const segment = normalizedPath.split('/')[1] || '';
   
-  // Check for parent routes
-  for (const item of navigationConfig) {
-    if (pathName.startsWith(item.href + '/') && item.href !== '/') {
-      return item.title;
-    }
-    
-    // Check children if available
-    if (item.children) {
-      const childRoute = item.children.find(child => 
-        child.href === pathName || pathName.startsWith(child.href + '/')
-      );
-      if (childRoute) return `${item.title} - ${childRoute.title}`;
-    }
+  // Handle special cases
+  if (segment === '') return 'Dashboard';
+  if (segment === 'role-select') return 'Select Role';
+  
+  // Check if there's a direct match in the navigation config
+  const matchingItem = navigationConfig.find(item => {
+    const itemPath = item.href.endsWith('/') ? item.href.slice(0, -1) : item.href;
+    const itemSegment = itemPath.split('/')[1] || '';
+    return itemSegment === segment;
+  });
+  
+  if (matchingItem) {
+    return matchingItem.title;
   }
   
-  return "Dashboard";
-};
+  // Fallback: capitalize the segment
+  return segment.charAt(0).toUpperCase() + segment.slice(1);
+} 

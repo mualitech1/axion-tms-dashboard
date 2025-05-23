@@ -1,11 +1,10 @@
-
 import { Job } from '../types/jobTypes';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
-import { Eye, MoreHorizontal } from 'lucide-react';
+import { Eye, MoreHorizontal, Zap, Network } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -38,12 +37,25 @@ export default function JobsList({ jobs, isLoading }: JobsListProps) {
       'issues': 'bg-red-500/10 text-red-500 border-red-500/20',
     };
     
+    // Map status to quantum-themed term
+    const statusMap: Record<string, string> = {
+      'booked': 'Queued',
+      'allocated': 'Assigned',
+      'in-progress': 'Processing',
+      'finished': 'Resolved',
+      'invoiced': 'Calculated',
+      'cleared': 'Verified',
+      'completed': 'Entangled',
+      'archived': 'Compressed',
+      'issues': 'Decoherent',
+    };
+    
     return (
       <Badge 
         variant="outline" 
         className={`capitalize ${statusColors[status as keyof typeof statusColors] || 'bg-gray-500/10 text-gray-500 border-gray-500/20'}`}
       >
-        {status.replace('-', ' ')}
+        {statusMap[status] || status.replace('-', ' ')}
       </Badge>
     );
   };
@@ -55,12 +67,19 @@ export default function JobsList({ jobs, isLoading }: JobsListProps) {
       'low': 'bg-blue-500/10 text-blue-500 border-blue-500/20',
     };
     
+    // Map priority to quantum-themed term
+    const priorityMap: Record<string, string> = {
+      'high': 'Critical',
+      'medium': 'Standard',
+      'low': 'Minor',
+    };
+    
     return (
       <Badge 
         variant="outline" 
         className={`capitalize ${priorityColors[priority.toLowerCase() as keyof typeof priorityColors] || 'bg-gray-500/10 text-gray-500 border-gray-500/20'}`}
       >
-        {priority}
+        {priorityMap[priority.toLowerCase()] || priority}
       </Badge>
     );
   };
@@ -81,14 +100,14 @@ export default function JobsList({ jobs, isLoading }: JobsListProps) {
       <Table>
         <TableHeader className="bg-aximo-darker">
           <TableRow className="hover:bg-transparent border-aximo-border">
-            <TableHead className="text-aximo-text-secondary">Reference</TableHead>
-            <TableHead className="text-aximo-text-secondary">Title</TableHead>
-            <TableHead className="text-aximo-text-secondary">Status</TableHead>
+            <TableHead className="text-aximo-text-secondary">Identifier</TableHead>
+            <TableHead className="text-aximo-text-secondary">Operation</TableHead>
+            <TableHead className="text-aximo-text-secondary">State</TableHead>
             <TableHead className="text-aximo-text-secondary">Priority</TableHead>
-            <TableHead className="text-aximo-text-secondary">Pickup Date</TableHead>
-            <TableHead className="text-aximo-text-secondary">Customer</TableHead>
-            <TableHead className="text-aximo-text-secondary">Carrier</TableHead>
-            <TableHead className="text-right text-aximo-text-secondary">Actions</TableHead>
+            <TableHead className="text-aximo-text-secondary">Temporal Point</TableHead>
+            <TableHead className="text-aximo-text-secondary">Entity</TableHead>
+            <TableHead className="text-aximo-text-secondary">Executor</TableHead>
+            <TableHead className="text-right text-aximo-text-secondary">Controls</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -105,9 +124,9 @@ export default function JobsList({ jobs, isLoading }: JobsListProps) {
               <TableCell className="text-aximo-text">{job.title}</TableCell>
               <TableCell>{getStatusBadge(job.status)}</TableCell>
               <TableCell>{getPriorityBadge(job.priority)}</TableCell>
-              <TableCell className="text-aximo-text">{format(new Date(job.date), 'PP')}</TableCell>
-              <TableCell className="text-aximo-text">{job.client}</TableCell>
-              <TableCell className="text-aximo-text">{job.hauler?.name || 'Unassigned'}</TableCell>
+              <TableCell className="text-aximo-text">{job.pickup_date ? format(new Date(job.pickup_date), 'PP') : 'Not scheduled'}</TableCell>
+              <TableCell className="text-aximo-text">{job.customer?.name || job.customer_id || 'Unknown'}</TableCell>
+              <TableCell className="text-aximo-text">{job.carrier?.name || 'Unassigned'}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
                   <Button 
@@ -129,13 +148,19 @@ export default function JobsList({ jobs, isLoading }: JobsListProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-aximo-darker border-aximo-border">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuLabel>Quantum Actions</DropdownMenuLabel>
                       <DropdownMenuSeparator className="bg-aximo-border" />
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
-                      <DropdownMenuItem>Assign Hauler</DropdownMenuItem>
-                      <DropdownMenuItem>Generate Invoice</DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Zap className="h-4 w-4 mr-2 text-aximo-primary" />
+                        Modify Parameters
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Network className="h-4 w-4 mr-2 text-aximo-primary" />
+                        Reassign Executor
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>Generate Calculation</DropdownMenuItem>
                       <DropdownMenuSeparator className="bg-aximo-border" />
-                      <DropdownMenuItem className="text-red-500">Cancel Job</DropdownMenuItem>
+                      <DropdownMenuItem className="text-red-500">Collapse Operation</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -151,9 +176,9 @@ export default function JobsList({ jobs, isLoading }: JobsListProps) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-medium text-aximo-text mb-1">No jobs found</h3>
+                  <h3 className="text-lg font-medium text-aximo-text mb-1">No operations found</h3>
                   <p className="text-sm text-aximo-text-secondary">
-                    No jobs match your current filter criteria
+                    No quantum operations match your current filter criteria
                   </p>
                 </div>
               </TableCell>

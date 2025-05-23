@@ -1,69 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Add keyframe animation for floating stars */
+@keyframes float {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) translateX(20px);
+    opacity: 0;
+  }
+}
+
+/* Enhanced pulse animation for celestial elements */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+}
+
+/* Cosmic glow animation */
+@keyframes cosmicGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(129, 140, 248, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(129, 140, 248, 0.8), 0 0 40px rgba(129, 140, 248, 0.3);
+  }
+}
+
+/* Text glow animation */
+@keyframes textGlow {
+  0%, 100% {
+    text-shadow: 0 0 5px rgba(129, 140, 248, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 15px rgba(129, 140, 248, 0.9), 0 0 30px rgba(129, 140, 248, 0.4);
+  }
+}
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    /* Light mode colors */
+    --background: 210 40% 98%;
+    --foreground: 215 25% 27%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 215 25% 27%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
+    --popover-foreground: 215 25% 27%;
+    --primary: 221.2 83.2% 53.3%;
     --primary-foreground: 210 40% 98%;
-
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 72.2% 50.6%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
+    --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
+    
+    /* Aximo brand colors for light mode */
+    --aximo-primary: 221.2 83.2% 53.3%;
+    --aximo-light: 210 40% 98%;
+    --aximo-dark: 215 25% 27%;
+    --aximo-darker: 222.2 47.4% 11.2%;
+    --aximo-text: 215 25% 27%;
+    --aximo-text-secondary: 215.4 16.3% 46.9%;
+    --aximo-border: 214.3 31.8% 91.4%;
+    --aximo-card: 210 40% 96.1%;
+    --aximo-hover: 210 40% 93%;
+    --aximo-shadow: 220 40% 2%;
+    
+    /* Welcome message for Sarah - light mode */
+    --welcome-gradient-start: 221.2 83.2% 65%;
+    --welcome-gradient-end: 262 83% 58%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
+    /* Dark mode colors */
+    --background: 224 71.4% 4.1%;
+    --foreground: 210 20% 98%;
+    --card: 224 71.4% 4.1%;
+    --card-foreground: 210 20% 98%;
+    --popover: 224 71.4% 4.1%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 263.4 70% 50.4%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+    --accent: 215 27.9% 16.9%;
+    --accent-foreground: 210 20% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 263.4 70% 50.4%;
+    
+    /* Aximo brand colors - dark mode */
+    --aximo-primary: 263.4 70% 50.4%;
+    --aximo-light: 210 20% 98%;
+    --aximo-dark: 224 71.4% 4.1%;
+    --aximo-darker: 222 47.4% 2.2%;
+    --aximo-text: 210 20% 98%;
+    --aximo-text-secondary: 217.9 10.6% 64.9%;
+    --aximo-border: 215 27.9% 16.9%;
+    --aximo-card: 222 47% 10%;
+    --aximo-hover: 222 47% 15%;
+    --aximo-shadow: 220 40% 2%;
+    
+    /* Welcome message for Sarah - dark mode */
+    --welcome-gradient-start: 263.4 70% 50.4%;
+    --welcome-gradient-end: 224 64% 45%;
   }
 }
 
@@ -73,26 +142,105 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  
+  /* Light mode heading styles */
+  :root h1 {
+    @apply text-aximo-dark font-semibold;
+  }
+  
+  :root h2 {
+    @apply text-aximo-dark font-medium;
+  }
+  
+  :root h3, :root h4, :root h5, :root h6 {
+    @apply text-aximo-dark;
+  }
+  
+  /* Dark mode heading styles */
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+    @apply text-aximo-text;
+  }
+  
+  /* Custom styling for Aximo branding elements */
+  .aximo-headline {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+    background: linear-gradient(
+      to right, 
+      hsl(var(--welcome-gradient-start)), 
+      hsl(var(--welcome-gradient-end))
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+  }
+  
+  /* Card styling for light mode */
+  .aximo-card {
+    @apply bg-white border border-aximo-border shadow-sm rounded-lg;
+    transition: all 0.2s ease;
+  }
+  
+  /* Card styling for dark mode - allow existing styles to remain */
+  .dark .aximo-card {
+    @apply bg-aximo-card border-aximo-border;
   }
 }
 
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* Custom scrollbar - both light and dark mode */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(5, 16, 27, 0.2);
-  border-radius: 10px;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(26, 50, 70, 0.6);
-  border-radius: 10px;
+/* Light mode scrollbar */
+:root::-webkit-scrollbar-thumb {
+  background: hsl(var(--aximo-border));
+  border-radius: 4px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(10, 155, 219, 0.7);
+:root::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--aximo-text-secondary));
+}
+
+/* Dark mode scrollbar */
+.dark::-webkit-scrollbar-thumb {
+  background: hsl(var(--aximo-border));
+  border-radius: 4px;
+}
+
+.dark::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--aximo-text-secondary));
+}
+
+/* Glass effect for components */
+.aximo-glass {
+  @apply backdrop-blur-md bg-white/80 dark:bg-aximo-dark/80;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced glassmorphism effect */
+.glassmorphism {
+  @apply backdrop-blur-md bg-white/50 dark:bg-aximo-darker/50;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px -10px rgba(0, 0, 0, 0.1);
 }
 
 /* Shadow glow for active elements */
@@ -214,4 +362,191 @@
 .animate-text {
   background-size: 200% auto;
   animation: text-shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* Additional light mode specific styles */
+:root {
+  --aximo-primary: #0090FF;
+  --aximo-dark: #F8FAFC;
+  --aximo-darker: #FFFFFF;
+  --aximo-light: #33C3F0;
+  --aximo-highlight: #1EAEDB;
+  --aximo-card: #FFFFFF;
+  --aximo-text: #334155;
+  --aximo-text-secondary: #64748B;
+  --aximo-text-tertiary: #94A3B8;
+  --aximo-border: #E2E8F0;
+  --aximo-glow: rgba(0, 144, 255, 0.5);
+  --aximo-background: #F1F5F9;
+}
+
+.dark {
+  --aximo-primary: #0090FF;
+  --aximo-dark: #0A101F;
+  --aximo-darker: #060C17;
+  --aximo-light: #33C3F0;
+  --aximo-highlight: #1EAEDB;
+  --aximo-card: #111827;
+  --aximo-text: #F9FAFB;
+  --aximo-text-secondary: #9CA3AF;
+  --aximo-text-tertiary: #6B7280;
+  --aximo-border: #1F2937;
+  --aximo-glow: rgba(0, 144, 255, 0.5);
+  --aximo-background: #0A101F;
+}
+
+/* Heading styles for light mode */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--aximo-text);
+}
+
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  color: var(--aximo-text);
+}
+
+/* Apply light mode styles to specific elements */
+.light .aximo-headline {
+  @apply text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent;
+}
+
+.light .aximo-card {
+  background: white;
+  border: 1px solid var(--aximo-border);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.light .aximo-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-color: var(--aximo-primary);
+}
+
+/* Special welcome message for Sarah */
+.sarah-welcome {
+  @apply text-3xl md:text-4xl font-bold my-4 aximo-headline;
+  text-shadow: 0 2px 10px rgba(var(--welcome-gradient-start), 0.2);
+  letter-spacing: -0.02em;
+}
+
+/* Arabic text styling for Islamic blessings */
+.arabic-text {
+  font-family: 'Amiri', serif;
+  direction: rtl;
+  letter-spacing: 0.5px;
+}
+
+/* Neon text effect */
+.neon-text {
+  color: #fff;
+  text-shadow: 
+    0 0 5px rgba(255, 255, 255, 0.8),
+    0 0 10px rgba(129, 140, 248, 0.8),
+    0 0 15px rgba(129, 140, 248, 0.6),
+    0 0 20px rgba(129, 140, 248, 0.4);
+  animation: textGlow 2s infinite alternate;
+}
+
+/* Neon border effect */
+.neon-border {
+  border: 1px solid rgba(129, 140, 248, 0.5);
+  box-shadow: 
+    0 0 5px rgba(129, 140, 248, 0.5),
+    0 0 10px rgba(129, 140, 248, 0.3),
+    inset 0 0 5px rgba(129, 140, 248, 0.3);
+  animation: cosmicGlow 4s infinite alternate;
+}
+
+/* Space background */
+.space-bg {
+  background: linear-gradient(to bottom, #0a0a1a, #0c0c2c);
+}
+
+/* Add scrollbar styles for webkit browsers */
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(124, 58, 237, 0.3);
+    border-radius: 10px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(124, 58, 237, 0.5);
+  }
+
+  .scrollbar-thumb-purple-500\/20::-webkit-scrollbar-thumb {
+    background: rgba(168, 85, 247, 0.2);
+  }
+
+  .scrollbar-track-transparent::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+/* Emergency Dark Mode Fixes - Force better dark mode */
+.dark .bg-white {
+  background-color: rgba(30, 27, 75, 0.2) !important;
+}
+
+.dark .bg-slate-50 {
+  background-color: rgba(30, 27, 75, 0.3) !important;
+}
+
+.dark .border-slate-100 {
+  border-color: rgba(79, 70, 229, 0.3) !important;
+}
+
+.dark .text-gray-500 {
+  color: rgba(148, 163, 184, 1) !important;
+}
+
+/* Force consistent card styling */
+.dark .card {
+  background-color: rgba(30, 27, 75, 0.2) !important;
+  border-color: rgba(79, 70, 229, 0.3) !important;
+}
+
+/* Fix any radio button containers */
+.dark .radio-group-container {
+  background-color: rgba(79, 70, 229, 0.2) !important;
+  border-color: rgba(79, 70, 229, 0.3) !important;
+}
+
+/* Quantum Currency Animation */
+@keyframes quantum-pulse {
+  0% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+}
+
+.animate-quantum-pulse {
+  animation: quantum-pulse 3s ease-in-out infinite;
 }

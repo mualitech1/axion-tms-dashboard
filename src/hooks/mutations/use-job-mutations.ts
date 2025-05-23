@@ -178,12 +178,47 @@ export function useJobMutations() {
             payloadForSupabase.reference = emergencyReference;
         }
 
-        console.log('🛡️ FINAL PAYLOAD DIRECTLY BEFORE SUPABASE INSERT:', JSON.stringify(payloadForSupabase, null, 2));
+        // NUCLEAR OPTION - ENSURE NO JOB_REFERENCE EXISTS ANYWHERE
+        // This is a scorched earth approach that guarantees job_reference is gone
+        const nuclearCleanPayload = { ...payloadForSupabase };
+        
+        // 1. Remove any key that contains job_reference (case insensitive)
+        Object.keys(nuclearCleanPayload).forEach(key => {
+          if (key.toLowerCase().includes('job_reference')) {
+            console.warn(`⚠️ NUCLEAR DEFENSE: Removing field "${key}" that might be job_reference`);
+            delete (nuclearCleanPayload as any)[key];
+          }
+        });
+        
+        // 2. Check ALL nested objects too
+        const deepClean = (obj: any) => {
+          if (!obj || typeof obj !== 'object') return;
+          
+          Object.keys(obj).forEach(key => {
+            if (key.toLowerCase().includes('job_reference')) {
+              console.warn(`⚠️ NUCLEAR DEFENSE: Removing nested field "${key}"`);
+              delete obj[key];
+            } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+              deepClean(obj[key]);
+            }
+          });
+        };
+        
+        // Apply deep cleaning to nested objects
+        if (typeof nuclearCleanPayload.pickup_location === 'object') {
+          deepClean(nuclearCleanPayload.pickup_location);
+        }
+        
+        if (typeof nuclearCleanPayload.delivery_location === 'object') {
+          deepClean(nuclearCleanPayload.delivery_location);
+        }
 
-        // Use the sanitized payload for insert
+        console.log('🛡️ FINAL PAYLOAD DIRECTLY BEFORE SUPABASE INSERT:', JSON.stringify(nuclearCleanPayload, null, 2));
+
+        // Use the NUCLEAR CLEANED payload for insert
         const { data, error } = await supabase
           .from('jobs')
-          .insert([payloadForSupabase as any])
+          .insert([nuclearCleanPayload as any])
           .select()
           .single();
 

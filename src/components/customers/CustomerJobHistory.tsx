@@ -1,7 +1,8 @@
-
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Customer } from '@/types/customer';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 import { 
   Table,
   TableBody,
@@ -16,7 +17,8 @@ import {
   Truck, 
   ArrowRight,
   FileCheck,
-  ChevronRight
+  ChevronRight,
+  PlusCircle
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -26,6 +28,22 @@ interface CustomerJobHistoryProps {
 
 const CustomerJobHistory = ({ customer }: CustomerJobHistoryProps) => {
   const [jobs, setJobs] = React.useState(customer.jobs || []);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleCreateJob = () => {
+    if (!customer?.id) {
+      toast({
+        title: "Customer ID Required",
+        description: "Customer information is needed to create a job",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Navigate to job creation with customer context
+    navigate(`/jobs/new?customerId=${customer.id}&customerName=${encodeURIComponent(customer.name)}`);
+  };
 
   const getStatusColor = (status: string) => {
     const statusLower = status.toLowerCase();
@@ -45,10 +63,20 @@ const CustomerJobHistory = ({ customer }: CustomerJobHistoryProps) => {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Job History</h3>
-        <Button variant="outline" size="sm">
-          <Download className="h-4 w-4 mr-1" />
-          Export Report
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleCreateJob}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white"
+            size="sm"
+          >
+            <PlusCircle className="h-4 w-4 mr-1" />
+            Create New Job
+          </Button>
+          <Button variant="outline" size="sm">
+            <Download className="h-4 w-4 mr-1" />
+            Export Report
+          </Button>
+        </div>
       </div>
       
       {jobs && jobs.length > 0 ? (
@@ -103,14 +131,17 @@ const CustomerJobHistory = ({ customer }: CustomerJobHistoryProps) => {
           </Table>
         </div>
       ) : (
-        <div className="text-center py-10 border border-dashed border-gray-300 rounded-md">
-          <Truck className="h-10 w-10 text-gray-400 mx-auto mb-2" />
-          <h4 className="text-muted-foreground font-medium mb-1">No job history</h4>
-          <p className="text-sm text-muted-foreground mb-3">
-            This customer doesn't have any completed jobs yet
+        <div className="text-center py-10 border border-dashed border-indigo-200 dark:border-indigo-800/50 rounded-lg bg-slate-50 dark:bg-indigo-950/30">
+          <Truck className="h-12 w-12 text-indigo-400 dark:text-indigo-500 mx-auto mb-3" />
+          <h4 className="text-indigo-900 dark:text-indigo-200 font-medium mb-2">No job history</h4>
+          <p className="text-sm text-indigo-500/70 dark:text-indigo-400/70 mb-4 max-w-md mx-auto">
+            This customer doesn't have any completed jobs yet. Create a new job to get started.
           </p>
-          <Button size="sm">
-            <Truck className="h-4 w-4 mr-1" />
+          <Button 
+            onClick={handleCreateJob}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white"
+          >
+            <PlusCircle className="h-4 w-4 mr-2" />
             Create New Job
           </Button>
         </div>

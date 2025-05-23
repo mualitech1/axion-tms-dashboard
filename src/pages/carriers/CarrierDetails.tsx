@@ -1,28 +1,164 @@
-
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Truck, FileText, MapPin, Phone, Mail, Calendar, Shield, CheckCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Truck, FileText, MapPin, Phone, Mail, Calendar, Shield, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { carrierData } from './data/carrierData';
+import { supabase } from '@/integrations/supabase/client';
+
+// Define carrier display interface with optional fields to accommodate both DB and mock data
+interface CarrierDisplay {
+  id: string;
+  name: string;
+  region: string;
+  fleet: string;
+  status: string;
+  favorite: boolean;
+  complianceStatus: string;
+  insuranceExpiry: string;
+  licenseExpiry: string;
+  capabilities: string[];
+  operatingRegions?: string[];
+  address?: string;
+  email?: string;
+  phone?: string;
+  country?: string;
+  partnerSince?: string;
+}
 
 export default function CarrierDetails() {
   const { id } = useParams();
-  const carrierId = id ? parseInt(id) : undefined;
+  const [carrier, setCarrier] = useState<CarrierDisplay | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
-  // Find the carrier by ID, or use the first carrier as a fallback
-  const carrier = carrierId 
-    ? carrierData.find(c => c.id === carrierId) 
-    : carrierData[0];
+  useEffect(() => {
+    const fetchCarrierDetails = async () => {
+      try {
+        setLoading(true);
+        
+        // Try to fetch the carrier from the database first
+        if (id) {
+          const { data, error } = await supabase
+            .from('companies')
+            .select('*')
+            .eq('id', id)
+            .eq('type', 'carrier')
+            .single();
+          
+          if (error) {
+            console.error("Error fetching carrier from database:", error);
+            throw error;
+          }
+          
+          if (data) {
+            // Use a safe function to get values with proper type checking
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const safeGet = (obj: any, path: string, defaultValue: any) => {
+              try {
+                const parts = path.split('.');
+                let current = obj;
+                
+                for (let i = 0; i < parts.length; i++) {
+                  if (current === undefined || current === null) return defaultValue;
+                  current = current[parts[i]];
+                }
+                
+                return current !== undefined && current !== null ? current : defaultValue;
+              } catch (err) {
+                return defaultValue;
+              }
+            };
+            
+            // Create a carrier object with proper types using type assertions where needed
+            const newCarrier: CarrierDisplay = {
+              id: data.id,
+              name: data.name,
+              status: data.status === 'active' ? 'Active' : 
+                     data.status === 'inactive' ? 'Inactive' : 'Issue',
+              region: safeGet(data, 'city', 'Unknown'),
+              fleet: safeGet(data, 'fleet_type', 'Mixed Fleet'),
+              favorite: false,
+              complianceStatus: safeGet(data, 'compliance_status', 'Compliant'),
+              insuranceExpiry: safeGet(data, 'metadata.insuranceExpiry', 
+                            new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]),
+              licenseExpiry: safeGet(data, 'metadata.licenseExpiry', 
+                            new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]),
+              capabilities: safeGet(data, 'metadata.capabilities', ['general']),
+              operatingRegions: safeGet(data, 'metadata.operatingRegions', ['local']),
+              address: safeGet(data, 'address', ''),
+              email: data.email,
+              phone: data.phone,
+              partnerSince: data.created_at 
+                ? new Date(data.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                : 'Jan 2022'
+            };
+            
+            setCarrier(newCarrier);
+            setLoading(false);
+            return;
+          }
+        }
+        
+        // Fall back to mock data if needed
+        if (id && !isNaN(Number(id))) {
+          const carrierId = parseInt(id);
+          const mockCarrier = carrierData.find(c => c.id === carrierId);
+          
+          if (mockCarrier) {
+            setCarrier({
+              ...mockCarrier,
+              id: mockCarrier.id.toString(),
+              partnerSince: 'Jan 2022'
+            });
+            setLoading(false);
+            return;
+          }
+        }
+        
+        // Last resort fallback to the first carrier in mock data
+        if (carrierData.length > 0) {
+          console.warn(`Carrier with ID ${id} not found, using first mock carrier as fallback`);
+          setCarrier({
+            ...carrierData[0],
+            id: carrierData[0].id.toString(),
+            partnerSince: 'Jan 2022'
+          });
+        } else {
+          setError("No carrier data available");
+        }
+        
+      } catch (error) {
+        console.error("Error in carrier details:", error);
+        setError("Failed to load carrier details");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchCarrierDetails();
+  }, [id]);
   
-  if (!carrier) {
+  if (loading) {
+    return (
+      <MainLayout title="Loading Carrier Details">
+        <div className="flex flex-col items-center justify-center h-96">
+          <Loader2 className="h-8 w-8 animate-spin text-aximo-primary mb-4" />
+          <p className="text-aximo-text">Loading carrier details...</p>
+        </div>
+      </MainLayout>
+    );
+  }
+  
+  if (error || !carrier) {
     return (
       <MainLayout title="Carrier Not Found">
         <div className="flex flex-col items-center justify-center h-96">
           <h1 className="text-2xl font-semibold text-aximo-text mb-4">Carrier Not Found</h1>
-          <p className="text-aximo-text-secondary mb-6">The carrier you are looking for does not exist.</p>
+          <p className="text-aximo-text-secondary mb-6">{error || "The carrier you are looking for does not exist."}</p>
           <Button asChild>
             <Link to="/carriers">Back to Carriers</Link>
           </Button>
@@ -117,21 +253,21 @@ export default function CarrierDetails() {
               <div className="flex items-start">
                 <MapPin className="h-4 w-4 text-aximo-text-secondary mt-0.5 mr-2" />
                 <div>
-                  <p className="text-sm">123 Transport Lane</p>
-                  <p className="text-sm">{carrier.region}, UK</p>
+                  <p className="text-sm">{carrier.address || "123 Transport Lane"}</p>
+                  <p className="text-sm">{carrier.region}, {carrier.country || "UK"}</p>
                 </div>
               </div>
               <div className="flex items-center">
                 <Phone className="h-4 w-4 text-aximo-text-secondary mr-2" />
-                <p className="text-sm">+44 20 7123 4567</p>
+                <p className="text-sm">{carrier.phone || "+44 20 7123 4567"}</p>
               </div>
               <div className="flex items-center">
                 <Mail className="h-4 w-4 text-aximo-text-secondary mr-2" />
-                <p className="text-sm">contact@{carrier.name.toLowerCase().replace(/\s+/g, '')}.com</p>
+                <p className="text-sm">{carrier.email || `contact@${carrier.name.toLowerCase().replace(/\s+/g, '')}.com`}</p>
               </div>
               <div className="flex items-center">
                 <Calendar className="h-4 w-4 text-aximo-text-secondary mr-2" />
-                <p className="text-sm">Partner since Jan 2022</p>
+                <p className="text-sm">Partner since {carrier.partnerSince || "Jan 2022"}</p>
               </div>
             </div>
           </motion.div>

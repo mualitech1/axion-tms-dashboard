@@ -1,6 +1,5 @@
-
 import { useState, useRef, useEffect } from "react";
-import { Send, Calendar, Users, Hash, AtSign, MessageSquare, Plus, X } from "lucide-react";
+import { Send, Calendar, Users as UsersIcon, Hash, AtSign, MessageSquare, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -412,7 +411,7 @@ export function JobBackofficeTab() {
                   
                   {note.mentions && note.mentions.length > 0 && (
                     <div className="flex mt-1 gap-1">
-                      <Users className="h-3.5 w-3.5 text-muted-foreground" />
+                      <UsersIcon className="h-3.5 w-3.5 text-muted-foreground" />
                       <div className="flex gap-1">
                         {note.mentions.map((user, index) => (
                           <span key={user.id} className="text-xs text-tms-blue">
@@ -460,7 +459,7 @@ export function JobBackofficeTab() {
                         
                         {reply.mentions && reply.mentions.length > 0 && (
                           <div className="flex mt-1 gap-1">
-                            <Users className="h-3.5 w-3.5 text-muted-foreground" />
+                            <UsersIcon className="h-3.5 w-3.5 text-muted-foreground" />
                             <div className="flex gap-1">
                               {reply.mentions.map((user, index) => (
                                 <span key={user.id} className="text-xs text-tms-blue">

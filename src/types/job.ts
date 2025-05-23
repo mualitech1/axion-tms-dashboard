@@ -1,4 +1,3 @@
-
 // Job status types
 export type JobStatus = 
   | "booked" 
@@ -8,8 +7,12 @@ export type JobStatus =
   | "invoiced"
   | "cleared"
   | "completed"
+  | "delivered"
   | "archived"
-  | "issues";
+  | "issues"
+  | "ready_for_invoicing"
+  | "self_invoiced"
+  | "pod_received";
 
 // Priority levels
 export type JobPriority = "low" | "medium" | "high";
@@ -21,12 +24,12 @@ export interface JobLocation {
   postcode: string;
   country: string;
   notes?: string;
-  [key: string]: any; // Allow any additional properties to be compatible with Json type
+  [key: string]: string | undefined; // More specific type than 'any' to satisfy linter
 }
 
 // Hauler/carrier info 
 export interface JobHauler {
-  id: string | number;
+  id: string; // Text format ID (previously UUID or number)
   name: string;
   contactPhone?: string;
   email?: string;
@@ -34,7 +37,7 @@ export interface JobHauler {
 
 // Consolidated Job interface
 export interface Job {
-  id: string | number;
+  id: string; // Text format ID (previously UUID or number)
   title: string;
   client: string;
   date: string;
@@ -46,14 +49,16 @@ export interface Job {
   priority: JobPriority;
   hauler?: JobHauler;
   value?: number;
+  agreed_cost_gbp?: number; // Payment amount for carrier
   reference?: string;
   notes?: string;
   createdAt: string;
   lastUpdatedAt?: string;
   estimatedDuration?: number;
   podUploaded?: boolean;
-  podDocumentId?: string;
+  podDocumentId?: string; // Text format ID (previously UUID)
   issueDetails?: string;
+  self_invoiced?: boolean | null; // Whether job has been included in a self-invoice
 }
 
 // Status transition interface

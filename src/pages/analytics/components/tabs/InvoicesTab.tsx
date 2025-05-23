@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { InvoiceAnalytics } from '@/components/invoices/InvoiceAnalytics';
@@ -10,10 +9,10 @@ interface InvoicesTabProps {
 
 export function InvoicesTab({ invoices }: InvoicesTabProps) {
   return (
-    <Card>
+    <Card className="bg-aximo-darker border-aximo-border">
       <CardHeader>
-        <CardTitle>Invoice Analytics</CardTitle>
-        <CardDescription>Financial trends and payment analysis</CardDescription>
+        <CardTitle className="text-aximo-text">Quantum Transaction Analysis</CardTitle>
+        <CardDescription className="text-aximo-text-secondary">Energy transfer patterns and entanglement metrics</CardDescription>
       </CardHeader>
       <CardContent>
         <InvoiceAnalytics invoices={invoices} />

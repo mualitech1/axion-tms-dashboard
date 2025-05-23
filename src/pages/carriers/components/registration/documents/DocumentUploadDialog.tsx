@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -8,11 +7,12 @@ import { toast } from "@/hooks/use-toast";
 import { DocumentTypeSelect } from "./DocumentTypeSelect";
 import { FileUploader } from "./FileUploader";
 import { VerificationStatus } from '@/utils/documents/documentVerification';
+import { Document } from '@/types/customer';
 
 interface DocumentUploadDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUpload: (document: any) => void;
+  onUpload: (document: Document) => void;
   uploadedDocumentTypes: string[];
 }
 
@@ -60,14 +60,13 @@ export function DocumentUploadDialog({
     }
     
     // Create a document object
-    const newDoc = {
+    const newDoc: Document = {
       id: `doc-${Date.now()}`,
       name: uploadingDoc.file.name,
-      type: uploadingDoc.type,
+      type: uploadingDoc.type as Document['type'],
       filePath: `/documents/${uploadingDoc.file.name}`,
-      fileSize: uploadingDoc.file.size,
+      fileSize: formatFileSize(uploadingDoc.file.size),
       dateUploaded: new Date().toISOString(),
-      notes: uploadingDoc.notes,
       verificationStatus: VerificationStatus.PENDING
     };
     
@@ -85,6 +84,13 @@ export function DocumentUploadDialog({
       title: "Document uploaded",
       description: "Document has been uploaded and is pending verification."
     });
+  };
+
+  // Helper function to format file size
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
   return (

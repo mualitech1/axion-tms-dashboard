@@ -1,6 +1,5 @@
-
 export interface Company {
-  id: string;
+  id: string; // Text format ID (previously UUID)
   name: string;
   type: 'customer' | 'carrier';
   contact_name: string | null;
@@ -16,11 +15,11 @@ export interface Company {
     postcode?: string;
     country?: string;
   } | null;
-  metadata: Record<string, any>;
+  metadata: Record<string, string | number | boolean | null>;
 }
 
 export interface Vehicle {
-  id: string;
+  id: string; // Text format ID (previously UUID)
   registration: string;
   make: string;
   model: string;
@@ -36,7 +35,7 @@ export interface Vehicle {
   acquisition_date: string | null;
   created_at: string;
   updated_at: string;
-  assigned_driver_id: string | null;
+  assigned_driver_id: string | null; // Text format ID (previously UUID)
 }
 
 // Modified to be a Record type which satisfies Json requirements
@@ -50,30 +49,32 @@ export interface JobLocation {
 }
 
 export interface Job {
-  id: string;
+  id: string; // Text format ID (previously UUID)
   reference: string;
   title: string;
-  customer_id: string | null;
-  carrier_id: string | null;
-  vehicle_id: string | null;
-  driver_id: string | null;
+  customer_id: string | null; // Text format ID (previously UUID)
+  carrier_id: string | null; // Text format ID (previously UUID)
+  vehicle_id: string | null; // Text format ID (previously UUID)
+  driver_id: string | null; // Text format ID (previously UUID)
   status: string;
   priority: string;
   pickup_date: string;
-  pickup_location: JobLocation | Record<string, any>;
-  delivery_location: JobLocation | Record<string, any>;
+  pickup_location: JobLocation | Record<string, string | number | null>;
+  delivery_location: JobLocation | Record<string, string | number | null>;
   estimated_duration: number | null;
   value: number | null;
+  agreed_cost_gbp: number | null; // Payment amount for carrier
   notes: string | null;
   created_at: string;
   updated_at: string;
-  created_by: string;
+  created_by: string; // Text format ID (previously UUID)
   pod_uploaded: boolean;
-  pod_document_id: string | null;
+  pod_document_id: string | null; // Text format ID (previously UUID)
   issue_details: string | null;
+  self_invoiced: boolean | null; // Whether job has been included in a self-invoice
   // Add joined relationships
   customer?: Company;
   carrier?: Company;
   vehicle?: Vehicle;
-  driver?: any;
+  driver?: Record<string, unknown>;
 }

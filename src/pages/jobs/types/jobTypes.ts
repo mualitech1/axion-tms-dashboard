@@ -1,4 +1,3 @@
-
 export type JobStatus = 
   | "booked" 
   | "allocated"
@@ -7,35 +6,79 @@ export type JobStatus =
   | "invoiced"
   | "cleared"
   | "completed"
+  | "delivered"
   | "archived"
-  | "issues";
+  | "issues"
+  | "ready_for_invoicing"
+  | "self_invoiced"
+  | "pod_received";
 
 export interface Job {
-  id: string | number; // Updated to accept both string and number
+  id: string | number; 
+  reference: string;
   title: string;
-  client: string;
-  date: string;
-  time: string;
-  origin: string;
-  destination: string;
-  vehicle: string;
   status: JobStatus;
   priority: "low" | "medium" | "high";
+  
+  // Relations
+  customer_id: string;
+  carrier_id?: string | null;
+  vehicle_id?: string | null;
+  driver_id?: string | null;
+  
+  // Nested relations
+  customer?: {
+    id: string;
+    name: string;
+    email?: string;
+    [key: string]: unknown;
+  };
+  
+  carrier?: {
+    id: string;
+    name: string;
+    email?: string;
+    [key: string]: unknown;
+  };
+  
+  // Locations
+  pickup_location: string | Record<string, unknown>;
+  delivery_location: string | Record<string, unknown>;
+  
+  // Dates
+  pickup_date?: string;
+  created_at: string;
+  updated_at?: string;
+  
+  // Additional fields
+  value?: number;
+  agreed_cost_gbp?: number; // Payment amount for carrier
+  notes?: string;
+  estimated_duration?: number;
+  pod_uploaded?: boolean;
+  pod_document_id?: string | null;
+  issue_details?: string | null;
+  created_by?: string;
+  self_invoiced?: boolean | null; // Whether job has been included in a self-invoice
+  
+  // Legacy fields (for compatibility with older components)
+  date?: string;
+  time?: string;
+  client?: string;
+  origin?: string;
+  destination?: string;
+  vehicle?: string;
   hauler?: {
     id: string | number;
     name: string;
     contactPhone?: string;
     email?: string;
   };
-  value?: number;
-  reference?: string;
-  notes?: string;
-  createdAt: string;
+  createdAt?: string;
   lastUpdatedAt?: string;
-  estimatedDuration?: number;
-  podUploaded?: boolean; // Track if POD has been uploaded
-  podDocumentId?: string; // Reference to the uploaded POD document
-  issueDetails?: string; // Details about any issues that occur
+  podUploaded?: boolean;
+  podDocumentId?: string;
+  issueDetails?: string;
 }
 
 export interface StatusTransition {

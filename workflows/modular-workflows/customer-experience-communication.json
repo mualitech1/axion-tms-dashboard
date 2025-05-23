@@ -1,0 +1,213 @@
+{
+  "name": "Customer Experience - Notification Module",
+  "nodes": [
+    {
+      "parameters": {
+        "fromEmail": "notifications@yourtmscompany.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "={{ $json.subject }}",
+        "text": "=Dear {{ $json.customerName }},\n\n{{ $json.message }}\n\nYou can track your delivery at any time using this link: {{ $json.trackingLink }}\n\nIf you have any questions, please don't hesitate to contact our customer support.\n\nThank you for choosing Aximo AI Logistics!\n\nBest regards,\nThe Aximo AI Logistics Team",
+        "options": {}
+      },
+      "id": "bfd9b06b-30cc-4dfa-9250-9d18d895f258",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        300,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "to": "={{ $json.customerPhone }}",
+        "message": "={{ $json.smsTemplate }}"
+      },
+      "id": "ffb96b0d-7ed5-4e61-969d-edb6ad08f309",
+      "name": "Send SMS Notification",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1.1,
+      "position": [
+        300,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://your-api-endpoint.com/api/crm/customers/{{$json.customerId}}/communications",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "jobId",
+              "value": "={{ $json.jobId }}"
+            },
+            {
+              "name": "communicationType",
+              "value": "={{ $json.customerPreferredComms }}"
+            },
+            {
+              "name": "subject",
+              "value": "={{ $json.subject }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.message }}"
+            },
+            {
+              "name": "sentAt",
+              "value": "={{ $now.toISOString() }}"
+            },
+            {
+              "name": "status",
+              "value": "sent"
+            }
+          ]
+        },
+        "options": {
+          "responseFormat": "json"
+        }
+      },
+      "id": "d4b9e5c6-3e81-4ddf-8597-2efc9ea6e42a",
+      "name": "Log Communication in CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        500,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "delivered"
+            }
+          ]
+        }
+      },
+      "id": "5a60b38c-93f2-4d8f-949f-cd1052e9ed04",
+      "name": "Is Delivery Complete?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        700,
+        200
+      ],
+      "connections": {
+        "true": [
+          [
+            {
+              "node": "7da9c7c0-7371-4f89-a80c-13ce5bde36f2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "parameters": {
+        "mode": "mergeByPosition"
+      },
+      "id": "72e7e34a-9641-446b-85aa-e8a7ccd540a7",
+      "name": "Merge Email/SMS Results",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        500,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "feedbackRequestSent",
+              "value": "true"
+            },
+            {
+              "name": "feedbackRequestTime",
+              "value": "={{ $now.toISOString() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7da9c7c0-7371-4f89-a80c-13ce5bde36f2",
+      "name": "Prepare Feedback Request",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2.2,
+      "position": [
+        900,
+        100
+      ]
+    }
+  ],
+  "connections": {
+    "Send Email Notification": {
+      "main": [
+        [
+          {
+            "node": "Merge Email/SMS Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send SMS Notification": {
+      "main": [
+        [
+          {
+            "node": "Merge Email/SMS Results",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Log Communication in CRM": {
+      "main": [
+        [
+          {
+            "node": "Is Delivery Complete?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Email/SMS Results": {
+      "main": [
+        [
+          {
+            "node": "Log Communication in CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {}
+} 

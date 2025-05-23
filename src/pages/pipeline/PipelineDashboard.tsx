@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, ListTodo, ArrowRightIcon, BarChart2, Users, DollarSign } from 'lucide-react';
+import { Plus, ListTodo, ArrowRightIcon, BarChart2, Users as UsersIcon, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Breadcrumb } from '@/components/navigation/Breadcrumb';
 import DashboardMetrics from './components/dashboard/DashboardMetrics';

@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useInvoiceForm } from "./hooks/useInvoiceForm";
@@ -38,12 +37,12 @@ export function CreateInvoiceDialog({
       onInvoiceUpdated?.(updatedInvoice);
       
       toast({
-        title: "Invoice updated",
-        description: `Invoice ${editInvoice.id} has been updated successfully.`,
+        title: "Quantum Transaction Updated",
+        description: `Transaction ${editInvoice.id} parameters successfully recalibrated.`,
       });
     } else {
       // Create new invoice
-      const newId = `INV-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`;
+      const newId = `QTX-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`;
       
       const newInvoice: InvoiceData = {
         id: newId,
@@ -59,8 +58,8 @@ export function CreateInvoiceDialog({
       onInvoiceCreated(newInvoice);
       
       toast({
-        title: "Invoice created",
-        description: `Invoice ${newId} has been created successfully.`,
+        title: "Quantum Transaction Created",
+        description: `Transaction ${newId} has been successfully initialized.`,
       });
     }
 
@@ -85,7 +84,7 @@ export function CreateInvoiceDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleDialogOpenChange}>
-      <DialogContent className="sm:max-w-[650px] p-0 overflow-hidden bg-white">
+      <DialogContent className="sm:max-w-[650px] p-0 overflow-hidden bg-aximo-darker border border-aximo-border">
         <InvoiceDialogHeader isEditMode={isEditMode} />
         
         <InvoiceFormProvider 

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Quantum Glow Effect -->
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    
+    <linearGradient id="orbitalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0090FF" />
+      <stop offset="100%" stop-color="#0062CC" />
+    </linearGradient>
+    
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD700" />
+      <stop offset="100%" stop-color="#FFA500" />
+    </linearGradient>
+
+    <linearGradient id="coreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#001F3F" />
+      <stop offset="100%" stop-color="#0062CC" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Quantum Field -->
+  <circle cx="64" cy="64" r="60" fill="url(#coreGradient)" opacity="0.8" />
+  <circle cx="64" cy="64" r="58" fill="none" stroke="#0090FF" stroke-width="1" stroke-dasharray="2,2" opacity="0.5" />
+
+  <!-- Shield/Hexagon Core -->
+  <path d="M64 24L92 40V72L64 88L36 72V40L64 24Z" fill="#001F3F" stroke="url(#goldGradient)" stroke-width="2" />
+  
+  <!-- Quantum Particles -->
+  <circle cx="64" cy="44" r="4" fill="url(#goldGradient)" filter="url(#glow)" />
+  <circle cx="80" cy="64" r="3" fill="#0090FF" filter="url(#glow)" />
+  <circle cx="48" cy="64" r="3" fill="#0090FF" filter="url(#glow)" />
+  
+  <!-- Connecting Lines -->
+  <line x1="64" y1="44" x2="80" y2="64" stroke="#0090FF" stroke-width="1" stroke-dasharray="1,1" />
+  <line x1="64" y1="44" x2="48" y2="64" stroke="#0090FF" stroke-width="1" stroke-dasharray="1,1" />
+  <line x1="48" y1="64" x2="80" y2="64" stroke="#0090FF" stroke-width="1" stroke-dasharray="1,1" />
+  
+  <!-- A Letter Stylized -->
+  <path d="M53 98H75L78 106H84L64 76H61L45 106H51L53 98Z" fill="url(#goldGradient)" filter="url(#glow)" />
+  <path d="M64 90L68 98H60L64 90Z" fill="#001F3F" />
+</svg> 

@@ -1,0 +1,508 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "job-completed",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "4a75e903-f81a-4d72-a89c-11e453c78d45",
+      "name": "Webhook: Job Completed",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://your-api-endpoint.com/api/jobs/{{$json.jobId}}/details",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_TOKEN"
+            }
+          ]
+        },
+        "options": {
+          "fullResponse": true,
+          "responseFormat": "json"
+        }
+      },
+      "id": "0c8e7126-5e34-4c89-ad21-3f4f09b641d9",
+      "name": "Get Job Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        450,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": null,
+          "name": null
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get completed job data\nconst jobData = items[0].json.data;\n\n// Calculate charges based on business rules\n// This is where your pricing logic would go\n\n// Base rate calculation\nlet baseCharge = 0;\nif (jobData.distance) {\n  // Example: $2 per mile\n  baseCharge = jobData.distance * 2;\n}\n\n// Weight surcharge\nlet weightSurcharge = 0;\nif (jobData.weight > 5000) {\n  // Example: $0.10 per pound over 5000 lbs\n  weightSurcharge = (jobData.weight - 5000) * 0.1;\n}\n\n// Time-based surcharges\nlet timeSurcharge = 0;\nif (jobData.deliveryTimeWindow === 'express') {\n  // Express delivery surcharge\n  timeSurcharge = baseCharge * 0.15; // 15% surcharge for express\n}\n\n// Special handling\nlet specialHandling = 0;\nif (jobData.specialRequirements && jobData.specialRequirements.length > 0) {\n  // $25 per special requirement\n  specialHandling = jobData.specialRequirements.length * 25;\n}\n\n// Fuel surcharge (example: 8% of the base)\nconst fuelSurcharge = baseCharge * 0.08;\n\n// Calculate total\nconst subtotal = baseCharge + weightSurcharge + timeSurcharge + specialHandling + fuelSurcharge;\n\n// Tax calculation (example: 7%)\nconst tax = subtotal * 0.07;\n\n// Final total\nconst total = subtotal + tax;\n\n// Calculate due date based on payment terms\nconst calculateDueDate = (completionDate, paymentTerms) => {\n  const completionTimestamp = new Date(completionDate).getTime();\n  \n  let daysToAdd = 30; // Default net-30\n  \n  if (paymentTerms === 'net-15') {\n    daysToAdd = 15;\n  } else if (paymentTerms === 'net-45') {\n    daysToAdd = 45;\n  } else if (paymentTerms === 'net-60') {\n    daysToAdd = 60;\n  }\n  \n  const dueDate = new Date(completionTimestamp + (daysToAdd * 24 * 60 * 60 * 1000));\n  return dueDate.toISOString().split('T')[0]; // YYYY-MM-DD format\n};\n\n// Return the calculated charges\nreturn [{\n  json: {\n    jobId: jobData.id,\n    customerId: jobData.customerId,\n    customerName: jobData.customerName,\n    customerEmail: jobData.customerEmail || 'customer@example.com',\n    jobReference: jobData.referenceNumber,\n    completionDate: jobData.completionDate,\n    charges: {\n      baseCharge: parseFloat(baseCharge.toFixed(2)),\n      weightSurcharge: parseFloat(weightSurcharge.toFixed(2)),\n      timeSurcharge: parseFloat(timeSurcharge.toFixed(2)),\n      specialHandling: parseFloat(specialHandling.toFixed(2)),\n      fuelSurcharge: parseFloat(fuelSurcharge.toFixed(2)),\n      subtotal: parseFloat(subtotal.toFixed(2)),\n      tax: parseFloat(tax.toFixed(2)),\n      total: parseFloat(total.toFixed(2))\n    },\n    paymentTerms: jobData.customer?.paymentTerms || 'net-30',\n    dueDate: calculateDueDate(jobData.completionDate, jobData.customer?.paymentTerms || 'net-30')\n  }\n}];"
+      },
+      "id": "25aa4289-71e2-4b51-b8e2-8fef8d33ba1b",
+      "name": "Calculate Charges",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2.1,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://your-api-endpoint.com/api/invoices/generate",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "jobId",
+              "value": "={{ $json.jobId }}"
+            },
+            {
+              "name": "customerId",
+              "value": "={{ $json.customerId }}"
+            },
+            {
+              "name": "customerName",
+              "value": "={{ $json.customerName }}"
+            },
+            {
+              "name": "invoiceDate",
+              "value": "={{ $now.toISOString().split('T')[0] }}"
+            },
+            {
+              "name": "dueDate",
+              "value": "={{ $json.dueDate }}"
+            },
+            {
+              "name": "charges",
+              "value": "={{ JSON.stringify($json.charges) }}"
+            },
+            {
+              "name": "totalAmount",
+              "value": "={{ $json.charges.total }}"
+            },
+            {
+              "name": "paymentTerms",
+              "value": "={{ $json.paymentTerms }}"
+            }
+          ]
+        },
+        "options": {
+          "fullResponse": true,
+          "responseFormat": "json"
+        }
+      },
+      "id": "a617e1d3-7921-4c64-808d-e2b6c0c609c0",
+      "name": "Generate Invoice",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        850,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": null,
+          "name": null
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.success }}",
+              "value2": "true"
+            }
+          ]
+        }
+      },
+      "id": "48d97f9a-3c3b-46da-a12d-442db700dbef",
+      "name": "Invoice Generated?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1050,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://your-api-endpoint.com/api/accounting/sync",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "invoiceId",
+              "value": "={{ $json.invoiceId }}"
+            },
+            {
+              "name": "systemName",
+              "value": "quickbooks"
+            },
+            {
+              "name": "action",
+              "value": "create"
+            }
+          ]
+        },
+        "options": {
+          "responseFormat": "json"
+        }
+      },
+      "id": "78ab3f82-cd29-4233-ba5a-09b89d2d5e7b",
+      "name": "Sync to Accounting System",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1250,
+        200
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": null,
+          "name": null
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "finance@yourtmscompany.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "Invoice #{{ $json.invoiceId }} for Job #{{ $json.jobId }}",
+        "text": "=Dear {{ $json.customerName }},\n\nPlease find attached your invoice #{{ $json.invoiceId }} for job #{{ $json.jobId }} completed on {{ $json.completionDate }}.\n\nInvoice Summary:\n- Base Charge: ${{ $json.charges.baseCharge }}\n- Additional Fees: ${{ $json.charges.weightSurcharge + $json.charges.timeSurcharge + $json.charges.specialHandling + $json.charges.fuelSurcharge }}\n- Subtotal: ${{ $json.charges.subtotal }}\n- Tax: ${{ $json.charges.tax }}\n- Total Due: ${{ $json.charges.total }}\n\nPayment Terms: {{ $json.paymentTerms }}\nDue Date: {{ $json.dueDate }}\n\nPlease remit payment by the due date. For questions regarding this invoice, please contact our finance department.\n\nThank you for your business!\n\nAximo AI Logistics Team",
+        "options": {
+          "attachments": "={{[{\"id\":\"invoice\",\"url\":$json.invoiceUrl}]}}"
+        }
+      },
+      "id": "d1e27ae9-8913-48af-9c2c-857d9f7d029a",
+      "name": "Send Invoice Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1450,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://your-api-endpoint.com/api/financial-dashboard/update",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "metric",
+              "value": "invoiced_amount"
+            },
+            {
+              "name": "value",
+              "value": "={{ $json.charges.total }}"
+            },
+            {
+              "name": "date",
+              "value": "={{ $now.toISOString().split('T')[0] }}"
+            },
+            {
+              "name": "customerId",
+              "value": "={{ $json.customerId }}"
+            }
+          ]
+        },
+        "options": {
+          "responseFormat": "json"
+        }
+      },
+      "id": "56e7f9a1-9572-4bff-8a32-6befa131c641",
+      "name": "Update Financial Dashboard",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1650,
+        200
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": null,
+          "name": null
+        }
+      }
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 1,
+              "unit": "days"
+            }
+          ]
+        }
+      },
+      "id": "5a1e9f8d-1c28-47eb-9e37-724356cfbf63",
+      "name": "Schedule Payment Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1250,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://your-api-endpoint.com/api/invoices/{{ $json.invoiceId }}/status",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_TOKEN"
+            }
+          ]
+        },
+        "options": {
+          "responseFormat": "json"
+        }
+      },
+      "id": "8de71f25-b97a-4394-b142-241cd3ca8e75",
+      "name": "Check Payment Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1450,
+        400
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": null,
+          "name": null
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "paid"
+            }
+          ]
+        }
+      },
+      "id": "95c87d23-c7d4-42e9-b0a5-ef31932643a9",
+      "name": "Invoice Paid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1650,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "finance@yourtmscompany.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "Payment Reminder: Invoice #{{ $json.invoiceId }}",
+        "text": "=Dear {{ $json.customerName }},\n\nThis is a friendly reminder that invoice #{{ $json.invoiceId }} for ${{ $json.charges.total }} is approaching its due date of {{ $json.dueDate }}.\n\nPlease ensure payment is made by the due date to avoid any late fees.\n\nIf you have already made this payment, please disregard this reminder.\n\nThank you for your business.\n\nAximo AI Logistics Team\nFinance Department"
+      },
+      "id": "3e7a891d-5f85-4db6-a4bc-eb8223cca56d",
+      "name": "Send Payment Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1850,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook: Job Completed": {
+      "main": [
+        [
+          {
+            "node": "Get Job Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Job Details": {
+      "main": [
+        [
+          {
+            "node": "Calculate Charges",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Charges": {
+      "main": [
+        [
+          {
+            "node": "Generate Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Invoice": {
+      "main": [
+        [
+          {
+            "node": "Invoice Generated?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invoice Generated?": {
+      "main": [
+        [
+          {
+            "node": "Sync to Accounting System",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sync to Accounting System": {
+      "main": [
+        [
+          {
+            "node": "Send Invoice Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Invoice Email": {
+      "main": [
+        [
+          {
+            "node": "Update Financial Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Payment Check": {
+      "main": [
+        [
+          {
+            "node": "Check Payment Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Payment Status": {
+      "main": [
+        [
+          {
+            "node": "Invoice Paid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invoice Paid?": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Payment Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {}
+}

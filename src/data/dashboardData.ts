@@ -1,4 +1,3 @@
-
 // Mock data for dashboard components
 
 export const mockJobsData = {
@@ -48,3 +47,11 @@ export const mockFinancialAlerts = {
   },
   creditLimitWarnings: 2
 };
+
+export const mockActivityData = [
+  { id: '1', type: 'order', description: 'New order #12345 received', timestamp: '2023-05-12T14:30:00Z', status: 'completed' },
+  { id: '2', type: 'user', description: 'New user Kamal registered', timestamp: '2023-05-12T13:25:00Z', status: 'completed' },
+  { id: '3', type: 'system', description: 'System backup completed', timestamp: '2023-05-12T12:00:00Z', status: 'completed' },
+  { id: '4', type: 'order', description: 'Order #12342 shipped', timestamp: '2023-05-12T11:15:00Z', status: 'completed' },
+  { id: '5', type: 'order', description: 'Order #12341 payment failed', timestamp: '2023-05-12T10:30:00Z', status: 'failed' },
+];

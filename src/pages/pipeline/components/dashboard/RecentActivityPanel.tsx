@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { Activity, Users, MessageSquare, FileText, ChevronRight } from 'lucide-react';
+import { Activity, Users as UsersIcon, MessageSquare, FileText, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
@@ -14,7 +13,7 @@ export default function RecentActivityPanel() {
       title: 'Call with ABC Logistics',
       description: 'Discussed transportation requirements',
       time: '2 hours ago',
-      icon: <Users size={16} className="text-blue-400" />,
+      icon: <UsersIcon size={16} className="text-blue-400" />,
       iconBg: 'bg-blue-500/10'
     },
     {
@@ -41,7 +40,7 @@ export default function RecentActivityPanel() {
       title: 'Meeting with Global Freight',
       description: 'New lead discussion',
       time: '2 days ago',
-      icon: <Users size={16} className="text-blue-400" />,
+      icon: <UsersIcon size={16} className="text-blue-400" />,
       iconBg: 'bg-blue-500/10'
     },
   ];

@@ -6,6 +6,7 @@ import { getErrorMessage } from '@/utils/error-handler';
 import { adaptDatabaseJobsToJobTypes, adaptJobTypeToDatabase, adaptDatabaseJobToJobType } from '@/pages/jobs/adapters/jobAdapter';
 import { Json } from '@/integrations/supabase/types';
 import { TableTypes } from '@/types/database-types';
+import { jobService } from '@/services/job-service';
 
 // Define a type alias for database job to make it clearer
 type DatabaseJob = TableTypes['jobs'];
@@ -182,8 +183,9 @@ export function useJobs(filters?: Record<string, any>) {
 }
 
 // Hook for fetching a specific job by ID
-export function useJob(id?: string | number) {
+export function useJob(id?: string) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const enabled = id !== undefined;
   
   const {
@@ -196,28 +198,18 @@ export function useJob(id?: string | number) {
       if (!id) return null;
       
       try {
-        // Convert id to string for Supabase
-        const jobId = id.toString();
+        // Use the jobService method instead of direct Supabase calls
+        // This avoids the schema cache error completely
+        const job = await jobService.getJobById(id);
         
-        const { data, error } = await supabase
-          .from('jobs')
-          .select(`
-            *,
-            customer:companies!customer_id(*),
-            carrier:companies!carrier_id(*),
-            vehicle:vehicles(*),
-            driver:drivers(*)
-          `)
-          .eq('id', jobId)
-          .single();
-
-        if (error) throw error;
+        if (!job) {
+          throw new Error(`Job with ID ${id} not found`);
+        }
         
-        console.log("Raw job data:", data); // Debug: Log raw data
+        console.log("Job data from service:", job); // Debug: Log data
         
         // Use our adapter to transform database job to UI job
-        // Add type assertion to resolve TypeScript error
-        return data ? adaptDatabaseJobToJobType(data as any) : null;
+        return adaptDatabaseJobToJobType(job as any);
       } catch (error) {
         console.error(`Error fetching job with ID ${id}:`, error);
         throw new Error(getErrorMessage(error));

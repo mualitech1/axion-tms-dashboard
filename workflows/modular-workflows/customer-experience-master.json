@@ -1,0 +1,342 @@
+{
+  "name": "Customer Experience Enhancement System - Master",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "job-status-update",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "63d52c13-5018-4d7b-8fd9-32fc7fc7059b",
+      "name": "Webhook: Job Status Update",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        300
+      ],
+      "connections": {
+        "main": [
+          [
+            {
+              "node": "Execute Initial Module",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $env.CUSTOMER_EXP_INIT_WORKFLOW_ID || 'REPLACE_WITH_WORKFLOW_ID' }}",
+        "options": {
+          "waitForResponse": true
+        }
+      },
+      "id": "ec428b8b-7c69-4b45-a9df-b2adb3c5a9c3",
+      "name": "Execute Initial Module",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        440,
+        300
+      ],
+      "connections": {
+        "main": [
+          [
+            {
+              "node": "Communication Preference",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ],
+        "error": [
+          [
+            {
+              "node": "Error Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.customerPreferredComms }}",
+              "value2": "email"
+            }
+          ]
+        }
+      },
+      "id": "1f48136d-2bf2-44f9-a750-008c399d4c76",
+      "name": "Communication Preference",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        640,
+        300
+      ],
+      "connections": {
+        "true": [
+          [
+            {
+              "node": "Execute Email Flow",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ],
+        "false": [
+          [
+            {
+              "node": "Execute SMS Flow",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $env.CUSTOMER_EXP_NOTIFICATION_WORKFLOW_ID || 'REPLACE_WITH_WORKFLOW_ID' }}",
+        "options": {
+          "waitForResponse": true
+        },
+        "additionalFields": {
+          "inputData": "={{ { \"notificationType\": \"email\" } }}"
+        }
+      },
+      "id": "fad9def0-3c34-4e51-8f0b-cdc1254e7c1d",
+      "name": "Execute Email Flow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        840,
+        200
+      ],
+      "connections": {
+        "main": [
+          [
+            {
+              "node": "Log Final Status",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ],
+        "error": [
+          [
+            {
+              "node": "Error Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $env.CUSTOMER_EXP_NOTIFICATION_WORKFLOW_ID || 'REPLACE_WITH_WORKFLOW_ID' }}",
+        "options": {
+          "waitForResponse": true
+        },
+        "additionalFields": {
+          "inputData": "={{ { \"notificationType\": \"sms\" } }}"
+        }
+      },
+      "id": "9e4b5f45-6932-4b99-a4bc-62a0fbcaf968",
+      "name": "Execute SMS Flow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        840,
+        400
+      ],
+      "connections": {
+        "main": [
+          [
+            {
+              "node": "Log Final Status",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ],
+        "error": [
+          [
+            {
+              "node": "Error Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Log the completion of the customer communication flow\nconst logData = {\n  jobId: $input.item.json.jobId,\n  status: $input.item.json.status,\n  communicationType: $input.item.json.customerPreferredComms,\n  notificationSent: true,\n  timestamp: new Date().toISOString(),\n  success: true\n};\n\n// You could log to a database or monitoring service here\nconsole.log('Customer communication completed:', JSON.stringify(logData));\n\n// Return success response\nreturn {\n  json: {\n    success: true,\n    message: `Successfully sent ${$input.item.json.customerPreferredComms} notification for job ${$input.item.json.jobId}`,\n    jobId: $input.item.json.jobId,\n    status: $input.item.json.status,\n    communicationType: $input.item.json.customerPreferredComms\n  }\n};"
+      },
+      "id": "e15e9c76-f5bb-4f5a-b1f5-89a0e4f2a2c5",
+      "name": "Log Final Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        300
+      ],
+      "connections": {
+        "main": [
+          [
+            {
+              "node": "Success Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "parameters": {
+        "responseCode": 200,
+        "responseData": "={{ $json }}"
+      },
+      "id": "7d9e8c0c-49e3-4d43-92fc-a8c558eb1f08",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "responseCode": 500,
+        "responseData": "={{ { \"success\": false, \"message\": $input.item.json.message || \"An error occurred while processing the customer notification\", \"error\": $input.item.json.error || $input.item.json } }}"
+      },
+      "id": "c3f4a4bf-9c6a-4e8a-9fb1-c6e3c9d3c5fb",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        640,
+        500
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook: Job Status Update": {
+      "main": [
+        [
+          {
+            "node": "Execute Initial Module",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Initial Module": {
+      "main": [
+        [
+          {
+            "node": "Communication Preference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "error": [
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Communication Preference": {
+      "true": [
+        [
+          {
+            "node": "Execute Email Flow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "false": [
+        [
+          {
+            "node": "Execute SMS Flow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Email Flow": {
+      "main": [
+        [
+          {
+            "node": "Log Final Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "error": [
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute SMS Flow": {
+      "main": [
+        [
+          {
+            "node": "Log Final Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "error": [
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Final Status": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+} 

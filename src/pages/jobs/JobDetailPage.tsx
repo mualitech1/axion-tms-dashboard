@@ -1,9 +1,8 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
 import { useJob } from '@/hooks/use-job';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { JobStatusCard } from './components/job-detail/JobStatusCard';
 import { motion } from 'framer-motion';
@@ -21,7 +20,7 @@ export default function JobDetailPage() {
 
   if (isLoading) {
     return (
-      <MainLayout title="Job Details">
+      <MainLayout title="Job Details" showBackButton onBack={handleBack}>
         <div className="flex items-center justify-center h-80">
           <Loader2 className="h-8 w-8 animate-spin text-aximo-primary" />
           <span className="ml-2 text-aximo-text">Loading job details...</span>
@@ -32,7 +31,7 @@ export default function JobDetailPage() {
 
   if (error) {
     return (
-      <MainLayout title="Job Details">
+      <MainLayout title="Job Details" showBackButton onBack={handleBack}>
         <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
           <div className="flex">
             <div className="flex-shrink-0">
@@ -59,12 +58,8 @@ export default function JobDetailPage() {
 
   if (!job) {
     return (
-      <MainLayout title="Job Details">
+      <MainLayout title="Job Details" showBackButton onBack={handleBack}>
         <div className="p-4">
-          <Button onClick={handleBack} variant="outline" size="sm" className="mb-4">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Jobs
-          </Button>
           <Card>
             <CardContent className="p-8 text-center">
               <h2 className="text-lg font-semibold mb-2">Job Not Found</h2>
@@ -76,40 +71,31 @@ export default function JobDetailPage() {
     );
   }
 
+  // Use the job title for the page title 
+  const pageTitle = `Job: ${job.title || 'Unknown Job'}`;
+  const pageDescription = `Reference: ${job.reference || 'No Reference'}`;
+
   return (
-    <MainLayout title={`Job: ${job.title}`}>
+    <MainLayout 
+      title={pageTitle} 
+      description={pageDescription}
+      showBackButton 
+      onBack={handleBack}
+    >
       <div className="container mx-auto">
-        <Button onClick={handleBack} variant="outline" size="sm" className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Jobs
-        </Button>
-        
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
           <div className="grid grid-cols-1 gap-6">
-            {/* Job Title and Basic Info */}
-            <div className="bg-white p-5 rounded-lg">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h1 className="text-xl font-semibold">{job.title}</h1>
-                  <p className="text-gray-500 text-sm mt-1">Reference: {job.reference || 'N/A'}</p>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">Edit</Button>
-                  <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">Delete</Button>
-                </div>
-              </div>
-            </div>
-            
-            {/* Job Status Card */}
+            {/* Main Content - No duplicated header elements */}
+            {/* Job Status Card - Pass ID as string */}
             <JobStatusCard 
               status={job.status} 
               priority={job.priority} 
               time={job.time} 
-              jobId={Number(job.id)} 
+              jobId={job.id.toString()} // Ensure ID is passed as string
             />
             
             {/* Job Details */}

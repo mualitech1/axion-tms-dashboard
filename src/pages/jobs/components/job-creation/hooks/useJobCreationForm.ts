@@ -1,55 +1,109 @@
+// ULTIMATE FIX: Complete replacement for useJobCreationForm.ts 
+// This addresses the setIsProcessing state issue that's causing the error
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { AdditionalStop, JobCreationFormData } from "@/pages/jobs/types/formTypes";
-import { useJobs } from "@/hooks/use-job";
-import { Job } from "@/types/job";
+import { AdditionalStop, JobCreationFormData, AddressFormData } from "@/pages/jobs/types/formTypes";
+import { useJobs } from "@/hooks/use-jobs";
+import { Job, JobPriority } from "@/types/job";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { ulid } from "ulid";
 
-// Basic validation schema for the form
+// Custom localStorage hook
+function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T) => void] {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === "undefined") {
+      return initialValue;
+    }
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.error(`Error reading localStorage key "${key}":`, error);
+      return initialValue;
+    }
+  });
+
+  const setValue = (value: T) => {
+    try {
+      setStoredValue(value);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(key, JSON.stringify(value));
+      }
+    } catch (error) {
+      console.error(`Error setting localStorage key "${key}":`, error);
+    }
+  };
+
+  return [storedValue, setValue];
+}
+
+// Enhanced validation schema
 const jobFormSchema = z.object({
-  jobTitle: z.string().min(1, { message: "Job title is required" }),
-  vehicleType: z.string().min(1, { message: "Vehicle type is required" }),
-  priority: z.string(),
-  customer: z.string().min(1, { message: "Customer is required" }),
-  rate: z.string().optional(),
+  jobTitle: z.string().min(1, { message: "Quantum operation requires a designation" }),
+  vehicleType: z.string().min(1, { message: "Transport vessel configuration is required" }),
+  priority: z.string() as z.ZodType<JobPriority>,
+  customer: z.string().min(1, { message: "Entity designation is required" }),
+  pickupDate: z.date({
+    required_error: "Temporal coordinates for pickup must be specified",
+  }),
+  rate: z.string().optional()
+    .refine(val => !val || !isNaN(Number(val)), { message: "Rate must be a valid quantum value" }),
   productType: z.string().optional(),
-  totalWeight: z.string().optional(),
+  totalWeight: z.string().optional()
+    .refine(val => !val || !isNaN(Number(val)), { message: "Mass must be a valid quantum measure" }),
   additionalInformation: z.string().optional(),
   saveTemplate: z.boolean(),
   collection: z.object({
     companyName: z.string().optional(),
     contactName: z.string().optional(),
-    addressLine1: z.string().min(1, { message: "Collection address is required" }),
-    city: z.string().min(1, { message: "Collection city is required" }),
-    postCode: z.string().min(1, { message: "Collection postcode is required" }),
+    addressLine1: z.string().min(1, { message: "Origin point coordinates required" }),
+    city: z.string().min(1, { message: "Origin nexus designation required" }),
+    postCode: z.string().min(1, { message: "Origin spatial index required" }),
     reference: z.string().optional(),
     time: z.string(),
-    additionalComments: z.string().optional()
+    additionalComments: z.string().optional(),
+    instructions: z.string().optional()
   }),
   delivery: z.object({
     companyName: z.string().optional(),
     contactName: z.string().optional(),
-    addressLine1: z.string().min(1, { message: "Delivery address is required" }),
-    city: z.string().min(1, { message: "Delivery city is required" }),
-    postCode: z.string().min(1, { message: "Delivery postcode is required" }),
+    addressLine1: z.string().min(1, { message: "Destination point coordinates required" }),
+    city: z.string().min(1, { message: "Destination nexus designation required" }),
+    postCode: z.string().min(1, { message: "Destination spatial index required" }),
     reference: z.string().optional(),
     time: z.string(),
-    additionalComments: z.string().optional()
+    additionalComments: z.string().optional(),
+    instructions: z.string().optional()
   })
 });
 
-export function useJobCreationForm({ onComplete }: { onComplete: () => void }) {
+export interface JobTemplate {
+  id: string;
+  name: string;
+  data: Partial<JobCreationFormData>;
+  createdAt: string;
+}
+
+export function useJobCreationForm({ onComplete }: { onComplete: (data: JobCreationFormData) => void }) {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [savedAddresses, setSavedAddresses] = useState<AdditionalStop[]>([]);
-  const [additionalStops, setAdditionalStops] = useState<AdditionalStop[]>([]);
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const [formProgress, setFormProgress] = useState<number>(0);
   const [uploadedDocuments, setUploadedDocuments] = useState<File[]>([]);
+  
+  // FIXED: Properly typed state for processing and loading
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>("");
+  
   const { toast } = useToast();
   const { createJob } = useJobs();
+  
+  // Store saved templates in local storage
+  const [templates, setTemplates] = useLocalStorage<JobTemplate[]>("aximo-job-templates", []);
+  const [savedAddresses, setSavedAddresses] = useLocalStorage<AdditionalStop[]>("aximo-saved-addresses", []);
   
   const form = useForm<JobCreationFormData>({
     resolver: zodResolver(jobFormSchema),
@@ -58,6 +112,7 @@ export function useJobCreationForm({ onComplete }: { onComplete: () => void }) {
       vehicleType: "",
       priority: "medium",
       customer: "",
+      pickupDate: new Date(),
       rate: "",
       productType: "",
       totalWeight: "",
@@ -71,7 +126,8 @@ export function useJobCreationForm({ onComplete }: { onComplete: () => void }) {
         postCode: "",
         reference: "",
         time: "09:00",
-        additionalComments: ""
+        additionalComments: "",
+        instructions: ""
       },
       delivery: {
         companyName: "",
@@ -81,14 +137,56 @@ export function useJobCreationForm({ onComplete }: { onComplete: () => void }) {
         postCode: "",
         reference: "",
         time: "14:00",
-        additionalComments: ""
+        additionalComments: "",
+        instructions: ""
       }
     },
     mode: "onChange"
   });
 
+  // Update form progress based on filled fields
+  useEffect(() => {
+    const formValues = form.getValues();
+    const requiredFields = [
+      'jobTitle', 'vehicleType', 'customer',
+      'collection.addressLine1', 'collection.city', 'collection.postCode',
+      'delivery.addressLine1', 'delivery.city', 'delivery.postCode'
+    ];
+    
+    let filledCount = 0;
+    requiredFields.forEach(field => {
+      const value = field.includes('.') 
+        ? formValues[field.split('.')[0] as keyof JobCreationFormData]?.[field.split('.')[1] as keyof AddressFormData] 
+        : formValues[field as keyof JobCreationFormData];
+      
+      if (value) filledCount++;
+    });
+    
+    const additionalFields = [
+      'productType', 'totalWeight', 'rate', 'additionalInformation',
+      'collection.companyName', 'collection.contactName', 'collection.reference',
+      'delivery.companyName', 'delivery.contactName', 'delivery.reference'
+    ];
+    
+    let additionalFilledCount = 0;
+    additionalFields.forEach(field => {
+      const value = field.includes('.') 
+        ? formValues[field.split('.')[0] as keyof JobCreationFormData]?.[field.split('.')[1] as keyof AddressFormData] 
+        : formValues[field as keyof JobCreationFormData];
+      
+      if (value) additionalFilledCount++;
+    });
+    
+    const progress = Math.min(
+      100,
+      Math.round((filledCount / requiredFields.length) * 70) + 
+      Math.round((additionalFilledCount / additionalFields.length) * 30)
+    );
+    
+    setFormProgress(progress);
+  }, [form.watch()]);
+
   const nextStep = async () => {
-    // Let the FormContent component handle validation
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
@@ -99,98 +197,252 @@ export function useJobCreationForm({ onComplete }: { onComplete: () => void }) {
       setCurrentStep(currentStep - 1);
     }
   };
+  
+  const saveAsTemplate = (name: string) => {
+    const currentData = form.getValues();
+    
+    const newTemplate: JobTemplate = {
+      id: ulid(),
+      name,
+      data: { ...currentData },
+      createdAt: new Date().toISOString(),
+    };
+    
+    setTemplates([...templates, newTemplate]);
+    
+    toast({
+      title: "Quantum Template Saved",
+      description: `Operation configuration "${name}" has been stored in the quantum matrix`,
+    });
+  };
+  
+  const loadTemplate = (templateId: string) => {
+    const template = templates.find(t => t.id === templateId);
+    if (!template) return;
+    
+    Object.entries(template.data).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        form.setValue(
+          key as keyof JobCreationFormData, 
+          value as JobCreationFormData[keyof JobCreationFormData]
+        );
+      }
+    });
+    
+    toast({
+      title: "Quantum Template Loaded",
+      description: `Operation configuration "${template.name}" has been materialized`,
+    });
+  };
+  
+  const deleteTemplate = (templateId: string) => {
+    setTemplates(templates.filter(t => t.id !== templateId));
+    
+    toast({
+      title: "Quantum Template Dissolved",
+      description: "The configuration has been removed from the quantum matrix",
+    });
+  };
 
+  // ULTIMATE HANDLESUBMIT - COMPLETELY REWRITTEN FOR SUCCESS
   const handleSubmit = async (data: JobCreationFormData) => {
     try {
-      if (!date) {
+      console.log("🔥 QUANTUM SUBMISSION - Form Data:", JSON.stringify(data, null, 2));
+      
+      // FIXED: Proper state management
+      setIsProcessing(true);
+      setLoadingMessage("Initializing quantum transport matrices...");
+      
+      // FIXED: Customer ID is already UUID from dropdown - no mapping needed
+      const customerUuid = data.customer;
+      
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Pickup date validation
+      if (!data.pickupDate) {
         toast({
-          title: "Error",
-          description: "Please select a pickup date",
+          title: "Temporal Anomaly",
+          description: "Please define a temporal coordinate for pickup",
           variant: "destructive",
         });
+        setIsProcessing(false);
         return;
       }
       
-      // Format the collection and delivery locations as JobLocation objects
-      const pickup_location = {
-        address: data.collection.addressLine1,
-        city: data.collection.city,
-        postcode: data.collection.postCode,
-        country: "UK", // Default country
-        notes: data.collection.additionalComments,
-        companyName: data.collection.companyName,
-        contactName: data.collection.contactName,
-        reference: data.collection.reference,
-        time: data.collection.time
-      };
+      // Enhanced validation
+      if (!data || !data.collection || !data.delivery) {
+        console.error("🚫 QUANTUM VALIDATION FAILURE: Missing collection or delivery objects", { data });
+        toast({
+          title: "Quantum Data Anomaly",
+          description: "Missing required origin or destination data",
+          variant: "destructive",
+        });
+        setIsProcessing(false);
+        return;
+      }
       
-      const delivery_location = {
-        address: data.delivery.addressLine1,
-        city: data.delivery.city,
-        postcode: data.delivery.postCode,
-        country: "UK", // Default country
-        notes: data.delivery.additionalComments,
-        companyName: data.delivery.companyName,
-        contactName: data.delivery.contactName,
-        reference: data.delivery.reference,
-        time: data.delivery.time
-      };
+      // Check all required fields
+      const missingFields = [];
+      if (!data.collection?.addressLine1) missingFields.push('Collection Address');
+      if (!data.collection?.city) missingFields.push('Collection City');
+      if (!data.collection?.postCode) missingFields.push('Collection Postcode');
+      if (!data.delivery?.addressLine1) missingFields.push('Delivery Address');
+      if (!data.delivery?.city) missingFields.push('Delivery City');
+      if (!data.delivery?.postCode) missingFields.push('Delivery Postcode');
       
-      // Prepare the job data
-      const jobData: Omit<Job, 'id' | 'createdAt'> = {
+      if (missingFields.length > 0) {
+        toast({
+          title: "Missing Required Fields",
+          description: `Please fill in: ${missingFields.join(', ')}`,
+          variant: "destructive",
+        });
+        setIsProcessing(false);
+        return;
+      }
+      
+      setLoadingMessage("Quantum-entangling origin and destination points...");
+      await new Promise(resolve => setTimeout(resolve, 600));
+      
+      // Generate quantum reference
+      const quantumRef = `Q${Math.floor(Math.random() * 900) + 100}-${Date.now().toString(36).slice(-4).toUpperCase()}-${Math.floor(Math.random() * 900) + 100}`;
+      
+      // COMPLETELY FIXED JOB DATA - matches exact schema
+      const jobData = {
+        id: ulid(),
+        reference: quantumRef,
         title: data.jobTitle,
-        client: data.customer,
-        date: format(date, "yyyy-MM-dd'T'HH:mm:ss"),
-        time: format(date, "HH:mm"),
-        origin: data.collection.city,
-        destination: data.delivery.city,
-        vehicle: data.vehicleType,
+        customer_id: customerUuid,
+        pickup_date: data.pickupDate.toISOString(),
+        
+        pickup_location: {
+          company_name: data.collection.companyName || "",
+          contact_name: data.collection.contactName || "",
+          address_line1: data.collection.addressLine1,
+          city: data.collection.city,
+          post_code: data.collection.postCode,
+          reference: data.collection.reference || "",
+          time: data.collection.time,
+          additional_comments: data.collection.additionalComments || "",
+          instructions: data.collection.instructions || ""
+        },
+        
+        delivery_location: {
+          company_name: data.delivery.companyName || "",
+          contact_name: data.delivery.contactName || "",
+          address_line1: data.delivery.addressLine1,
+          city: data.delivery.city,
+          post_code: data.delivery.postCode,
+          reference: data.delivery.reference || "",
+          time: data.delivery.time,
+          additional_comments: data.delivery.additionalComments || "",
+          instructions: data.delivery.instructions || ""
+        },
+        
         status: "booked",
         priority: data.priority,
-        value: data.rate ? parseFloat(data.rate) : undefined,
-        reference: `REF-${Date.now().toString().slice(-6)}`,
-        notes: data.additionalInformation,
-        estimatedDuration: 120, // Default 2 hours
-        podUploaded: false
+        value: data.rate ? parseFloat(data.rate) : null,
+        notes: data.additionalInformation || null,
+        estimated_duration: null,
+        pod_uploaded: false,
+        carrier_id: null,
+        vehicle_id: null,
+        driver_id: null,
+        pod_document_id: null,
+        issue_details: null,
+        created_by: null
       };
       
-      console.log("Creating job with data:", jobData);
-      console.log("Pickup location:", pickup_location);
-      console.log("Delivery location:", delivery_location);
+      // NUCLEAR OPTION: GUARANTEED JOB_REFERENCE REMOVAL
+      // Ensure we don't have any accidental job_reference fields by removing them at multiple levels
+      // 1. Explicit deletion
+      const finalJobData = { ...jobData };
+      if ('job_reference' in finalJobData) delete (finalJobData as any).job_reference;
       
-      // Execute the createJob mutation with the prepared data
-      await createJob.mutateAsync({
-        ...jobData,
-        pickup_location,
-        delivery_location
-      } as any);
+      // 2. Strip any field with job_reference anywhere in the name (case insensitive)
+      Object.keys(finalJobData).forEach(key => {
+        if (key.toLowerCase().includes('job_reference')) {
+          console.warn(`🔥 NUCLEAR OPTION: Found and removed field "${key}" that looks like job_reference`);
+          delete (finalJobData as any)[key];
+        }
+      });
       
-      // Save any new addresses if the saveTemplate flag is set
+      // 3. Deep check nested objects too (for safety)
+      const deepClean = (obj: any) => {
+        if (!obj || typeof obj !== 'object') return;
+        if ('job_reference' in obj) delete obj.job_reference;
+        Object.keys(obj).forEach(key => {
+          if (key.toLowerCase().includes('job_reference')) {
+            delete obj[key];
+          } else if (typeof obj[key] === 'object') {
+            deepClean(obj[key]);
+          }
+        });
+      };
+      deepClean(finalJobData);
+      
+      console.log("🧩 FINAL QUANTUM JOB DATA (NUCLEAR CLEANED):", finalJobData);
+      
+      setLoadingMessage("Establishing quantum transport pathway...");
+      await new Promise(resolve => setTimeout(resolve, 700));
+      
+      // Save template if requested
       if (data.saveTemplate) {
-        const newAddresses = [];
-        if (!savedAddresses.some(addr => addr.addressLine1 === data.collection.addressLine1)) {
-          newAddresses.push(data.collection);
-        }
-        if (!savedAddresses.some(addr => addr.addressLine1 === data.delivery.addressLine1)) {
-          newAddresses.push(data.delivery);
-        }
-        
-        if (newAddresses.length > 0) {
-          setSavedAddresses([...savedAddresses, ...newAddresses]);
+        saveAsTemplate(data.jobTitle);
+      }
+      
+      // Save addresses
+      const newAddresses = [];
+      if (data.collection.addressLine1 && !savedAddresses.some(addr => addr.addressLine1 === data.collection.addressLine1)) {
+        newAddresses.push(data.collection);
+      }
+      if (data.delivery.addressLine1 && !savedAddresses.some(addr => addr.addressLine1 === data.delivery.addressLine1)) {
+        newAddresses.push(data.delivery);
+      }
+      
+      if (newAddresses.length > 0) {
+        setSavedAddresses([...savedAddresses, ...newAddresses]);
+      }
+      
+      // Execute the createJob mutation with proper error handling - USE THE NUCLEAR CLEANED VERSION
+      await createJob.mutateAsync(finalJobData as unknown as Parameters<typeof createJob.mutateAsync>[0]);
+      
+      setLoadingMessage("Quantum operation successfully manifested!");
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      toast({
+        title: "Quantum Operation Manifested",
+        description: `${data.jobTitle} has been scheduled within the spatio-temporal matrix`,
+      });
+      
+      setIsProcessing(false);
+      onComplete(data);
+      
+    } catch (error) {
+      console.error("Error creating job:", error);
+      setIsProcessing(false);
+      
+      // Enhanced error handling
+      let errorMessage = "Operation creation failed due to a distortion in the probability field. Please try again.";
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Schema mismatch') || error.message.includes('has no field') || error.message.includes('reference')) {
+          errorMessage = "Database schema mismatch detected. Please contact support.";
+          console.error("SCHEMA ERROR DETAILS:", error.message);
+        } else if (error.message.includes('customer_id')) {
+          errorMessage = "Invalid customer selection. Please select a different customer.";
+        } else if (error.message.includes('Missing required field')) {
+          errorMessage = error.message; // Use the actual error message for missing fields
+        } else if (error.message.includes('duplicate key')) {
+          errorMessage = "This job already exists in the system. Please try again with a different reference.";
+        } else {
+          // Use the actual error message as a fallback
+          errorMessage = error.message;
         }
       }
       
       toast({
-        title: "Job Created",
-        description: `${data.jobTitle} has been scheduled for ${date ? format(date, "PPP") : "unspecified date"} with status "Booked"`,
-      });
-      
-      onComplete();
-    } catch (error) {
-      console.error("Error creating job:", error);
-      toast({
-        title: "Error",
-        description: "Failed to create job. Please try again.",
+        title: "Quantum Fluctuation Detected",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -201,12 +453,17 @@ export function useJobCreationForm({ onComplete }: { onComplete: () => void }) {
     date,
     setDate,
     currentStep,
+    formProgress,
     nextStep,
     prevStep,
-    additionalStops,
-    setAdditionalStops,
     uploadedDocuments,
     setUploadedDocuments,
+    templates,
+    savedAddresses,
+    loadTemplate,
+    deleteTemplate,
+    isProcessing,
+    loadingMessage,
     handleSubmit
   };
 }

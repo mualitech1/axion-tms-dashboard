@@ -170,6 +170,35 @@ export function adaptJobTypeToDatabase(job: ExtendedJobData): Partial<DatabaseJo
     delete finalResult.job_reference;
   }
   
-  console.log("🔄 adaptJobTypeToDatabase - OUTPUT:", result);
-  return result;
+  // NUCLEAR OPTION: Comprehensive deletion of ANY job_reference field
+  // This is the most aggressive approach to guarantee no job_reference reaches Supabase
+  const nuclearClean = (obj: Record<string, any>) => {
+    // 1. Direct removal of exact match
+    if ('job_reference' in obj) {
+      console.warn("⚛️ NUCLEAR DEFENSE: Removing exact job_reference match");
+      delete obj.job_reference;
+    }
+    
+    // 2. Remove any key that *might* be job_reference (case insensitive pattern matching)
+    Object.keys(obj).forEach(key => {
+      if (key.toLowerCase().includes('job_reference') || 
+          key.toLowerCase().includes('jobreference') ||
+          key.toLowerCase().includes('job_ref') ||
+          (key.toLowerCase().includes('job') && key.toLowerCase().includes('ref'))) {
+        console.warn(`⚛️ NUCLEAR DEFENSE: Removing potential job_reference: "${key}"`);
+        delete obj[key];
+      } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+        // 3. Recursive cleaning of nested objects
+        nuclearClean(obj[key]);
+      }
+    });
+    
+    return obj;
+  };
+  
+  // Apply nuclear cleaning
+  const purifiedResult = nuclearClean(finalResult);
+  
+  console.log("🔄 adaptJobTypeToDatabase - OUTPUT (NUCLEAR CLEANED):", purifiedResult);
+  return purifiedResult;
 }

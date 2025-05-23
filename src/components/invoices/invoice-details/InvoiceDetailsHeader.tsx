@@ -1,6 +1,5 @@
-
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency } from "@/utils/format";
+import { formatCurrency } from "@/lib/utils";
 
 interface InvoiceDetailsHeaderProps {
   invoice: any;

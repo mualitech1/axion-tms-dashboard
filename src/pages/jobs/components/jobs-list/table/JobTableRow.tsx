@@ -1,4 +1,3 @@
-
 import { format } from "date-fns";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { JobStatusBadge } from "./JobStatusBadge";
@@ -25,17 +24,17 @@ export function JobTableRow({ job, onRowClick }: JobTableRowProps) {
 
   return (
     <TableRow 
-      className="hover:bg-muted/20 cursor-pointer"
+      className="group hover:bg-aximo-darker/60 cursor-pointer group-hover:ring-1 group-hover:ring-aximo-primary/70 group-hover:shadow-[0_0_12px_rgba(var(--color-aximo-primary-rgb),0.4)] transition-all duration-300 border-b border-aximo-border"
       onClick={() => onRowClick(job.id)}
     >
-      <TableCell className="font-medium">#{String(job.id)}</TableCell>
-      <TableCell><JobStatusBadge status={job.status} /></TableCell>
-      <TableCell><JobPriorityBadge priority={job.priority} /></TableCell>
-      <TableCell>{job.client}</TableCell>
-      <TableCell>{job.origin}</TableCell>
-      <TableCell>{job.destination}</TableCell>
-      <TableCell>{format(new Date(job.date), "MMM d, HH:mm")}</TableCell>
-      <TableCell>{job.hauler?.name || "Unassigned"}</TableCell>
+      <TableCell className="font-medium text-aximo-text">#{String(job.id)}</TableCell>
+      <TableCell className="text-aximo-text"><JobStatusBadge status={job.status} /></TableCell>
+      <TableCell className="text-aximo-text"><JobPriorityBadge priority={job.priority} /></TableCell>
+      <TableCell className="text-aximo-text">{job.client}</TableCell>
+      <TableCell className="text-aximo-text">{job.origin}</TableCell>
+      <TableCell className="text-aximo-text">{job.destination}</TableCell>
+      <TableCell className="text-aximo-text">{format(new Date(job.date), "MMM d, HH:mm")}</TableCell>
+      <TableCell className="text-aximo-text">{job.hauler?.name || "Unassigned"}</TableCell>
       <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
         <JobsTableActions onView={handleView} onEdit={handleEdit} />
       </TableCell>

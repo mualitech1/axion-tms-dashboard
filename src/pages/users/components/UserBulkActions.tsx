@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { User } from '../types';
 import { Button } from '@/components/ui/button';
@@ -14,10 +13,15 @@ import {
   Check, 
   X, 
   Trash2, 
-  Users, 
+  Users as UsersIcon,
   ChevronDown,
   UserPlus,
-  UserMinus
+  UserMinus,
+  Mail,
+  CheckCircle,
+  XCircle,
+  Shield,
+  MoreHorizontal,
 } from 'lucide-react';
 import { 
   Dialog,
@@ -101,7 +105,7 @@ export default function UserBulkActions({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="flex items-center bg-white border-gray-300 text-gray-700">
-              <Users className="mr-2 h-4 w-4" />
+              <UsersIcon className="mr-2 h-4 w-4" />
               Bulk Actions
               <ChevronDown className="ml-2 h-4 w-4" />
             </Button>

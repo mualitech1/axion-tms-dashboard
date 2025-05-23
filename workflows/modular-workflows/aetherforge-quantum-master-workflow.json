@@ -1,0 +1,276 @@
+{
+  "name": "AetherForge Quantum Agent Creation - Master Workflow",
+  "nodes": [
+    {
+      "id": "entry",
+      "name": "Webhook: Create Quantum Agent",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [100, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "quantum-agent/create",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "connections": { "main": [ [ { "node": "init", "input": "main" } ] ] }
+    },
+    {
+      "id": "init",
+      "name": "Execute Initialization Module",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [300, 300],
+      "parameters": {
+        "workflowId": "={{ $env.QUANTUM_INIT_WORKFLOW_ID || 'REPLACE_WITH_WORKFLOW_ID' }}",
+        "options": { "waitForResponse": true }
+      },
+      "connections": { 
+        "main": [ [ { "node": "exists_branch", "input": "main" } ] ]
+      }
+    },
+    {
+      "id": "exists_branch",
+      "name": "Check if Agent Exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [500, 300],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.hasOwnProperty('success') && $json.success === false && $json.message === 'Agent already exists' }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "connections": { 
+        "true": [ [ { "node": "respond_exists", "input": "main" } ] ],
+        "false": [ [ { "node": "blueprint", "input": "main" } ] ]
+      }
+    },
+    {
+      "id": "respond_exists",
+      "name": "Respond: Agent Already Exists",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [700, 200],
+      "parameters": {
+        "responseCode": 409,
+        "responseData": "={{ $json }}"
+      }
+    },
+    {
+      "id": "blueprint",
+      "name": "Execute Blueprint Processing Module",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [700, 400],
+      "parameters": {
+        "workflowId": "={{ $env.QUANTUM_BLUEPRINT_WORKFLOW_ID || 'REPLACE_WITH_WORKFLOW_ID' }}",
+        "options": { "waitForResponse": true }
+      },
+      "connections": { 
+        "main": [ [ { "node": "entanglement", "input": "main" } ] ]
+      }
+    },
+    {
+      "id": "entanglement",
+      "name": "Execute Entanglement Module",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [900, 400],
+      "parameters": {
+        "workflowId": "={{ $env.QUANTUM_ENTANGLEMENT_WORKFLOW_ID || 'REPLACE_WITH_WORKFLOW_ID' }}",
+        "options": { "waitForResponse": true }
+      },
+      "connections": { 
+        "main": [ [ { "node": "state", "input": "main" } ] ]
+      }
+    },
+    {
+      "id": "state",
+      "name": "Execute State & Evolution Module",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1100, 400],
+      "parameters": {
+        "workflowId": "={{ $env.QUANTUM_STATE_WORKFLOW_ID || 'REPLACE_WITH_WORKFLOW_ID' }}",
+        "options": { "waitForResponse": true }
+      },
+      "connections": { 
+        "main": [ [ { "node": "telemetry", "input": "main" } ] ]
+      }
+    },
+    {
+      "id": "telemetry",
+      "name": "Execute Telemetry & Response Module",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1300, 400],
+      "parameters": {
+        "workflowId": "={{ $env.QUANTUM_TELEMETRY_WORKFLOW_ID || 'REPLACE_WITH_WORKFLOW_ID' }}",
+        "options": { "waitForResponse": true }
+      },
+      "connections": { 
+        "main": [ [ { "node": "respond", "input": "main" } ] ]
+      }
+    },
+    {
+      "id": "respond",
+      "name": "Respond: Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1500, 400],
+      "parameters": {
+        "responseCode": 201,
+        "responseData": "={{ $json }}"
+      }
+    },
+    {
+      "id": "error",
+      "name": "Respond: Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [900, 600],
+      "parameters": {
+        "responseCode": 500,
+        "responseData": "={{ { \"success\": false, \"message\": $input.item.json.message || 'An error occurred during agent creation', \"error\": $input.item.json.error || $input.item.json } }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook: Create Quantum Agent": {
+      "main": [
+        [
+          {
+            "node": "Execute Initialization Module",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Initialization Module": {
+      "main": [
+        [
+          {
+            "node": "Check if Agent Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "error": [
+        [
+          {
+            "node": "Respond: Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Agent Exists": {
+      "true": [
+        [
+          {
+            "node": "Respond: Agent Already Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "false": [
+        [
+          {
+            "node": "Execute Blueprint Processing Module",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Blueprint Processing Module": {
+      "main": [
+        [
+          {
+            "node": "Execute Entanglement Module",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "error": [
+        [
+          {
+            "node": "Respond: Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Entanglement Module": {
+      "main": [
+        [
+          {
+            "node": "Execute State & Evolution Module",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "error": [
+        [
+          {
+            "node": "Respond: Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute State & Evolution Module": {
+      "main": [
+        [
+          {
+            "node": "Execute Telemetry & Response Module",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "error": [
+        [
+          {
+            "node": "Respond: Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Telemetry & Response Module": {
+      "main": [
+        [
+          {
+            "node": "Respond: Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "error": [
+        [
+          {
+            "node": "Respond: Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+} 

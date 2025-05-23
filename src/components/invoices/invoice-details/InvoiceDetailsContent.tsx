@@ -1,6 +1,5 @@
-
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { formatCurrency } from "@/utils/format";
+import { formatCurrency } from "@/lib/utils";
 
 interface InvoiceDetailsContentProps {
   invoice: any;

@@ -1,0 +1,731 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "job-status-update",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "63d52c13-5018-4d7b-8fd9-32fc7fc7059b",
+      "name": "Webhook: Job Status Update",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://your-api-endpoint.com/api/jobs/{{$json.jobId}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_TOKEN"
+            }
+          ]
+        },
+        "options": {
+          "responseFormat": "json"
+        }
+      },
+      "id": "b8715e7b-d3ec-4a1d-9e21-2b93156423da",
+      "name": "Get Job Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        420,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract incoming data\nconst jobData = items[0].json;\nconst status = jobData.status;\nconst jobId = jobData.id;\nconst customerId = jobData.customerId;\nconst customerName = jobData.customerName;\nconst customerEmail = jobData.customerEmail;\nconst customerPhone = jobData.customerPhone;\nconst customerPreferredComms = jobData.customerPreferredComms || \"email\";\nconst pickupAddress = jobData.pickupAddress;\nconst deliveryAddress = jobData.deliveryAddress;\nconst estimatedDeliveryDate = jobData.estimatedDeliveryDate;\nconst trackingLink = `https://your-tms-domain.com/tracking/${jobId}`;\n\n// Get carrier data if available\nconst carrierName = jobData.carrier?.name || \"our delivery team\";\nconst carrierPhone = jobData.carrier?.phone || \"\";\n\n// Generate appropriate message based on status\nlet subject = \"\";\nlet message = \"\";\nlet emailTemplate = \"\";\nlet smsTemplate = \"\";\n\nswitch(status) {\n  case \"created\":\n    subject = `Your delivery #${jobId} has been booked`;\n    emailTemplate = \"jobCreated\";\n    smsTemplate = \"New delivery booked! Track at: \" + trackingLink;\n    message = `We've received your delivery request. Your tracking number is ${jobId}. We'll notify you when a carrier is assigned.`;\n    break;\n    \n  case \"assigned\":\n    subject = `Carrier assigned to your delivery #${jobId}`;\n    emailTemplate = \"carrierAssigned\";\n    smsTemplate = `${carrierName} will handle your delivery #${jobId}. Track at: ${trackingLink}`;\n    message = `${carrierName} has been assigned to your delivery. You can expect pickup on ${new Date(jobData.scheduledPickupTime).toLocaleDateString()}.`;\n    break;\n    \n  case \"pickedUp\":\n    subject = `Your delivery #${jobId} has been picked up`;\n    emailTemplate = \"inTransit\";\n    smsTemplate = `Your items for delivery #${jobId} have been picked up and are on the way! ETA: ${new Date(estimatedDeliveryDate).toLocaleDateString()}`;\n    message = `Your items have been picked up from ${pickupAddress} and are now in transit. Estimated delivery: ${new Date(estimatedDeliveryDate).toLocaleDateString()}.`;\n    break;\n    \n  case \"inTransit\":\n    subject = `Your delivery #${jobId} is in transit`;\n    emailTemplate = \"inTransit\";\n    smsTemplate = `Delivery #${jobId} is on the way! Current ETA: ${new Date(estimatedDeliveryDate).toLocaleDateString()}`;\n    message = `Your delivery is on its way to ${deliveryAddress}. Estimated delivery: ${new Date(estimatedDeliveryDate).toLocaleDateString()}.`;\n    break;\n    \n  case \"outForDelivery\":\n    subject = `Your delivery #${jobId} is out for delivery today`;\n    emailTemplate = \"outForDelivery\";\n    smsTemplate = `Your delivery #${jobId} will arrive today! Track final status at: ${trackingLink}`;\n    message = `Good news! Your delivery is out for delivery and scheduled to arrive today at ${deliveryAddress}.`;\n    break;\n    \n  case \"delivered\":\n    subject = `Your delivery #${jobId} has been completed`;\n    emailTemplate = \"delivered\";\n    smsTemplate = `Your delivery #${jobId} is complete! We'd love your feedback: ${trackingLink}/feedback`;\n    message = `Your delivery has been successfully completed. Thank you for choosing our service. We'd appreciate your feedback.`;\n    break;\n    \n  case \"delayed\":\n    subject = `Update on your delivery #${jobId}`;\n    emailTemplate = \"delayed\";\n    smsTemplate = `Delivery #${jobId} has been delayed. New ETA: ${new Date(estimatedDeliveryDate).toLocaleDateString()}. We apologize for the inconvenience.`;\n    message = `We wanted to inform you that your delivery has been delayed. New estimated delivery: ${new Date(estimatedDeliveryDate).toLocaleDateString()}. We apologize for any inconvenience.`;\n    break;\n    \n  default:\n    subject = `Update on your delivery #${jobId}`;\n    emailTemplate = \"statusUpdate\";\n    smsTemplate = `Status update for delivery #${jobId}: ${status}. Track at: ${trackingLink}`;\n    message = `The status of your delivery has been updated to: ${status}. Track your delivery at ${trackingLink}.`;\n}\n\n// Return communication data along with job details\nreturn [{\n  json: {\n    jobId,\n    customerId,\n    customerName,\n    customerEmail,\n    customerPhone,\n    customerPreferredComms,\n    status,\n    subject,\n    message,\n    emailTemplate,\n    smsTemplate,\n    trackingLink,\n    jobData\n  }\n}];"
+      },
+      "id": "47e4c719-48f8-4e9e-99c9-9dfc2299d38d",
+      "name": "Prepare Customer Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2.1,
+      "position": [
+        600,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.customerPreferredComms }}",
+              "value2": "email"
+            }
+          ]
+        }
+      },
+      "id": "1f48136d-2bf2-44f9-a750-008c399d4c76",
+      "name": "Communication Preference",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        780,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "notifications@yourtmscompany.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "={{ $json.subject }}",
+        "text": "=Dear {{ $json.customerName }},\n\n{{ $json.message }}\n\nYou can track your delivery at any time using this link: {{ $json.trackingLink }}\n\nIf you have any questions, please don't hesitate to contact our customer support.\n\nThank you for choosing Aximo AI Logistics!\n\nBest regards,\nThe Aximo AI Logistics Team",
+        "options": {}
+      },
+      "id": "bfd9b06b-30cc-4dfa-9250-9d18d895f258",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        980,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "to": "={{ $json.customerPhone }}",
+        "message": "={{ $json.smsTemplate }}"
+      },
+      "id": "ffb96b0d-7ed5-4e61-969d-edb6ad08f309",
+      "name": "Send SMS Notification",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1.1,
+      "position": [
+        980,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://your-api-endpoint.com/api/crm/customers/{{$json.customerId}}/communications",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "jobId",
+              "value": "={{ $json.jobId }}"
+            },
+            {
+              "name": "communicationType",
+              "value": "={{ $json.customerPreferredComms }}"
+            },
+            {
+              "name": "subject",
+              "value": "={{ $json.subject }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.message }}"
+            },
+            {
+              "name": "sentAt",
+              "value": "={{ $now.toISOString() }}"
+            },
+            {
+              "name": "status",
+              "value": "sent"
+            }
+          ]
+        },
+        "options": {
+          "responseFormat": "json"
+        }
+      },
+      "id": "d4b9e5c6-3e81-4ddf-8597-2efc9ea6e42a",
+      "name": "Log Communication in CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1180,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "delivered"
+            }
+          ]
+        }
+      },
+      "id": "5a60b38c-93f2-4d8f-949f-cd1052e9ed04",
+      "name": "Is Delivery Complete?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "specificTime",
+              "hour": 10,
+              "minute": 0
+            }
+          ]
+        }
+      },
+      "id": "f1259188-a27c-4c0c-b096-0c16641e07e7",
+      "name": "Schedule Feedback Request",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1560,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "feedback@yourtmscompany.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "How was your delivery experience? #{{ $json.jobId }}",
+        "text": "=Dear {{ $json.customerName }},\n\nThank you for choosing Aximo AI Logistics for your recent delivery (Job #{{ $json.jobId }}).\n\nWe'd love to hear about your experience. Please take a moment to rate our service by clicking one of the links below:\n\n⭐⭐⭐⭐⭐ Excellent: {{ $json.trackingLink }}/feedback?rating=5&jobId={{ $json.jobId }}\n⭐⭐⭐⭐ Good: {{ $json.trackingLink }}/feedback?rating=4&jobId={{ $json.jobId }}\n⭐⭐⭐ Average: {{ $json.trackingLink }}/feedback?rating=3&jobId={{ $json.jobId }}\n⭐⭐ Below Average: {{ $json.trackingLink }}/feedback?rating=2&jobId={{ $json.jobId }}\n⭐ Poor: {{ $json.trackingLink }}/feedback?rating=1&jobId={{ $json.jobId }}\n\nYour feedback helps us improve our service.\n\nThank you,\nThe Aximo AI Logistics Team",
+        "options": {}
+      },
+      "id": "75d14b7f-c75a-4b22-b025-883bdde98cc3",
+      "name": "Send Feedback Request",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1740,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "feedback",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "8b77f6ec-75c3-4f38-91fd-a9dfaa65d7a3",
+      "name": "Webhook: Feedback Response",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        1560,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract feedback parameters\nconst rating = parseInt(items[0].json.query.rating) || 0;\nconst jobId = items[0].json.query.jobId;\n\n// Determine feedback category\nlet feedbackCategory = '';\nif (rating >= 4) {\n  feedbackCategory = 'positive';\n} else if (rating === 3) {\n  feedbackCategory = 'neutral';\n} else {\n  feedbackCategory = 'negative';\n}\n\n// Return normalized feedback data\nreturn [{\n  json: {\n    jobId,\n    rating,\n    feedbackCategory,\n    feedbackDate: new Date().toISOString(),\n    feedbackSource: 'email',\n    responseUrl: `https://your-tms-domain.com/feedback/thank-you?jobId=${jobId}`\n  }\n}];"
+      },
+      "id": "c8f71ec8-8e53-4785-b6b1-86bccf6b5ee8",
+      "name": "Process Feedback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2.1,
+      "position": [
+        1740,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://your-api-endpoint.com/api/feedback",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "jobId",
+              "value": "={{ $json.jobId }}"
+            },
+            {
+              "name": "rating",
+              "value": "={{ $json.rating }}"
+            },
+            {
+              "name": "feedbackCategory",
+              "value": "={{ $json.feedbackCategory }}"
+            },
+            {
+              "name": "feedbackDate",
+              "value": "={{ $json.feedbackDate }}"
+            },
+            {
+              "name": "feedbackSource",
+              "value": "={{ $json.feedbackSource }}"
+            }
+          ]
+        },
+        "options": {
+          "responseFormat": "json"
+        }
+      },
+      "id": "a4e8d75e-10ea-4f7e-ac40-822f1b53c419",
+      "name": "Save Feedback to Database",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1920,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.feedbackCategory }}",
+              "value2": "negative"
+            }
+          ]
+        }
+      },
+      "id": "4fc6e5b1-598a-4fe6-a9d5-e578fe51091e",
+      "name": "Negative Feedback?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2100,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://your-api-endpoint.com/api/support-tickets",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "type",
+              "value": "service_recovery"
+            },
+            {
+              "name": "jobId",
+              "value": "={{ $json.jobId }}"
+            },
+            {
+              "name": "customerRating",
+              "value": "={{ $json.rating }}"
+            },
+            {
+              "name": "priority",
+              "value": "high"
+            },
+            {
+              "name": "description",
+              "value": "=Customer rated their delivery experience {{ $json.rating }}/5 stars. Immediate service recovery needed."
+            },
+            {
+              "name": "createdAt",
+              "value": "={{ $now.toISOString() }}"
+            },
+            {
+              "name": "status",
+              "value": "open"
+            }
+          ]
+        },
+        "options": {
+          "responseFormat": "json"
+        }
+      },
+      "id": "c0a81242-0e3b-400d-84b6-a147b5e1dec5",
+      "name": "Create Service Recovery Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2280,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "support@yourtmscompany.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "We value your feedback on delivery #{{ $json.jobId }}",
+        "text": "=Dear {{ $json.customerName }},\n\nThank you for sharing your feedback about your recent delivery experience.\n\nWe're sorry to hear that your experience did not meet expectations. At Aximo AI Logistics, we strive for excellence in every delivery.\n\nA member of our customer care team will contact you within 24 hours to address your concerns and find a solution.\n\nWe appreciate the opportunity to improve our service.\n\nSincerely,\nCustomer Support Team\nAximo AI Logistics"
+      },
+      "id": "f15e4e68-8247-4cf5-9a9e-37e0fe44b990",
+      "name": "Send Service Recovery Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        2460,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://your-api-endpoint.com/api/analytics/customer-satisfaction",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "jobId",
+              "value": "={{ $json.jobId }}"
+            },
+            {
+              "name": "rating",
+              "value": "={{ $json.rating }}"
+            },
+            {
+              "name": "feedbackCategory",
+              "value": "={{ $json.feedbackCategory }}"
+            },
+            {
+              "name": "date",
+              "value": "={{ $now.toISOString().split('T')[0] }}"
+            }
+          ]
+        },
+        "options": {
+          "responseFormat": "json"
+        }
+      },
+      "id": "e3e8176c-a571-42dc-a327-fc7dfea54f04",
+      "name": "Update Customer Satisfaction KPIs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2280,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://your-api-endpoint.com/api/customers/{{$json.customerId}}",
+        "method": "PATCH",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "lastFeedbackRating",
+              "value": "={{ $json.rating }}"
+            },
+            {
+              "name": "lastFeedbackDate",
+              "value": "={{ $json.feedbackDate }}"
+            },
+            {
+              "name": "feedbackCount",
+              "value": "={{ $json.existingFeedbackCount ? $json.existingFeedbackCount + 1 : 1 }}"
+            }
+          ]
+        },
+        "options": {
+          "responseFormat": "json"
+        }
+      },
+      "id": "8fbf572d-0129-476a-8944-4617e49ecce8",
+      "name": "Update Customer Profile",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "content": "<html>\n  <body>\n    <h1>Thank you for your feedback!</h1>\n    <p>We appreciate you taking the time to share your experience with us.</p>\n    <p>Your input helps us improve our service for you and all our customers.</p>\n    <p>Have a great day!</p>\n  </body>\n</html>",
+        "responseCode": 200
+      },
+      "id": "c84a2b06-69cb-4089-9bd1-fdfa44f64ddf",
+      "name": "Send Thank You Page",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2100,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook: Job Status Update": {
+      "main": [
+        [
+          {
+            "node": "Get Job Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Job Details": {
+      "main": [
+        [
+          {
+            "node": "Prepare Customer Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Customer Message": {
+      "main": [
+        [
+          {
+            "node": "Communication Preference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Communication Preference": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send SMS Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Notification": {
+      "main": [
+        [
+          {
+            "node": "Log Communication in CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send SMS Notification": {
+      "main": [
+        [
+          {
+            "node": "Log Communication in CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Communication in CRM": {
+      "main": [
+        [
+          {
+            "node": "Is Delivery Complete?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Delivery Complete?": {
+      "main": [
+        [
+          {
+            "node": "Webhook: Feedback Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Schedule Feedback Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Feedback Request": {
+      "main": [
+        [
+          {
+            "node": "Send Feedback Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook: Feedback Response": {
+      "main": [
+        [
+          {
+            "node": "Process Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Feedback": {
+      "main": [
+        [
+          {
+            "node": "Save Feedback to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Feedback to Database": {
+      "main": [
+        [
+          {
+            "node": "Negative Feedback?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Thank You Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Negative Feedback?": {
+      "main": [
+        [
+          {
+            "node": "Create Service Recovery Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Customer Satisfaction KPIs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Service Recovery Ticket": {
+      "main": [
+        [
+          {
+            "node": "Send Service Recovery Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Customer Satisfaction KPIs": {
+      "main": [
+        [
+          {
+            "node": "Update Customer Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {}
+}

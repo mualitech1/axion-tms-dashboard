@@ -1,83 +1,104 @@
-
+import React from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { RequiredIndicator } from '@/components/ui/required-indicator';
+import { ContactDetailsForm } from '../ContactDetailsForm';
+import { Control, FieldErrors, UseFormTrigger } from 'react-hook-form';
+import { motion } from 'framer-motion';
 import { User, Mail, Phone } from 'lucide-react';
-import ContactDetailsForm from '../ContactDetailsForm';
-import { ContactPerson } from '@/types/customer';
-import { FormNavButtons } from './FormNavButtons';
 
 interface ContactsTabProps {
+  control: Control<any>;
+  formState: { errors: FieldErrors };
+  trigger: UseFormTrigger<any>;
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  primaryContact: ContactPerson | null;
-  setPrimaryContact: (contact: ContactPerson) => void;
-  invoiceContact: ContactPerson | null;
-  setInvoiceContact: (contact: ContactPerson) => void;
-  operationsContact: ContactPerson | null;
-  setOperationsContact: (contact: ContactPerson) => void;
+  primaryContact: any;
+  setPrimaryContact: (contact: any) => void;
+  invoiceContact: any;
+  setInvoiceContact: (contact: any) => void;
+  operationsContact: any;
+  setOperationsContact: (contact: any) => void;
 }
 
-export const ContactsTab = ({
-  activeTab,
-  setActiveTab,
-  primaryContact,
-  setPrimaryContact,
-  invoiceContact,
-  setInvoiceContact,
-  operationsContact,
-  setOperationsContact
-}: ContactsTabProps) => {
+export const ContactsTab: React.FC<ContactsTabProps> = ({ 
+  control, 
+  formState, 
+  trigger, 
+  activeTab, 
+  setActiveTab, 
+  primaryContact, 
+  setPrimaryContact, 
+  invoiceContact, 
+  setInvoiceContact, 
+  operationsContact, 
+  setOperationsContact 
+}) => {
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <User className="h-5 w-5 text-blue-600" />
-            <h3 className="text-lg font-semibold text-gray-800">Primary Contact</h3>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-medium">Primary Contact</CardTitle>
+            <Badge variant="default" className="bg-indigo-500">Required</Badge>
           </div>
-          <span className="bg-red-50 text-red-600 text-xs font-medium px-2.5 py-1 rounded-full border border-red-100 flex items-center">
-            <span className="w-2 h-2 bg-red-600 rounded-full mr-1.5"></span>
-            Required
-          </span>
-        </div>
-        <p className="text-sm text-gray-500 mb-4">This contact will be the main point of contact for this customer</p>
-        <ContactDetailsForm
-          onSave={(contact) => setPrimaryContact(contact)}
-          existingContact={primaryContact}
-          contactType="primary"
-        />
-      </div>
-      
-      <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-        <div className="flex items-center gap-2 mb-4">
-          <Mail className="h-5 w-5 text-blue-600" />
-          <h3 className="text-lg font-semibold mb-0">Invoice Contact</h3>
-        </div>
-        <p className="text-sm text-gray-500 mb-4">This contact will receive invoices and payment requests</p>
-        <ContactDetailsForm
-          onSave={(contact) => setInvoiceContact(contact)}
-          existingContact={invoiceContact}
-          contactType="invoice"
-        />
-      </div>
-      
-      <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-        <div className="flex items-center gap-2 mb-4">
-          <Phone className="h-5 w-5 text-blue-600" />
-          <h3 className="text-lg font-semibold mb-0">Operations Contact</h3>
-        </div>
-        <p className="text-sm text-gray-500 mb-4">This contact will handle day-to-day operational matters</p>
-        <ContactDetailsForm
-          onSave={(contact) => setOperationsContact(contact)}
-          existingContact={operationsContact}
-          contactType="operations"
-        />
-      </div>
+          <p className="text-sm text-muted-foreground">
+            The main contact person for this customer
+          </p>
+        </CardHeader>
+        <CardContent>
+          <ContactDetailsForm
+            control={control}
+            formState={formState}
+            prefix="primaryContact"
+            required={true}
+            trigger={trigger}
+          />
+        </CardContent>
+      </Card>
 
-      <FormNavButtons 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-        prevStep="general"
-        nextStep="terms"
-      />
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-medium">Invoice Contact</CardTitle>
+            <Badge variant="outline" className="border-indigo-500 text-indigo-500">Optional</Badge>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            The person responsible for invoice payments
+          </p>
+        </CardHeader>
+        <CardContent>
+          <ContactDetailsForm
+            control={control}
+            formState={formState}
+            prefix="invoiceContact"
+            required={false}
+            trigger={trigger}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-medium">Operations Contact</CardTitle>
+            <Badge variant="outline" className="border-indigo-500 text-indigo-500">Optional</Badge>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            The person responsible for day-to-day operations
+          </p>
+        </CardHeader>
+        <CardContent>
+          <ContactDetailsForm
+            control={control}
+            formState={formState}
+            prefix="operationsContact"
+            required={false}
+            trigger={trigger}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 };

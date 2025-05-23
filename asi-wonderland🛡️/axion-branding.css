@@ -1,0 +1,146 @@
+/**
+ * Axion Brand Kit - Core Styles
+ * ==============================
+ * These variables and utility classes define the Axion brand identity
+ * For use in onboarding, auth screens, and other branded experiences
+ */
+
+:root {
+  /* Primary Brand Colors */
+  --axion-blue-primary: #0090FF;
+  --axion-blue-dark: #0062CC;
+  --axion-blue-deeper: #001F3F;
+  --axion-gold-primary: #FFD700;
+  --axion-gold-dark: #FFA500;
+  
+  /* Quantum Theme Colors */
+  --axion-quantum-glow: rgba(0, 144, 255, 0.5);
+  --axion-dark-bg: #0A101F;
+  --axion-darker-bg: #060C17;
+  
+  /* Text Colors */
+  --axion-text-light: #F9FAFB;
+  --axion-text-secondary: #9CA3AF;
+  
+  /* Border Colors */
+  --axion-border: #1F2937;
+  
+  /* Animation Speeds */
+  --axion-transition-fast: 0.2s;
+  --axion-transition-normal: 0.3s;
+  --axion-transition-slow: 0.5s;
+}
+
+/* Typography Classes */
+.axion-title {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--axion-text-light);
+}
+
+.axion-subtitle {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-weight: 500;
+  color: var(--axion-text-secondary);
+}
+
+/* Logo Container */
+.axion-logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* Quantum Glow Effects */
+.axion-quantum-glow {
+  box-shadow: 0 0 15px var(--axion-quantum-glow);
+  transition: box-shadow var(--axion-transition-normal) ease;
+}
+
+.axion-quantum-glow:hover {
+  box-shadow: 0 0 25px var(--axion-quantum-glow);
+}
+
+/* Auth Container */
+.axion-auth-container {
+  background-color: var(--axion-dark-bg);
+  border: 1px solid var(--axion-border);
+  border-radius: 0.5rem;
+  padding: 2rem;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* Button Styles */
+.axion-button-primary {
+  background: linear-gradient(to right, var(--axion-blue-primary), var(--axion-blue-dark));
+  color: var(--axion-text-light);
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: all var(--axion-transition-fast) ease;
+}
+
+.axion-button-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 144, 255, 0.3);
+}
+
+.axion-button-gold {
+  background: linear-gradient(to right, var(--axion-gold-primary), var(--axion-gold-dark));
+  color: var(--axion-blue-deeper);
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: all var(--axion-transition-fast) ease;
+}
+
+.axion-button-gold:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+/* Input Fields */
+.axion-input {
+  background-color: var(--axion-darker-bg);
+  border: 1px solid var(--axion-border);
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  color: var(--axion-text-light);
+  width: 100%;
+  transition: border-color var(--axion-transition-fast) ease;
+}
+
+.axion-input:focus {
+  outline: none;
+  border-color: var(--axion-blue-primary);
+  box-shadow: 0 0 0 2px rgba(0, 144, 255, 0.2);
+}
+
+/* Animations */
+@keyframes axion-pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.axion-pulse {
+  animation: axion-pulse 2s infinite ease-in-out;
+}
+
+@keyframes axion-orbit {
+  from { transform: rotate(0deg) translateX(50px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(50px) rotate(-360deg); }
+}
+
+.axion-orbit {
+  animation: axion-orbit 10s infinite linear;
+} 

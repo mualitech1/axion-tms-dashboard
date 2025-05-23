@@ -1,0 +1,12 @@
+/* This is a binary file that cannot be created through text editing. 
+   Please use the SVG file to create a PNG in a graphics program or through command-line tools.
+   For example, using the Node.js package 'sharp' or a tool like Inkscape.
+   
+   Here's a terminal command example using Inkscape:
+   inkscape -z -e axion-logo.png -w 512 -h 512 axion-logo.svg
+   
+   Alternative approaches:
+   1. Load the SVG in a browser and use browser tools to export as PNG
+   2. Use a service like https://svgtopng.com/ to convert 
+   3. Use a graphics editor like GIMP, Photoshop, or Figma
+*/ 

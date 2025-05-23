@@ -1,0 +1,60 @@
+{
+  "name": "AetherForge Quantum Agent State and Evolution",
+  "nodes": [
+    {
+      "id": "17",
+      "name": "Calculate State, Position, Evolution",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [100, 100],
+      "parameters": {
+        "functionCode": "const calculateQuantumState = (agentId, orbitalLevel, bohrRadius, capabilityVector) => {\n     const baseStates = ['stable', 'expanding', 'contracting', 'transitioning']; const rng = Math.random;\n     const primaryIndex = Math.floor(rng() * baseStates.length); let remainingProbability = 1.0; const stateVector = [];\n     for (let i = 0; i < baseStates.length; i++) { let amp = (i === primaryIndex) ? (0.6 + (rng() * 0.2)) : (remainingProbability * rng() / (baseStates.length - i)); amp = Math.min(amp, remainingProbability); remainingProbability -= amp; stateVector.push(Math.sqrt(amp).toFixed(4)); }\n     if (remainingProbability > 0.0001) stateVector[primaryIndex] = Math.sqrt(parseFloat(stateVector[primaryIndex])**2 + remainingProbability).toFixed(4);\n     const phaseAngles = Array.from({ length: baseStates.length }, () => (rng() * 2 * Math.PI).toFixed(4));\n     const coherence = Math.max(0.1, 1 - (orbitalLevel * 0.05) - (rng() * 0.1));\n     return { state: baseStates[primaryIndex], base_states: baseStates, amplitudes: stateVector, phases: phaseAngles, coherence: coherence.toFixed(4), last_collapse: new Date().toISOString() };\n};\nconst calculateOrbitalPosition = (agentId, orbitalLevel, bohrRadius, capabilityVector) => {\n    const rng = Math.random; const theta = rng() * 2 * Math.PI; const phi = Math.acos(2 * rng() - 1);\n    const capBias = (capabilityVector || []).reduce((acc, val, idx)=>{ const a = (idx*Math.PI/4); return {x:acc.x+Math.cos(a)*val*0.2, y:acc.y+Math.sin(a)*val*0.2, z:acc.z+(val-0.5)*0.2};}, {x:0,y:0,z:0});\n    const radius = (bohrRadius||1) * (0.9 + rng() * 0.2);\n    const x = radius*Math.sin(phi)*Math.cos(theta)+capBias.x; const y = radius*Math.sin(phi)*Math.sin(theta)+capBias.y; const z = radius*Math.cos(phi)+capBias.z;\n    const w = capabilityVector ? (capabilityVector[0] + capabilityVector[capabilityVector.length-1]) / 2 : 0; const v = rng() * (bohrRadius||1) / (orbitalLevel||1);\n    const vel = Math.sqrt(1 / (bohrRadius||1)); const vx = -vel*Math.sin(theta); const vy=vel*Math.cos(theta);\n    return { position: {x:x.toFixed(4),y:y.toFixed(4),z:z.toFixed(4),w:w.toFixed(4),v:v.toFixed(4)}, coordinates:{theta:theta.toFixed(4),phi:phi.toFixed(4),r:radius.toFixed(4)}, velocity:{vx:vx.toFixed(4),vy:vy.toFixed(4),vz:0}, orbital_energy: (-1/(2*(bohrRadius||1))).toFixed(6), gravitational_bias: capBias };\n};\nconst calculateAgentEvolutionTrajectory = (agentData) => {\n    const ol = agentData.orbital_level || 1; const caps = agentData.capabilities || []; const ec = (agentData.entangled_agents || []).length; const coh = parseFloat(agentData.quantum_state?.coherence || 0.85);\n    const paths = [ { name: 'orbital_advancement', probability: Math.min(1, caps.length/(3*ol||1))*coh*0.7, time_estimate_seconds: 3600*ol }, { name: 'capability_expansion', probability: (0.5+(ol*0.1))*coh, time_estimate_seconds: 1800*Math.sqrt(caps.length||1) }, { name: 'specialization', probability: (0.3+(caps.length*0.05))*coh, time_estimate_seconds: 2400 } ];\n    paths.sort((a,b) => b.probability - a.probability); const opt = paths[0];\n    return { current_evolutionary_stage: `orbital_${ol}_stable`, potential_evolution_paths: paths, optimal_path: opt, evolutionary_pressure: Math.max(...paths.map(p => p.probability)).toFixed(2), next_evolution_estimate: new Date(Date.now() + (opt.time_estimate_seconds||0)*1000).toISOString() };\n};\n\nconst agentInput = $input.item.json;\nconst agentBase = agentInput.agentBaseData;\nconst agentId = agentBase.id;\nconst orbitalLevel = agentBase.orbital_level;\nconst bohrRadius = agentBase.bohr_radius;\nconst capabilityVector = agentBase.capability_vector;\nconst energyLevel = agentBase.energy_level;\nconst entangledAgents = agentInput.entangled_agents;\nconst capabilities = agentBase.capabilities;\n\nconst quantumState = calculateQuantumState(agentId, orbitalLevel, bohrRadius, capabilityVector);\nconst orbitalPosition = calculateOrbitalPosition(agentId, orbitalLevel, bohrRadius, capabilityVector);\nconst evolutionTrajectory = calculateAgentEvolutionTrajectory({ orbital_level: orbitalLevel, energy_level: energyLevel, capabilities: capabilities, entangled_agents: entangledAgents, quantum_state: quantumState });\n\nitem.json.quantum_state = quantumState;\nitem.json.orbital_position = orbitalPosition;\nitem.json.evolution_trajectory = evolutionTrajectory;\nreturn item;"
+      },
+      "connections": { "main": [ [ { "node": "18", "input": "main" } ] ] }
+    },
+    {
+      "id": "18",
+      "name": "Update Agent in Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [300, 100],
+      "credentials": { "supabaseApi": { "id": "YOUR_SUPABASE_CREDENTIAL_ID", "name": "Supabase account" } },
+      "parameters": {
+        "operation": "update",
+        "from": "agents",
+        "match": { "key": "id", "value": "={{ $json.agentId }}" },
+        "columns": {
+          "status": "active",
+          "quantum_state": "={{ $json.quantum_state }}",
+          "orbital_position": "={{ $json.orbital_position }}",
+          "entangled_agents": "={{ $json.entangled_agents }}",
+          "active_connections": "={{ $json.entangled_agents.length }}",
+          "last_activity": "={{ new Date().toISOString() }}"
+        }
+      },
+      "connections": { "main": [ [ { "node": "20", "input": "main" } ] ] }
+    },
+    {
+      "id": "20",
+      "name": "Prepare Communication Channels",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [500, 100],
+      "parameters": {
+        "functionCode": "function generateSharedQuantumKey(agent1Id, agent2Id) { const ids=[agent1Id,agent2Id].sort(); const c=`${ids[0]}:${ids[1]}:q`; let h=0; for(let i=0;i<c.length;i++){h=((h<<5)-h)+c.charCodeAt(i);h|=0;} return `qec_${Math.abs(h).toString(16)}_${Date.now().toString(36)}`; }\nconst createQuantumCommunicationChannels = (agentId, entangledAgents) => {\n    const protocols = (entangledAgents || []).map(targetId => ({ target_agent_id: targetId, protocol_type: 'quantum_entangled_messaging', shared_key: generateSharedQuantumKey(agentId, targetId), established: new Date().toISOString(), max_coherence_time_ms: 86400000, message_capacity: 100 }));\n    return { agent_id: agentId, communication_protocols: protocols, total_channels: protocols.length, primary_channel: protocols[0]||null };\n};\n\nconst agentData = $input.item.json;\nconst agentId = agentData.agentId;\nconst entangledAgents = agentData.entangled_agents;\nconst comms = createQuantumCommunicationChannels(agentId, entangledAgents);\n\nitem.json.communication_channels = comms;\nreturn item;"
+      },
+      "connections": { "main": [ [ { "node": "21", "input": "main" } ] ] }
+    },
+    {
+      "id": "21",
+      "name": "Calculate Ecosystem Coherence",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [700, 100],
+      "parameters": {
+        "functionCode": "const calculateQuantumCoherenceMetrics = (agents) => {\n    if (!agents || agents.length === 0) return { global_coherence: 1.0, orbital_coherences: {}, stability_index: 1.0, coherence_trend:'stable', decoherence_risk:'minimal' };\n    const orbitals = {}; agents.forEach(a => { const o=a.orbital_level; if(!orbitals[o]) orbitals[o]=[]; orbitals[o].push(a); });\n    const orbitalCoh = {}; let wcSum=0; let tWeight=0;\n    Object.entries(orbitals).forEach(([ol, oa]) => { const blc=Math.max(0.1,1-(Number(ol)*0.05)); const acf=Math.max(0.5,1-(oa.length*0.03)); const oc=blc*acf; orbitalCoh[ol]=oc.toFixed(4); wcSum+=oc*oa.length; tWeight+=oa.length; });\n    const gc = tWeight>0 ? (wcSum/tWeight).toFixed(4) : '1.0000';\n    const cohVals = Object.values(orbitalCoh).map(v=>parseFloat(v));\n    const si = cohVals.length>0 ? Math.max(0.1,(1-(Math.max(...cohVals)-Math.min(...cohVals)))).toFixed(4) : '1.0000';\n    return { global_coherence: gc, orbital_coherences: orbitalCoh, stability_index: si, coherence_trend: 'stable', decoherence_risk: parseFloat(gc)<0.5 ? 'elevated':'minimal' };\n};\n\nconst allActiveAgents = $input.item.json.allAgents || [];\nconst agentData = $input.item.json;\nconst ecosystemMetrics = calculateQuantumCoherenceMetrics(allActiveAgents);\n\nitem.json.ecosystem_metrics = ecosystemMetrics;\nreturn item;"
+      }
+    }
+  ],
+  "connections": {}
+} 

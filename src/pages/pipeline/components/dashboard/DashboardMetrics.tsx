@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Users, CreditCard, BarChart2, TrendingUp } from 'lucide-react';
+import { Users as UsersIcon, CreditCard, BarChart2, TrendingUp } from 'lucide-react';
 import { BadgeDelta } from '@/components/ui/badge-delta';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -14,7 +13,7 @@ export default function DashboardMetrics() {
       title: "Total Leads",
       value: "32",
       change: 8,
-      icon: <Users className="h-5 w-5 text-blue-400" />,
+      icon: <UsersIcon className="h-5 w-5 text-blue-400" />,
       iconBg: "bg-blue-500/10",
       iconGlow: "shadow-[0_0_15px_rgba(59,130,246,0.5)]",
       trend: "up"

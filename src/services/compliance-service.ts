@@ -1,7 +1,8 @@
-
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, withSupabaseRetry } from '@/integrations/supabase/client';
 import { getErrorMessage } from '@/utils/error-handler';
 import { auditService } from './audit-service';
+import { Tables } from '@/integrations/supabase/types';
+import { toast } from '@/hooks/use-toast';
 
 export type ComplianceStatus = 'draft' | 'pending_approval' | 'approved' | 'revoked' | 'expired';
 
@@ -360,6 +361,253 @@ class ComplianceService {
       return !!data;
     } catch (error) {
       console.error('Failed to check document acknowledgement status:', error);
+      throw new Error(getErrorMessage(error));
+    }
+  }
+
+  /**
+   * Get documents that are expiring soon
+   * @param daysThreshold Number of days to consider as "expiring soon"
+   * @param entityType Type of entity to filter documents for ('carrier', 'driver', or 'all')
+   * @returns Array of documents expiring within the specified threshold
+   */
+  async getExpiringDocuments(
+    daysThreshold: number = 30, 
+    entityType: 'carrier' | 'driver' | 'all' = 'all'
+  ): Promise<ComplianceDocument[]> {
+    try {
+      // Calculate the date threshold
+      const today = new Date();
+      const thresholdDate = new Date();
+      thresholdDate.setDate(today.getDate() + daysThreshold);
+      
+      // Format dates for Supabase query
+      const todayFormatted = today.toISOString().split('T')[0];
+      const thresholdFormatted = thresholdDate.toISOString().split('T')[0];
+      
+      // Use withSupabaseRetry for automatic retry with exponential backoff
+      return await withSupabaseRetry(async () => {
+        let query = supabase
+          .from('compliance_documents')
+          .select('*')
+          .gte('expiry_date', todayFormatted)
+          .lte('expiry_date', thresholdFormatted)
+          .order('expiry_date', { ascending: true });
+        
+        // Filter by entity type if specified
+        if (entityType !== 'all') {
+          query = query.eq('document_type', entityType === 'carrier' ? 'carrier_document' : 'driver_document');
+        }
+        
+        const { data, error } = await query;
+        
+        if (error) {
+          throw error;
+        }
+        
+        // Transform the data to match our interface
+        return data.map(doc => ({
+          id: doc.id,
+          title: doc.title,
+          description: doc.description,
+          documentType: doc.document_type,
+          filePath: doc.file_path,
+          version: doc.version,
+          status: doc.status as ComplianceStatus,
+          effectiveDate: doc.effective_date,
+          expiryDate: doc.expiry_date,
+          ownerId: doc.owner_id,
+          approvedBy: doc.approved_by,
+          approvalDate: doc.approval_date,
+          createdAt: doc.created_at,
+          updatedAt: doc.updated_at,
+          metadata: doc.metadata ? JSON.parse(JSON.stringify(doc.metadata)) : null
+        }));
+      }, 3, 2000); // 3 retries with 2s base delay
+    } catch (error) {
+      console.error('Failed to fetch expiring documents:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Find documents that have already expired
+   * @returns Array of expired documents
+   */
+  async getExpiredDocuments(): Promise<ComplianceDocument[]> {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      
+      const { data, error } = await supabase
+        .from('compliance_documents')
+        .select('*')
+        .lt('expiry_date', today)
+        .order('expiry_date', { ascending: false });
+      
+      if (error) throw error;
+      
+      // Convert to camelCase
+      return data.map(doc => ({
+        id: doc.id,
+        title: doc.title,
+        description: doc.description,
+        documentType: doc.document_type,
+        filePath: doc.file_path,
+        version: doc.version,
+        status: doc.status as ComplianceStatus,
+        effectiveDate: doc.effective_date,
+        expiryDate: doc.expiry_date,
+        ownerId: doc.owner_id,
+        approvedBy: doc.approved_by,
+        approvalDate: doc.approval_date,
+        createdAt: doc.created_at,
+        updatedAt: doc.updated_at,
+        metadata: safeJsonToRecord(doc.metadata)
+      }));
+    } catch (error) {
+      console.error('Failed to fetch expired documents:', error);
+      throw new Error(getErrorMessage(error));
+    }
+  }
+
+  /**
+   * Get carrier documents that are expiring soon
+   * @param carrierId ID of the carrier to check documents for
+   * @param daysThreshold Number of days to consider as "expiring soon"
+   * @returns Array of carrier documents expiring within the specified threshold
+   */
+  async getCarrierExpiringDocuments(carrierId: string, daysThreshold: number = 30): Promise<any[]> {
+    try {
+      // Calculate the date threshold
+      const today = new Date();
+      const thresholdDate = new Date();
+      thresholdDate.setDate(today.getDate() + daysThreshold);
+      
+      // Get carrier documents that expire between today and the threshold date
+      const { data, error } = await supabase
+        .from('documents')
+        .select('*')
+        .eq('company_id', carrierId)
+        .gte('expiry_date', today.toISOString().split('T')[0])
+        .lte('expiry_date', thresholdDate.toISOString().split('T')[0])
+        .order('expiry_date', { ascending: true });
+      
+      if (error) throw error;
+      
+      return data;
+    } catch (error) {
+      console.error(`Failed to fetch expiring documents for carrier ${carrierId}:`, error);
+      throw new Error(getErrorMessage(error));
+    }
+  }
+
+  /**
+   * Create alerts for expiring documents and send notifications
+   * @param threshold Number of days to consider as alert thresholds
+   * @returns Array of created alerts
+   */
+  async createComplianceAlerts(thresholds: number[] = [7, 30, 60]): Promise<ComplianceDocument[]> {
+    try {
+      const allExpiringDocs: ComplianceDocument[] = [];
+      
+      // Process each threshold
+      for (const days of thresholds) {
+        const expiringDocs = await this.getExpiringDocuments(days);
+        allExpiringDocs.push(...expiringDocs);
+        
+        // Group documents by expiry date for better notification management
+        const documentsByExpiry: Record<string, ComplianceDocument[]> = {};
+        
+        expiringDocs.forEach(doc => {
+          const expiryDate = doc.expiryDate || '';
+          if (!documentsByExpiry[expiryDate]) {
+            documentsByExpiry[expiryDate] = [];
+          }
+          documentsByExpiry[expiryDate].push(doc);
+        });
+        
+        // Log alerts for each expiry date group
+        for (const [expiryDate, documents] of Object.entries(documentsByExpiry)) {
+          // In a real implementation, this would call a notification service
+          console.log(`COMPLIANCE ALERT: ${documents.length} documents expiring on ${expiryDate}`);
+          console.log(`Severity: ${days <= 7 ? 'high' : days <= 30 ? 'medium' : 'low'}`);
+          console.log(`Documents: ${documents.map(d => d.id).join(', ')}`);
+          
+          // In a future implementation, this would also create records in a 'compliance_alerts' table
+          // and potentially send notifications through a notification service
+        }
+      }
+      
+      // Return all expiring documents
+      return allExpiringDocs;
+    } catch (error) {
+      console.error('Failed to create compliance alerts:', error);
+      throw new Error(getErrorMessage(error));
+    }
+  }
+
+  /**
+   * Check if a carrier has all required compliance documents valid
+   * @param carrierId ID of the carrier to check
+   * @returns Result object with compliance status
+   */
+  async checkCarrierCompliance(carrierId: string): Promise<{
+    isCompliant: boolean;
+    missingDocuments: string[];
+    expiringDocuments: any[];
+    expiredDocuments: any[];
+  }> {
+    try {
+      // Get carrier documents
+      const { data: documents, error } = await supabase
+        .from('documents')
+        .select('*')
+        .eq('company_id', carrierId);
+      
+      if (error) throw error;
+      
+      // Define required document types for carriers
+      const requiredDocTypes = [
+        'insurance_git', // Goods in Transit Insurance
+        'insurance_fleet', // Fleet Insurance
+        'license', // Operator's License
+        'terms' // Terms & Conditions Agreement
+      ];
+      
+      // Check for missing documents
+      const existingDocTypes = documents.map(doc => doc.type);
+      const missingDocuments = requiredDocTypes.filter(type => 
+        !existingDocTypes.includes(type)
+      );
+      
+      // Check for expired documents
+      const today = new Date().toISOString().split('T')[0];
+      const expiredDocuments = documents.filter(doc => 
+        doc.expiry_date && doc.expiry_date < today
+      );
+      
+      // Check for documents expiring soon (within 30 days)
+      const thirtyDaysLater = new Date();
+      thirtyDaysLater.setDate(thirtyDaysLater.getDate() + 30);
+      const thirtyDaysDate = thirtyDaysLater.toISOString().split('T')[0];
+      
+      const expiringDocuments = documents.filter(doc => 
+        doc.expiry_date && 
+        doc.expiry_date >= today && 
+        doc.expiry_date <= thirtyDaysDate
+      );
+      
+      // A carrier is compliant if they have all required documents and none are expired
+      const isCompliant = missingDocuments.length === 0 && expiredDocuments.length === 0;
+      
+      return {
+        isCompliant,
+        missingDocuments,
+        expiringDocuments,
+        expiredDocuments
+      };
+    } catch (error) {
+      console.error(`Failed to check compliance for carrier ${carrierId}:`, error);
       throw new Error(getErrorMessage(error));
     }
   }

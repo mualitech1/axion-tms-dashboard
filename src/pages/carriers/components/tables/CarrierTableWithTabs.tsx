@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -24,27 +23,27 @@ export default function CarrierTableWithTabs({ carriers }: CarrierTableWithTabsP
           <TabsList className="grid grid-cols-4 w-full max-w-md bg-aximo-darker">
             <TabsTrigger 
               value="all"
-              className="data-[state=active]:bg-indigo-600/20 data-[state=active]:text-indigo-600"
+              className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
             >
-              All Carriers
+              All Conduits
             </TabsTrigger>
             <TabsTrigger 
               value="active"
-              className="data-[state=active]:bg-indigo-600/20 data-[state=active]:text-indigo-600"
+              className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
             >
-              Active
+              Stabilized
             </TabsTrigger>
             <TabsTrigger 
               value="issue"
-              className="data-[state=active]:bg-indigo-600/20 data-[state=active]:text-indigo-600"
+              className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
             >
-              Issue
+              Fluctuating
             </TabsTrigger>
             <TabsTrigger 
               value="inactive"
-              className="data-[state=active]:bg-indigo-600/20 data-[state=active]:text-indigo-600"
+              className="data-[state=active]:bg-aximo-primary/20 data-[state=active]:text-aximo-primary"
             >
-              Inactive
+              Dormant
             </TabsTrigger>
           </TabsList>
         </div>

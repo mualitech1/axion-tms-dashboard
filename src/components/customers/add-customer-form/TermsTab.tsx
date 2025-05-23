@@ -1,4 +1,3 @@
-
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { InputWithIcon } from '@/components/ui/input-with-icon';
 import { UseFormReturn } from 'react-hook-form';
@@ -6,6 +5,7 @@ import { PoundSterling, FileText, CheckCircle, X, Save } from 'lucide-react';
 import { CustomerFormValues } from './types';
 import { FormNavButtons } from './FormNavButtons';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface TermsTabProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -16,6 +16,12 @@ interface TermsTabProps {
 
 export const TermsTab = ({ form, activeTab, setActiveTab, isSubmitting }: TermsTabProps) => {
   const isMobile = useIsMobile();
+  
+  // Helper function to safely extract error messages as strings
+  const getErrorMessage = (fieldName: string): string => {
+    const error = form.formState.errors[fieldName];
+    return error?.message ? String(error.message) : '';
+  };
   
   return (
     <div className="space-y-4 md:space-y-6 animate-fade-in">
@@ -32,11 +38,14 @@ export const TermsTab = ({ form, activeTab, setActiveTab, isSubmitting }: TermsT
               <FormLabel className="font-medium">Credit Limit (£)</FormLabel>
               <FormControl>
                 <InputWithIcon 
-                  icon={PoundSterling} 
+                  icon={<PoundSterling className="h-4 w-4 text-indigo-400" />}
                   type="number"
-                  {...field} 
+                  value={field.value || ''}
                   onChange={(e) => field.onChange(Number(e.target.value))}
                   placeholder="Enter credit limit" 
+                  error={getErrorMessage('creditLimit')}
+                  name={field.name}
+                  onBlur={field.onBlur}
                 />
               </FormControl>
               <FormMessage />
@@ -51,26 +60,26 @@ export const TermsTab = ({ form, activeTab, setActiveTab, isSubmitting }: TermsT
         render={({ field }) => (
           <FormItem className="flex flex-row items-start space-x-3 md:space-x-4 p-4 md:p-6 bg-white rounded-lg md:rounded-xl shadow-md border border-gray-100">
             <FormControl>
-              <div className="flex h-5 md:h-6 items-center space-x-1.5 md:space-x-2">
-                <input
-                  type="checkbox"
-                  checked={field.value}
-                  onChange={field.onChange}
-                  className="h-4 md:h-5 w-4 md:w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
+              <div className="flex items-start gap-2">
+                <Checkbox 
+                  id="acceptTerms" 
+                  checked={field.value} 
+                  onCheckedChange={field.onChange}
+                  aria-label="Accept Terms and Conditions"
                 />
-                {field.value ? (
-                  <CheckCircle className="h-4 md:h-5 w-4 md:w-5 text-emerald-500" />
-                ) : (
-                  <X className="h-4 md:h-5 w-4 md:w-5 text-red-500" />
-                )}
+                <div className="grid gap-1.5 leading-none">
+                  <label
+                    htmlFor="acceptTerms"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Accept Terms and Conditions
+                  </label>
+                  <p className="text-sm text-muted-foreground">
+                    By accepting you agree to our <a href="#" className="text-indigo-500 hover:underline">Terms of Service</a> and <a href="#" className="text-indigo-500 hover:underline">Privacy Policy</a>.
+                  </p>
+                </div>
               </div>
             </FormControl>
-            <div className="space-y-1">
-              <FormLabel className="text-sm md:text-base font-medium">Terms & Conditions</FormLabel>
-              <p className="text-xs md:text-sm text-muted-foreground">
-                Customer has accepted the terms and conditions of service
-              </p>
-            </div>
           </FormItem>
         )}
       />

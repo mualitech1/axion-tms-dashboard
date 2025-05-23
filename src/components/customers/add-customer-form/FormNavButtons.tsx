@@ -1,78 +1,48 @@
-
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ChevronsRight, Save } from 'lucide-react';
+import { ChevronsRight, ArrowRight, ChevronRight, BrainCircuit, Atom } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface FormNavButtonsProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  nextStep: string;
   isSubmitting?: boolean;
-  isLastStep?: boolean;
-  prevStep?: string;
-  nextStep?: string;
 }
 
 export const FormNavButtons = ({ 
   activeTab, 
-  setActiveTab,
-  isSubmitting = false,
-  isLastStep = false,
-  prevStep,
-  nextStep
+  setActiveTab, 
+  nextStep,
+  isSubmitting = false
 }: FormNavButtonsProps) => {
   return (
-    <div className="mt-4 flex justify-between">
-      {prevStep ? (
-        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={() => setActiveTab(prevStep)}
-            className="flex items-center gap-2 border-indigo-200 hover:bg-indigo-50 dark:border-indigo-700 dark:hover:bg-indigo-900/50 dark:text-indigo-300"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            {activeTab === "contacts" ? "Back to Company Info" : "Back to Contacts"}
-          </Button>
-        </motion.div>
-      ) : <div></div>}
-      
-      {nextStep && !isLastStep && (
-        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-          <Button 
-            type="button" 
-            onClick={() => setActiveTab(nextStep)}
-            className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white transition-all duration-200 flex items-center gap-2 shadow-md"
-          >
-            {activeTab === "general" ? "Continue to Contacts" : "Continue to Terms"}
-            <ChevronsRight className="h-4 w-4 ml-1" />
-          </Button>
-        </motion.div>
-      )}
-      
-      {isLastStep && (
-        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-          <Button 
-            type="submit" 
-            disabled={isSubmitting}
-            className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white transition-all duration-200 flex items-center gap-2 shadow-md"
-          >
-            {isSubmitting ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Creating Customer...
-              </>
-            ) : (
-              <>
-                <Save className="h-4 w-4" />
-                Save Customer
-              </>
-            )}
-          </Button>
-        </motion.div>
-      )}
+    <div className="flex justify-end pt-4">
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <Button
+          type="button"
+          className="group relative overflow-hidden bg-gradient-to-r from-indigo-600/80 to-blue-600/80 hover:from-indigo-700/90 hover:to-blue-700/90 text-white border border-indigo-500/40 shadow-[0_0_15px_-3px] shadow-indigo-500/30"
+          onClick={() => setActiveTab(nextStep)}
+          disabled={isSubmitting}
+        >
+          {/* Neural circuit animation in button */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-10">
+            <Atom className="w-20 h-20 text-white animate-pulse" />
+          </div>
+          
+          {/* Glow effect overlay */}
+          <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-20 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-shine" />
+          
+          <div className="relative z-10 flex items-center">
+            <span className="mr-2">Advance Quantum Waveform</span>
+            <div className="bg-indigo-500/30 p-1 rounded-md">
+              <BrainCircuit className="h-4 w-4" />
+            </div>
+          </div>
+        </Button>
+      </motion.div>
     </div>
   );
 };

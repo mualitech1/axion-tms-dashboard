@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { JobStatus } from "../../types/jobTypes";
 import { getStatusLabel, getStatusColor } from "../../utils/jobStatusUtils";
@@ -15,13 +14,14 @@ import {
   FileText,
   Truck,
   UserCheck,
-  XCircle
+  XCircle,
+  Eye
 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 interface JobLifecycleViewerProps {
-  jobId: number;
+  jobId: string | number; // Accept both string and number for ID
   currentStatus: JobStatus;
   statusHistory?: {
     status: JobStatus;
@@ -80,13 +80,16 @@ export function JobLifecycleViewer({
             size="sm"
             className="flex items-center gap-2"
           >
-            <Calendar className="h-4 w-4" />
+            <Eye className="h-4 w-4" />
             View Job Lifecycle
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Job #{jobId} Lifecycle History</DialogTitle>
+            <DialogDescription>
+              View the complete timeline and history of this job's status changes
+            </DialogDescription>
           </DialogHeader>
           
           <div className="mt-4 space-y-4">
@@ -148,15 +151,9 @@ export function JobLifecycleViewer({
                         {getStatusLabel(item.status)}
                       </h4>
                       <span className="text-xs text-gray-500">
-                        {new Date(item.timestamp).toLocaleString()}
+                        Updated by: {item.user}
                       </span>
                     </div>
-                    
-                    {item.user && (
-                      <p className="text-xs text-gray-600">
-                        Updated by: {item.user}
-                      </p>
-                    )}
                     
                     {item.notes && (
                       <p className="text-xs text-gray-600 mt-1 bg-gray-50 p-2 rounded">

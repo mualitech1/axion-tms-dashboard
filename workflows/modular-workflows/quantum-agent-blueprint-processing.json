@@ -1,0 +1,52 @@
+{
+  "name": "AetherForge Quantum Blueprint Processing",
+  "nodes": [
+    {
+      "id": "5",
+      "name": "Process Blueprint (Quantum Genetics)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [100, 100],
+      "parameters": {
+        "functionCode": "const processBlueprint = (initData, blueprintResult) => {\n  let blueprint = blueprintResult || null;\n  let inheritancePath = [];\n  let quantumGenetics = {};\n\n  if (blueprint && blueprint.id) {\n    inheritancePath = [{ id: blueprint.id, name: blueprint.name, quantum_signature: blueprint.quantum_signature }];\n    quantumGenetics = {\n        dominantTraits: Object.entries(blueprint.traits || {}).filter(([k, v]) => v > 0.7).map(([k]) => k),\n        recessiveTraits: Object.entries(blueprint.traits || {}).filter(([k, v]) => v <= 0.7 && v >= 0.3).map(([k]) => k),\n        mutations: Object.entries(blueprint.traits || {}).filter(([k, v]) => v < 0.3).map(([k]) => k)\n    };\n  } else {\n    const dynamicBlueprintId = initData.agentId;\n    const geneticTraits = { adaptability: 0.3 + Math.random() * 0.7, specialization: 0.3 + Math.random() * 0.7, efficiency: 0.3 + Math.random() * 0.7, resilience: 0.3 + Math.random() * 0.7, communication: 0.3 + Math.random() * 0.7 };\n    blueprint = { id: dynamicBlueprintId, name: `Dynamic BP: ${initData.name}`, description: `Auto-generated dynamic blueprint for ${initData.type} agent [${initData.agentId}]`, agent_type: initData.type, capabilities: initData.requestedCapabilities, created_at: initData.timestamp, creator_id: initData.creatorId, version: '1.0-dynamic', is_dynamic: true, parent_blueprint_id: null, traits: geneticTraits, quantum_signature: `dyn_${initData.quantumSignature}`, orbital_level_minimum: initData.orbitalLevel };\n    const configurations = {};\n    if (geneticTraits.efficiency > 0.7) configurations.resource_optimization = 'aggressive'; else if (geneticTraits.efficiency > 0.4) configurations.resource_optimization = 'balanced'; else configurations.resource_optimization = 'minimal';\n    if (geneticTraits.adaptability > 0.7) { configurations.auto_scaling = true; configurations.learning_rate = 'high'; } else { configurations.auto_scaling = geneticTraits.adaptability > 0.5; configurations.learning_rate = geneticTraits.adaptability > 0.5 ? 'medium' : 'low'; }\n    blueprint.configuration = configurations;\n    quantumGenetics = { dominantTraits: Object.entries(geneticTraits).filter(([k,v]) => v > 0.7).map(([k]) => k), recessiveTraits: Object.entries(geneticTraits).filter(([k,v]) => v <= 0.7 && v >= 0.3).map(([k]) => k), mutations: [], is_original_genetic_line: true };\n    blueprint.is_dynamic = true;\n  }\n\n  const finalCapabilities = blueprint.capabilities || initData.requestedCapabilities;\n  const finalConfig = blueprint.configuration || {};\n\n  function calculateBaseVector(capabilities) {\n      const vectorMap = { 'data_analysis': [1,0,0,0,0], 'workflow_automation': [0,1,0,0,0], 'security_scanning': [0,0,1,0,0], 'nlp': [0,0,0,1,0], 'code_generation': [0,0,0,0,1] };\n      const vectorLength = 5; let vector = Array(vectorLength).fill(0);\n      (capabilities || []).forEach(cap => { if (vectorMap[cap]) vector = vector.map((v, i) => v + vectorMap[cap][i]); });\n      return vector;\n  }\n  const calculateCapabilityVector = (capabilities, genetics) => {\n      const baseVector = calculateBaseVector(capabilities);\n      const dominantModifier = 0.2, recessiveModifier = 0.1;\n      (genetics.dominantTraits || []).forEach(trait => { if (trait === 'adaptability') baseVector[0] += dominantModifier; });\n      (genetics.recessiveTraits || []).forEach(trait => { if (trait === 'adaptability') baseVector[0] += recessiveModifier; });\n      const magnitude = Math.sqrt(baseVector.reduce((sum, val) => sum + val * val, 0));\n      return magnitude > 0 ? baseVector.map(v => v / magnitude) : baseVector;\n  };\n  const capabilityVector = calculateCapabilityVector(finalCapabilities, quantumGenetics);\n\n  return { ...initData, blueprint, is_dynamic_blueprint: blueprint.is_dynamic || false, capabilities: finalCapabilities, configuration: finalConfig, capability_vector: capabilityVector, quantum_genetics: quantumGenetics, inheritance_path: inheritancePath };\n};\n\nconst initData = $input.item.json.initData;\nconst blueprintResult = $input.item.json;\nitem.json = processBlueprint(initData, blueprintResult);\nreturn item;"
+      },
+      "connections": { "main": [ [ { "node": "7", "input": "main" } ] ] }
+    },
+    {
+      "id": "7",
+      "name": "Prepare Agent Base Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [300, 100],
+      "parameters": {
+        "functionCode": "const data = $input.item.json;\n\nconst agentBaseData = {\n  id: data.agentId,\n  name: data.name,\n  description: `${data.type} agent created with orbital level ${data.orbitalLevel}`,\n  type: data.type,\n  capabilities: data.capabilities || [],\n  created_at: data.timestamp,\n  creator_id: data.creatorId,\n  status: 'initializing',\n  blueprint_id: data.blueprint?.id || null,\n  blueprint_name: data.blueprint?.name || null,\n  orbital_level: data.orbitalLevel,\n  bohr_radius: data.bohrRadius,\n  quantum_signature: data.quantumSignature,\n  energy_level: data.energyLevel,\n  capability_vector: data.capability_vector || [],\n  configuration: data.configuration || {},\n  metadata: { quantum_genetics: data.quantum_genetics, inheritance_path: data.inheritance_path },\n  quantum_state: { status: 'initializing' }, \n  orbital_position: { status: 'initializing' }, \n  entangled_agents: [], \n  active_connections: 0,\n  last_activity: data.timestamp\n};\n\nitem.json.agentBaseData = agentBaseData;\nreturn item;"
+      },
+      "connections": { "main": [ [ { "node": "14", "input": "main" } ] ] }
+    },
+    {
+      "id": "14",
+      "name": "Validate Database Types",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [500, 100],
+      "parameters": {
+        "functionCode": "const data = $input.item.json;\nconst agentData = data.agentBaseData;\n\nif (!agentData) throw new Error('Agent base data is missing');\n\nif (!Array.isArray(agentData.capabilities)) {\n  agentData.capabilities = agentData.capabilities ? [agentData.capabilities] : [];\n}\n\nif (!Array.isArray(agentData.capability_vector)) {\n  agentData.capability_vector = agentData.capability_vector ? [agentData.capability_vector] : [];\n}\n\nif (!Array.isArray(agentData.entangled_agents)) {\n  agentData.entangled_agents = agentData.entangled_agents ? [agentData.entangled_agents] : [];\n}\n\nif (typeof agentData.orbital_level === 'string') {\n  agentData.orbital_level = parseInt(agentData.orbital_level, 10) || 1;\n}\n\nif (typeof agentData.bohr_radius === 'string') {\n  agentData.bohr_radius = parseFloat(agentData.bohr_radius) || 1.0;\n}\n\nif (typeof agentData.energy_level === 'string') {\n  agentData.energy_level = parseFloat(agentData.energy_level) || -0.5;\n}\n\nif (typeof agentData.active_connections === 'string') {\n  agentData.active_connections = parseInt(agentData.active_connections, 10) || 0;\n}\n\nif (typeof agentData.quantum_state !== 'object' || agentData.quantum_state === null) {\n  agentData.quantum_state = { status: 'initializing' };\n}\n\nif (typeof agentData.orbital_position !== 'object' || agentData.orbital_position === null) {\n  agentData.orbital_position = { status: 'initializing' };\n}\n\nif (typeof agentData.configuration !== 'object' || agentData.configuration === null) {\n  agentData.configuration = {};\n}\n\nif (typeof agentData.metadata !== 'object' || agentData.metadata === null) {\n  agentData.metadata = {};\n}\n\nitem.json.agentBaseData = agentData;\nreturn item;"
+      },
+      "connections": { "main": [ [ { "node": "15", "input": "main" } ] ] }
+    },
+    {
+      "id": "15",
+      "name": "Insert Agent into Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [700, 100],
+      "credentials": { "supabaseApi": { "id": "YOUR_SUPABASE_CREDENTIAL_ID", "name": "Supabase account" } },
+      "parameters": {
+        "operation": "insert",
+        "from": "agents",
+        "data": "={{ $json.agentBaseData }}"
+      }
+    }
+  ],
+  "connections": {}
+} 

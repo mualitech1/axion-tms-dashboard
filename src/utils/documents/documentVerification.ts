@@ -1,4 +1,3 @@
-
 import { Document } from '@/types/customer';
 
 /**
@@ -14,7 +13,7 @@ export enum VerificationStatus {
  * Check if all required documents are verified
  */
 export const areAllDocumentsVerified = (documents: Document[]): boolean => {
-  const requiredDocumentTypes = ['contract', 'terms', 'insurance', 'license'];
+  const requiredDocumentTypes = ['contract', 'terms', 'insurance_git', 'insurance_fleet', 'license'];
   
   // Check if all required document types exist and are verified
   return requiredDocumentTypes.every(type => 
@@ -35,7 +34,7 @@ export const getRequiredDocumentTypes = (): Array<{
 }> => {
   return [
     {
-      type: 'insurance',
+      type: 'insurance_git',
       label: 'Goods In Transit (GIT) Policy',
       description: 'Valid insurance policy covering transportation of goods'
     },
@@ -45,7 +44,7 @@ export const getRequiredDocumentTypes = (): Array<{
       description: 'Valid operator license issued by relevant authority'
     },
     {
-      type: 'insurance',
+      type: 'insurance_fleet',
       label: 'Motor or Fleet Insurance',
       description: 'Insurance policy covering all vehicles in operation'
     },

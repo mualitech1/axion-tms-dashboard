@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Dialog, 
@@ -34,10 +33,11 @@ import CustomerJobHistory from './CustomerJobHistory';
 interface CustomerDetailDialogProps {
   customer: Customer | null;
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onClose: () => void;
+  onEdit?: (customer: Customer) => void;
 }
 
-const CustomerDetailDialog = ({ customer, open, onOpenChange }: CustomerDetailDialogProps) => {
+const CustomerDetailDialog = ({ customer, open, onClose, onEdit }: CustomerDetailDialogProps) => {
   const [activeTab, setActiveTab] = useState("general");
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
@@ -54,27 +54,45 @@ const CustomerDetailDialog = ({ customer, open, onOpenChange }: CustomerDetailDi
         description: "Customer details have been updated successfully",
         variant: "default",
       });
-      onOpenChange(false);
+      onClose();
     }, 800);
   };
 
+  const handleEdit = () => {
+    if (onEdit && customer) {
+      onEdit(customer);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent 
+        className="max-w-4xl max-h-[90vh] overflow-y-auto p-0" 
+        aria-describedby="customer-detail-description"
+        aria-labelledby="customer-detail-title"
+      >
         <DialogHeader className="px-6 py-4 border-b sticky top-0 bg-gradient-to-r from-indigo-50 to-white dark:from-indigo-950 dark:to-indigo-900 z-10">
           <div className="flex items-center gap-3">
             <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold shadow-md">
               {customer.name.substring(0, 1)}
             </div>
             <div>
-              <DialogTitle className="text-xl bg-gradient-to-r from-indigo-800 to-indigo-600 bg-clip-text text-transparent dark:from-indigo-300 dark:to-indigo-500">{customer.name}</DialogTitle>
-              <div className="text-sm text-muted-foreground mt-1 flex items-center gap-2">
+              <DialogTitle 
+                id="customer-detail-title"
+                className="text-xl bg-gradient-to-r from-indigo-800 to-indigo-600 bg-clip-text text-transparent dark:from-indigo-300 dark:to-indigo-500"
+              >
+                {customer.name}
+              </DialogTitle>
+              <div 
+                id="customer-detail-description" 
+                className="text-sm text-muted-foreground mt-1 flex items-center gap-2"
+              >
                 <span className="bg-green-100 text-green-700 text-xs py-0.5 px-2 rounded-full flex items-center gap-1 dark:bg-green-900/30 dark:text-green-400">
                   <CheckCircle className="h-3 w-3" />
-                  <span>Active Customer</span>
+                  <span>{customer.status || 'Active'} Customer</span>
                 </span>
                 <span className="text-muted-foreground">•</span>
-                <span>Added on Apr 2, 2025</span>
+                <span>Added on {customer.createdAt ? new Date(customer.createdAt).toLocaleDateString() : 'N/A'}</span>
               </div>
             </div>
           </div>
@@ -82,7 +100,7 @@ const CustomerDetailDialog = ({ customer, open, onOpenChange }: CustomerDetailDi
         
         <Tabs defaultValue="general" value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="px-6 pt-4 border-b bg-gradient-to-r from-indigo-50/50 to-white dark:from-indigo-950/50 dark:to-indigo-900/50">
-            <TabsList className="grid grid-cols-6 bg-indigo-100/70 rounded-lg p-1 dark:bg-indigo-900/30">
+            <TabsList className="grid grid-cols-6 bg-indigo-100/70 rounded-lg p-1 dark:bg-indigo-900/30" aria-label="Customer information tabs">
               <TabsTrigger value="general" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-indigo-800 dark:text-indigo-200">
                 <Building className="h-4 w-4 mr-2" />
                 General
@@ -151,22 +169,46 @@ const CustomerDetailDialog = ({ customer, open, onOpenChange }: CustomerDetailDi
         </Tabs>
         
         <DialogFooter className="px-6 py-4 border-t bg-gradient-to-r from-indigo-50 to-white dark:from-indigo-950/50 dark:to-indigo-900/50">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button 
-            className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white shadow-md" 
-            disabled={isSaving} 
-            onClick={handleSave}
-          >
-            {isSaving ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Saving Changes...
-              </>
-            ) : 'Save Changes'}
-          </Button>
+          <div className="flex items-center gap-2 w-full justify-between">
+            <div>
+              {onEdit && (
+                <Button 
+                  variant="outline" 
+                  className="border-indigo-200 text-indigo-700" 
+                  onClick={handleEdit}
+                  aria-label="Edit customer details"
+                >
+                  Edit Customer
+                </Button>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                onClick={onClose}
+                aria-label="Cancel and close dialog"
+              >
+                Cancel
+              </Button>
+              <Button 
+                className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white shadow-md" 
+                disabled={isSaving} 
+                onClick={handleSave}
+                aria-label="Save customer changes"
+                aria-busy={isSaving}
+              >
+                {isSaving ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Saving Changes...
+                  </>
+                ) : 'Save Changes'}
+              </Button>
+            </div>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

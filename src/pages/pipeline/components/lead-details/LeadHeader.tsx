@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -111,11 +110,11 @@ export default function LeadHeader({ lead, onSetReminder, onStartOnboarding }: L
             <div className="flex items-center gap-2">
               <div className="text-sm">Estimated value</div>
               <div className="font-bold text-lg">
-                ${lead.value.toLocaleString()}
+                £{lead.value.toLocaleString()}
               </div>
             </div>
             <div className="text-sm text-muted-foreground">
-              {lead.probability}% probability • ${(lead.value * lead.probability / 100).toLocaleString()} weighted
+              {lead.probability}% probability • £{(lead.value * lead.probability / 100).toLocaleString()} weighted
             </div>
           </div>
         </div>

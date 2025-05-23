@@ -1,8 +1,8 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
-import { InvoiceData } from "./create-invoice-dialog/CreateInvoiceDialog";
+import { InvoiceData } from "./create-invoice-dialog/types";
+import { formatCurrency } from "@/lib/utils";
 
 interface InvoiceAnalyticsProps {
   invoices: InvoiceData[];
@@ -80,7 +80,7 @@ export function InvoiceAnalytics({ invoices }: InvoiceAnalyticsProps) {
               {bestMonth?.name || "-"}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              ${bestMonth?.total.toLocaleString() || 0} total revenue
+              {formatCurrency(bestMonth?.total || 0)} total revenue
             </p>
           </CardContent>
         </Card>
@@ -91,7 +91,7 @@ export function InvoiceAnalytics({ invoices }: InvoiceAnalyticsProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${avgAmount.toLocaleString(undefined, {maximumFractionDigits: 2})}
+              {formatCurrency(avgAmount)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               Based on {invoices.length} invoices
@@ -126,7 +126,7 @@ export function InvoiceAnalytics({ invoices }: InvoiceAnalyticsProps) {
               <BarChart data={monthlyData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip formatter={(value) => [`$${value}`, 'Amount']} />
+                <Tooltip formatter={(value: number) => [formatCurrency(value), 'Amount']} />
                 <Bar dataKey="total" fill="#818cf8" name="Total" />
                 <Bar dataKey="paid" fill="#4ade80" name="Paid" />
               </BarChart>

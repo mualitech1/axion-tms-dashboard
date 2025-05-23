@@ -1,33 +1,58 @@
-
 import { Form } from "@/components/ui/form";
 import { motion, AnimatePresence } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { BasicInfoStep } from "./step-forms/BasicInfoStep";
-import { AddressesStep } from "./step-forms/AddressesStep";
-import { SummaryStep } from "./step-forms/SummaryStep";
 import { NavigationButtons } from "./NavigationButtons";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { UseFormReturn } from "react-hook-form";
 import { AdditionalStop, JobCreationFormData } from "@/pages/jobs/types/formTypes";
 import * as React from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Sparkles, BookOpen, FolderSync, Loader2 } from "lucide-react";
+import { JobTemplate } from "./hooks/useJobCreationForm";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Progress } from "@/components/ui/progress";
+import { Card } from "@/components/ui/card";
+import { StepIndicator } from "./StepIndicator";
+import { StepOne } from "./step-forms/StepOne";
+import { StepTwo } from "./step-forms/StepTwo";
+import { StepThree } from "./step-forms/StepThree";
+import { z } from "zod";
+
+interface Template {
+  id: string;
+  name: string;
+  createdAt: string;
+}
 
 interface FormContentProps {
-  form: UseFormReturn<JobCreationFormData>;
-  currentStep: number;
-  totalSteps: number;
+  form: UseFormReturn<JobCreationFormData, z.ZodType<JobCreationFormData>, undefined>;
   date: Date | undefined;
   setDate: (date: Date | undefined) => void;
+  currentStep: number;
+  totalSteps: number;
+  formProgress: number;
   onDocumentsChange: (files: File[]) => void;
   additionalStops: AdditionalStop[];
   addStop: () => void;
   removeStop: (index: number) => void;
-  updateAdditionalStop: (index: number, field: keyof AdditionalStop, value: string) => void;
+  updateAdditionalStop: (index: number, data: AdditionalStop) => void;
   nextStep: () => void;
   prevStep: () => void;
-  onCancel: () => void;
-  onSubmit: (data: JobCreationFormData) => void;
+  handleCancel: () => void;
+  handleSubmit: () => void;
+  handleTemplateSave: () => void;
+  templates: Template[];
+  handleTemplateLoad: (id: string) => void;
+  handleTemplateDelete: (id: string) => void;
+  isLoading: boolean;
+  loadingMsg: string;
 }
 
 const variants = {
@@ -47,10 +72,11 @@ const variants = {
 
 export function FormContent({
   form,
-  currentStep,
-  totalSteps,
   date,
   setDate,
+  currentStep,
+  totalSteps,
+  formProgress,
   onDocumentsChange,
   additionalStops,
   addStop,
@@ -58,8 +84,14 @@ export function FormContent({
   updateAdditionalStop,
   nextStep,
   prevStep,
-  onCancel,
-  onSubmit
+  handleCancel,
+  handleSubmit,
+  handleTemplateSave,
+  templates,
+  handleTemplateLoad,
+  handleTemplateDelete,
+  isLoading,
+  loadingMsg
 }: FormContentProps) {
   const isMobile = useIsMobile();
   const [direction, setDirection] = React.useState(0);
@@ -103,92 +135,83 @@ export function FormContent({
     prevStep();
   };
 
-  const renderCurrentStep = () => {
+  // Render steps based on current step
+  const renderStep = () => {
     switch (currentStep) {
       case 1:
         return (
-          <BasicInfoStep 
-            form={form} 
-            date={date} 
+          <StepOne
+            form={form}
+            date={date}
             setDate={setDate}
-            onDocumentsChange={onDocumentsChange} 
+            templates={templates}
+            onLoadTemplate={handleTemplateLoad}
+            onDeleteTemplate={handleTemplateDelete}
+            onSaveTemplate={handleTemplateSave}
           />
         );
       case 2:
         return (
-          <AddressesStep 
-            form={form} 
-            additionalStops={additionalStops} 
-            addStop={addStop}
-            removeStop={removeStop}
-            updateAdditionalStop={updateAdditionalStop}
+          <StepTwo
+            form={form}
+            additionalStops={additionalStops}
+            onAddStop={addStop}
+            onRemoveStop={removeStop}
+            onUpdateStop={updateAdditionalStop}
           />
         );
       case 3:
-        return <SummaryStep form={form} date={date} />;
+        return <StepThree form={form} onDocumentsChange={onDocumentsChange} />;
       default:
         return null;
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[500px] text-center p-6">
+        <div className="w-20 h-20 mb-6">
+          <Loader2 className="h-20 w-20 animate-spin text-[#0adeee]" />
+        </div>
+        <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#0adeee] to-[#0a9bdb] bg-clip-text text-transparent">
+          Processing Your Request
+        </h2>
+        <p className="text-[#6b82a6] max-w-md">
+          {loadingMsg || "Initializing quantum transport matrices..."}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <Form {...form}>
-      <form 
-        onSubmit={form.handleSubmit(onSubmit)} 
-        className="space-y-4 px-4 sm:px-6 py-6"
-      >
-        <div className="flex flex-col">
+      <form>
+        <Card className="p-6 bg-transparent border-0 shadow-none">
+          <StepIndicator
+            currentStep={currentStep}
+            totalSteps={totalSteps}
+            formProgress={formProgress}
+          />
+          
           {formError && (
-            <Alert variant="destructive" className="mb-4 bg-red-900/20 border-red-800 text-red-300">
+            <Alert className="mb-4 bg-red-950/30 border-red-800 text-red-300">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{formError}</AlertDescription>
             </Alert>
           )}
           
-          <div className="bg-[#05101b] rounded-lg shadow-lg border border-[#1a3246] mb-4">
-            <div className="p-4 sm:p-6">
-              <AnimatePresence custom={direction} mode="wait">
-                <motion.div
-                  key={currentStep}
-                  custom={direction}
-                  variants={variants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                >
-                  <div className="relative">
-                    <motion.div
-                      initial={{ opacity: 0.3 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.1, duration: 0.4 }}
-                      className="max-h-[calc(100vh-320px)] overflow-y-auto pr-2 custom-scrollbar"
-                    >
-                      {renderCurrentStep()}
-                    </motion.div>
-                    
-                    {/* Step indicator */}
-                    <div className="absolute right-0 top-0">
-                      <div className="bg-[#0a9bdb]/10 text-[#0adeee] text-xs font-mono px-2.5 py-1 rounded-md border border-[#1a3246]">
-                        Step {currentStep} of {totalSteps}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </div>
-          
-          {/* Navigation buttons - now positioned correctly */}
-          <NavigationButtons 
+          {renderStep()}
+
+          <NavigationButtons
             currentStep={currentStep}
             totalSteps={totalSteps}
-            isSubmitting={form.formState.isSubmitting}
-            prevStep={handlePrev}
-            nextStep={handleNext}
-            onCancel={onCancel}
+            onPrevious={handlePrev}
+            onNext={handleNext}
+            onCancel={handleCancel}
+            onSubmit={handleSubmit}
+            submitEnabled={formProgress >= 70}
           />
-        </div>
+        </Card>
       </form>
     </Form>
   );

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Dialog, 
@@ -12,7 +11,7 @@ import { toast } from "@/hooks/use-toast";
 import { UploadCloud, X, FileText, Check, Loader2 } from "lucide-react";
 
 interface PodUploadDialogProps {
-  jobId: number;
+  jobId: string | number;
   open: boolean;
   onClose: () => void;
   onUploadComplete: () => void;
@@ -118,12 +117,14 @@ export function PodUploadDialog({
               or
             </p>
             <div className="mt-2">
+              <label htmlFor="pod-upload" className="sr-only">Upload Proof of Delivery document</label>
               <input
                 id="pod-upload"
                 type="file"
                 className="hidden"
                 accept=".pdf,.jpg,.jpeg,.png"
                 onChange={handleFileInput}
+                aria-label="Upload Proof of Delivery document"
               />
               <Button 
                 type="button" 
