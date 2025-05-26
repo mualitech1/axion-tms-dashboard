@@ -7,9 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
-    "lint": "eslint .",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test-core": "node scripts/test-core-features.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
