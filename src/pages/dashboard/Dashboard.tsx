@@ -9,7 +9,7 @@ import DashboardCard from '@/components/dashboard/DashboardCard';
 import { EnhancedChart } from '@/components/dashboard/EnhancedChart';
 import ActivityFeed from '@/components/dashboard/ActivityFeed';
 import { PieChart, BarChart, LineChart, Activity, TrendingUp, Truck, Boxes, Calendar, DollarSign, Package } from 'lucide-react';
-import { KamalWelcome } from '@/components/ui/welcome';
+import { DynamicWelcome } from '@/components/ui/dynamic-welcome';
 import HazimQuantumOptimizer from '@/components/dashboard/HazimQuantumOptimizer';
 import { useResponsive } from '@/hooks/use-responsive';
 import { DocumentExpiryAlerts } from '@/components/dashboard/DocumentExpiryAlerts';
@@ -132,7 +132,7 @@ export function Dashboard() {
       <HazimQuantumOptimizer />
       
       {/* Kamal Welcome Component */}
-      <KamalWelcome />
+      <DynamicWelcome />
       
       {/* Dashboard Header */}
       <DashboardHeader 

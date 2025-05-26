@@ -16,110 +16,114 @@ import {
   Clock, DollarSign, AlertTriangle, CheckCircle
 } from 'lucide-react';
 
-type Company = Tables<'companies'>;
+type Customer = Tables<'customers'>;
 
 interface JobFormData {
-  title: string;
-  description: string;
+  consignment_details: string;
   customer_id: string;
-  pickup_location: {
-    address: string;
+  collection_address: {
+    company_name: string;
+    contact_name: string;
+    street: string;
     city: string;
     postcode: string;
     country: string;
+    special_instructions?: string;
+    ref_number_if_any?: string;
   };
-  delivery_location: {
-    address: string;
+  delivery_address: {
+    company_name: string;
+    contact_name: string;
+    street: string;
     city: string;
     postcode: string;
     country: string;
+    special_instructions?: string;
+    ref_number_if_any?: string;
   };
-  pickup_date: string;
-  pickup_time: string;
-  delivery_date: string;
-  delivery_time: string;
-  pickup_instructions: string;
-  delivery_instructions: string;
+  collection_datetime_planned_from: string;
+  collection_datetime_planned_to: string;
+  delivery_datetime_planned_from: string;
+  delivery_datetime_planned_to: string;
+  driver_instructions: string;
   service_type: string;
-  vehicle_requirements: string;
-  priority: string;
-  rate: string;
-  weight: string;
-  dimensions: string;
-  special_requirements: string;
+  vehicle_trailer_requirements: string;
+  agreed_rate_gbp: string;
+  weight_kg: string;
+  pallets: string;
+  goods_description: string;
+  currency?: string;
 }
 
 export default function CreateJobPage() {
   const navigate = useNavigate();
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<JobFormData>({
-    title: '',
-    description: '',
+    consignment_details: '',
     customer_id: '',
-    pickup_location: {
-      address: '',
+    collection_address: {
+      company_name: '',
+      contact_name: '',
+      street: '',
       city: '',
       postcode: '',
       country: 'United Kingdom'
     },
-    delivery_location: {
-      address: '',
+    delivery_address: {
+      company_name: '',
+      contact_name: '',
+      street: '',
       city: '',
       postcode: '',
       country: 'United Kingdom'
     },
-    pickup_date: '',
-    pickup_time: '',
-    delivery_date: '',
-    delivery_time: '',
-    pickup_instructions: '',
-    delivery_instructions: '',
+    collection_datetime_planned_from: '',
+    collection_datetime_planned_to: '',
+    delivery_datetime_planned_from: '',
+    delivery_datetime_planned_to: '',
+    driver_instructions: '',
     service_type: 'standard',
-    vehicle_requirements: 'standard',
-    priority: 'medium',
-    rate: '',
-    weight: '',
-    dimensions: '',
-    special_requirements: ''
+    vehicle_trailer_requirements: 'standard',
+    agreed_rate_gbp: '',
+    weight_kg: '',
+    pallets: '',
+    goods_description: '',
+    currency: 'GBP'
   });
 
   useEffect(() => {
-    loadCompanies();
+    loadCustomers();
   }, []);
 
-  const loadCompanies = async () => {
+  const loadCustomers = async () => {
     try {
-      setLoading(true);
       const { data, error } = await supabase
-        .from('companies')
+        .from('customers')
         .select('*')
-        .eq('type', 'customer')
-        .order('name');
+        .order('company_name');
 
       if (error) throw error;
-      setCompanies(data || []);
+      setCustomers(data || []);
     } catch (error) {
-      console.error('Error loading companies:', error);
+      console.error('Error loading customers:', error);
       toast({
         title: "Error",
-        description: "Failed to load customer list",
+        description: "Failed to load customers",
         variant: "destructive"
       });
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
-  const handleLocationChange = (locationType: 'pickup_location' | 'delivery_location', field: string, value: string) => {
+  const handleLocationChange = (locationType: 'collection_address' | 'delivery_address', field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [locationType]: {
@@ -140,11 +144,11 @@ export default function CreateJobPage() {
 
   const validateForm = () => {
     const required = [
-      'title',
+      'consignment_details',
       'customer_id',
-      'pickup_date',
+      'collection_datetime_planned_from',
       'service_type',
-      'priority'
+      'agreed_rate_gbp'
     ];
 
     for (const field of required) {
@@ -158,16 +162,16 @@ export default function CreateJobPage() {
       }
     }
 
-    if (!formData.pickup_location.address || !formData.pickup_location.city) {
+    if (!formData.collection_address.street || !formData.collection_address.city) {
       toast({
         title: "Validation Error",
-        description: "Pickup address and city are required",
+        description: "Collection address and city are required",
         variant: "destructive"
       });
       return false;
     }
 
-    if (!formData.delivery_location.address || !formData.delivery_location.city) {
+    if (!formData.delivery_address.street || !formData.delivery_address.city) {
       toast({
         title: "Validation Error",
         description: "Delivery address and city are required",
@@ -187,28 +191,69 @@ export default function CreateJobPage() {
     try {
       setSaving(true);
       
+      console.log('🚀 FORM SUBMISSION STARTED');
+      console.log('📋 Raw Form Data:', formData);
+      console.log('🎯 Customer ID being sent:', formData.customer_id);
+      console.log('🔍 Customer ID type:', typeof formData.customer_id);
+      
+      // Transform form data to match our jobs table schema
       const jobData = {
-        reference: generateJobReference(),
-        title: formData.title,
-        description: formData.description,
+        consignment_details: formData.consignment_details,
+        ikb_order_no: generateJobReference(),
         customer_id: formData.customer_id,
-        pickup_location: formData.pickup_location,
-        delivery_location: formData.delivery_location,
-        pickup_date: formData.pickup_date,
-        pickup_time: formData.pickup_time,
-        delivery_date: formData.delivery_date || null,
-        delivery_time: formData.delivery_time || null,
-        pickup_instructions: formData.pickup_instructions || null,
-        delivery_instructions: formData.delivery_instructions || null,
-        service_type: formData.service_type,
-        vehicle_requirements: formData.vehicle_requirements,
-        priority: formData.priority,
-        rate: formData.rate ? parseFloat(formData.rate) : null,
-        weight: formData.weight || null,
-        dimensions: formData.dimensions || null,
-        special_requirements: formData.special_requirements || null,
-        status: 'pending'
+        status: 'pending',
+        
+        // Collection datetime
+        collection_datetime_planned_from: formData.collection_datetime_planned_from ? new Date(formData.collection_datetime_planned_from).toISOString() : new Date().toISOString(),
+        collection_datetime_planned_to: formData.collection_datetime_planned_to ? new Date(formData.collection_datetime_planned_to).toISOString() : null,
+        
+        // Delivery datetime
+        delivery_datetime_planned_from: formData.delivery_datetime_planned_from ? new Date(formData.delivery_datetime_planned_from).toISOString() : null,
+        delivery_datetime_planned_to: formData.delivery_datetime_planned_to ? new Date(formData.delivery_datetime_planned_to).toISOString() : null,
+        
+        // Collection address as JSONB
+        collection_address: {
+          company_name: formData.collection_address.company_name || '',
+          contact_name: formData.collection_address.contact_name || '',
+          street: formData.collection_address.street,
+          city: formData.collection_address.city,
+          postcode: formData.collection_address.postcode,
+          country: formData.collection_address.country || 'United Kingdom',
+          special_instructions: formData.collection_address.special_instructions || '',
+          ref_number_if_any: formData.collection_address.ref_number_if_any || ''
+        },
+        
+        // Delivery address as JSONB
+        delivery_address: {
+          company_name: formData.delivery_address.company_name || '',
+          contact_name: formData.delivery_address.contact_name || '',
+          street: formData.delivery_address.street,
+          city: formData.delivery_address.city,
+          postcode: formData.delivery_address.postcode,
+          country: formData.delivery_address.country || 'United Kingdom',
+          special_instructions: formData.delivery_address.special_instructions || '',
+          ref_number_if_any: formData.delivery_address.ref_number_if_any || ''
+        },
+        
+        // Service details
+        agreed_rate_gbp: formData.agreed_rate_gbp ? parseFloat(formData.agreed_rate_gbp) : null,
+        currency: formData.currency || 'GBP',
+        vehicle_trailer_requirements: formData.vehicle_trailer_requirements,
+        goods_description: formData.goods_description || null,
+        weight_kg: formData.weight_kg ? parseFloat(formData.weight_kg) : null,
+        pallets: formData.pallets ? parseInt(formData.pallets) : null,
+        driver_instructions: formData.driver_instructions || null,
+        
+        // Additional fields
+        additional_stops: [],
+        pod_document_urls: [],
+        cmr_document_urls: [],
+        run_sheet_urls: [],
+        internal_notes: [],
+        created_by: null // Will be set by RLS/auth
       };
+
+      console.log('🔧 Transformed job data for Supabase:', jobData);
 
       const { data, error } = await supabase
         .from('jobs')
@@ -216,19 +261,24 @@ export default function CreateJobPage() {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('🚨 SUPABASE ERROR:', error);
+        throw error;
+      }
+
+      console.log('✅ SUCCESS! Job created:', data);
 
       toast({
-        title: "Success",
-        description: `Job ${data.reference} created successfully`,
+        title: "Success! 🔥",
+        description: `Job ${jobData.ikb_order_no} created successfully! BOOM! 🚀`,
       });
 
-      navigate(`/jobs/details/${data.id}`);
+      navigate(`/jobs`);
     } catch (error) {
-      console.error('Error creating job:', error);
+      console.error('❌ Error creating job:', error);
       toast({
         title: "Error",
-        description: "Failed to create job",
+        description: `Failed to create job: ${error.message}`,
         variant: "destructive"
       });
     } finally {
@@ -280,11 +330,11 @@ export default function CreateJobPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="title">Job Title *</Label>
+                    <Label htmlFor="consignment_details">Consignment Details *</Label>
                     <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) => handleInputChange('title', e.target.value)}
+                      id="consignment_details"
+                      value={formData.consignment_details}
+                      onChange={(e) => handleInputChange('consignment_details', e.target.value)}
                       placeholder="e.g., Manchester to London Delivery"
                       required
                     />
@@ -296,9 +346,9 @@ export default function CreateJobPage() {
                         <SelectValue placeholder="Select customer" />
                       </SelectTrigger>
                       <SelectContent>
-                        {companies.map(company => (
-                          <SelectItem key={company.id} value={company.id}>
-                            {company.name}
+                        {customers.map(customer => (
+                          <SelectItem key={customer.id} value={customer.id}>
+                            {customer.company_name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -307,12 +357,12 @@ export default function CreateJobPage() {
                 </div>
                 
                 <div>
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="goods_description">Goods Description</Label>
                   <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Detailed description of the job requirements..."
+                    id="goods_description"
+                    value={formData.goods_description}
+                    onChange={(e) => handleInputChange('goods_description', e.target.value)}
+                    placeholder="Detailed description of the goods..."
                     rows={3}
                   />
                 </div>
@@ -336,21 +386,21 @@ export default function CreateJobPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="pickup-address">Address *</Label>
+                    <Label htmlFor="collection-address">Address *</Label>
                     <Input
-                      id="pickup-address"
-                      value={formData.pickup_location.address}
-                      onChange={(e) => handleLocationChange('pickup_location', 'address', e.target.value)}
+                      id="collection-address"
+                      value={formData.collection_address.street}
+                      onChange={(e) => handleLocationChange('collection_address', 'street', e.target.value)}
                       placeholder="Street address"
                       required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="pickup-city">City *</Label>
+                    <Label htmlFor="collection-city">City *</Label>
                     <Input
-                      id="pickup-city"
-                      value={formData.pickup_location.city}
-                      onChange={(e) => handleLocationChange('pickup_location', 'city', e.target.value)}
+                      id="collection-city"
+                      value={formData.collection_address.city}
+                      onChange={(e) => handleLocationChange('collection_address', 'city', e.target.value)}
                       placeholder="City"
                       required
                     />
@@ -359,20 +409,20 @@ export default function CreateJobPage() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="pickup-postcode">Postcode</Label>
+                    <Label htmlFor="collection-postcode">Postcode</Label>
                     <Input
-                      id="pickup-postcode"
-                      value={formData.pickup_location.postcode}
-                      onChange={(e) => handleLocationChange('pickup_location', 'postcode', e.target.value)}
+                      id="collection-postcode"
+                      value={formData.collection_address.postcode}
+                      onChange={(e) => handleLocationChange('collection_address', 'postcode', e.target.value)}
                       placeholder="Postcode"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="pickup-country">Country</Label>
+                    <Label htmlFor="collection-country">Country</Label>
                     <Input
-                      id="pickup-country"
-                      value={formData.pickup_location.country}
-                      onChange={(e) => handleLocationChange('pickup_location', 'country', e.target.value)}
+                      id="collection-country"
+                      value={formData.collection_address.country}
+                      onChange={(e) => handleLocationChange('collection_address', 'country', e.target.value)}
                       placeholder="Country"
                     />
                   </div>
@@ -380,33 +430,57 @@ export default function CreateJobPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="pickup-date">Pickup Date *</Label>
+                    <Label htmlFor="collection-datetime-planned-from">Pickup Date *</Label>
                     <Input
-                      id="pickup-date"
-                      type="date"
-                      value={formData.pickup_date}
-                      onChange={(e) => handleInputChange('pickup_date', e.target.value)}
+                      id="collection-datetime-planned-from"
+                      type="datetime-local"
+                      value={formData.collection_datetime_planned_from}
+                      onChange={(e) => handleInputChange('collection_datetime_planned_from', e.target.value)}
                       required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="pickup-time">Pickup Time</Label>
+                    <Label htmlFor="collection-datetime-planned-to">Pickup Time</Label>
                     <Input
-                      id="pickup-time"
-                      type="time"
-                      value={formData.pickup_time}
-                      onChange={(e) => handleInputChange('pickup_time', e.target.value)}
+                      id="collection-datetime-planned-to"
+                      type="datetime-local"
+                      value={formData.collection_datetime_planned_to}
+                      onChange={(e) => handleInputChange('collection_datetime_planned_to', e.target.value)}
                     />
                   </div>
                 </div>
 
+                {/* Collection Contact Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 p-4 bg-slate-800/50 rounded-lg">
+                  <h4 className="col-span-full text-sm font-medium text-blue-400 mb-2">Collection Contact</h4>
+                  <div>
+                    <Label htmlFor="collection_company">Company Name</Label>
+                    <Input
+                      id="collection_company"
+                      placeholder="Collection company name"
+                      value={formData.collection_address.company_name || ''}
+                      onChange={(e) => handleLocationChange('collection_address', 'company_name', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="collection_contact">Contact Person</Label>
+                    <Input
+                      id="collection_contact"
+                      placeholder="Contact person name"
+                      value={formData.collection_address.contact_name || ''}
+                      onChange={(e) => handleLocationChange('collection_address', 'contact_name', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Special Collection Instructions */}
                 <div>
-                  <Label htmlFor="pickup-instructions">Pickup Instructions</Label>
+                  <Label htmlFor="collection_instructions">Special Collection Instructions</Label>
                   <Textarea
-                    id="pickup-instructions"
-                    value={formData.pickup_instructions}
-                    onChange={(e) => handleInputChange('pickup_instructions', e.target.value)}
-                    placeholder="Special instructions for pickup..."
+                    id="collection_instructions"
+                    placeholder="Special instructions for collection (loading requirements, access codes, etc.)"
+                    value={formData.collection_address.special_instructions || ''}
+                    onChange={(e) => handleLocationChange('collection_address', 'special_instructions', e.target.value)}
                     rows={2}
                   />
                 </div>
@@ -433,8 +507,8 @@ export default function CreateJobPage() {
                     <Label htmlFor="delivery-address">Address *</Label>
                     <Input
                       id="delivery-address"
-                      value={formData.delivery_location.address}
-                      onChange={(e) => handleLocationChange('delivery_location', 'address', e.target.value)}
+                      value={formData.delivery_address.street}
+                      onChange={(e) => handleLocationChange('delivery_address', 'street', e.target.value)}
                       placeholder="Street address"
                       required
                     />
@@ -443,8 +517,8 @@ export default function CreateJobPage() {
                     <Label htmlFor="delivery-city">City *</Label>
                     <Input
                       id="delivery-city"
-                      value={formData.delivery_location.city}
-                      onChange={(e) => handleLocationChange('delivery_location', 'city', e.target.value)}
+                      value={formData.delivery_address.city}
+                      onChange={(e) => handleLocationChange('delivery_address', 'city', e.target.value)}
                       placeholder="City"
                       required
                     />
@@ -456,8 +530,8 @@ export default function CreateJobPage() {
                     <Label htmlFor="delivery-postcode">Postcode</Label>
                     <Input
                       id="delivery-postcode"
-                      value={formData.delivery_location.postcode}
-                      onChange={(e) => handleLocationChange('delivery_location', 'postcode', e.target.value)}
+                      value={formData.delivery_address.postcode}
+                      onChange={(e) => handleLocationChange('delivery_address', 'postcode', e.target.value)}
                       placeholder="Postcode"
                     />
                   </div>
@@ -465,8 +539,8 @@ export default function CreateJobPage() {
                     <Label htmlFor="delivery-country">Country</Label>
                     <Input
                       id="delivery-country"
-                      value={formData.delivery_location.country}
-                      onChange={(e) => handleLocationChange('delivery_location', 'country', e.target.value)}
+                      value={formData.delivery_address.country}
+                      onChange={(e) => handleLocationChange('delivery_address', 'country', e.target.value)}
                       placeholder="Country"
                     />
                   </div>
@@ -474,32 +548,56 @@ export default function CreateJobPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="delivery-date">Delivery Date</Label>
+                    <Label htmlFor="delivery-datetime-planned-from">Delivery Date</Label>
                     <Input
-                      id="delivery-date"
-                      type="date"
-                      value={formData.delivery_date}
-                      onChange={(e) => handleInputChange('delivery_date', e.target.value)}
+                      id="delivery-datetime-planned-from"
+                      type="datetime-local"
+                      value={formData.delivery_datetime_planned_from}
+                      onChange={(e) => handleInputChange('delivery_datetime_planned_from', e.target.value)}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="delivery-time">Delivery Time</Label>
+                    <Label htmlFor="delivery-datetime-planned-to">Delivery Time</Label>
                     <Input
-                      id="delivery-time"
-                      type="time"
-                      value={formData.delivery_time}
-                      onChange={(e) => handleInputChange('delivery_time', e.target.value)}
+                      id="delivery-datetime-planned-to"
+                      type="datetime-local"
+                      value={formData.delivery_datetime_planned_to}
+                      onChange={(e) => handleInputChange('delivery_datetime_planned_to', e.target.value)}
                     />
                   </div>
                 </div>
 
+                {/* Delivery Contact Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 p-4 bg-slate-800/50 rounded-lg">
+                  <h4 className="col-span-full text-sm font-medium text-orange-400 mb-2">Delivery Contact</h4>
+                  <div>
+                    <Label htmlFor="delivery_company">Company Name</Label>
+                    <Input
+                      id="delivery_company"
+                      placeholder="Delivery company name"
+                      value={formData.delivery_address.company_name || ''}
+                      onChange={(e) => handleLocationChange('delivery_address', 'company_name', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="delivery_contact">Contact Person</Label>
+                    <Input
+                      id="delivery_contact"
+                      placeholder="Contact person name"
+                      value={formData.delivery_address.contact_name || ''}
+                      onChange={(e) => handleLocationChange('delivery_address', 'contact_name', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Special Delivery Instructions */}
                 <div>
-                  <Label htmlFor="delivery-instructions">Delivery Instructions</Label>
+                  <Label htmlFor="delivery_instructions">Special Delivery Instructions</Label>
                   <Textarea
-                    id="delivery-instructions"
-                    value={formData.delivery_instructions}
-                    onChange={(e) => handleInputChange('delivery_instructions', e.target.value)}
-                    placeholder="Special instructions for delivery..."
+                    id="delivery_instructions"
+                    placeholder="Special instructions for delivery (unloading requirements, access codes, etc.)"
+                    value={formData.driver_instructions || ''}
+                    onChange={(e) => handleInputChange('driver_instructions', e.target.value)}
                     rows={2}
                   />
                 </div>
@@ -529,89 +627,85 @@ export default function CreateJobPage() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="standard">Standard Delivery</SelectItem>
-                        <SelectItem value="express">Express Delivery</SelectItem>
-                        <SelectItem value="overnight">Overnight Delivery</SelectItem>
-                        <SelectItem value="same_day">Same Day Delivery</SelectItem>
-                        <SelectItem value="scheduled">Scheduled Delivery</SelectItem>
+                        <SelectItem value="road_freight">Road Freight</SelectItem>
+                        <SelectItem value="express_delivery">Express Delivery</SelectItem>
+                        <SelectItem value="international">International</SelectItem>
+                        <SelectItem value="groupage">Groupage</SelectItem>
+                        <SelectItem value="dedicated">Dedicated Vehicle</SelectItem>
+                        <SelectItem value="temperature_controlled">Temperature Controlled</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   
                   <div>
-                    <Label htmlFor="vehicle-requirements">Vehicle Type</Label>
-                    <Select value={formData.vehicle_requirements} onValueChange={(value) => handleInputChange('vehicle_requirements', value)}>
+                    <Label htmlFor="vehicle-trailer-requirements">Vehicle Type</Label>
+                    <Select value={formData.vehicle_trailer_requirements} onValueChange={(value) => handleInputChange('vehicle_trailer_requirements', value)}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="standard">Standard Vehicle</SelectItem>
-                        <SelectItem value="van">Van</SelectItem>
-                        <SelectItem value="truck">Truck</SelectItem>
-                        <SelectItem value="hgv">HGV</SelectItem>
-                        <SelectItem value="refrigerated">Refrigerated</SelectItem>
+                        <SelectItem value="curtain_sider">Curtain Sider</SelectItem>
+                        <SelectItem value="box_van">Box Van</SelectItem>
                         <SelectItem value="flatbed">Flatbed</SelectItem>
+                        <SelectItem value="refrigerated">Refrigerated</SelectItem>
+                        <SelectItem value="tanker">Tanker</SelectItem>
+                        <SelectItem value="container">Container</SelectItem>
+                        <SelectItem value="lowloader">Low Loader</SelectItem>
+                        <SelectItem value="car_transporter">Car Transporter</SelectItem>
+                        <SelectItem value="tail_lift">Tail Lift Required</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   
                   <div>
-                    <Label htmlFor="priority">Priority *</Label>
-                    <Select value={formData.priority} onValueChange={(value) => handleInputChange('priority', value)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="urgent">Urgent</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="agreed_rate_gbp">Rate (£)</Label>
+                    <Input
+                      id="agreed_rate_gbp"
+                      type="number"
+                      step="0.01"
+                      value={formData.agreed_rate_gbp}
+                      onChange={(e) => handleInputChange('agreed_rate_gbp', e.target.value)}
+                      placeholder="0.00"
+                    />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="rate">Rate (£)</Label>
+                    <Label htmlFor="weight_kg">Weight (kg)</Label>
                     <Input
-                      id="rate"
-                      type="number"
-                      step="0.01"
-                      value={formData.rate}
-                      onChange={(e) => handleInputChange('rate', e.target.value)}
-                      placeholder="0.00"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="weight">Weight (kg)</Label>
-                    <Input
-                      id="weight"
-                      value={formData.weight}
-                      onChange={(e) => handleInputChange('weight', e.target.value)}
+                      id="weight_kg"
+                      value={formData.weight_kg}
+                      onChange={(e) => handleInputChange('weight_kg', e.target.value)}
                       placeholder="e.g., 100kg"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="dimensions">Dimensions</Label>
+                    <Label htmlFor="pallets">Number of Pallets</Label>
                     <Input
-                      id="dimensions"
-                      value={formData.dimensions}
-                      onChange={(e) => handleInputChange('dimensions', e.target.value)}
-                      placeholder="e.g., 2m x 1m x 1m"
+                      id="pallets"
+                      type="number"
+                      placeholder="e.g., 10"
+                      value={formData.pallets || ''}
+                      onChange={(e) => handleInputChange('pallets', e.target.value)}
                     />
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="special-requirements">Special Requirements</Label>
-                  <Textarea
-                    id="special-requirements"
-                    value={formData.special_requirements}
-                    onChange={(e) => handleInputChange('special_requirements', e.target.value)}
-                    placeholder="Any special handling requirements, equipment needed, etc..."
-                    rows={3}
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="currency">Currency</Label>
+                    <Select value={formData.currency || 'GBP'} onValueChange={(value) => handleInputChange('currency', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select currency" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="GBP">GBP (£)</SelectItem>
+                        <SelectItem value="EUR">EUR (€)</SelectItem>
+                        <SelectItem value="USD">USD ($)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -655,3 +749,4 @@ export default function CreateJobPage() {
     </div>
   );
 }
+

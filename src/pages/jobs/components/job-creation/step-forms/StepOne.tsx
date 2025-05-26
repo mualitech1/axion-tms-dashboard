@@ -17,7 +17,7 @@ import {
 import { UseFormReturn } from "react-hook-form";
 import { JobCreationFormData } from "@/pages/jobs/types/formTypes";
 import { z } from "zod";
-import { useCompanies } from '@/hooks/use-companies';
+import { useCustomers } from '@/hooks/use-customer';
 
 interface Template {
   id: string;
@@ -44,7 +44,7 @@ export function StepOne({
   onDeleteTemplate,
   onSaveTemplate
 }: StepOneProps) {
-  const { customers, isLoading } = useCompanies();
+  const { customers, isLoading } = useCustomers();
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -138,7 +138,7 @@ export function StepOne({
                       <SelectItem value="__none__" disabled>No customers found</SelectItem>
                     ) : (
                       customers.map((customer) => (
-                        <SelectItem key={customer.id} value={customer.id}>{customer.name}</SelectItem>
+                        <SelectItem key={customer.id} value={customer.id}>{customer.company_name}</SelectItem>
                       ))
                     )}
                   </SelectContent>

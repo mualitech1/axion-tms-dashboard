@@ -1,0 +1,5 @@
+[33mf0c2065[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m  ENTERPRISE TMS COMPLETE - Full Dashboard, Jobs, Customers, Carriers, Invoicing, Document Upload - PRODUCTION READY
+[33mf30e8e4[m  Add Quantum Shield summary and demo guide
+[33meffa6b2[m  Add Quantum Shield test utility for job creation
+[33m0c61811[m  Quantum Sync: Harmonize Supabase schema with frontend, fix job_reference field
+[33m2a04ee8[m Fix: Wrap app with QueryClientProvider

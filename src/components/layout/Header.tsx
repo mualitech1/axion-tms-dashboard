@@ -29,7 +29,7 @@ interface HeaderProps {
 }
 
 export default function Header({ title }: HeaderProps) {
-  const { signOut, user } = useAuth();
+  const { signOut, user, profile } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [notifications] = useState(3); // Sample notification count
@@ -52,14 +52,45 @@ export default function Header({ title }: HeaderProps) {
     setPageTitle(getSectionTitle(location.pathname));
   }, [location.pathname, title]);
   
+  // Get user display name
+  const getUserDisplayName = () => {
+    if (profile?.first_name && profile?.last_name) {
+      return `${profile.first_name} ${profile.last_name}`;
+    }
+    if (profile?.first_name) {
+      return profile.first_name;
+    }
+    if (user?.email) {
+      // Extract name from email if no profile name
+      const emailName = user.email.split('@')[0];
+      return emailName.split('.').map(part => 
+        part.charAt(0).toUpperCase() + part.slice(1)
+      ).join(' ');
+    }
+    return 'User';
+  };
+
   // Get user initials for avatar
   const getUserInitials = () => {
-    if (!user?.email) return 'A';
-    const parts = user.email.split('@')[0].split('.');
-    if (parts.length > 1) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
+    if (profile?.first_name && profile?.last_name) {
+      return (profile.first_name[0] + profile.last_name[0]).toUpperCase();
     }
-    return user.email.charAt(0).toUpperCase();
+    if (profile?.first_name) {
+      return profile.first_name.slice(0, 2).toUpperCase();
+    }
+    if (user?.email) {
+      const parts = user.email.split('@')[0].split('.');
+      if (parts.length > 1) {
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+      }
+      return user.email.charAt(0).toUpperCase();
+    }
+    return 'U';
+  };
+
+  // Get role display name - simplified for now
+  const getRoleDisplayName = () => {
+    return 'User'; // Simplified until role system is implemented
   };
 
   return (
@@ -221,27 +252,29 @@ export default function Header({ title }: HeaderProps) {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 flex items-center gap-2 group hover:bg-aximo-card px-2">
               <Avatar className="h-8 w-8 border border-aximo-border/50">
-                <AvatarImage src="/avatar.jpg" alt="User Avatar" />
+                <AvatarImage src={profile?.avatar_url || undefined} alt="User Avatar" />
                 <AvatarFallback className="bg-aximo-primary text-white">
                   {getUserInitials()}
                 </AvatarFallback>
               </Avatar>
               <div className="hidden md:flex flex-col items-start">
-                <span className="text-sm font-medium text-aximo-text">John Doe</span>
-                <span className="text-xs text-aximo-text-secondary">Administrator</span>
+                <span className="text-sm font-medium text-aximo-text">{getUserDisplayName()}</span>
+                <span className="text-xs text-aximo-text-secondary">{getRoleDisplayName()}</span>
               </div>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56 rounded-md border-aximo-border bg-aximo-card shadow-lg" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium text-aximo-text">John Doe</p>
-                <p className="text-xs text-aximo-text-secondary truncate">john.doe@example.com</p>
+                <p className="text-sm font-medium text-aximo-text">{getUserDisplayName()}</p>
+                <p className="text-xs text-aximo-text-secondary truncate">{user?.email || 'No email'}</p>
+                {/* Add role display name */}
+                <p className="text-xs text-aximo-primary font-medium">{getRoleDisplayName()}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/profile')}>
                 <CircleUser className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
@@ -283,7 +316,17 @@ export default function Header({ title }: HeaderProps) {
                 <span className="text-yellow-500 font-medium">Reset Schema Cache</span>
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem onClick={() => signOut()}>
+            <DropdownMenuItem 
+              onClick={async () => {
+                try {
+                  await signOut();
+                } catch (error) {
+                  console.error('Logout failed:', error);
+                  // Force logout even if there's an error
+                  window.location.href = '/auth';
+                }
+              }}
+            >
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
             </DropdownMenuItem>

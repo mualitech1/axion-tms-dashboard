@@ -6,11 +6,14 @@ import { toast } from '@/hooks/use-toast';
  * Custom hook for form validation using Zod
  * Provides consistent form validation across the application
  */
-export function useFormValidation<T extends z.ZodType<unknown, z.ZodTypeDef, unknown>>(schema: T) {
+export function useFormValidation<T extends z.ZodType<unknown, z.ZodTypeDef, unknown>>(
+  schema: T, 
+  initialValues?: Partial<z.infer<T>>
+) {
   type FormDataType = z.infer<T>;
   
   const [errors, setErrors] = useState<Record<string, string[]>>({});
-  const [formData, setFormData] = useState<Partial<FormDataType>>({});
+  const [formData, setFormData] = useState<Partial<FormDataType>>(initialValues || {});
   const [isValidating, setIsValidating] = useState(false);
   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
   

@@ -1,465 +1,317 @@
-import { useEffect, useState, createContext, useContext } from 'react';
-import { Session, User } from '@supabase/supabase-js';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
-import { getErrorMessage } from '@/utils/error-handler';
-import { SecurityEventType, logSecurityEvent, checkSuspiciousActivity } from '../services/security-audit';
-import { getCSRFToken, storeCSRFToken } from '@/utils/security-headers';
-import { registerDevice } from '@/services/device-management';
+import { Session, User } from '@supabase/supabase-js';
+import { Database } from '@/integrations/supabase/types';
+import { AppRole } from '@/types/permissions';
+
+type Profile = Database['public']['Tables']['user_profiles']['Row'];
 
 interface AuthContextType {
   session: Session | null;
   user: User | null;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
-  signOut: () => Promise<void>;
+  profile: Profile | null;
   loading: boolean;
-  resetPassword: (email: string) => Promise<void>;
-  checkSession: () => Promise<boolean>;
+  isInitialized: boolean;
+  signIn: (email: string, password: string) => Promise<{ success: boolean; error?: Error | string | null; emailNotConfirmed?: boolean; email?: string }>;
+  signUp: (email: string, password: string, fullName: string) => Promise<{ success: boolean; error?: Error | string | null; requiresConfirmation?: boolean; email?: string }>;
+  signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ success: boolean; error?: Error | string | null }>;
+  resendConfirmationEmail: (email: string) => Promise<{ success: boolean; error?: Error | string | null }>;
+  markOnboardingComplete: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Track login attempts for rate limiting
-const loginAttempts = new Map<string, { count: number, lastAttempt: number }>();
-
-// Basic rate limiting function
-const checkRateLimit = (email: string): boolean => {
-  const now = Date.now();
-  const attempt = loginAttempts.get(email);
-  
-  if (!attempt) {
-    loginAttempts.set(email, { count: 1, lastAttempt: now });
-    return false;
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
   }
-  
-  // Reset if last attempt was more than 15 minutes ago
-  if (now - attempt.lastAttempt > 15 * 60 * 1000) {
-    loginAttempts.set(email, { count: 1, lastAttempt: now });
-    return false;
-  }
-  
-  // Rate limit: 5 attempts in 15 minutes
-  if (attempt.count >= 5) {
-    return true;
-  }
-  
-  // Increment attempt counter
-  loginAttempts.set(email, { 
-    count: attempt.count + 1, 
-    lastAttempt: now 
-  });
-  
-  return false;
+  return context;
 };
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [authInitialized, setAuthInitialized] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  useEffect(() => {
-    let mounted = true;
-    
-    // Store IP address (in real app, would be captured server-side)
-    const fetchClientIP = async () => {
-      try {
-        const response = await fetch('https://api.ipify.org?format=json');
-        const data = await response.json();
-        sessionStorage.setItem('client_ip', data.ip);
-      } catch (error) {
-        console.error('Could not fetch IP:', error);
-      }
-    };
-    
-    fetchClientIP();
-    
-    // Generate CSRF token on app initialization
-    storeCSRFToken();
-    
-    // Function to update auth state in one place to prevent state inconsistencies
-    const updateAuthState = (newSession: Session | null) => {
-      if (!mounted) return;
-      
-      setSession(newSession);
-      setUser(newSession?.user ?? null);
-      
-      if (!authInitialized) {
-        setAuthInitialized(true);
-        setLoading(false);
-      }
-    };
-    
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, newSession) => {
-        console.log('Auth state changed:', event, newSession?.user?.email);
-        
-        // Update state with new session
-        updateAuthState(newSession);
-        
-        if (event === 'SIGNED_IN') {
-          // Log successful login
-          if (newSession?.user) {
-            try {
-              // Register the current device
-              await registerDevice(newSession.user.id);
-              
-              // Log the login event
-              await logSecurityEvent(
-                SecurityEventType.LOGIN_SUCCESS,
-                newSession.user.id,
-                { method: 'password' }
-              );
-              
-              // Check for suspicious activity
-              const suspicious = await checkSuspiciousActivity(newSession.user.id);
-              if (suspicious) {
-                toast({
-                  title: "Security Alert",
-                  description: "Unusual account activity detected. Please review your recent logins.",
-                  variant: "destructive"
-                });
-              }
-            } catch (error) {
-              console.error('Error in post-login tasks:', error);
-            }
-          }
-          
-          toast({
-            title: "Successfully signed in",
-            description: `Welcome, ${newSession?.user?.email}`,
-          });
-          
-          // Instead of using navigate here, we can use window.location
-          window.location.href = '/';
-        } else if (event === 'SIGNED_OUT') {
-          window.location.href = '/auth';
-        } else if (event === 'PASSWORD_RECOVERY') {
-          // Handle password recovery event
-          window.location.href = '/auth?reset=true';
-        }
-      }
-    );
+  // Helper function to fetch user profile (scoped inside AuthProvider)
+  const fetchUserProfile = async (userId: string): Promise<Profile | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session: initialSession }, error }) => {
       if (error) {
-        console.error('Error getting initial session:', error);
+        console.error('Error fetching profile:', error.message);
+        return null;
       }
-      
-      console.log('Initial session check:', initialSession?.user?.email);
-      
-      // Update state with initial session
-      updateAuthState(initialSession);
-      
-      // If user is already logged in and on auth page, redirect to home
-      if (initialSession && window.location.pathname === '/auth') {
-        window.location.href = '/';
+      console.log('Fetched user profile:', data);
+      // Assuming 'data' matches the structure of 'Profile' type from Supabase generated types
+      return data as Profile; 
+    } catch (error) {
+      console.error('Exception fetching profile:', error);
+      return null;
+    }
+  };
+
+  // Helper function to create user profile (scoped inside AuthProvider)
+  const createUserProfile = async (user: User, fullName: string): Promise<Profile | null> => {
+    try {
+      console.log(`Creating profile for user: ${user.id}, email: ${user.email}`);
+      const profileDataToInsert: Partial<Database['public']['Tables']['user_profiles']['Row']> = {
+        id: user.id,
+        email: user.email,
+        full_name: fullName,
+        has_completed_onboarding: false, // Explicitly set for new profiles
+      };
+
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .insert(profileDataToInsert as Database['public']['Tables']['user_profiles']['Row'])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating profile:', error.message);
+        if (error.code === '23505') { 
+          console.warn('Profile likely already exists, attempting to fetch it.');
+          return fetchUserProfile(user.id);
+        }
+        return null;
       }
+      console.log('Profile created successfully:', data);
+      return data as Profile;
+    } catch (error) {
+      console.error('Exception creating profile:', error);
+      return null;
+    }
+  };
+
+  // Function to mark onboarding as complete (scoped inside AuthProvider)
+  const markOnboardingComplete = async (): Promise<boolean> => {
+    if (!user?.id) {
+      console.error('Cannot mark onboarding complete: no user logged in.');
+      return false;
+    }
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .update({ has_completed_onboarding: true, updated_at: new Date().toISOString() })
+        .eq('id', user.id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error marking onboarding complete:', error.message);
+        return false;
+      }
+
+      if (data) {
+        setProfile(data as Profile);
+        console.log('Onboarding marked as complete for user:', user.id, data);
+      } else {
+        // Fallback for optimistic update if select() doesn't return expected data
+        setProfile(prevProfile => prevProfile ? { ...prevProfile, has_completed_onboarding: true } as Profile : null);
+        console.log('Onboarding marked as complete (optimistic) for user:', user.id);
+      }
+      return true;
+    } catch (error) {
+      console.error('Exception marking onboarding complete:', error);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Initialize auth state & listen for changes (simplified for stability)
+  useEffect(() => {
+    setLoading(true);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserProfile(session.user.id).then(setProfile);
+      }
+      setLoading(false);
+      setIsInitialized(true);
     });
 
-    // Session timeout check - automatically log out after inactivity
-    let inactivityTimeout: number;
-    
-    const resetInactivityTimer = () => {
-      clearTimeout(inactivityTimeout);
-      // 30 minute timeout (adjust as needed)
-      inactivityTimeout = window.setTimeout(() => {
-        if (session) {
-          toast({
-            title: "Session expired",
-            description: "You've been signed out due to inactivity",
-          });
-          supabase.auth.signOut();
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        const fetchedProfile = await fetchUserProfile(session.user.id);
+        if (fetchedProfile) {
+          setProfile(fetchedProfile);
+        } else if (_event === 'SIGNED_IN' || (_event === 'USER_UPDATED' && !fetchedProfile)) {
+            const fullNameFromAuth = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'New User';
+            const newProfile = await createUserProfile(session.user, fullNameFromAuth as string);
+            setProfile(newProfile); 
         }
-      }, 30 * 60 * 1000);
-    };
-    
-    // Reset timer on user activity
-    const activityEvents = ['mousedown', 'keypress', 'scroll', 'touchstart'];
-    activityEvents.forEach(event => {
-      document.addEventListener(event, resetInactivityTimer);
+      } else {
+        setProfile(null);
+      }
     });
-    
-    // Initialize timer
-    if (session) {
-      resetInactivityTimer();
-    }
 
     return () => {
-      mounted = false;
-      subscription.unsubscribe();
-      activityEvents.forEach(event => {
-        document.removeEventListener(event, resetInactivityTimer);
-      });
-      clearTimeout(inactivityTimeout);
+      authListener?.subscription?.unsubscribe();
     };
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  // --- Auth functions (restored to previously stable versions) ---
+
+  const signIn = async (email: string, password: string): Promise<{ success: boolean; error?: Error | string | null; emailNotConfirmed?: boolean; email?: string }> => {
+    setLoading(true);
     try {
-      console.log('Attempting sign in for:', email);
-      
-      // Check rate limiting
-      if (checkRateLimit(email)) {
-        toast({
-          title: "Too many attempts",
-          description: "Please try again later or reset your password",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      // Add CSRF token to the auth request options
-      const csrfToken = getCSRFToken();
-      
-      // Fixed: Use the correct structure for signInWithPassword parameters
-      const { error, data } = await supabase.auth.signInWithPassword({ 
-        email, 
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
         password,
-        options: {
-          captchaToken: undefined,  // Optional captcha token if needed
-        }
       });
-      
-      // If login is successful, update user metadata with CSRF token separately
-      if (!error && data?.user) {
-        await supabase.auth.updateUser({
-          data: {
-            csrf_token: csrfToken
-          }
-        });
-      }
-      
       if (error) {
-        console.error('Sign in error:', error.message);
-        
-        // Log failed login attempt if we have user information
-        const { data: userData } = await supabase.auth.getUser();
-        if (userData?.user) {
-          await logSecurityEvent(
-            SecurityEventType.LOGIN_FAILED,
-            userData.user.id,
-            { reason: error.message }
-          );
+        if (error.message.includes('Email not confirmed')) {
+          return { success: false, error: 'Email not confirmed', emailNotConfirmed: true, email: email.trim() };
         }
-        
-        // Provide more user-friendly error messages
-        if (error.message.includes('credentials')) {
-          throw new Error('Invalid email or password');
-        } else if (error.message.includes('email') && error.message.includes('confirm')) {
-          throw new Error('Please check your email to confirm your account before logging in');
-        } else {
-          throw error;
-        }
+        return { success: false, error: error.message };
       }
-      
-      console.log('Sign in successful for:', email, data);
-    } catch (error: unknown) {
-      console.error('Sign in error:', error instanceof Error ? error.message : String(error));
-      toast({
-        title: "Error signing in",
-        description: getErrorMessage(error instanceof Error ? error : new Error(String(error))),
-        variant: "destructive"
-      });
-      throw error;
+      return { success: true };
+    } catch (err: any) {
+      console.error("Sign in exception:", err);
+      return { success: false, error: err.message || 'An unexpected error occurred during sign in.' };
+    } finally {
+      setLoading(false);
     }
   };
 
-  const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
+  const signUp = async (email: string, password: string, fullName: string): Promise<{ success: boolean; error?: Error | string | null; requiresConfirmation?: boolean; email?: string }> => {
+    setLoading(true);
     try {
-      console.log('Attempting sign up for:', email);
-      
-      // Password strength validation
-      const hasUppercase = /[A-Z]/.test(password);
-      const hasLowercase = /[a-z]/.test(password);
-      const hasNumbers = /[0-9]/.test(password);
-      const hasSpecialChars = /[^A-Za-z0-9]/.test(password);
-      
-      if (password.length < 8) {
-        throw new Error("Password must be at least 8 characters long");
-      }
-      
-      if (!(hasUppercase && hasLowercase && hasNumbers && hasSpecialChars)) {
-        throw new Error(
-          "Password must include uppercase and lowercase letters, numbers, and special characters"
-        );
-      }
-      
-      // Use the current origin for redirectTo
-      const redirectUrl = window.location.origin + '/auth';
-      console.log('Using redirect URL:', redirectUrl);
-      
-      const { error, data } = await supabase.auth.signUp({
-        email,
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
         password,
         options: {
           data: {
-            first_name: firstName,
-            last_name: lastName
+            full_name: fullName,
           },
-          emailRedirectTo: redirectUrl
-        }
+        },
       });
-      
-      if (error) {
-        console.error('Sign up error:', error.message);
-        throw error;
-      }
-      
-      // Check if email confirmation is required
-      if (data?.user && data?.session === null) {
-        toast({
-          title: "Success!",
-          description: "Please check your email to confirm your account."
-        });
-      } else {
-        toast({
-          title: "Account created!",
-          description: "You have been successfully registered and logged in."
-        });
-      }
-      
-    } catch (error: unknown) {
-      console.error('Sign up error:', error instanceof Error ? error.message : String(error));
-      
-      // Provide more user-friendly error messages
-      if (error instanceof Error && error.message.includes('already registered')) {
-        toast({
-          title: "Email already registered",
-          description: "This email is already registered. Try logging in instead.",
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Error signing up",
-          description: getErrorMessage(error instanceof Error ? error : new Error(String(error))),
-          variant: "destructive"
-        });
-      }
-      throw error;
-    }
-  };
 
-  const resetPassword = async (email: string) => {
-    try {
-      // Get the current site URL dynamically
-      const siteUrl = window.location.origin;
-      console.log('Using site URL for password reset:', siteUrl);
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      if (data.user && data.user.identities && data.user.identities.length === 0) {
+        // This case might indicate an issue like email already in use but unconfirmed.
+        return { success: false, error: 'User already exists or unconfirmed. Please check your email or try logging in.', email: email.trim() };
+      }
       
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${siteUrl}/auth/reset-password`,
-      });
+      if (data.session) { // User is signed in, profile will be created by onAuthStateChange or already exists
+        return { success: true, requiresConfirmation: !data.session, email: email.trim() };
+      } else if (data.user) { // User exists, email confirmation needed
+         // Attempt to create profile here if it might not exist yet, before onAuthStateChange runs
+        // This can happen if email confirmation is on and it's the first signup.
+        const existingProfile = await fetchUserProfile(data.user.id);
+        if (!existingProfile) {
+            await createUserProfile(data.user, fullName); 
+        }
+        return { success: true, requiresConfirmation: true, email: email.trim() };
+      }
       
-      if (error) throw error;
-      
-      toast({
-        title: "Quantum Key Reset Initiated",
-        description: "Please check your quantum nexus for recalibration instructions."
-      });
-      
-      // Log password reset request (without userId since we don't know it yet)
-      // In a real app, you might want to log this server-side
-    } catch (error: unknown) {
-      console.error('Password reset error:', error instanceof Error ? error.message : String(error));
-      toast({
-        title: "Quantum Disruption",
-        description: error instanceof Error ? error.message : "Failed to initiate quantum key reset",
-        variant: "destructive"
-      });
-      throw error;
+      // Fallback if neither session nor user is in data, but no error - unusual
+      return { success: false, error: 'Sign up completed, but user state is unclear. Please try logging in.' };
+
+    } catch (err: any) {
+      console.error("Sign up exception:", err);
+      return { success: false, error: err.message || 'An unexpected error occurred during sign up.' };
+    } finally {
+      setLoading(false);
     }
   };
 
   const signOut = async () => {
+    console.log('🚪 Starting aggressive logout...');
+    window.dispatchEvent(new CustomEvent('axion-logout'));
+    setLoading(true);
+    setSession(null);
+    setUser(null);
+    setProfile(null);
     try {
-      console.log('Attempting sign out');
-      
-      // Log the logout event before signing out
-      if (user) {
-        await logSecurityEvent(
-          SecurityEventType.LOGIN_SUCCESS,
-          user.id,
-          { reason: 'user_initiated' }
-        );
-      }
-      
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
-      toast({
-        title: "Signed out",
-        description: "You have been successfully signed out."
+      Object.keys(localStorage).forEach(key => {
+        if (key.includes('supabase') || key.includes('auth') || key.includes('session')) {
+          localStorage.removeItem(key);
+        }
       });
-    } catch (error: unknown) {
-      console.error('Sign out error:', error instanceof Error ? error.message : String(error));
-      toast({
-        title: "Error signing out",
-        description: getErrorMessage(error instanceof Error ? error : new Error(String(error))),
-        variant: "destructive"
+      Object.keys(sessionStorage).forEach(key => {
+        if (key.includes('supabase') || key.includes('auth') || key.includes('session')) {
+          sessionStorage.removeItem(key);
+        }
       });
-      throw error;
-    }
-  };
-
-  // Check if session is still valid
-  const checkSession = async (): Promise<boolean> => {
-    try {
-      // Wrap in a timeout to handle potential hanging promises
-      const timeoutPromise = new Promise<boolean>((_, reject) => {
-        setTimeout(() => {
-          reject(new Error('Session check timed out'));
-        }, 3000); // 3-second timeout
-      });
-      
-      const sessionPromise = new Promise<boolean>((resolve) => {
-        // Use an immediately-invoked async function inside
-        (async () => {
-          try {
-            const { data, error } = await supabase.auth.getSession();
-            if (error) {
-              console.error('Session check supabase error:', error);
-              resolve(false);
-              return;
-            }
-            resolve(!!data.session);
-          } catch (err) {
-            console.error('Session check unexpected error:', err);
-            resolve(false);
-          }
-        })();
-      });
-      
-      // Race the promises to handle timeout
-      return Promise.race([sessionPromise, timeoutPromise]);
+      await supabase.auth.signOut({ scope: 'global' });
+      console.log('✅ Supabase logout successful');
     } catch (error) {
-      console.error('Session check error:', error);
-      return false;
+      console.warn('⚠️ Supabase logout failed, but continuing with local logout:', error);
+    }
+    setTimeout(() => {
+      window.location.href = '/auth';
+    }, 100);
+    setLoading(false);
+  };
+
+  const resetPassword = async (email: string): Promise<{ success: boolean; error?: Error | string | null }> => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/update-password`,
+      });
+      if (error) {
+        return { success: false, error: error.message };
+      }
+      return { success: true };
+    } catch (err: any) {
+      console.error("Reset password exception:", err);
+      return { success: false, error: err.message || 'An unexpected error occurred during password reset.' };
+    } finally {
+      setLoading(false);
     }
   };
 
-  return (
-    <AuthContext.Provider value={{ 
-      session, 
-      user, 
-      signIn, 
-      signUp, 
-      signOut, 
-      loading,
-      resetPassword,
-      checkSession
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
+  const resendConfirmationEmail = async (email: string): Promise<{ success: boolean; error?: Error | string | null }> => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resend({ 
+        type: 'signup', 
+        email: email.trim() 
+      });
+      if (error) {
+        return { success: false, error: error.message };
+      }
+      return { success: true };
+    } catch (err: any) {
+      console.error("Resend confirmation exception:", err);
+      return { success: false, error: err.message || 'An unexpected error occurred during email resend.' };
+    } finally {
+      setLoading(false);
+    }
+  };
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
+  const value: AuthContextType = {
+    session,
+    user,
+    profile,
+    loading,
+    isInitialized,
+    signIn,
+    signUp,
+    signOut,
+    resetPassword,
+    resendConfirmationEmail,
+    markOnboardingComplete,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};

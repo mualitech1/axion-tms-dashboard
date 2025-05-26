@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { getErrorMessage } from '@/utils/error-handler';
 
 // Hook for fetching all customers with optional filters
-export function useCustomers(filters?: Record<string, any>) {
+export function useCustomers(filters?: Record<string, string | number | boolean>) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -19,9 +19,8 @@ export function useCustomers(filters?: Record<string, any>) {
     queryFn: async () => {
       try {
         let query = supabase
-          .from('companies')
-          .select('*')
-          .eq('type', 'customer');
+          .from('customers')
+          .select('*');
         
         // Apply filters if any
         if (filters) {
@@ -31,24 +30,24 @@ export function useCustomers(filters?: Record<string, any>) {
           // Add more filters as needed
         }
         
-        const { data, error } = await query.order('name');
+        const { data, error } = await query.order('company_name');
         if (error) throw error;
         
         // Transform database records to Customer type
-        const customers: Customer[] = data.map(company => ({
-          id: company.id,
-          name: company.name,
-          email: company.email || '',
-          phone: company.phone || '',
-          contact: company.contact_name || '',
-          status: company.status,
-          creditLimit: company.credit_limit || 0,
-          address: company.address ? {
-            street: company.address.street || '',
-            city: company.address.city || '',
-            state: company.address.state || '',
-            postalCode: company.address.postalCode || '',
-            country: company.address.country || '',
+        const customers: Customer[] = data.map(customer => ({
+          id: customer.id,
+          name: customer.company_name,
+          email: customer.operations_contact?.email || customer.finance_contact?.email || '',
+          phone: customer.operations_contact?.phone || customer.finance_contact?.phone || '',
+          contact: customer.operations_contact?.name || customer.finance_contact?.name || '',
+          status: customer.status,
+          creditLimit: customer.credit_limit_gbp || 0,
+          address: customer.main_address ? {
+            street: customer.main_address.street || '',
+            city: customer.main_address.city || '',
+            state: customer.main_address.state || '',
+            postalCode: customer.main_address.postcode || '',
+            country: customer.main_address.country || '',
           } : {
             street: '',
             city: '',
@@ -56,7 +55,7 @@ export function useCustomers(filters?: Record<string, any>) {
             postalCode: '',
             country: '',
           },
-          createdAt: company.created_at || new Date().toISOString(),
+          createdAt: customer.created_at || new Date().toISOString(),
         }));
         
         return customers;
@@ -80,20 +79,33 @@ export function useCustomers(filters?: Record<string, any>) {
   const createCustomer = useMutation({
     mutationFn: async (customerData: Omit<Customer, 'id' | 'createdAt'>) => {
       try {
-        // Transform to database format
+        // Transform to database format matching the actual schema
         const supabaseCustomer = {
-          name: customerData.name,
-          email: customerData.email,
-          phone: customerData.phone,
-          contact_name: customerData.contact,
+          company_name: customerData.name,
           status: customerData.status,
-          credit_limit: customerData.creditLimit,
-          address: customerData.address,
-          type: 'customer', // Important to identify as customer in companies table
+          credit_limit_gbp: customerData.creditLimit,
+          currency_type: 'GBP',
+          main_address: customerData.address ? {
+            street: customerData.address.street,
+            city: customerData.address.city,
+            state: customerData.address.state,
+            postcode: customerData.address.postalCode,
+            country: customerData.address.country,
+          } : null,
+          operations_contact: {
+            name: customerData.contact,
+            email: customerData.email,
+            phone: customerData.phone,
+          },
+          finance_contact: {
+            name: customerData.contact,
+            email: customerData.email,
+            phone: customerData.phone,
+          },
         };
         
         const { data, error } = await supabase
-          .from('companies')
+          .from('customers')
           .insert(supabaseCustomer)
           .select()
           .single();
@@ -126,18 +138,33 @@ export function useCustomers(filters?: Record<string, any>) {
     mutationFn: async ({ id, ...updates }: Partial<Customer> & { id: string }) => {
       try {
         // Transform to database format
-        const supabaseUpdates = {
-          ...(updates.name && { name: updates.name }),
-          ...(updates.email && { email: updates.email }),
-          ...(updates.phone && { phone: updates.phone }),
-          ...(updates.contact && { contact_name: updates.contact }),
-          ...(updates.status && { status: updates.status }),
-          ...(updates.creditLimit && { credit_limit: updates.creditLimit }),
-          ...(updates.address && { address: updates.address }),
-        };
+        const supabaseUpdates: Record<string, unknown> = {};
+        
+        if (updates.name) supabaseUpdates.company_name = updates.name;
+        if (updates.status) supabaseUpdates.status = updates.status;
+        if (updates.creditLimit) supabaseUpdates.credit_limit_gbp = updates.creditLimit;
+        
+        if (updates.address) {
+          supabaseUpdates.main_address = {
+            street: updates.address.street,
+            city: updates.address.city,
+            state: updates.address.state,
+            postcode: updates.address.postalCode,
+            country: updates.address.country,
+          };
+        }
+        
+        if (updates.contact || updates.email || updates.phone) {
+          // Update operations contact
+          supabaseUpdates.operations_contact = {
+            name: updates.contact,
+            email: updates.email,
+            phone: updates.phone,
+          };
+        }
         
         const { data, error } = await supabase
-          .from('companies')
+          .from('customers')
           .update(supabaseUpdates)
           .eq('id', id)
           .select()
@@ -171,10 +198,9 @@ export function useCustomers(filters?: Record<string, any>) {
     mutationFn: async (id: string) => {
       try {
         const { error } = await supabase
-          .from('companies')
+          .from('customers')
           .delete()
-          .eq('id', id)
-          .eq('type', 'customer'); // Safety check
+          .eq('id', id);
 
         if (error) throw error;
       } catch (error) {
@@ -225,10 +251,9 @@ export function useCustomer(id?: string) {
       
       try {
         const { data, error } = await supabase
-          .from('companies')
+          .from('customers')
           .select('*')
           .eq('id', id)
-          .eq('type', 'customer')
           .single();
 
         if (error) throw error;
@@ -237,18 +262,18 @@ export function useCustomer(id?: string) {
         if (data) {
           const customer: Customer = {
             id: data.id,
-            name: data.name,
-            email: data.email || '',
-            phone: data.phone || '',
-            contact: data.contact_name || '',
+            name: data.company_name,
+            email: data.operations_contact?.email || data.finance_contact?.email || '',
+            phone: data.operations_contact?.phone || data.finance_contact?.phone || '',
+            contact: data.operations_contact?.name || data.finance_contact?.name || '',
             status: data.status,
-            creditLimit: data.credit_limit || 0,
-            address: data.address ? {
-              street: data.address.street || '',
-              city: data.address.city || '',
-              state: data.address.state || '',
-              postalCode: data.address.postalCode || '',
-              country: data.address.country || '',
+            creditLimit: data.credit_limit_gbp || 0,
+            address: data.main_address ? {
+              street: data.main_address.street || '',
+              city: data.main_address.city || '',
+              state: data.main_address.state || '',
+              postalCode: data.main_address.postcode || '',
+              country: data.main_address.country || '',
             } : {
               street: '',
               city: '',

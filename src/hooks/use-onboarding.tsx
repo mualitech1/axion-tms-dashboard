@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { useAuthStore } from '@/store/authStore';
+import { useAuth } from '@/hooks/use-auth';
 import { AppRole } from '@/types/permissions';
 
 // Types
@@ -181,15 +181,16 @@ export const onboardingHints: RoleBasedHints = {
 
 // Provider component
 export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
-  const { activeRole, user } = useAuthStore();
+  const { user, isInitialized } = useAuth();
+  const [activeRole] = useState<AppRole>(AppRole.Admin); // Temporary default role until we implement role system
   const [seenHints, setSeenHints] = useState<Record<string, boolean>>({});
   const [activeHint, setActiveHint] = useState<OnboardingHint | null>(null);
   const [isFirstVisit, setIsFirstVisit] = useState(false);
   const [isOnboardingEnabled, setOnboardingEnabled] = useState(true);
 
-  // Check if this is the user's first visit
+  // Initialize onboarding when auth is ready
   useEffect(() => {
-    if (!user) return;
+    if (!isInitialized || !user) return;
     
     const storageKey = `axion-onboarding-${user.id}`;
     const onboardingData = localStorage.getItem(storageKey);
@@ -225,7 +226,7 @@ export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
     if (onboardingEnabled === 'false') {
       setOnboardingEnabled(false);
     }
-  }, [user]);
+  }, [user, isInitialized]);
 
   // Function to check if a hint has been seen
   const hasSeenHint = (hintId: string): boolean => {

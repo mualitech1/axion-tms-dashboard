@@ -13,7 +13,11 @@ import {
   Boxes,
   Scan,
   MessageSquare,
-  ClipboardList
+  ClipboardList,
+  Smartphone,
+  Settings,
+  Wrench,
+  User
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { AppRole } from '@/types/permissions';
@@ -87,6 +91,16 @@ export const navigationConfig: NavigationItem[] = [
     href: '/drivers',
     icon: Gauge,
     shortcut: 'Alt+9'
+  },
+  {
+    title: 'Driver Mobile Portal',
+    href: '/drivers/mobile',
+    icon: Smartphone
+  },
+  {
+    title: 'Customer Portal',
+    href: '/customers/portal',
+    icon: Building2
   },
   {
     title: 'Invoices',
