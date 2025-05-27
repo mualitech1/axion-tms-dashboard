@@ -58,6 +58,7 @@ export function OnboardingWelcome() {
   const { activeRole, user } = useAuthStore();
   const { isFirstVisit, isOnboardingEnabled, setOnboardingEnabled, startTour } = useOnboarding();
   const [open, setOpen] = useState(false);
+  const [isStartingTour, setIsStartingTour] = useState(false);
   const { theme } = useTheme();
   
   useEffect(() => {
@@ -81,10 +82,13 @@ export function OnboardingWelcome() {
   };
 
   const handleStartTour = () => {
+    setIsStartingTour(true);
     setOpen(false);
     // Start the tour after a brief delay to allow dialog to close
     setTimeout(() => {
+      console.log('🚀 Starting onboarding tour for role:', activeRole);
       startTour();
+      setIsStartingTour(false);
     }, 300);
   };
   
@@ -188,10 +192,26 @@ export function OnboardingWelcome() {
           </Button>
           <Button 
             onClick={handleStartTour}
-            className="bg-aximo-primary hover:bg-aximo-primary-hover text-white"
+            disabled={isStartingTour}
+            className="bg-aximo-primary hover:bg-aximo-primary-hover text-white disabled:opacity-50"
           >
-            <span>Start Tour</span>
-            <ArrowRight className="ml-2 h-4 w-4" />
+            {isStartingTour ? (
+              <>
+                <span>Starting Tour...</span>
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="ml-2"
+                >
+                  <ArrowRight className="h-4 w-4" />
+                </motion.div>
+              </>
+            ) : (
+              <>
+                <span>Start Tour</span>
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </>
+            )}
           </Button>
         </DialogFooter>
         

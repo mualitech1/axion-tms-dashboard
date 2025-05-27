@@ -42,12 +42,50 @@ export interface JobRecord {
 
 export interface Customer {
   id: string; // Text format ID (previously UUID)
-  name: string;
-  contact: string;
-  email: string;
-  phone: string;
+  company_name: string;
   status: string;
-  creditLimit: number;
+  currency_type?: string;
+  credit_limit_gbp?: number;
+  billing_cycle_agreement?: string;
+  restrictions_limitations?: string;
+  overdue_invoice_reminder_days?: number;
+  main_address?: {
+    street: string;
+    city: string;
+    postcode: string;
+    country: string;
+  };
+  finance_contact?: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+  operations_contact?: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+  pod_agreement_contact?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+  };
+  banking_details?: {
+    bank_name?: string;
+    account_name?: string;
+    sort_code?: string;
+    account_number?: string;
+    iban?: string;
+  };
+  created_at?: string;
+  updated_at?: string;
+  
+  // Legacy fields for backward compatibility
+  name?: string;
+  contact?: string;
+  email?: string;
+  phone?: string;
+  creditLimit?: number;
   lastOrder?: string;
   createdAt?: string;
   address?: {

@@ -221,7 +221,7 @@ export default function JobsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+        <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
       </div>
     );
@@ -229,22 +229,22 @@ export default function JobsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+        {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
+          <div>
           <h1 className="text-3xl font-bold text-white">Jobs Management</h1>
           <p className="text-gray-400">Manage transport orders and deliveries</p>
-        </div>
-        <Button 
-          onClick={() => navigate('/jobs/create')}
+          </div>
+            <Button
+              onClick={() => navigate('/jobs/create')}
           className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-        >
+            >
           <Plus className="h-4 w-4 mr-2" />
-          Create Job
-        </Button>
-      </div>
+              Create Job
+            </Button>
+          </div>
 
-      {/* Stats Cards */}
+        {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -252,16 +252,16 @@ export default function JobsPage() {
           transition={{ delay: 0.1 }}
         >
           <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
                   <p className="text-gray-400 text-sm">Total Jobs</p>
                   <p className="text-2xl font-bold text-white">{jobs.length}</p>
                 </div>
                 <FileText className="h-8 w-8 text-blue-400" />
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+              </CardContent>
+            </Card>
         </motion.div>
 
         <motion.div
@@ -365,25 +365,25 @@ export default function JobsPage() {
 
       {/* Jobs Table */}
       <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700">
-        <CardHeader>
+            <CardHeader>
           <CardTitle className="text-white">Jobs List</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {filteredJobs.length === 0 ? (
-            <div className="text-center py-8">
+            </CardHeader>
+            <CardContent>
+              {filteredJobs.length === 0 ? (
+                <div className="text-center py-8">
               <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-400">No jobs found</p>
               <Button 
                 className="mt-4"
                 onClick={() => navigate('/jobs/create')}
               >
-                Create First Job
-              </Button>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
+                      Create First Job
+                    </Button>
+                </div>
+              ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
                   <TableHead className="text-gray-300">Order #</TableHead>
                   <TableHead className="text-gray-300">Customer</TableHead>
                   <TableHead className="text-gray-300">Route</TableHead>
@@ -391,81 +391,81 @@ export default function JobsPage() {
                   <TableHead className="text-gray-300">Status</TableHead>
                   <TableHead className="text-gray-300">Value</TableHead>
                   <TableHead className="text-gray-300">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredJobs.map((job) => (
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredJobs.map((job) => (
                   <TableRow key={job.id} className="border-gray-700">
                     <TableCell className="text-white font-medium">
                       {job.ikb_order_no || 'N/A'}
-                    </TableCell>
+                          </TableCell>
                     <TableCell className="text-gray-300">
                       <div className="flex items-center space-x-2">
                         <Building2 className="h-4 w-4" />
                         <span>{job.customer?.company_name || 'Unknown'}</span>
-                      </div>
-                    </TableCell>
+                            </div>
+                          </TableCell>
                     <TableCell className="text-gray-300">
                       <div className="flex items-center space-x-1 text-sm">
                         <MapPin className="h-3 w-3" />
                         <span>{formatAddress(job.collection_address)}</span>
                         <span>→</span>
                         <span>{formatAddress(job.delivery_address)}</span>
-                      </div>
-                    </TableCell>
+                            </div>
+                          </TableCell>
                     <TableCell className="text-gray-300">
                       <div className="flex items-center space-x-1 text-sm">
-                        <Calendar className="h-3 w-3" />
+                                <Calendar className="h-3 w-3" />
                         <span>{formatDate(job.collection_datetime_planned_from)}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
+                            </div>
+                          </TableCell>
+                          <TableCell>
                       <Badge className={statusColors[job.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}>
                         {job.status}
-                      </Badge>
-                    </TableCell>
+                            </Badge>
+                          </TableCell>
                     <TableCell className="text-gray-300">
                       £{job.agreed_rate_gbp?.toFixed(2) || '0.00'}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                          </TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => navigate(`/jobs/details/${job.id}`)}>
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Details
-                          </DropdownMenuItem>
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => navigate(`/jobs/details/${job.id}`)}>
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  View Details
+                                </DropdownMenuItem>
                           {(job.status === 'pending' || job.status === 'confirmed') && (
                             <DropdownMenuItem onClick={() => navigate(`/jobs/assign/${job.id}`)}>
-                              <Truck className="h-4 w-4 mr-2" />
+                                  <Truck className="h-4 w-4 mr-2" />
                               Assign to Carrier
-                            </DropdownMenuItem>
+                                </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem onClick={() => navigate(`/jobs/edit/${job.id}`)}>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit Job
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleDeleteJob(job.id)}
-                            className="text-red-600"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
+                                <DropdownMenuItem onClick={() => navigate(`/jobs/edit/${job.id}`)}>
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Edit Job
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => handleDeleteJob(job.id)}
+                                  className="text-red-600"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
                             Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+              )}
+            </CardContent>
+          </Card>
     </div>
   );
 }

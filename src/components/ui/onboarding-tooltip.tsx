@@ -195,18 +195,29 @@ export function OnboardingTooltipController({ children }: OnboardingTooltipContr
     
     import('@/hooks/use-onboarding').then(({ onboardingHints }) => {
       const roleHints = onboardingHints[activeRole] || [];
-      // Filter out hints that have been seen
-      const unseenHints = roleHints.filter(hint => !hasSeenHint(hint.id));
-      setCurrentHints(unseenHints);
+      setCurrentHints(roleHints); // Use ALL hints, not just unseen ones
     });
-  }, [activeRole, user, hasSeenHint, isOnboardingEnabled]);
+  }, [activeRole, user, isOnboardingEnabled]);
   
-  // Show the first hint when the component mounts
+  // Update current hint index when activeHint changes (for manual tour starts)
   useEffect(() => {
-    if (currentHints.length > 0 && isFirstVisit && isOnboardingEnabled) {
-      setActiveHint(currentHints[currentHintIndex]);
+    if (activeHint && currentHints.length > 0) {
+      const hintIndex = currentHints.findIndex(hint => hint.id === activeHint.id);
+      if (hintIndex !== -1) {
+        setCurrentHintIndex(hintIndex);
+      }
     }
-  }, [currentHints, isFirstVisit, currentHintIndex, setActiveHint, isOnboardingEnabled]);
+  }, [activeHint, currentHints]);
+  
+  // Show the first unseen hint when the component mounts (for first visit only)
+  useEffect(() => {
+    if (currentHints.length > 0 && isFirstVisit && isOnboardingEnabled && !activeHint) {
+      const unseenHints = currentHints.filter(hint => !hasSeenHint(hint.id));
+      if (unseenHints.length > 0) {
+        setActiveHint(unseenHints[0]);
+      }
+    }
+  }, [currentHints, isFirstVisit, setActiveHint, isOnboardingEnabled, activeHint, hasSeenHint]);
   
   const handleClose = () => {
     setActiveHint(null);

@@ -142,21 +142,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setIsInitialized(true);
     });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) {
-        const fetchedProfile = await fetchUserProfile(session.user.id);
-        if (fetchedProfile) {
-          setProfile(fetchedProfile);
-        } else if (_event === 'SIGNED_IN' || (_event === 'USER_UPDATED' && !fetchedProfile)) {
-            const fullNameFromAuth = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'New User';
-            const newProfile = await createUserProfile(session.user, fullNameFromAuth as string);
-            setProfile(newProfile); 
+      
+      setTimeout(async () => {
+        if (session?.user) {
+          const fetchedProfile = await fetchUserProfile(session.user.id);
+          if (fetchedProfile) {
+            setProfile(fetchedProfile);
+          } else if (_event === 'SIGNED_IN' || (_event === 'USER_UPDATED' && !fetchedProfile)) {
+              const fullNameFromAuth = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'New User';
+              const newProfile = await createUserProfile(session.user, fullNameFromAuth as string);
+              setProfile(newProfile); 
+          }
+        } else {
+          setProfile(null);
         }
-      } else {
-        setProfile(null);
-      }
+      }, 0);
     });
 
     return () => {

@@ -1,10 +1,9 @@
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { ThemeProvider } from './components/ui/theme-provider';
+import { createBrowserRouter, RouterProvider, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { ThemeProvider, useTheme } from './components/ui/theme-provider';
 import MainLayout from './components/layout/MainLayout';
 import { Dashboard } from './pages/dashboard/Dashboard';
 import NotFound from './pages/NotFound';
 import { Toaster } from './components/ui/toaster';
-import { useTheme } from './components/ui/theme-provider';
 import Index from './pages/Index';
 import Analytics from './pages/Analytics';
 import Customers from './pages/Customers';
@@ -30,7 +29,7 @@ import { EmailConfirmationPage } from './pages/auth/EmailConfirmationPage';
 import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AuthProvider, useAuth } from './hooks/use-auth';
-import { ErrorBoundary } from './components/ui/error-boundary';
+import { ErrorBoundary, JobErrorBoundary } from './components/ui/ErrorBoundary';
 import { RouteTestingPanel } from './utils/route-testing';
 import { OnboardingProvider } from './hooks/use-onboarding';
 import { OnboardingTooltipController } from './components/ui/onboarding-tooltip';
@@ -42,6 +41,9 @@ import TestSupabase from './pages/TestSupabase';
 import { supabase } from '@/integrations/supabase/client';
 import CarrierDashboard from './pages/carriers/CarrierDashboard';
 import DriverMobilePortal from './pages/drivers/DriverMobilePortal';
+import AuthCallback from '@/pages/auth/AuthCallback';
+import JobDetailsPage from './pages/jobs/JobDetailsPage';
+import { jobDetailsLoader, jobEditLoader } from './loaders/jobLoader';
 
 // Lazy load pipeline components
 const PipelineDashboard = lazy(() => import('./pages/pipeline/PipelineDashboard'));
@@ -51,23 +53,9 @@ const PipelineReports = lazy(() => import('./pages/pipeline/PipelineReports'));
 const PipelineSettings = lazy(() => import('./pages/pipeline/PipelineSettings'));
 const PipelineReminders = lazy(() => import('./pages/pipeline/PipelineReminders'));
 
-// Lazy load heavy components
-// const JobSchedulePage = lazy(() => import('./pages/jobs/JobSchedulePage'));
-// const JobDetailsPage = lazy(() => import('./pages/jobs/JobDetailsPage'));
-// const JobTrackingPage = lazy(() => import('./pages/jobs/JobTrackingPage'));
-// const JobReportsPage = lazy(() => import('./pages/jobs/JobReportsPage'));
-// const SupplyChainPlanningPage = lazy(() => import('./pages/supply-chain/SupplyChainPlanningPage'));
-// const InventoryManagementPage = lazy(() => import('./pages/supply-chain/InventoryManagementPage'));
-// const ProcurementPage = lazy(() => import('./pages/supply-chain/ProcurementPage'));
-// const VendorManagementPage = lazy(() => import('./pages/supply-chain/VendorManagementPage'));
-// const CarrierDetails = lazy(() => import('./pages/carriers/CarrierDetails'));
-// const VehicleDetail = lazy(() => import('./pages/fleet/VehicleDetail'));
-// const DriverDetails = lazy(() => import('./pages/drivers/DriverDetails'));
-// const InvoiceDetails = lazy(() => import('./pages/invoices/InvoiceDetails'));
-
 // **🔥 SIMPLIFIED AUTH WRAPPER - PRODUCTION READY**
 function SimpleAuthManager({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, loading, isInitialized } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [timeoutCount, setTimeoutCount] = useState(0);
@@ -88,21 +76,28 @@ function SimpleAuthManager({ children }: { children: React.ReactNode }) {
     };
   }, []);
   
-  // **EMERGENCY TIMEOUT - Prevent loading hangs**
+  // **IMPROVED TIMEOUT - More patient with OAuth flows**
   useEffect(() => {
-    if (loading) {
+    if (loading && isInitialized) {
+      // Be more patient if we're on an OAuth callback route
+      const isOAuthCallback = location.pathname.includes('/auth/callback');
+      const timeoutDuration = isOAuthCallback ? 5000 : 3000; // 5s for OAuth, 3s for regular
+      
       const timeout = setTimeout(() => {
         setTimeoutCount(prev => prev + 1);
-        console.log('⚠️ AUTH TIMEOUT WARNING: Loading taking too long, considering bypass...');
-      }, 2000); // 2 second timeout
+        console.log('⚠️ AUTH TIMEOUT WARNING: Loading taking too long, considering bypass...', {
+          isOAuthCallback,
+          timeoutCount: timeoutCount + 1
+        });
+      }, timeoutDuration);
       
       return () => clearTimeout(timeout);
     }
-  }, [loading]);
+  }, [loading, isInitialized, location.pathname, timeoutCount]);
 
-  // **FORCE BYPASS AFTER 3 SECONDS**
+  // **FORCE BYPASS AFTER MULTIPLE TIMEOUTS**
   useEffect(() => {
-    if (timeoutCount >= 2) {
+    if (timeoutCount >= 3) {
       console.log('🚨 AUTH BYPASS ACTIVATED: Forcing through to prevent hang');
       // Don't redirect, just let the app render
       return;
@@ -111,8 +106,13 @@ function SimpleAuthManager({ children }: { children: React.ReactNode }) {
 
   // **SIMPLE ROUTING LOGIC**
   useEffect(() => {
+    // Wait for auth to initialize first
+    if (!isInitialized) {
+      return;
+    }
+    
     // Don't do anything if still loading (unless timeout)
-    if (loading && timeoutCount < 2) {
+    if (loading && timeoutCount < 3) {
       return;
     }
     
@@ -122,7 +122,7 @@ function SimpleAuthManager({ children }: { children: React.ReactNode }) {
       return;
     }
     
-    const isPublicRoute = ['/auth', '/reset-password', '/role-select'].includes(location.pathname);
+    const isPublicRoute = ['/auth', '/reset-password', '/role-select', '/auth/callback'].includes(location.pathname);
     
     // If no user and not on public route, go to auth
     if (!user && !isPublicRoute) {
@@ -137,16 +137,31 @@ function SimpleAuthManager({ children }: { children: React.ReactNode }) {
       navigate('/dashboard', { replace: true });
       return;
     }
-  }, [user, loading, location.pathname, navigate, timeoutCount, isLoggingOut]);
+  }, [user, loading, location.pathname, navigate, timeoutCount, isLoggingOut, isInitialized]);
 
-  // **MINIMAL LOADING SCREEN**
-  if (loading && timeoutCount < 2) {
+  // **IMPROVED LOADING SCREEN - Show initialization status**
+  if (!isInitialized || (loading && timeoutCount < 3)) {
+    const loadingMessage = !isInitialized 
+      ? "Initializing authentication..." 
+      : location.pathname.includes('/auth/callback')
+        ? "Processing OAuth authentication..."
+        : "Initializing Axion TMS...";
+        
+    const timeoutMessage = !isInitialized 
+      ? "Connecting to authentication service..."
+      : `Loading timeout in ${6 - timeoutCount}s`;
+    
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-white text-lg">Initializing Axion TMS...</p>
-          <p className="text-slate-400 text-sm mt-2">Loading timeout in {4 - timeoutCount}s</p>
+          <p className="text-white text-lg">{loadingMessage}</p>
+          <p className="text-slate-400 text-sm mt-2">{timeoutMessage}</p>
+          {location.pathname.includes('/auth/callback') && (
+            <p className="text-blue-400 text-xs mt-2">
+              🔄 Processing Google OAuth...
+            </p>
+          )}
         </div>
       </div>
     );
@@ -155,244 +170,157 @@ function SimpleAuthManager({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function AppContent() {
+function AppContentShell() {
   const { theme } = useTheme();
+  const isDev = import.meta.env?.DEV || false;
   
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'dark' : 'light'} w-full bg-aximo-background text-aximo-text`}>
       <OnboardingTooltipController>
-        <Routes>
-          {/* **PUBLIC ROUTES** */}
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/auth/confirm-email" element={<EmailConfirmationPage />} />
-          <Route path="/reset-password" element={<PasswordResetPage />} />
-          <Route path="/role-select" element={<RoleSelectPage />} />
-          
-          {/* **ONBOARDING ROUTE - Protected but doesn't require onboarding completion** */}
-          <Route path="/onboarding" element={<OnboardingPage />} />
-          
-          {/* **PROTECTED ROUTES - All require authentication** */}
-          <Route 
-            path="/" 
-            element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <Dashboard />
-                </MainLayout>
-              </ProtectedRoute>
-            } 
-          />
-          
-          <Route 
-            path="/dashboard" 
-            element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <Dashboard />
-                </MainLayout>
-              </ProtectedRoute>
-            } 
-          />
-
-          {/* **LAZY-LOADED PROTECTED ROUTES** */}
-          <Route 
-            path="/customers" 
-            element={
-              <ProtectedRoute>
-                <MainLayout title="Customers">
-                  <Customers />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route 
-            path="/jobs" 
-            element={
-              <ProtectedRoute>
-                <MainLayout title="Jobs">
-                  <Jobs />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route 
-            path="/jobs/create" 
-            element={
-              <ProtectedRoute>
-                <CreateJobPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route 
-            path="/jobs/assign/:jobId" 
-            element={
-              <ProtectedRoute>
-                <JobAssignmentPage />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* **ALL OTHER ROUTES** */}
-          <Route 
-            path="/analytics" 
-            element={
-              <ProtectedRoute>
-                <MainLayout title="Analytics">
-                  <Analytics />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route 
-            path="/test-supabase" 
-            element={
-              <ProtectedRoute>
-                <MainLayout title="Test Supabase">
-                  <Suspense fallback={<div>Loading...</div>}>
-                    <TestSupabase />
-                  </Suspense>
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route 
-            path="/users" 
-            element={
-              <ProtectedRoute>
-                <MainLayout title="Users">
-                  <Users />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route 
-            path="/carriers/*" 
-            element={
-              <ProtectedRoute>
-                <MainLayout title="Carriers">
-                  <Carriers />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route 
-            path="/fleet/*" 
-            element={
-              <ProtectedRoute>
-                <MainLayout title="Fleet Management">
-                  <Fleet />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route 
-            path="/drivers/*" 
-            element={
-              <ProtectedRoute>
-                <MainLayout title="Drivers">
-                  <Drivers />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route 
-            path="/invoices/*" 
-            element={
-              <ProtectedRoute>
-                <MainLayout title="Invoices">
-                  <Invoices />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route 
-            path="/finance/*" 
-            element={
-              <ProtectedRoute>
-                <MainLayout title="Finance">
-                  <Finance />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route 
-            path="/settings/*" 
-            element={
-              <ProtectedRoute>
-                <MainLayout title="Settings">
-                  <Settings />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route 
-            path="/carriers/dashboard/*" 
-            element={
-              <ProtectedRoute>
-                <MainLayout title="Carrier Dashboard">
-                  <CarrierDashboard />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route 
-            path="/drivers/mobile" 
-            element={
-              <ProtectedRoute>
-                <DriverMobilePortal />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route 
-            path="/customers/portal" 
-            element={
-              <ProtectedRoute>
-                <CustomerPortal />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* **FALLBACK** */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        
+        <Outlet />
         <Toaster />
         <OnboardingWelcome />
-        
         {/* Development Route Testing */}
-        {import.meta.env.DEV && <RouteTestingPanel />}
+        {isDev && <RouteTestingPanel />}
       </OnboardingTooltipController>
     </div>
   );
 }
 
+const RootLayout = () => {
+  return (
+    <SimpleAuthManager>
+      <OnboardingProvider>
+        <AppContentShell />
+      </OnboardingProvider>
+    </SimpleAuthManager>
+  );
+};
+
+// **🚀 MODERN REACT ROUTER V6 CONFIGURATION**
+const router = createBrowserRouter([
+  {
+    element: <RootLayout />,
+    errorElement: <ErrorBoundary />,
+    children: [
+      // **PUBLIC ROUTES**
+      { path: "/auth", element: <AuthPage /> },
+      { path: "/auth/callback", element: <AuthCallback /> },
+      { path: "/auth/confirm-email", element: <EmailConfirmationPage /> },
+      { path: "/reset-password", element: <PasswordResetPage /> },
+      { path: "/role-select", element: <RoleSelectPage /> },
+      
+      // **ONBOARDING ROUTE - Protected but doesn't require onboarding completion**
+      { path: "/onboarding", element: <OnboardingPage /> },
+      
+      // **PROTECTED ROUTES WITH MAIN LAYOUT**
+      {
+        element: <ProtectedRoute><MainLayout><Outlet /></MainLayout></ProtectedRoute>,
+        children: [
+          { path: "/", element: <Dashboard /> },
+          { path: "/dashboard", element: <Dashboard /> },
+          { path: "/customers", element: <Customers /> },
+          { path: "/jobs", element: <Jobs /> },
+          
+          // **🔥 PROFESSIONAL JOB ROUTES WITH ERROR BOUNDARIES & LOADERS**
+          {
+            path: "/jobs/details/:id",
+            element: <JobDetailsPage />,
+            loader: jobDetailsLoader,
+            errorElement: <JobErrorBoundary />
+          },
+          {
+            path: "/jobs/edit/:id",
+            element: <CreateJobPage />,
+            loader: jobEditLoader,
+            errorElement: <JobErrorBoundary />
+          },
+          { path: "/jobs/assign/:id", element: <JobAssignmentPage /> },
+          
+          { path: "/analytics", element: <Analytics /> },
+          { 
+            path: "/test-supabase", 
+            element: <Suspense fallback={<div>Loading...</div>}><TestSupabase /></Suspense> 
+          },
+          { path: "/users", element: <Users /> },
+          { path: "/carriers/*", element: <Carriers /> },
+          { path: "/fleet/*", element: <Fleet /> },
+          { path: "/drivers/*", element: <Drivers /> },
+          { path: "/invoices/*", element: <Invoices /> },
+          { path: "/finance/*", element: <Finance /> },
+          { path: "/settings/*", element: <Settings /> },
+          { path: "/carriers/dashboard/*", element: <CarrierDashboard /> },
+          { path: "/customers/portal", element: <CustomerPortal /> },
+          
+          // **LAZY LOADED PIPELINE ROUTES**
+          { 
+            path: "/pipeline/dashboard", 
+            async lazy() { 
+              const { default: Component } = await import('./pages/pipeline/PipelineDashboard'); 
+              return { Component }; 
+            }
+          },
+          { 
+            path: "/pipeline/board", 
+            async lazy() { 
+              const { default: Component } = await import('./pages/pipeline/PipelineBoard'); 
+              return { Component }; 
+            }
+          },
+          { 
+            path: "/pipeline/tasks", 
+            async lazy() { 
+              const { default: Component } = await import('./pages/pipeline/PipelineTasks'); 
+              return { Component }; 
+            }
+          },
+          { 
+            path: "/pipeline/reports", 
+            async lazy() { 
+              const { default: Component } = await import('./pages/pipeline/PipelineReports'); 
+              return { Component }; 
+            }
+          },
+          { 
+            path: "/pipeline/settings", 
+            async lazy() { 
+              const { default: Component } = await import('./pages/pipeline/PipelineSettings'); 
+              return { Component }; 
+            }
+          },
+          { 
+            path: "/pipeline/reminders", 
+            async lazy() { 
+              const { default: Component } = await import('./pages/pipeline/PipelineReminders'); 
+              return { Component }; 
+            }
+          },
+        ]
+      },
+      
+      // **STANDALONE PROTECTED ROUTES (without MainLayout)**
+      {
+        path: "/jobs/create", 
+        element: <ProtectedRoute><CreateJobPage /></ProtectedRoute>
+      },
+      {
+        path: "/drivers/mobile", 
+        element: <ProtectedRoute><DriverMobilePortal /></ProtectedRoute>
+      },
+      
+      // **FALLBACK**
+      { path: "*", element: <NotFound /> }
+    ]
+  }
+]);
+
 // **🚀 MAIN APP - CLEAN & PRODUCTION READY**
 export default function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="aximo-theme">
-      <ErrorBoundary>
-        <AuthProvider>
-          <SimpleAuthManager>
-            <OnboardingProvider>
-              <AppContent />
-            </OnboardingProvider>
-          </SimpleAuthManager>
-        </AuthProvider>
-      </ErrorBoundary>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </ThemeProvider>
   );
 }

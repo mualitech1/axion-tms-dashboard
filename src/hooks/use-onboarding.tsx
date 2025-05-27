@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useAuth } from '@/hooks/use-auth';
+import { useAuthStore } from '@/store/authStore';
 import { AppRole } from '@/types/permissions';
 
 // Types
@@ -182,7 +183,7 @@ export const onboardingHints: RoleBasedHints = {
 // Provider component
 export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
   const { user, isInitialized } = useAuth();
-  const [activeRole] = useState<AppRole>(AppRole.Admin); // Temporary default role until we implement role system
+  const { activeRole } = useAuthStore(); // Get actual role from auth store
   const [seenHints, setSeenHints] = useState<Record<string, boolean>>({});
   const [activeHint, setActiveHint] = useState<OnboardingHint | null>(null);
   const [isFirstVisit, setIsFirstVisit] = useState(false);
@@ -282,12 +283,13 @@ export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
     
     // Get hints for the current role
     const roleHints = onboardingHints[activeRole] || [];
-    // Filter out hints that have been seen
-    const unseenHints = roleHints.filter(hint => !hasSeenHint(hint.id));
     
-    if (unseenHints.length > 0) {
-      // Start with the first unseen hint
-      setActiveHint(unseenHints[0]);
+    if (roleHints.length > 0) {
+      // Always start with the first hint - allow tour replay
+      setActiveHint(roleHints[0]);
+    } else {
+      // Fallback: show a message if no hints are configured for this role
+      console.warn(`No onboarding hints configured for role: ${activeRole}`);
     }
   };
 

@@ -15,6 +15,7 @@ import { toast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Label } from '@/components/ui/label';
 import { AxionLogo } from '@/components/axion-logo/AxionLogo';
+import { GoogleAuthButton } from '@/components/auth/GoogleAuthButton';
 
 // Schema definitions
 const loginSchema = z.object({
@@ -388,6 +389,19 @@ export default function AuthPage() {
                           </>
                         )}
                         </Button>
+
+                        {/* Divider */}
+                        <div className="relative">
+                          <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t border-slate-600" />
+                          </div>
+                          <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-slate-800 px-2 text-slate-400">Or continue with</span>
+                          </div>
+                        </div>
+
+                        {/* Google OAuth Button */}
+                        <GoogleAuthButton mode="sign_in" />
                       
                         <Button 
                           onClick={() => setShowResetForm(true)}
@@ -490,6 +504,19 @@ export default function AuthPage() {
                           </>
                         )}
                         </Button>
+
+                        {/* Divider */}
+                        <div className="relative">
+                          <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t border-slate-600" />
+                          </div>
+                          <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-slate-800 px-2 text-slate-400">Or continue with</span>
+                          </div>
+                        </div>
+
+                        {/* Google OAuth Button */}
+                        <GoogleAuthButton mode="sign_up" />
                     </div>
                   </TabsContent>
                 </Tabs>

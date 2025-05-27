@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -57,6 +57,8 @@ interface JobFormData {
 
 export default function CreateJobPage() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -95,7 +97,10 @@ export default function CreateJobPage() {
 
   useEffect(() => {
     loadCustomers();
-  }, []);
+    if (isEditMode && id) {
+      loadJobForEdit(id);
+    }
+  }, [isEditMode, id]);
 
   const loadCustomers = async () => {
     try {
@@ -113,6 +118,68 @@ export default function CreateJobPage() {
         description: "Failed to load customers",
         variant: "destructive"
       });
+    }
+  };
+
+  const loadJobForEdit = async (jobId: string) => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('jobs')
+        .select('*')
+        .eq('id', jobId)
+        .single();
+
+      if (error) throw error;
+
+      // Populate form with existing job data
+      if (data) {
+        setFormData({
+          consignment_details: data.consignment_details || '',
+          customer_id: data.customer_id || '',
+          collection_address: (data.collection_address as any) || {
+            company_name: '',
+            contact_name: '',
+            street: '',
+            city: '',
+            postcode: '',
+            country: 'United Kingdom'
+          },
+          delivery_address: (data.delivery_address as any) || {
+            company_name: '',
+            contact_name: '',
+            street: '',
+            city: '',
+            postcode: '',
+            country: 'United Kingdom'
+          },
+          collection_datetime_planned_from: data.collection_datetime_planned_from ? 
+            new Date(data.collection_datetime_planned_from).toISOString().slice(0, 16) : '',
+          collection_datetime_planned_to: data.collection_datetime_planned_to ? 
+            new Date(data.collection_datetime_planned_to).toISOString().slice(0, 16) : '',
+          delivery_datetime_planned_from: data.delivery_datetime_planned_from ? 
+            new Date(data.delivery_datetime_planned_from).toISOString().slice(0, 16) : '',
+          delivery_datetime_planned_to: data.delivery_datetime_planned_to ? 
+            new Date(data.delivery_datetime_planned_to).toISOString().slice(0, 16) : '',
+          driver_instructions: data.driver_instructions || '',
+          service_type: 'standard', // Default since it doesn't exist in current schema
+          vehicle_trailer_requirements: data.vehicle_trailer_requirements || 'standard',
+          agreed_rate_gbp: data.agreed_rate_gbp?.toString() || '',
+          weight_kg: data.weight_kg?.toString() || '',
+          pallets: data.pallets?.toString() || '',
+          goods_description: data.goods_description || '',
+          currency: data.currency || 'GBP'
+        });
+      }
+    } catch (error) {
+      console.error('Error loading job for edit:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load job data",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -195,11 +262,11 @@ export default function CreateJobPage() {
       console.log('📋 Raw Form Data:', formData);
       console.log('🎯 Customer ID being sent:', formData.customer_id);
       console.log('🔍 Customer ID type:', typeof formData.customer_id);
+      console.log('📝 Mode:', isEditMode ? 'EDIT' : 'CREATE');
       
       // Transform form data to match our jobs table schema
       const jobData = {
         consignment_details: formData.consignment_details,
-        ikb_order_no: generateJobReference(),
         customer_id: formData.customer_id,
         status: 'pending',
         
@@ -250,35 +317,58 @@ export default function CreateJobPage() {
         cmr_document_urls: [],
         run_sheet_urls: [],
         internal_notes: [],
-        created_by: null // Will be set by RLS/auth
+        updated_at: new Date().toISOString()
       };
+
+      // Add ikb_order_no only for new jobs
+      if (!isEditMode) {
+        (jobData as any).ikb_order_no = generateJobReference();
+        (jobData as any).created_by = null; // Will be set by RLS/auth
+      }
 
       console.log('🔧 Transformed job data for Supabase:', jobData);
 
-      const { data, error } = await supabase
-        .from('jobs')
-        .insert([jobData])
-        .select()
-        .single();
+      let data, error;
+      
+      if (isEditMode) {
+        // Update existing job
+        const result = await supabase
+          .from('jobs')
+          .update(jobData)
+          .eq('id', id)
+          .select()
+          .single();
+        data = result.data;
+        error = result.error;
+      } else {
+        // Create new job
+        const result = await supabase
+          .from('jobs')
+          .insert([jobData])
+          .select()
+          .single();
+        data = result.data;
+        error = result.error;
+      }
 
       if (error) {
         console.error('🚨 SUPABASE ERROR:', error);
         throw error;
       }
 
-      console.log('✅ SUCCESS! Job created:', data);
+      console.log('✅ SUCCESS! Job saved:', data);
 
       toast({
-        title: "Success! 🔥",
-        description: `Job ${jobData.ikb_order_no} created successfully! BOOM! 🚀`,
+        title: `Success! 🔥`,
+        description: `Job ${isEditMode ? 'updated' : 'created'} successfully! BOOM! 🚀`,
       });
 
       navigate(`/jobs`);
     } catch (error) {
-      console.error('❌ Error creating job:', error);
+      console.error('❌ Error saving job:', error);
       toast({
         title: "Error",
-        description: `Failed to create job: ${error.message}`,
+        description: `Failed to ${isEditMode ? 'update' : 'create'} job: ${error.message}`,
         variant: "destructive"
       });
     } finally {
@@ -306,9 +396,11 @@ export default function CreateJobPage() {
             </Button>
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-aximo-primary to-blue-500 bg-clip-text text-transparent">
-                Create New Job
+                {isEditMode ? 'Edit Job' : 'Create New Job'}
               </h1>
-              <p className="text-aximo-text-secondary mt-1">Add a new transportation job to the system</p>
+              <p className="text-aximo-text-secondary mt-1">
+                {isEditMode ? 'Update transportation job details' : 'Add a new transportation job to the system'}
+              </p>
             </div>
           </div>
         </motion.div>
@@ -734,12 +826,12 @@ export default function CreateJobPage() {
               {saving ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Creating...
+                  {isEditMode ? 'Updating...' : 'Creating...'}
                 </>
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  Create Job
+                  {isEditMode ? 'Update Job' : 'Create Job'}
                 </>
               )}
             </Button>

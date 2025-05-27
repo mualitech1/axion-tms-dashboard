@@ -17,7 +17,7 @@ export const useAuthStore = create<AuthState & {
 }>((set, get) => ({
   // State
   user: null,
-  activeRole: AppRole.Admin, // Default to admin for development
+  activeRole: AppRole.Operations, // Default to operations for manager testing
   permissions: [],
   loading: false,
   isInitialized: false,
@@ -70,10 +70,10 @@ export const useAuthStore = create<AuthState & {
         return;
       }
       
-      // User is logged in - set default admin role for development
+      // User is logged in - set default operations role for manager testing
       set({ 
         user: session.user,
-        activeRole: AppRole.Admin,
+        activeRole: AppRole.Operations, // Changed from Admin to Operations for manager experience
         permissions: [], // Add mock permissions if needed
         loading: false,
         isInitialized: true
