@@ -318,9 +318,7 @@ const router = createBrowserRouter([
 export default function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="aximo-theme">
-      <AuthProvider>
-        <RouterProvider router={router} />
-      </AuthProvider>
+      <RouterProvider router={router} />
     </ThemeProvider>
   );
 }

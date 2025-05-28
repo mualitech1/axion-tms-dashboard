@@ -343,10 +343,10 @@ export default function CreateJobPage() {
       } else {
         // Create new job
         const result = await supabase
-          .from('jobs')
-          .insert([jobData])
-          .select()
-          .single();
+        .from('jobs')
+        .insert([jobData])
+        .select()
+        .single();
         data = result.data;
         error = result.error;
       }

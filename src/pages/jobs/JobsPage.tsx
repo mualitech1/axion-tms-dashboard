@@ -257,7 +257,7 @@ export default function JobsPage() {
                   <div>
                   <p className="text-gray-400 text-sm">Total Jobs</p>
                   <p className="text-2xl font-bold text-white">{jobs.length}</p>
-                </div>
+                  </div>
                 <FileText className="h-8 w-8 text-blue-400" />
                 </div>
               </CardContent>

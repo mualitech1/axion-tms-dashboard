@@ -1,6 +1,4 @@
-
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import './index.css'
 import { AuthProvider } from './hooks/use-auth.tsx'
@@ -10,9 +8,7 @@ import { queryClient } from './config/query-client'
 createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <App />
     </AuthProvider>
   </QueryClientProvider>
 );
