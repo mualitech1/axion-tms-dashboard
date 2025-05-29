@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,10 @@ import { InvoiceTabs } from "./InvoiceTabs";
 import { InvoiceDetailsForm } from "./InvoiceDetailsForm";
 import { InvoiceLineItems } from "./InvoiceLineItems";
 import { useInvoiceContext } from "./InvoiceContext";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Zap } from "lucide-react";
 
 interface InvoiceDialogContentProps {
   onCancel: () => void;
@@ -74,6 +77,59 @@ export function InvoiceDialogContent({ onCancel }: InvoiceDialogContentProps) {
               {formValues.isEditMode ? "Update Invoice" : "Create Invoice"}
             </Button>
           </DialogFooter>
+        </TabsContent>
+
+        <TabsContent value="energy" className="space-y-6">
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Zap className="h-5 w-5 text-purple-600" />
+              <h3 className="font-semibold text-purple-800">Quantum Energy Distribution</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="energy-core">Primary Energy Core</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select core type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="quantum-fusion">Quantum Fusion Core</SelectItem>
+                    <SelectItem value="antimatter">Antimatter Reactor</SelectItem>
+                    <SelectItem value="zero-point">Zero-Point Energy</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="energy-output">Energy Output (TW)</Label>
+                <Input 
+                  id="energy-output"
+                  type="number"
+                  placeholder="Enter terawatt output"
+                />
+              </div>
+              <div>
+                <Label htmlFor="efficiency">Quantum Efficiency (%)</Label>
+                <Input 
+                  id="efficiency"
+                  type="number"
+                  placeholder="Enter efficiency percentage"
+                />
+              </div>
+              <div>
+                <Label htmlFor="resonance">Dimensional Resonance</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select resonance frequency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="alpha">Alpha Wave (7-13 Hz)</SelectItem>
+                    <SelectItem value="beta">Beta Wave (14-30 Hz)</SelectItem>
+                    <SelectItem value="gamma">Gamma Wave (30+ Hz)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

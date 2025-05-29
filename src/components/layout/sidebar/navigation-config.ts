@@ -17,7 +17,11 @@ import {
   Smartphone,
   Settings,
   Wrench,
-  User
+  User,
+  CreditCard,
+  Receipt,
+  TrendingUp,
+  Wallet
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { AppRole } from '@/types/permissions';
@@ -62,10 +66,32 @@ export const navigationConfig: NavigationItem[] = [
     shortcut: 'Alt+4'
   },
   {
-    title: 'Finance',
+    title: 'Quantum Finance',
     href: '/finance',
     icon: CircleDollarSign,
-    shortcut: 'Alt+5'
+    shortcut: 'Alt+5',
+    children: [
+      {
+        title: 'Financial Matrix',
+        href: '/finance',
+        icon: Wallet
+      },
+      {
+        title: 'Quantum Invoices',
+        href: '/finance/invoices',
+        icon: Receipt
+      },
+      {
+        title: 'Payment Portal',
+        href: '/finance/payments',
+        icon: CreditCard
+      },
+      {
+        title: 'Financial Analytics',
+        href: '/finance/analytics',
+        icon: TrendingUp
+      }
+    ]
   },
   {
     title: 'Users',
@@ -101,12 +127,6 @@ export const navigationConfig: NavigationItem[] = [
     title: 'Customer Portal',
     href: '/customers/portal',
     icon: Building2
-  },
-  {
-    title: 'Invoices',
-    href: '/invoices',
-    icon: FileText,
-    shortcut: 'Alt+0'
   },
   {
     title: 'Supply Chain',

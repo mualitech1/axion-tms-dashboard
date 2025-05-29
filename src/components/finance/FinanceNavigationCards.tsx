@@ -1,69 +1,69 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Network, Atom, Zap, Sparkles } from "lucide-react";
+import { Receipt, CreditCard, BarChart3, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function FinanceNavigationCards() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-      <Link to="/invoices">
-        <Card className="hover:border-aximo-primary transition-colors cursor-pointer bg-aximo-darker border-aximo-border">
+      <Link to="/finance/invoices">
+        <Card className="hover:border-aximo-primary transition-colors cursor-pointer bg-aximo-darker border-aximo-border hover:shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-md font-medium flex items-center text-aximo-text">
-              <Network className="h-5 w-5 mr-2 text-aximo-primary" />
-              Quantum Transactions
+              <Receipt className="h-5 w-5 mr-2 text-aximo-primary" />
+              Quantum Invoices
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-aximo-text-secondary">
-              Manage and generate quantum energy exchanges
+              Create and manage quantum energy exchange documents
             </p>
           </CardContent>
         </Card>
       </Link>
 
-      <Link to="/finance/carrier-self-invoices">
-        <Card className="hover:border-aximo-primary transition-colors cursor-pointer bg-aximo-darker border-aximo-border">
+      <Link to="/finance/payments">
+        <Card className="hover:border-aximo-primary transition-colors cursor-pointer bg-aximo-darker border-aximo-border hover:shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-md font-medium flex items-center text-aximo-text">
-              <Atom className="h-5 w-5 mr-2 text-aximo-primary" />
-              Executor Self-Statements
+              <CreditCard className="h-5 w-5 mr-2 text-green-500" />
+              Payment Portal
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-aximo-text-secondary">
-              Manage executor quantum entanglement records
+              Track payments and financial entanglements
             </p>
           </CardContent>
         </Card>
       </Link>
 
-      <Link to="/finance/disputes">
-        <Card className="hover:border-aximo-primary transition-colors cursor-pointer bg-aximo-darker border-aximo-border">
+      <Link to="/finance/analytics">
+        <Card className="hover:border-aximo-primary transition-colors cursor-pointer bg-aximo-darker border-aximo-border hover:shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-md font-medium flex items-center text-aximo-text">
-              <Sparkles className="h-5 w-5 mr-2 text-aximo-primary" />
-              Energy Discrepancies
+              <BarChart3 className="h-5 w-5 mr-2 text-blue-500" />
+              Financial Analytics
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-aximo-text-secondary">
-              Manage and resolve quantum flux anomalies
+              Advanced insights and quantum financial patterns
             </p>
           </CardContent>
         </Card>
       </Link>
 
-      <Link to="/finance/payment-runs">
-        <Card className="hover:border-aximo-primary transition-colors cursor-pointer bg-aximo-darker border-aximo-border">
+      <Link to="/finance/invoices/new">
+        <Card className="hover:border-aximo-primary transition-colors cursor-pointer bg-aximo-darker border-aximo-border hover:shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-md font-medium flex items-center text-aximo-text">
-              <Zap className="h-5 w-5 mr-2 text-aximo-primary" />
-              Entanglement Batches
+              <Zap className="h-5 w-5 mr-2 text-yellow-500" />
+              Create Invoice
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-aximo-text-secondary">
-              Prepare and track quantum batch entanglements
+              Generate new quantum energy exchange documents
             </p>
           </CardContent>
         </Card>

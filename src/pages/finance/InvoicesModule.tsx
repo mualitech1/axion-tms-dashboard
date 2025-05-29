@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Card } from "@/components/ui/card";
 import { InvoiceSummaryCards } from "@/components/invoices/InvoiceSummaryCards";
@@ -15,15 +15,9 @@ import { useInvoiceList } from "@/hooks/use-invoice-list";
 import { useInvoiceActions } from "@/hooks/use-invoice-actions";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Zap, Network } from "lucide-react";
+import { Network, Plus, Zap, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
-
-// Import the CreateInvoicePage
-import CreateInvoicePage from "./invoices/CreateInvoicePage";
-import InvoiceDetails from "./invoices/InvoiceDetails";
-import { JobToInvoiceConverter } from "@/components/invoices/JobToInvoiceConverter";
-import CarrierSelfInvoicingPage from "./invoices/CarrierSelfInvoicingPage";
 
 // Data adapter to transform Supabase invoice data to InvoiceData format
 function transformSupabaseToInvoiceData(supabaseInvoices: any): InvoiceData[] {
@@ -48,21 +42,15 @@ function transformSupabaseToInvoiceData(supabaseInvoices: any): InvoiceData[] {
   }));
 }
 
-// Main component that handles routing
-export default function Invoices() {
-  return (
-    <Routes>
-      <Route path="/" element={<InvoicesListing />} />
-      <Route path="/new" element={<CreateInvoicePage />} />
-      <Route path="/:invoiceId" element={<InvoiceDetails />} />
-      <Route path="/job-to-invoice" element={<JobToInvoiceConverter />} />
-      <Route path="/carrier-self-invoicing" element={<CarrierSelfInvoicingPage />} />
-    </Routes>
-  );
-}
-
-// The original invoices listing component
-function InvoicesListing() {
+/**
+ * 🧾 QUANTUM INVOICES MODULE - ENHANCED INVOICE MANAGEMENT
+ * 
+ * Professional invoice creation, management, and tracking
+ * Features auto-calculations, PDF export, and payment status tracking
+ * 
+ * SPACETOON PRODUCTION QUALITY! 🔥⚡
+ */
+export default function InvoicesModule() {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const navigate = useNavigate();
 
@@ -106,7 +94,7 @@ function InvoicesListing() {
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <Network className="h-12 w-12 mx-auto mb-4 text-aximo-primary animate-pulse" />
-              <h3 className="text-lg font-medium text-aximo-text">Synchronizing Quantum Financial Matrix...</h3>
+              <h3 className="text-lg font-medium text-aximo-text">Synchronizing Quantum Invoice Matrix...</h3>
               <p className="text-aximo-text-secondary">Entangling transaction patterns</p>
             </div>
           </div>
@@ -125,12 +113,13 @@ function InvoicesListing() {
 
   const breadcrumbItems = [
     { label: "Quantum Hub", path: "/" },
-    { label: "Financial Matrix", path: "/invoices" }
+    { label: "Financial Matrix", path: "/finance" },
+    { label: "Quantum Invoices", path: "/finance/invoices" }
   ];
 
-  // Modified handler to use router navigation instead of dialog
+  // Enhanced handler for creating invoices
   const handleCreateInvoice = () => {
-    navigate('/invoices/new');
+    navigate('/finance/invoices/new');
   };
 
   return (
@@ -142,10 +131,19 @@ function InvoicesListing() {
         className="bg-gradient-to-r from-aximo-primary/20 to-aximo-light/10 p-6 rounded-lg border border-aximo-border"
       >
         <Breadcrumb items={breadcrumbItems} />
-        <DashboardHeader
-          title="Quantum Financial Matrix"
-          subtitle="Manage energy transactions and value exchange across the quantum network"
-        />
+        <div className="flex items-center justify-between">
+          <DashboardHeader
+            title="Quantum Invoice Matrix"
+            subtitle="Professional invoice creation with auto-calculations and quantum-level precision"
+          />
+          <Button 
+            onClick={handleCreateInvoice}
+            className="bg-gradient-to-r from-aximo-primary to-purple-600 hover:from-aximo-primary/90 hover:to-purple-700 shadow-lg"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Create Quantum Invoice
+          </Button>
+        </div>
       </motion.div>
 
       <motion.div
@@ -170,15 +168,15 @@ function InvoicesListing() {
               className="gap-2 border-aximo-border bg-aximo-darker hover:bg-aximo-primary/10 transition-all shadow-sm"
               onClick={() => setShowAnalytics(true)}
             >
-              <Network className="h-4 w-4" />
-              <span>Quantum Analytics</span>
+              <BarChart3 className="h-4 w-4" />
+              <span>Financial Analytics</span>
             </Button>
           </SheetTrigger>
         </div>
         
         <SheetContent className="w-[90%] sm:max-w-[800px] overflow-y-auto custom-scrollbar bg-aximo-darker border-l border-aximo-border">
           <SheetHeader className="mb-6">
-            <SheetTitle className="text-2xl text-aximo-text">Financial Entanglement Patterns</SheetTitle>
+            <SheetTitle className="text-2xl text-aximo-text">Quantum Financial Entanglement Patterns</SheetTitle>
           </SheetHeader>
           <InvoiceAnalytics invoices={invoicesList} />
         </SheetContent>
@@ -240,4 +238,4 @@ function InvoicesListing() {
       />
     </div>
   );
-}
+} 

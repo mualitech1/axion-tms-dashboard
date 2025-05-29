@@ -1,63 +1,55 @@
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { FinanceMetrics } from "@/components/finance/FinanceMetrics";
-import { FinanceNavigationCards } from "@/components/finance/FinanceNavigationCards";
-import { FinanceTabContent } from "@/components/finance/FinanceTabContent";
-import { BillingSection } from "@/components/finance/BillingSection";
-import { motion } from "framer-motion";
-import { Breadcrumb } from "@/components/navigation/Breadcrumb";
+import { Routes, Route } from 'react-router-dom';
 
-export default function Finance() {
-  const breadcrumbItems = [
-    { label: "Quantum Hub", path: "/" },
-    { label: "Quantum Treasury", path: "/finance" }
-  ];
+// Finance Module Components
+import FinanceDashboard from './finance/FinanceDashboard';
+import InvoicesModule from './finance/InvoicesModule';
+import PaymentsModule from './finance/PaymentsModule';
+import FinanceAnalytics from './finance/FinanceAnalytics';
 
+// Legacy invoice components for backward compatibility
+import CreateInvoicePage from './invoices/CreateInvoicePage';
+import InvoiceDetails from './invoices/InvoiceDetails';
+import { JobToInvoiceConverter } from '@/components/invoices/JobToInvoiceConverter';
+import CarrierSelfInvoicingPage from './invoices/CarrierSelfInvoicingPage';
+
+/**
+ * 🌀 QUANTUM FINANCE MODULE - UNIFIED FINANCIAL POWERHOUSE
+ * 
+ * The ultimate fusion of Finance + Invoices + Payments + Analytics
+ * Built with SPACETOON PRODUCTION QUALITY! 🔥
+ * 
+ * Routes:
+ * /finance                    - Financial Matrix Dashboard
+ * /finance/invoices           - Quantum Invoices List
+ * /finance/invoices/new       - Create New Invoice
+ * /finance/invoices/:id       - Invoice Details
+ * /finance/payments           - Payment Portal
+ * /finance/analytics          - Financial Analytics
+ */
+export default function QuantumFinanceModule() {
   return (
-    <div className="space-y-6 animate-fade-in">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="bg-gradient-to-r from-aximo-primary/20 to-aximo-light/10 p-6 rounded-lg border border-aximo-border"
-      >
-        <Breadcrumb items={breadcrumbItems} />
-        <DashboardHeader
-          title="Quantum Treasury Matrix"
-          subtitle="Monitor and analyze energy flow and quantum value exchange patterns"
-        />
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-      >
-        <FinanceMetrics />
-      </motion.div>
+    <Routes>
+      {/* Main Finance Dashboard - The Quantum Treasury */}
+      <Route path="/" element={<FinanceDashboard />} />
       
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.2 }}
-      >
-        <FinanceNavigationCards />
-      </motion.div>
+      {/* Invoices Module */}
+      <Route path="/invoices" element={<InvoicesModule />} />
+      <Route path="/invoices/new" element={<CreateInvoicePage />} />
+      <Route path="/invoices/:invoiceId" element={<InvoiceDetails />} />
+      <Route path="/invoices/job-to-invoice" element={<JobToInvoiceConverter />} />
+      <Route path="/invoices/carrier-self-invoicing" element={<CarrierSelfInvoicingPage />} />
       
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.3 }}
-      >
-        <BillingSection />
-      </motion.div>
+      {/* Payments Module */}
+      <Route path="/payments" element={<PaymentsModule />} />
       
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.4 }}
-      >
-        <FinanceTabContent />
-      </motion.div>
-    </div>
+      {/* Financial Analytics */}
+      <Route path="/analytics" element={<FinanceAnalytics />} />
+      
+      {/* Legacy Routes - Redirect old /invoices paths */}
+      <Route path="/legacy-invoices/*" element={<InvoicesModule />} />
+    </Routes>
   );
 }
+
+// Export the original Finance page as FinanceDashboard for the main route
+export { default as FinanceDashboard } from './finance/FinanceDashboard';

@@ -11,7 +11,7 @@ export function InvoiceDetailsContent({ invoice }: InvoiceDetailsContentProps) {
       <div className="grid grid-cols-2 gap-8">
         <div>
           <h3 className="font-medium text-gray-900">Issue Date</h3>
-          <p className="mt-1 text-gray-600">{new Date(invoice.issue_date).toLocaleDateString()}</p>
+          <p className="mt-1 text-gray-600">{new Date(invoice.invoice_date).toLocaleDateString()}</p>
         </div>
         <div>
           <h3 className="font-medium text-gray-900">Due Date</h3>
@@ -31,12 +31,12 @@ export function InvoiceDetailsContent({ invoice }: InvoiceDetailsContentProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {invoice.invoice_items?.map((item: any) => (
+            {invoice.invoice_line_items?.map((item: any) => (
               <TableRow key={item.id}>
                 <TableCell>{item.description}</TableCell>
                 <TableCell className="text-right">{item.quantity}</TableCell>
-                <TableCell className="text-right">{formatCurrency(item.unit_price)}</TableCell>
-                <TableCell className="text-right">{formatCurrency(item.amount)}</TableCell>
+                <TableCell className="text-right">{formatCurrency(item.unit_price_gbp)}</TableCell>
+                <TableCell className="text-right">{formatCurrency(item.line_total_gbp)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -45,15 +45,15 @@ export function InvoiceDetailsContent({ invoice }: InvoiceDetailsContentProps) {
         <div className="mt-6 border-t pt-6">
           <div className="flex justify-between text-sm">
             <span className="font-medium text-gray-600">Subtotal</span>
-            <span className="font-medium">{formatCurrency(invoice.total_amount - invoice.tax_amount)}</span>
+            <span className="font-medium">{formatCurrency(invoice.subtotal_gbp)}</span>
           </div>
           <div className="flex justify-between text-sm mt-2">
-            <span className="font-medium text-gray-600">Tax</span>
-            <span className="font-medium">{formatCurrency(invoice.tax_amount)}</span>
+            <span className="font-medium text-gray-600">VAT (20%)</span>
+            <span className="font-medium">{formatCurrency(invoice.vat_amount_gbp)}</span>
           </div>
           <div className="flex justify-between text-lg mt-4 font-semibold">
             <span>Total</span>
-            <span>{formatCurrency(invoice.total_amount)}</span>
+            <span>{formatCurrency(invoice.total_amount_gbp)}</span>
           </div>
         </div>
       </div>
